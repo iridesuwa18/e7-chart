@@ -47,8 +47,24 @@
       "locked": true,
       "_x": 5,
       "_y": 100
+    },
+    {
+      "id": 1779354031169,
+      "name": "Frieren",
+      "rarity": "5ml",
+      "role": "Mage",
+      "element": "Earth",
+      "vType": "TNK",
+      "vScore": 9.5,
+      "hType": "SUR",
+      "hScore": 10,
+      "notes": "Her shield makes her a \"tank\"",
+      "iconData": "https://raw.githubusercontent.com/iridesuwa18/e7-chart/main/assets/heroes/frieren.webp",
+      "locked": true,
+      "_x": 0,
+      "_y": 97.5
     }
   ],
   "draftData": null,
-  "savedAt": "2026-05-21T08:54:41.930Z"
+  "savedAt": "2026-05-21T09:00:50.028Z"
 }
