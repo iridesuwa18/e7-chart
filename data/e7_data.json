@@ -15,8 +15,24 @@
       "locked": true,
       "_x": 0,
       "_y": 87.5
+    },
+    {
+      "id": 1779353267841,
+      "name": "Genesis Ras",
+      "rarity": "5ml",
+      "role": "Knight",
+      "element": "Light",
+      "vType": "TNK",
+      "vScore": 6.5,
+      "hType": "SUR",
+      "hScore": 10,
+      "notes": "",
+      "iconData": "https://raw.githubusercontent.com/iridesuwa18/e7-chart/main/assets/heroes/genesis-ras.webp",
+      "locked": true,
+      "_x": 0,
+      "_y": 82.5
     }
   ],
   "draftData": null,
-  "savedAt": "2026-05-21T08:38:27.598Z"
+  "savedAt": "2026-05-21T08:48:44.903Z"
 }
