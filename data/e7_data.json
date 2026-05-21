@@ -7,14 +7,14 @@
       "role": "Soul Weaver",
       "element": "Light",
       "vType": "TNK",
-      "vScore": 7.5,
+      "vScore": 9,
       "hType": "SUR",
       "hScore": 10,
       "notes": "",
       "iconData": "https://raw.githubusercontent.com/iridesuwa18/e7-chart/main/assets/heroes/ruele-of-light.webp",
       "locked": true,
       "_x": 0,
-      "_y": 87.5
+      "_y": 95
     },
     {
       "id": 1779353267841,
@@ -31,8 +31,24 @@
       "locked": true,
       "_x": 0,
       "_y": 82.5
+    },
+    {
+      "id": 1779353620344,
+      "name": "Estelle",
+      "rarity": "5r",
+      "role": "Knight",
+      "element": "Earth",
+      "vType": "TNK",
+      "vScore": 10,
+      "hType": "SUR",
+      "hScore": 9,
+      "notes": "",
+      "iconData": "https://raw.githubusercontent.com/iridesuwa18/e7-chart/main/assets/heroes/estelle.webp",
+      "locked": true,
+      "_x": 5,
+      "_y": 100
     }
   ],
   "draftData": null,
-  "savedAt": "2026-05-21T08:48:44.903Z"
+  "savedAt": "2026-05-21T08:54:41.930Z"
 }
