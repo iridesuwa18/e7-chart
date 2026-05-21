@@ -12,11 +12,11 @@
       "hScore": 10,
       "notes": "",
       "iconData": "https://raw.githubusercontent.com/iridesuwa18/e7-chart/main/assets/heroes/ruele-of-light.webp",
-      "locked": false,
+      "locked": true,
       "_x": 0,
       "_y": 87.5
     }
   ],
   "draftData": null,
-  "savedAt": "2026-05-21T08:37:48.000Z"
+  "savedAt": "2026-05-21T08:38:27.598Z"
 }
