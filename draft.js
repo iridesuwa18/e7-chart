@@ -76,8 +76,8 @@ function migrateDraftData(raw) {
   try { d = typeof raw === "string" ? JSON.parse(raw) : raw; }
   catch { return freshDraftData(); }
   if (!d || typeof d !== "object") return freshDraftData();
-  const ft = t => ({ id:t.id??uid(), name:t.name??"", icon:t.icon??"", color:t.color??"#888888", createdAt:t.createdAt??Date.now() });
-  const fs = s => ({ id:s.id??uid(), name:s.name??"", icon:s.icon??"", linkedBuffs:s.linkedBuffs??[], linkedDebuffs:s.linkedDebuffs??[], linkedRoles:s.linkedRoles??[], synergizedRoles:s.synergizedRoles??[], teamSupportRoles:s.teamSupportRoles??[], createdAt:s.createdAt??Date.now() });
+  const ft = t => ({ id:t.id??uid(), name:t.name??"", icon:t.icon??"", color:t.color??"#888888", createdAt:t.createdAt??Date.now(), ...(t.parentId?{parentId:t.parentId}:{}) });
+  const fs = s => ({ id:s.id??uid(), name:s.name??"", icon:s.icon??"", linkedBuffs:s.linkedBuffs??[], linkedDebuffs:s.linkedDebuffs??[], linkedRoles:s.linkedRoles??[], synergizedRoles:s.synergizedRoles??[], teamSupportRoles:s.teamSupportRoles??[], createdAt:s.createdAt??Date.now(), ...(s.parentId?{parentId:s.parentId}:{}) });
   const fr = r => ({ id:r.id??uid(), name:r.name??"", color:r.color??"#888888", createdAt:r.createdAt??Date.now() });
   const fu = u => ({ id:u.id??uid(), name:u.name??"", color:u.color??"#888888", matchAll:u.matchAll??false, linkedBuffs:u.linkedBuffs??[], linkedDebuffs:u.linkedDebuffs??[], linkedStrengths:u.linkedStrengths??[], linkedWeaknesses:u.linkedWeaknesses??[], linkedElements:u.linkedElements??[], createdAt:u.createdAt??Date.now() });
   return {
@@ -123,8 +123,8 @@ function saveDraftData(d) {
 }
 
 /* ── Blank constructors ── */
-const blankTag       = () => ({ id:uid(), name:"", icon:"", color:"#888888", createdAt:Date.now() });
-const blankSW        = () => ({ id:uid(), name:"", icon:"", linkedBuffs:[], linkedDebuffs:[], linkedRoles:[], synergizedRoles:[], teamSupportRoles:[], createdAt:Date.now() });
+const blankTag       = (parentId=null) => ({ id:uid(), name:"", icon:"", color:"#888888", createdAt:Date.now(), ...(parentId?{parentId}:{}) });
+const blankSW        = (parentId=null) => ({ id:uid(), name:"", icon:"", linkedBuffs:[], linkedDebuffs:[], linkedRoles:[], synergizedRoles:[], teamSupportRoles:[], createdAt:Date.now(), ...(parentId?{parentId}:{}) });
 const blankRole      = () => ({ id:uid(), name:"", color:"#888888", createdAt:Date.now() });
 const blankUniqueRole= () => ({ id:uid(), name:"", color:"#888888", matchAll:false, linkedBuffs:[], linkedDebuffs:[], linkedStrengths:[], linkedWeaknesses:[], linkedElements:[], createdAt:Date.now() });
 
@@ -550,6 +550,185 @@ const LeafIcon = ({size=11, color="#4cba60"}) => (
   </svg>
 );
 
+/* ══════════════════════════════════════════
+   ICON MAKER MODAL
+   Creates a square icon from typed text,
+   then uploads it to GitHub like any image.
+══════════════════════════════════════════ */
+const ICON_FONTS = [
+  { label:"Cinzel (Serif)",     value:"Cinzel, Georgia, serif" },
+  { label:"Crimson Pro",        value:"'Crimson Pro', Georgia, serif" },
+  { label:"Sans-Serif",         value:"Arial, Helvetica, sans-serif" },
+  { label:"Monospace",          value:"'Courier New', monospace" },
+  { label:"Cursive",            value:"Georgia, 'Times New Roman', serif" },
+];
+
+function IconMakerModal({ folder, onSave, onClose }) {
+  const SIZE = 256;
+  const canvasRef = useRef();
+  const [text,      setText]      = useState("★");
+  const [font,      setFont]      = useState(ICON_FONTS[0].value);
+  const [textColor, setTextColor] = useState("#e8c84a");
+  const [bgColor,   setBgColor]   = useState("#0d1526");
+  const [fontSize,  setFontSize]  = useState(120);
+  const [shadow,    setShadow]    = useState(true);
+  const [uploading, setUploading] = useState(false);
+  const [err,       setErr]       = useState("");
+
+  // Re-draw canvas whenever any option changes
+  useEffect(() => {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+    const ctx = canvas.getContext("2d");
+
+    // Background
+    ctx.clearRect(0, 0, SIZE, SIZE);
+    if (bgColor === "transparent") {
+      // Checkerboard to indicate transparency
+      ctx.fillStyle = "#1a2a40";
+      ctx.fillRect(0, 0, SIZE, SIZE);
+    } else {
+      ctx.fillStyle = bgColor;
+      ctx.fillRect(0, 0, SIZE, SIZE);
+    }
+
+    // Text
+    const fs = Math.max(8, Math.min(220, fontSize));
+    ctx.font = `bold ${fs}px ${font}`;
+    ctx.textAlign    = "center";
+    ctx.textBaseline = "middle";
+
+    if (shadow) {
+      ctx.shadowColor   = "rgba(0,0,0,0.7)";
+      ctx.shadowBlur    = 10;
+      ctx.shadowOffsetX = 2;
+      ctx.shadowOffsetY = 2;
+    } else {
+      ctx.shadowColor = "transparent";
+      ctx.shadowBlur  = 0;
+    }
+
+    ctx.fillStyle = textColor;
+    ctx.fillText(text || "?", SIZE / 2, SIZE / 2);
+  }, [text, font, textColor, bgColor, fontSize, shadow]);
+
+  async function handleSave() {
+    setErr("");
+    setUploading(true);
+    try {
+      const canvas = canvasRef.current;
+      const dataUrl = canvas.toDataURL("image/png");
+      const url = await uploadImage(dataUrl, folder);
+      onSave(url);
+    } catch(e) {
+      setErr("Upload failed: " + e.message);
+    }
+    setUploading(false);
+  }
+
+  return (
+    <div style={{ position:"fixed", inset:0, background:"rgba(0,0,0,.88)", display:"flex", alignItems:"center", justifyContent:"center", zIndex:10000, padding:16 }}>
+      <div style={{ background:T.panel, border:`1px solid ${T.border}`, borderTop:`2px solid ${T.gold}`, borderRadius:6, padding:"22px 22px 18px", width:480, maxWidth:"96vw", maxHeight:"90vh", overflowY:"auto", boxShadow:"0 20px 60px rgba(0,0,0,.8)" }}>
+        {/* Header */}
+        <div style={{ display:"flex", alignItems:"center", justifyContent:"space-between", marginBottom:16, paddingBottom:10, borderBottom:`1px solid ${T.goldDim}` }}>
+          <span style={{ fontFamily:"Cinzel,serif", color:T.gold2, fontSize:13, letterSpacing:".25em" }}>✏ ICON MAKER</span>
+          <button onClick={onClose} style={{ background:"none", border:"none", color:T.dim, fontSize:18, cursor:"pointer", lineHeight:1 }}>×</button>
+        </div>
+
+        <div style={{ display:"flex", gap:16, flexWrap:"wrap" }}>
+          {/* Preview */}
+          <div style={{ flexShrink:0, display:"flex", flexDirection:"column", alignItems:"center", gap:8 }}>
+            <canvas ref={canvasRef} width={SIZE} height={SIZE}
+              style={{ width:160, height:160, borderRadius:6, border:`2px solid ${T.gold}`, display:"block", imageRendering:"pixelated" }}/>
+            <span style={{ fontSize:10, color:T.dim, fontFamily:"Cinzel,serif", letterSpacing:1 }}>PREVIEW</span>
+          </div>
+
+          {/* Controls */}
+          <div style={{ flex:1, minWidth:200, display:"flex", flexDirection:"column", gap:10 }}>
+            <Field label="Text / Abbreviation">
+              <input value={text} onChange={e=>setText(e.target.value)} placeholder="e.g.  ATK↑  or  ★" maxLength={8}
+                style={{...INP, fontSize:16, letterSpacing:2, textAlign:"center"}} autoFocus/>
+            </Field>
+
+            <Field label="Font">
+              <select value={font} onChange={e=>setFont(e.target.value)}
+                style={{...INP, cursor:"pointer"}}>
+                {ICON_FONTS.map(f => <option key={f.value} value={f.value}>{f.label}</option>)}
+              </select>
+            </Field>
+
+            <Field label={`Font Size: ${fontSize}px`}>
+              <input type="range" min={8} max={220} step={1} value={fontSize}
+                onChange={e=>setFontSize(Number(e.target.value))}
+                style={{ width:"100%", accentColor:T.gold }}/>
+            </Field>
+
+            <div style={{ display:"flex", gap:12, flexWrap:"wrap" }}>
+              <div style={{ flex:1, minWidth:120 }}>
+                <Field label="Text Colour">
+                  <div style={{ display:"flex", gap:6, alignItems:"center" }}>
+                    <input type="color" value={textColor} onChange={e=>setTextColor(e.target.value)}
+                      style={{ width:32, height:28, border:"none", background:"none", cursor:"pointer", padding:0 }}/>
+                    <input value={textColor} onChange={e=>setTextColor(e.target.value)}
+                      style={{...INP, width:80, fontSize:11}}/>
+                  </div>
+                </Field>
+              </div>
+              <div style={{ flex:1, minWidth:120 }}>
+                <Field label="Background">
+                  <div style={{ display:"flex", gap:6, alignItems:"center" }}>
+                    <input type="color" value={bgColor==="transparent"?"#000000":bgColor} onChange={e=>setBgColor(e.target.value)}
+                      style={{ width:32, height:28, border:"none", background:"none", cursor:"pointer", padding:0 }}/>
+                    <input value={bgColor} onChange={e=>setBgColor(e.target.value)}
+                      style={{...INP, width:80, fontSize:11}}/>
+                  </div>
+                </Field>
+              </div>
+            </div>
+
+            <label style={{ display:"flex", alignItems:"center", gap:8, cursor:"pointer", userSelect:"none" }}>
+              <input type="checkbox" checked={shadow} onChange={e=>setShadow(e.target.checked)}
+                style={{ accentColor:T.gold, width:14, height:14 }}/>
+              <span style={{ fontSize:12, color:T.dim, fontFamily:"'Crimson Pro',serif" }}>Drop shadow</span>
+            </label>
+
+            {/* Quick bg presets */}
+            <div>
+              <div style={{ fontSize:10, color:T.dim, fontFamily:"Cinzel,serif", letterSpacing:1, marginBottom:4 }}>QUICK BACKGROUNDS</div>
+              <div style={{ display:"flex", gap:4, flexWrap:"wrap" }}>
+                {["#0d1526","#1a0a0a","#0a1a0a","#1a1a0a","#0a0a1a","#1a0a1a","#000000","#1c2533"].map(c => (
+                  <div key={c} onClick={()=>setBgColor(c)} title={c}
+                    style={{ width:22, height:22, borderRadius:3, background:c, cursor:"pointer", border:`2px solid ${c===bgColor?T.gold:T.border}`, flexShrink:0 }}/>
+                ))}
+              </div>
+            </div>
+
+            {/* Quick text color presets */}
+            <div>
+              <div style={{ fontSize:10, color:T.dim, fontFamily:"Cinzel,serif", letterSpacing:1, marginBottom:4 }}>QUICK TEXT COLOURS</div>
+              <div style={{ display:"flex", gap:4, flexWrap:"wrap" }}>
+                {["#e8c84a","#208888","#a82860","#3a7a50","#7a3030","#5070a8","#c06060","#ffffff","#60c0e0"].map(c => (
+                  <div key={c} onClick={()=>setTextColor(c)} title={c}
+                    style={{ width:22, height:22, borderRadius:3, background:c, cursor:"pointer", border:`2px solid ${c===textColor?T.gold:T.border}`, flexShrink:0 }}/>
+                ))}
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {err && <div style={{ fontSize:12, color:"#e07070", background:"rgba(192,57,43,.1)", border:"1px solid #5a2020", borderRadius:3, padding:"6px 10px", marginTop:10 }}>{err}</div>}
+
+        <div style={{ display:"flex", gap:8, justifyContent:"flex-end", marginTop:16, paddingTop:12, borderTop:`1px solid ${T.border}` }}>
+          <Btn onClick={onClose}>Cancel</Btn>
+          <Btn variant="primary" onClick={handleSave} disabled={uploading||!text.trim()}>
+            {uploading ? "Uploading…" : "✓ Save Icon to Repo"}
+          </Btn>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 /* ── Modal wrapper ── */
 function Modal({ title, onClose, children, width=600, maxH="90vh" }) {
   return (
@@ -602,8 +781,19 @@ function SearchDropdown({ label, items, sel, onToggle, color=T.gold }) {
     document.addEventListener("mousedown", h);
     return () => document.removeEventListener("mousedown", h);
   }, []);
-  const filtered = items.filter(i => !search || (i.name||"").toLowerCase().includes(search.toLowerCase()));
-  const selNames = sel.map(id => items.find(x=>x.id===id)?.name).filter(Boolean);
+  // Helper: get display name with parent prefix for subcategory tags
+  function itemDisplayName(item) {
+    if (!item.parentId) return item.name||"(unnamed)";
+    const parent = items.find(x=>x.id===item.parentId);
+    return parent ? `${parent.name} › ${item.name||"(unnamed)"}` : (item.name||"(unnamed)");
+  }
+
+  const filtered = items.filter(i => {
+    if (!search) return true;
+    const s = search.toLowerCase();
+    return (i.name||"").toLowerCase().includes(s) || itemDisplayName(i).toLowerCase().includes(s);
+  });
+  const selNames = sel.map(id => { const it=items.find(x=>x.id===id); return it ? itemDisplayName(it) : null; }).filter(Boolean);
   return (
     <Field label={label}>
       <div ref={ref} style={{ position:"relative" }}>
@@ -612,7 +802,7 @@ function SearchDropdown({ label, items, sel, onToggle, color=T.gold }) {
             ? <span style={{ color:T.dim, fontSize:12, fontFamily:"'Crimson Pro',serif", fontStyle:"italic" }}>None — click to browse</span>
             : <div style={{ display:"flex", gap:3, flexWrap:"wrap", flex:1 }}>
                 {selNames.map((n,i) => {
-                  const item = items.find(x=>x.name===n);
+                  const item = items.find(x=>itemDisplayName(x)===n);
                   return <span key={i} style={{ fontSize:11, padding:"1px 6px", borderRadius:2, background:(item?.color||color)+"22", color:item?.color||color, fontFamily:"'Crimson Pro',serif" }}>{n}</span>;
                 })}
               </div>
@@ -620,18 +810,21 @@ function SearchDropdown({ label, items, sel, onToggle, color=T.gold }) {
           <span style={{ color:T.dim, fontSize:10, flexShrink:0 }}>{open?"▲":"▼"}</span>
         </div>
         {open && (
-          <div style={{ position:"absolute", top:"100%", left:0, right:0, zIndex:1000, background:T.panel, border:`1px solid ${T.border}`, borderRadius:3, maxHeight:190, overflowY:"auto", boxShadow:"0 8px 24px rgba(0,0,0,.6)" }}>
+          <div style={{ position:"absolute", top:"100%", left:0, right:0, zIndex:1000, background:T.panel, border:`1px solid ${T.border}`, borderRadius:3, maxHeight:230, overflowY:"auto", boxShadow:"0 8px 24px rgba(0,0,0,.6)" }}>
             <div style={{ padding:"5px 8px", borderBottom:`1px solid ${T.border}`, position:"sticky", top:0, background:T.panel }}>
               <input value={search} onChange={e=>setSearch(e.target.value)} placeholder="Search…" style={{...INP, fontSize:11}} autoFocus/>
             </div>
             {filtered.length === 0 && <div style={{ padding:10, color:T.dim, fontSize:12, fontStyle:"italic", fontFamily:"'Crimson Pro',serif" }}>No matches</div>}
             {filtered.map(item => {
-              const active = sel.includes(item.id);
+              const active    = sel.includes(item.id);
+              const dispName  = itemDisplayName(item);
+              const isSub     = !!item.parentId;
               return (
-                <div key={item.id} onClick={()=>onToggle(item.id)} style={{ display:"flex", alignItems:"center", gap:8, padding:"7px 10px", background:active?(item.color||color)+"18":undefined, borderBottom:`1px solid ${T.border}22`, cursor:"pointer" }}>
+                <div key={item.id} onClick={()=>onToggle(item.id)} style={{ display:"flex", alignItems:"center", gap:8, padding:isSub?"5px 10px 5px 22px":"7px 10px", background:active?(item.color||color)+"18":undefined, borderBottom:`1px solid ${T.border}22`, cursor:"pointer" }}>
+                  {isSub && <span style={{ fontSize:9, color:T.dim, marginLeft:-10, marginRight:-2 }}>└</span>}
                   <div style={{ width:13, height:13, border:`1px solid ${active?item.color||color:T.border}`, borderRadius:2, background:active?item.color||color:undefined, flexShrink:0 }}/>
                   <Ico src={item.icon} size={15} fallback={item.name?.[0]||"?"}/>
-                  <span style={{ fontSize:12, color:active?item.color||color:T.text, fontFamily:"'Crimson Pro',serif", flex:1 }}>{item.name||"(unnamed)"}</span>
+                  <span style={{ fontSize:isSub?11:12, color:active?item.color||color:isSub?T.dim:T.text, fontFamily:"'Crimson Pro',serif", flex:1 }}>{dispName}</span>
                   {active && <span style={{ color:item.color||color, fontSize:10 }}>✓</span>}
                 </div>
               );
@@ -906,8 +1099,9 @@ function ImagePicker({ value, onChange, allImages=[], folder="icons" }) {
   // New states for File Manager flow
   const [croppedData,     setCroppedData]     = useState(null);
   const [showFileManager, setShowFileManager] = useState(false);
+  const [showIconMaker,   setShowIconMaker]   = useState(false);
 
-  const TABS = [["url","URL"],["file","File"],["paste","Paste"],["library",`📁 ${library.length}`],["text","Text"]];
+  const TABS = [["url","URL"],["file","File"],["paste","Paste"],["library",`📁 ${library.length}`],["text","Text"],["make","✏ Make"]];
   return (
     <div>
       <div style={{ display:"flex", gap:4, marginBottom:6, alignItems:"center" }}>
@@ -930,6 +1124,17 @@ function ImagePicker({ value, onChange, allImages=[], folder="icons" }) {
       )}
       {mode==="text" && (
         <input value={value&&!value.startsWith("data:")&&!value.startsWith("http")?value:""} onChange={e=>onChange(e.target.value)} placeholder="Short label…" style={INP}/>
+      )}
+      {mode==="make" && (
+        <div>
+          <button onClick={()=>setShowIconMaker(true)}
+            style={{ background:T.card, border:`1px solid ${T.goldDim}`, color:T.gold, padding:"7px 16px", borderRadius:3, fontSize:12, cursor:"pointer", fontFamily:"Cinzel,serif", letterSpacing:".1em" }}>
+            ✏ Open Icon Maker…
+          </button>
+          <div style={{ fontSize:11, color:T.dim, fontFamily:"'Crimson Pro',serif", marginTop:5 }}>
+            Type abbreviations, pick font &amp; colours, save as a PNG to your repo.
+          </div>
+        </div>
       )}
       {mode==="file" && (
         <>
@@ -987,6 +1192,14 @@ function ImagePicker({ value, onChange, allImages=[], folder="icons" }) {
             setShowFileManager(false);
             setCroppedData(null);
           }}
+        />
+      )}
+      {/* Icon Maker — text-based icon generator */}
+      {showIconMaker && (
+        <IconMakerModal
+          folder={folder}
+          onSave={url => { onChange(url); setShowIconMaker(false); setMode("library"); }}
+          onClose={()=>setShowIconMaker(false)}
         />
       )}
     </div>
@@ -1293,12 +1506,12 @@ function HeroesView({ heroes, draftData, onHeroSave }) {
               {/* Buffs/Debuffs preview */}
               {(h.buffs||[]).length > 0 && (
                 <div style={{ display:"flex", gap:2, flexWrap:"wrap", marginBottom:3 }}>
-                  {h.buffs.map(id => { const b=draftData.buffs?.find(x=>x.id===id); return b?<span key={id} style={{ fontSize:9, padding:"1px 4px", borderRadius:2, background:(b.color||"#208888")+"22", color:b.color||"#208888", fontFamily:"'Crimson Pro',serif" }}>{b.name}</span>:null; })}
+                  {h.buffs.map(id => { const b=draftData.buffs?.find(x=>x.id===id); if(!b)return null; const parent=b.parentId?draftData.buffs?.find(x=>x.id===b.parentId):null; const label=parent?`${parent.name}›${b.name}`:b.name; return <span key={id} title={label} style={{ fontSize:9, padding:"1px 4px", borderRadius:2, background:(b.color||"#208888")+"22", color:b.color||"#208888", fontFamily:"'Crimson Pro',serif", maxWidth:90, overflow:"hidden", textOverflow:"ellipsis", whiteSpace:"nowrap" }}>{label}</span>; })}
                 </div>
               )}
               {(h.debuffs||[]).length > 0 && (
                 <div style={{ display:"flex", gap:2, flexWrap:"wrap", marginBottom:4 }}>
-                  {h.debuffs.map(id => { const d=draftData.debuffs?.find(x=>x.id===id); return d?<span key={id} style={{ fontSize:9, padding:"1px 4px", borderRadius:2, background:(d.color||"#a82860")+"22", color:d.color||"#a82860", fontFamily:"'Crimson Pro',serif" }}>{d.name}</span>:null; })}
+                  {h.debuffs.map(id => { const d=draftData.debuffs?.find(x=>x.id===id); if(!d)return null; const parent=d.parentId?draftData.debuffs?.find(x=>x.id===d.parentId):null; const label=parent?`${parent.name}›${d.name}`:d.name; return <span key={id} title={label} style={{ fontSize:9, padding:"1px 4px", borderRadius:2, background:(d.color||"#a82860")+"22", color:d.color||"#a82860", fontFamily:"'Crimson Pro',serif", maxWidth:90, overflow:"hidden", textOverflow:"ellipsis", whiteSpace:"nowrap" }}>{label}</span>; })}
                 </div>
               )}
 
@@ -1502,10 +1715,19 @@ function TagModal({ type, tag, draftData, onSave, onClose }) {
     wkSupport: "e.g. \"Cannot counterattack\" + link Shielder / Healer role\n→ If a teammate with that role is on your team, shows as team support.",
   };
 
-  const title = `${tag.id ? "Edit" : "New"} ${isStr?"Strength":type==="weaknesses"?"Weakness":type==="buffs"?"Buff":"Debuff"}`;
+  const typeLabel = isStr?"Strength":type==="weaknesses"?"Weakness":type==="buffs"?"Buff":"Debuff";
+  const parentTag  = f.parentId ? (draftData[type]||[]).find(t=>t.id===f.parentId) : null;
+  const isNew      = !tag.id;
+  const title = `${isNew ? "New" : "Edit"} ${typeLabel}${parentTag ? ` — subcategory of "${parentTag.name}"` : ""}`;
 
   return (
     <Modal title={title} onClose={onClose} width={540}>
+      {parentTag && (
+        <div style={{ background:T.card, border:`1px solid ${T.goldDim}`, borderRadius:3, padding:"6px 12px", marginBottom:10, display:"flex", alignItems:"center", gap:8, fontSize:12, color:T.dim, fontFamily:"'Crimson Pro',serif" }}>
+          <Ico src={parentTag.icon} size={18} fallback={parentTag.name?.[0]||"?"}/>
+          <span>Subcategory of <strong style={{color:parentTag.color||T.gold}}>{parentTag.name}</strong> — treated as its own standalone tag, but grouped visually.</span>
+        </div>
+      )}
       <Field label="Name">
         <input value={f.name} onChange={e=>setF(x=>({...x,name:e.target.value}))} placeholder="Tag name…" style={INP} autoFocus/>
       </Field>
@@ -1911,32 +2133,60 @@ function TagsView({ draftData, onDraftDataUpdate }) {
                 <Btn onClick={()=>clearSelection(key)}>Cancel</Btn>
               </div>
             )}
-            <div style={{ maxHeight:220, overflowY:"auto", display:"flex", flexDirection:"column", gap:4 }}>
-              {filtered.map(tag => (
-                <div key={tag.id} style={{ background:sel.has(tag.id)?color+"18":T.card, border:`1px solid ${sel.has(tag.id)?color:tag.color||color}33`, borderRadius:4, padding:"6px 10px", display:"flex", alignItems:"center", gap:8, transition:"background 0.1s" }}>
-                  <input type="checkbox" checked={sel.has(tag.id)} onChange={()=>toggleSelect(key,tag.id)} style={{ accentColor:color, width:13, height:13, cursor:"pointer", flexShrink:0 }}/>
-                  <Ico src={tag.icon} size={22} fallback={tag.name?.[0]||"?"}/>
-                  <div style={{ flex:1, minWidth:0 }}>
-                    <div style={{ fontSize:12, color:tag.color||color, fontFamily:"Cinzel,serif", overflow:"hidden", textOverflow:"ellipsis", whiteSpace:"nowrap" }}>{tag.name||<span style={{color:T.dim,fontStyle:"italic"}}>Unnamed</span>}</div>
-                    {((tag.linkedDebuffs||[]).length>0 || (tag.linkedBuffs||[]).length>0) && (
-                      <div style={{ fontSize:10, color:T.dim, fontFamily:"'Crimson Pro',serif", overflow:"hidden", textOverflow:"ellipsis", whiteSpace:"nowrap" }}>
-                        {(tag.linkedDebuffs||[]).length>0 && <span>Debuffs: {tag.linkedDebuffs.map(id=>draftData.debuffs?.find(d=>d.id===id)?.name).filter(Boolean).join(", ")}</span>}
-                        {(tag.linkedBuffs||[]).length>0   && <span style={{marginLeft:8}}>Buffs: {tag.linkedBuffs.map(id=>draftData.buffs?.find(b=>b.id===id)?.name).filter(Boolean).join(", ")}</span>}
+            {(()=>{
+              // Separate root tags (no parentId) from subcategory tags
+              const rootTags = filtered.filter(t => !t.parentId);
+              const subMap   = {}; // parentId → [child tags]
+              filtered.filter(t => t.parentId).forEach(t => { (subMap[t.parentId]||(subMap[t.parentId]=[])).push(t); });
+              // Also show orphaned subs (parent not in filtered) at bottom
+              const orphanSubs = filtered.filter(t => t.parentId && !filtered.find(r=>r.id===t.parentId));
+
+              function renderTagRow(tag, isChild=false) {
+                return (
+                  <div key={tag.id}>
+                    <div style={{ background:sel.has(tag.id)?color+"18":T.card, border:`1px solid ${sel.has(tag.id)?color:tag.color||color}33`, borderRadius:4, padding:"6px 10px", display:"flex", alignItems:"center", gap:8, transition:"background 0.1s", marginLeft: isChild ? 18 : 0 }}>
+                      {isChild && <span style={{ fontSize:10, color:T.dim, marginRight:-4 }}>└</span>}
+                      <input type="checkbox" checked={sel.has(tag.id)} onChange={()=>toggleSelect(key,tag.id)} style={{ accentColor:color, width:13, height:13, cursor:"pointer", flexShrink:0 }}/>
+                      <Ico src={tag.icon} size={22} fallback={tag.name?.[0]||"?"}/>
+                      <div style={{ flex:1, minWidth:0 }}>
+                        <div style={{ fontSize:12, color:tag.color||color, fontFamily:"Cinzel,serif", overflow:"hidden", textOverflow:"ellipsis", whiteSpace:"nowrap" }}>
+                          {isChild && <span style={{ fontSize:9, color:T.dim, fontFamily:"'Crimson Pro',serif", marginRight:4 }}>sub:</span>}
+                          {tag.name||<span style={{color:T.dim,fontStyle:"italic"}}>Unnamed</span>}
+                        </div>
+                        {((tag.linkedDebuffs||[]).length>0 || (tag.linkedBuffs||[]).length>0) && (
+                          <div style={{ fontSize:10, color:T.dim, fontFamily:"'Crimson Pro',serif", overflow:"hidden", textOverflow:"ellipsis", whiteSpace:"nowrap" }}>
+                            {(tag.linkedDebuffs||[]).length>0 && <span>Debuffs: {tag.linkedDebuffs.map(id=>draftData.debuffs?.find(d=>d.id===id)?.name).filter(Boolean).join(", ")}</span>}
+                            {(tag.linkedBuffs||[]).length>0   && <span style={{marginLeft:8}}>Buffs: {tag.linkedBuffs.map(id=>draftData.buffs?.find(b=>b.id===id)?.name).filter(Boolean).join(", ")}</span>}
+                          </div>
+                        )}
                       </div>
-                    )}
+                      <div style={{ display:"flex", gap:4, flexShrink:0 }}>
+                        {!isChild && (
+                          <Btn onClick={()=>setEdit({type:key, tag:key==="strengths"||key==="weaknesses"?blankSW(tag.id):blankTag(tag.id)})}
+                            style={{ fontSize:9, padding:"2px 7px" }} title="Add subcategory under this tag">＋ Sub</Btn>
+                        )}
+                        <Btn onClick={()=>setEdit({type:key, tag:{...tag,linkedBuffs:[...(tag.linkedBuffs||[])],linkedDebuffs:[...(tag.linkedDebuffs||[])],linkedRoles:[...(tag.linkedRoles||[])],synergizedRoles:[...(tag.synergizedRoles||[])],teamSupportRoles:[...(tag.teamSupportRoles||[])]}})}>Edit</Btn>
+                        <Btn onClick={()=>doDuplicate(key,tag)}>Dupe</Btn>
+                        {delConf===tag.id
+                          ? <><Btn variant="danger" onClick={()=>doDelete(key,tag.id)}>Confirm</Btn><Btn onClick={()=>setDelConf(null)}>Cancel</Btn></>
+                          : <Btn variant="danger" onClick={()=>setDelConf(tag.id)}>Delete</Btn>
+                        }
+                      </div>
+                    </div>
+                    {/* Subcategories indented beneath parent */}
+                    {(subMap[tag.id]||[]).map(child => renderTagRow(child, true))}
                   </div>
-                  <div style={{ display:"flex", gap:4, flexShrink:0 }}>
-                    <Btn onClick={()=>setEdit({type:key, tag:{...tag,linkedBuffs:[...(tag.linkedBuffs||[])],linkedDebuffs:[...(tag.linkedDebuffs||[])],linkedRoles:[...(tag.linkedRoles||[])],synergizedRoles:[...(tag.synergizedRoles||[])],teamSupportRoles:[...(tag.teamSupportRoles||[])]}})}>Edit</Btn>
-                    <Btn onClick={()=>doDuplicate(key,tag)}>Dupe</Btn>
-                    {delConf===tag.id
-                      ? <><Btn variant="danger" onClick={()=>doDelete(key,tag.id)}>Confirm</Btn><Btn onClick={()=>setDelConf(null)}>Cancel</Btn></>
-                      : <Btn variant="danger" onClick={()=>setDelConf(tag.id)}>Delete</Btn>
-                    }
-                  </div>
+                );
+              }
+
+              return (
+                <div style={{ maxHeight:360, overflowY:"auto", display:"flex", flexDirection:"column", gap:4 }}>
+                  {rootTags.map(tag => renderTagRow(tag, false))}
+                  {orphanSubs.map(tag => renderTagRow(tag, false))}
+                  {filtered.length===0 && <span style={{ fontSize:12, color:T.dim, fontStyle:"italic", fontFamily:"'Crimson Pro',serif", padding:"4px 0" }}>{(draftData[key]||[]).length===0?"None yet — add one above.":"No matches."}</span>}
                 </div>
-              ))}
-              {filtered.length===0 && <span style={{ fontSize:12, color:T.dim, fontStyle:"italic", fontFamily:"'Crimson Pro',serif", padding:"4px 0" }}>{(draftData[key]||[]).length===0?"None yet — add one above.":"No matches."}</span>}
-            </div>
+              );
+            })()}
           </div>
         );
       })}
