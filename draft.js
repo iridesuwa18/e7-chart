@@ -563,9 +563,24 @@ const ICON_FONTS = [
   { label:"Cursive",            value:"Georgia, 'Times New Roman', serif" },
 ];
 
+/* Symbol categories for the picker panel */
+const SYMBOL_CATS = [
+  { label:"Arrows",    symbols:["↑","↓","←","→","↗","↙","↔","↕","⇑","⇓","⇒","⇐","⇔","▲","▼","◀","▶","➤","➜","➝","➞","↺","↻","⟳","⟲"] },
+  { label:"Stars",     symbols:["★","☆","✦","✧","✩","✪","✫","✬","✭","✮","✯","✰","⭐","🌟","💫","✨"] },
+  { label:"Combat",    symbols:["⚔","🗡","🛡","⚡","🔥","💥","⚠","☠","💀","🗝","⚙","🔩","🔱","⚜","🏹","🪃"] },
+  { label:"Math",      symbols:["×","÷","±","≈","≠","≤","≥","∞","∑","∆","∇","√","∂","∫","%","‰","#","@"] },
+  { label:"Shapes",    symbols:["●","○","■","□","◆","◇","▪","▫","▸","◂","◉","◎","⬛","⬜","🔶","🔷","🔸","🔹","🔺","🔻"] },
+  { label:"Signs",     symbols:["✓","✗","✘","✕","⊕","⊖","⊗","⊘","⊙","⊚","⊛","⊜","⊝","⊞","⊟","⊠","⊡","⊢","⊣"] },
+  { label:"Hands",     symbols:["👆","👇","👈","👉","☝","✌","🤞","👍","👎","✊","👊","🤜","🤛","🙌","🤝","👐","🤲"] },
+  { label:"Status",    symbols:["❤","🧡","💛","💚","💙","💜","🖤","🤍","💔","❌","⭕","🔴","🟡","🟢","🔵","⚫","⚪"] },
+  { label:"Time",      symbols:["⏳","⌛","⏰","⏱","⏲","🕐","🕑","🕒","🕓","🕔","🕕","🕖","🕗","🕘","🕙","🕚","🕛"] },
+  { label:"E7 / RPG",  symbols:["⚡","🌀","❄","🔥","💧","🌿","☀","🌙","🌑","💎","👁","🐉","🦅","🦁","🐺","🗺","⚗","🧪","🔮","🧿","🏆","🥇","🪄","📜"] },
+];
+
 function IconMakerModal({ folder, onSave, onClose }) {
   const SIZE = 256;
-  const canvasRef = useRef();
+  const canvasRef   = useRef();
+  const inputRef    = useRef();
   const [text,      setText]      = useState("★");
   const [font,      setFont]      = useState(ICON_FONTS[0].value);
   const [textColor, setTextColor] = useState("#e8c84a");
@@ -574,6 +589,23 @@ function IconMakerModal({ folder, onSave, onClose }) {
   const [shadow,    setShadow]    = useState(true);
   const [uploading, setUploading] = useState(false);
   const [err,       setErr]       = useState("");
+  const [symCat,    setSymCat]    = useState(0); // active symbol category index
+
+  // Insert a symbol at the cursor position (or append)
+  function insertSymbol(sym) {
+    const input = inputRef.current;
+    if (!input) { setText(t => (t + sym).slice(0, 8)); return; }
+    const start = input.selectionStart ?? text.length;
+    const end   = input.selectionEnd   ?? text.length;
+    const next  = (text.slice(0, start) + sym + text.slice(end)).slice(0, 8);
+    setText(next);
+    // Restore focus + move cursor after inserted symbol
+    requestAnimationFrame(() => {
+      input.focus();
+      const pos = Math.min(start + [...sym].length, 8);
+      input.setSelectionRange(pos, pos);
+    });
+  }
 
   // Re-draw canvas whenever any option changes
   useEffect(() => {
@@ -581,20 +613,12 @@ function IconMakerModal({ folder, onSave, onClose }) {
     if (!canvas) return;
     const ctx = canvas.getContext("2d");
 
-    // Background
     ctx.clearRect(0, 0, SIZE, SIZE);
-    if (bgColor === "transparent") {
-      // Checkerboard to indicate transparency
-      ctx.fillStyle = "#1a2a40";
-      ctx.fillRect(0, 0, SIZE, SIZE);
-    } else {
-      ctx.fillStyle = bgColor;
-      ctx.fillRect(0, 0, SIZE, SIZE);
-    }
+    ctx.fillStyle = bgColor === "transparent" ? "#1a2a40" : bgColor;
+    ctx.fillRect(0, 0, SIZE, SIZE);
 
-    // Text
     const fs = Math.max(8, Math.min(220, fontSize));
-    ctx.font = `bold ${fs}px ${font}`;
+    ctx.font         = `bold ${fs}px ${font}`;
     ctx.textAlign    = "center";
     ctx.textBaseline = "middle";
 
@@ -628,7 +652,8 @@ function IconMakerModal({ folder, onSave, onClose }) {
 
   return (
     <div style={{ position:"fixed", inset:0, background:"rgba(0,0,0,.88)", display:"flex", alignItems:"center", justifyContent:"center", zIndex:10000, padding:16 }}>
-      <div style={{ background:T.panel, border:`1px solid ${T.border}`, borderTop:`2px solid ${T.gold}`, borderRadius:6, padding:"22px 22px 18px", width:480, maxWidth:"96vw", maxHeight:"90vh", overflowY:"auto", boxShadow:"0 20px 60px rgba(0,0,0,.8)" }}>
+      <div style={{ background:T.panel, border:`1px solid ${T.border}`, borderTop:`2px solid ${T.gold}`, borderRadius:6, padding:"22px 22px 18px", width:560, maxWidth:"96vw", maxHeight:"92vh", overflowY:"auto", boxShadow:"0 20px 60px rgba(0,0,0,.8)" }}>
+
         {/* Header */}
         <div style={{ display:"flex", alignItems:"center", justifyContent:"space-between", marginBottom:16, paddingBottom:10, borderBottom:`1px solid ${T.goldDim}` }}>
           <span style={{ fontFamily:"Cinzel,serif", color:T.gold2, fontSize:13, letterSpacing:".25em" }}>✏ ICON MAKER</span>
@@ -645,14 +670,49 @@ function IconMakerModal({ folder, onSave, onClose }) {
 
           {/* Controls */}
           <div style={{ flex:1, minWidth:200, display:"flex", flexDirection:"column", gap:10 }}>
+
+            {/* Text input */}
             <Field label="Text / Abbreviation">
-              <input value={text} onChange={e=>setText(e.target.value)} placeholder="e.g.  ATK↑  or  ★" maxLength={8}
-                style={{...INP, fontSize:16, letterSpacing:2, textAlign:"center"}} autoFocus/>
+              <div style={{ display:"flex", gap:4 }}>
+                <input ref={inputRef} value={text} onChange={e=>setText(e.target.value.slice(0,8))}
+                  placeholder="e.g.  ATK↑  or  ★" maxLength={8}
+                  style={{...INP, fontSize:16, letterSpacing:2, textAlign:"center", flex:1}}/>
+                {text && (
+                  <button onClick={()=>setText("")}
+                    style={{ background:"none", border:`1px solid ${T.border}`, color:T.dim, borderRadius:3, padding:"0 8px", fontSize:11, cursor:"pointer" }}>✕</button>
+                )}
+              </div>
             </Field>
 
+            {/* ── Symbol Picker ── */}
+            <div style={{ background:T.bg, border:`1px solid ${T.border}`, borderRadius:4, overflow:"hidden" }}>
+              {/* Category tabs */}
+              <div style={{ display:"flex", overflowX:"auto", borderBottom:`1px solid ${T.border}`, background:T.panel }}>
+                {SYMBOL_CATS.map((cat, i) => (
+                  <button key={i} onClick={()=>setSymCat(i)}
+                    style={{ background:symCat===i?T.gold+"22":"none", border:"none", borderBottom:symCat===i?`2px solid ${T.gold}`:"2px solid transparent", color:symCat===i?T.gold:T.dim, padding:"5px 9px", fontSize:9, fontFamily:"Cinzel,serif", letterSpacing:.5, cursor:"pointer", whiteSpace:"nowrap", flexShrink:0, transition:"all .1s" }}>
+                    {cat.label}
+                  </button>
+                ))}
+              </div>
+              {/* Symbol grid */}
+              <div style={{ display:"flex", flexWrap:"wrap", gap:2, padding:6 }}>
+                {SYMBOL_CATS[symCat].symbols.map((sym, i) => (
+                  <button key={i} onClick={()=>insertSymbol(sym)} title={`Insert "${sym}"`}
+                    style={{ background:T.card, border:`1px solid ${T.border}`, borderRadius:3, width:30, height:30, fontSize:16, cursor:"pointer", display:"flex", alignItems:"center", justifyContent:"center", color:T.text, flexShrink:0, transition:"background .1s, border-color .1s" }}
+                    onMouseEnter={e=>{ e.currentTarget.style.background=T.gold+"22"; e.currentTarget.style.borderColor=T.gold; }}
+                    onMouseLeave={e=>{ e.currentTarget.style.background=T.card; e.currentTarget.style.borderColor=T.border; }}>
+                    {sym}
+                  </button>
+                ))}
+              </div>
+              <div style={{ padding:"2px 8px 6px", fontSize:10, color:T.dim, fontFamily:"'Crimson Pro',serif", fontStyle:"italic" }}>
+                Click to insert at cursor · max 8 chars
+              </div>
+            </div>
+
             <Field label="Font">
-              <select value={font} onChange={e=>setFont(e.target.value)}
-                style={{...INP, cursor:"pointer"}}>
+              <select value={font} onChange={e=>setFont(e.target.value)} style={{...INP, cursor:"pointer"}}>
                 {ICON_FONTS.map(f => <option key={f.value} value={f.value}>{f.label}</option>)}
               </select>
             </Field>
