@@ -62,7 +62,13 @@
       "iconData": "https://raw.githubusercontent.com/iridesuwa18/e7-chart/main/assets/heroes/frieren.webp",
       "locked": true,
       "_x": 0,
-      "_y": 97.5
+      "_y": 97.5,
+      "altStats": {
+        "vType": "TNK",
+        "vScore": 9.5,
+        "hType": "SUR",
+        "hScore": 10
+      }
     },
     {
       "id": 1779355319814,
@@ -82,5 +88,5 @@
     }
   ],
   "draftData": null,
-  "savedAt": "2026-05-23T11:31:28.986Z"
+  "savedAt": "2026-06-02T23:51:56.696Z"
 }
