@@ -44,6 +44,26 @@ let pendingAdminAction = null; // "save" | "load" | "edit-hero" | "add-hero"
 /* ── Edit session: once unlocked, editing stays open for the session ── */
 let editSessionUnlocked = false;
 
+/* ── Admin password session cache ──
+   We deliberately do NOT let the browser's native password manager
+   remember this field (it's an admin key, not a login) — see the
+   admin-password input in index.html, which uses a masked text field
+   instead of type="password" so Chrome never offers to save it.
+   Instead, once the password is verified successfully, we cache it in
+   sessionStorage so it's remembered for the rest of this browser tab's
+   session (cleared automatically when the tab/browser is closed) and
+   reused automatically without prompting again. ── */
+const ADMIN_PW_KEY = "e7_admin_pw";
+function getCachedAdminPassword() {
+  try { return sessionStorage.getItem(ADMIN_PW_KEY) || null; } catch { return null; }
+}
+function setCachedAdminPassword(pw) {
+  try { sessionStorage.setItem(ADMIN_PW_KEY, pw); } catch { /* storage unavailable — just skip caching */ }
+}
+function clearCachedAdminPassword() {
+  try { sessionStorage.removeItem(ADMIN_PW_KEY); } catch { /* ignore */ }
+}
+
 /* ── Hero Details modal ── */
 let detailsHeroId = null; // which hero's details panel is open
 
@@ -89,6 +109,10 @@ const saveStatus   = document.getElementById("save-status");
   loadLocal();
   renderAll();
 
+  // If an admin password was already verified earlier this browser session,
+  // stay unlocked (persists across page refreshes until the tab is closed).
+  if (getCachedAdminPassword()) editSessionUnlocked = true;
+
   // Auto-load from server for ALL visitors on page open (no password needed)
   autoLoadFromServer();
 
@@ -133,6 +157,14 @@ const saveStatus   = document.getElementById("save-status");
   document.getElementById("modal-overlay").addEventListener("click", e => { if (e.target === overlay) closeModal(); });
   modalConfirm.addEventListener("click", onModalConfirm);
   modalDelete.addEventListener("click", onModalDelete);
+
+  // Stat comparison popup
+  document.getElementById("btn-compare-v").addEventListener("click", () => openStatCompare("v"));
+  document.getElementById("btn-compare-h").addEventListener("click", () => openStatCompare("h"));
+  document.getElementById("compare-close").addEventListener("click", closeStatCompare);
+  document.getElementById("compare-overlay").addEventListener("click", e => {
+    if (e.target === document.getElementById("compare-overlay")) closeStatCompare();
+  });
 
   // Admin modal
   document.getElementById("admin-confirm").addEventListener("click", onAdminConfirm);
@@ -1104,7 +1136,7 @@ function onModalConfirm() {
     heroes.push({
       id: Date.now(),
       name, rarity, role, element, vType, vScore, hType, hScore, notes, iconData,
-      locked: false, altStats,
+      locked, altStats,
     });
   }
 
@@ -1123,6 +1155,90 @@ function deleteHero(id) {
   if (selectedId === id) selectedId = null;
   saveLocal();
   renderAll();
+}
+
+/* ═══════════════════════════════════════
+   STAT COMPARISON POPUP
+   Shows the closest hero(es) below and above
+   the value currently entered in the form,
+   plus any heroes with the exact same value.
+═══════════════════════════════════════ */
+function normScore(v) {
+  // Round to 1 decimal to avoid floating-point equality issues (step is 0.1)
+  return Math.round((Number(v) || 0) * 10) / 10;
+}
+
+function openStatCompare(axis) {
+  const type   = (axis === "v" ? fVType : fHType).value;
+  const target = normScore((axis === "v" ? fVScore : fHScore).value);
+
+  // Compare against every other hero using the same stat type on this axis
+  // (e.g. only other SPD heroes when the current axis is set to SPD).
+  // The hero currently being edited is excluded from its own comparison.
+  const pool = heroes.filter(h =>
+    h.id !== editingId && (axis === "v" ? h.vType : h.hType) === type
+  );
+  const scoreOf = h => normScore(axis === "v" ? h.vScore : h.hScore);
+
+  const same = pool.filter(h => scoreOf(h) === target);
+
+  const belowScores = pool.filter(h => scoreOf(h) < target).map(scoreOf);
+  const aboveScores = pool.filter(h => scoreOf(h) > target).map(scoreOf);
+  const belowVal = belowScores.length ? Math.max(...belowScores) : null;
+  const aboveVal = aboveScores.length ? Math.min(...aboveScores) : null;
+  const below = belowVal !== null ? pool.filter(h => scoreOf(h) === belowVal) : [];
+  const above = aboveVal !== null ? pool.filter(h => scoreOf(h) === aboveVal) : [];
+
+  document.getElementById("compare-title").textContent = `${type} COMPARISON`;
+  document.getElementById("compare-body").innerHTML = `
+    <div class="compare-target">
+      <div class="compare-target-label">Your Selected Value</div>
+      <div class="compare-target-value">${type} ${target.toFixed(1)}</div>
+    </div>
+    ${compareSectionHTML("Closest Below", "below", belowVal, below, axis, "No hero found below this value — you may be at the low extreme.")}
+    ${compareSectionHTML("Same Value", "same", target, same, axis, "No other hero shares this exact value.")}
+    ${compareSectionHTML("Closest Above", "above", aboveVal, above, axis, "No hero found above this value — you may be at the high extreme.")}
+  `;
+  document.getElementById("compare-overlay").classList.add("open");
+}
+
+function compareSectionHTML(label, cls, val, list, axis, emptyMsg) {
+  const valTag = (val !== null && val !== undefined)
+    ? `<span class="compare-val-tag" style="background:${sectionColor(cls)};color:var(--bg)">${val.toFixed(1)}</span>`
+    : "";
+  const inner = list.length
+    ? `<div class="compare-grid">${list.map(h => compareCardHTML(h, axis)).join("")}</div>`
+    : `<div class="compare-empty">${emptyMsg}</div>`;
+  return `
+    <div class="compare-section">
+      <div class="compare-section-label ${cls}">${label} ${valTag}</div>
+      ${inner}
+    </div>`;
+}
+
+function sectionColor(cls) {
+  return cls === "below" ? "#4fc3f7" : cls === "above" ? "#ef9a9a" : "#81c784";
+}
+
+function compareCardHTML(h, axis) {
+  const meta  = RARITY_META[h.rarity] || RARITY_META["5r"];
+  const type  = axis === "v" ? h.vType : h.hType;
+  const score = normScore(axis === "v" ? h.vScore : h.hScore).toFixed(1);
+  const iconHTML = h.iconData
+    ? `<div class="compare-card-icon"><img src="${h.iconData}"></div>`
+    : `<div class="compare-card-icon"><div class="compare-card-icon-fallback">⚔️</div></div>`;
+  return `
+    <div class="compare-card">
+      ${iconHTML}
+      <div class="compare-card-info">
+        <div class="compare-card-name">${h.name || "Unnamed Hero"}</div>
+        <div class="compare-card-score" style="color:${meta.color}">${meta.label} · ${type} ${score}</div>
+      </div>
+    </div>`;
+}
+
+function closeStatCompare() {
+  document.getElementById("compare-overlay").classList.remove("open");
 }
 
 /* ═══════════════════════════════════════
@@ -1152,6 +1268,24 @@ function loadLocal() {
 ═══════════════════════════════════════ */
 function openAdminGate(action) {
   pendingAdminAction = action;
+
+  // Reuse the password already verified earlier this session, if we have
+  // one cached — skips the prompt entirely instead of asking again.
+  const cachedPw = getCachedAdminPassword();
+  if (cachedPw) {
+    if (action === "save") { saveToServer(cachedPw); return; }
+    if (action === "load") { loadFromServer(cachedPw); return; }
+    if (action === "add-hero") { editSessionUnlocked = true; openAddModal(); return; }
+    if (action === "edit-hero") {
+      editSessionUnlocked = true;
+      if (detailsHeroId !== null) {
+        const h = heroes.find(x => x.id === detailsHeroId);
+        if (h) { closeHeroDetails(); openEditModal(h); }
+      }
+      return;
+    }
+  }
+
   const label = action === "save" ? "save" : action === "load" ? "load" : action === "add-hero" ? "add a hero" : "edit this hero";
   document.getElementById("admin-action-label").textContent = label;
   document.getElementById("admin-password").value = "";
@@ -1196,6 +1330,7 @@ async function onAdminConfirm() {
       // If network fails, we trust locally — session continues
     }
     editSessionUnlocked = true;
+    setCachedAdminPassword(pw);
     closeAdminGate();
     if (pendingAdminAction === "edit-hero" && detailsHeroId !== null) {
       const h = heroes.find(x => x.id === detailsHeroId);
@@ -1271,7 +1406,18 @@ async function saveToServer(password) {
       body: JSON.stringify({ heroes, password }),
     });
     const data = await res.json();
-    if (!res.ok) throw new Error(data.error || "Save failed");
+    if (!res.ok) {
+      if (res.status === 401) {
+        // Cached password (or the one just typed) was rejected — forget it
+        // and ask again.
+        clearCachedAdminPassword();
+        setStatus("❌ " + (data.error || "Wrong password"));
+        openAdminGate("save");
+        return;
+      }
+      throw new Error(data.error || "Save failed");
+    }
+    setCachedAdminPassword(password);
     setStatus("✅ Saved to GitHub");
   } catch (e) {
     setStatus("❌ " + e.message);
@@ -1287,7 +1433,16 @@ async function loadFromServer(password) {
       body: JSON.stringify({ password }),
     });
     const data = await res.json();
-    if (!res.ok) throw new Error(data.error || "Load failed");
+    if (!res.ok) {
+      if (res.status === 401) {
+        clearCachedAdminPassword();
+        setStatus("❌ " + (data.error || "Wrong password"));
+        openAdminGate("load");
+        return;
+      }
+      throw new Error(data.error || "Load failed");
+    }
+    setCachedAdminPassword(password);
     if (Array.isArray(data.heroes)) {
       heroes = data.heroes;
       saveLocal();

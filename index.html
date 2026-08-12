@@ -336,6 +336,7 @@
             </select>
             <input type="number" id="f-v-score" min="0" max="10" step="0.1" value="0" placeholder="0.0" />
           </div>
+          <button type="button" class="stat-info-btn" id="btn-compare-v" title="Compare with heroes near this value">i</button>
         </div>
         <div class="form-group">
           <label>Horizontal (SUR / RS)</label>
@@ -346,6 +347,7 @@
             </select>
             <input type="number" id="f-h-score" min="0" max="10" step="0.1" value="0" placeholder="0.0" />
           </div>
+          <button type="button" class="stat-info-btn" id="btn-compare-h" title="Compare with heroes near this value">i</button>
         </div>
       </div>
 
@@ -445,6 +447,17 @@
     </div>
   </div>
 
+  <!-- STAT COMPARISON OVERLAY -->
+  <div class="overlay" id="compare-overlay">
+    <div class="modal compare-modal" id="compare-modal">
+      <div class="details-modal-header">
+        <div class="modal-title" id="compare-title" style="margin:0;padding:0;border:none">STAT COMPARISON</div>
+        <button class="det-close-btn" id="compare-close">×</button>
+      </div>
+      <div class="compare-body" id="compare-body"></div>
+    </div>
+  </div>
+
   <!-- ADMIN PASSWORD MODAL -->
   <div class="overlay" id="admin-overlay">
     <div class="modal" id="admin-modal">
@@ -452,7 +465,7 @@
       <p class="admin-desc">Please enter the GitHub Key password to <span id="admin-action-label">save</span>.</p>
       <div class="form-group" style="margin-top:14px">
         <label>Password</label>
-        <input type="password" id="admin-password" placeholder="Enter admin key…" autocomplete="off" />
+        <input type="text" id="admin-password" placeholder="Enter admin key…" autocomplete="off" spellcheck="false" style="-webkit-text-security:disc;text-security:disc" />
       </div>
       <div id="admin-error" class="admin-error" style="display:none"></div>
       <div class="modal-btns">
