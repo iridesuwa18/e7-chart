@@ -194,8 +194,8 @@
       "id": 1786457677406,
       "name": "Little Queen Charlotte",
       "rarity": "5ml",
-      "role": "",
-      "element": "",
+      "role": "Warrior",
+      "element": "Light",
       "vType": "SPD",
       "vScore": 8,
       "hType": "SUR",
@@ -210,7 +210,8 @@
         "hScore": 9.5
       },
       "_x": 2.5,
-      "_y": 10
+      "_y": 10,
+      "hidden": false
     },
     {
       "id": 1786457819041,
@@ -227,7 +228,8 @@
       "locked": true,
       "altStats": null,
       "_x": 5,
-      "_y": 6.500000000000007
+      "_y": 6.500000000000007,
+      "hidden": false
     },
     {
       "id": 1786494103758,
@@ -244,7 +246,8 @@
       "locked": true,
       "altStats": null,
       "_x": 65,
-      "_y": 87.5
+      "_y": 87.5,
+      "hidden": false
     },
     {
       "id": 1786494323094,
@@ -261,7 +264,8 @@
       "locked": true,
       "altStats": null,
       "_x": 17.5,
-      "_y": 89
+      "_y": 89,
+      "hidden": false
     },
     {
       "id": 1786494420941,
@@ -278,7 +282,8 @@
       "locked": true,
       "altStats": null,
       "_x": 10,
-      "_y": 93
+      "_y": 93,
+      "hidden": false
     },
     {
       "id": 1786494564456,
@@ -295,7 +300,8 @@
       "locked": true,
       "altStats": null,
       "_x": 9,
-      "_y": 6.500000000000007
+      "_y": 6.500000000000007,
+      "hidden": false
     },
     {
       "id": 1787262710589,
@@ -317,9 +323,10 @@
         "hScore": 7
       },
       "_x": 15,
-      "_y": 16
+      "_y": 16,
+      "hidden": false
     }
   ],
   "draftData": null,
-  "savedAt": "2026-08-20T21:52:37.712Z"
+  "savedAt": "2026-08-20T21:56:36.908Z"
 }
