@@ -32,6 +32,33 @@ let labelsVisible  = true;   // show hero name labels
 let spreadEnabled  = false;  // nudge overlapping icons apart
 let focusEnabled   = false;  // dim non-selected heroes
 let highlightedId  = null;   // roster-click green highlight
+let dotMode        = false;  // icons become small coloured element dots
+
+/* ── Dot mode: element → colour ── */
+const ELEMENT_DOT_COLORS = {
+  Fire:  "#e0573a",
+  Ice:   "#4fc3f7",
+  Earth: "#7cb342",
+  Light: "#ffd54f",
+  Dark:  "#9c6ade",
+  "":    "#8a9bab",
+};
+
+/* Shortens a hero name to its first two letters of each word, dot-joined.
+   e.g. "Last Rider Krau" → "LA.RI.KR" */
+function shortenHeroName(name) {
+  const words = (name || "Hero").trim().split(/\s+/).filter(Boolean);
+  if (words.length === 0) return "??";
+  return words.map(w => w.slice(0, 2).toUpperCase()).join(".");
+}
+
+/* ── Circle Select mode ── */
+let circleMode = false;              // tool armed (click chart to place/move circle)
+let circleSel  = null;               // { cx, cy, r } in chart percent coordinates
+const CIRCLE_DEFAULT_R = 15;
+const CIRCLE_MIN_R = 5, CIRCLE_MAX_R = 40;
+let magnifierOpen = false;
+let magnifierExcluded = { rarity: new Set(), role: new Set(), element: new Set() };
 
 /* ── Visibility modal filter state ── */
 let visFilterRarity  = new Set(["5ml","5r","4","3"]);
@@ -177,11 +204,25 @@ const saveStatus   = document.getElementById("save-status");
   chart.addEventListener("pointerup",   onPointerUp);
   chart.addEventListener("pointercancel", onPointerUp);
 
-  // Deselect on chart background click
+  // Deselect on chart background click / place circle when Circle Mode is armed
   chart.addEventListener("click", e => {
-    if (e.target === chart || e.target.classList.contains("axis-h") || e.target.classList.contains("axis-v")) {
-      setSelected(null);
+    if (e.target !== chart && !e.target.classList.contains("axis-h") && !e.target.classList.contains("axis-v")) return;
+
+    if (circleMode) {
+      const rect = chart.getBoundingClientRect();
+      const x = ((e.clientX - rect.left) / rect.width) * 100;
+      const y = ((e.clientY - rect.top) / rect.height) * 100;
+      circleSel = {
+        cx: Math.max(0, Math.min(100, x)),
+        cy: Math.max(0, Math.min(100, y)),
+        r: circleSel ? circleSel.r : CIRCLE_DEFAULT_R,
+      };
+      renderCircleSelect();
+      if (magnifierOpen) renderMagnifier();
+      return;
     }
+
+    setSelected(null);
   });
 
   // Image icon controls
@@ -280,6 +321,39 @@ const saveStatus   = document.getElementById("save-status");
     focusEnabled = !focusEnabled;
     document.getElementById("btn-focus-toggle").classList.toggle("active", focusEnabled);
     renderChart();
+  });
+
+  document.getElementById("btn-dot-toggle").addEventListener("click", () => {
+    dotMode = !dotMode;
+    document.getElementById("btn-dot-toggle").classList.toggle("active", dotMode);
+    document.body.classList.toggle("dot-mode", dotMode);
+    renderChart();
+  });
+
+  // ── Circle Select mode ──
+  document.getElementById("btn-circle-toggle").addEventListener("click", () => {
+    circleMode = !circleMode;
+    document.getElementById("btn-circle-toggle").classList.toggle("active", circleMode);
+    chart.classList.toggle("circle-armed", circleMode);
+  });
+
+  document.getElementById("circle-radius-input").addEventListener("input", e => {
+    if (!circleSel) return;
+    circleSel.r = Math.max(CIRCLE_MIN_R, Math.min(CIRCLE_MAX_R, Number(e.target.value) || CIRCLE_DEFAULT_R));
+    renderCircleSelect();
+    if (magnifierOpen) renderMagnifier();
+  });
+
+  document.getElementById("btn-circle-clear").addEventListener("click", () => {
+    circleSel = null;
+    renderCircleSelect();
+    if (magnifierOpen) closeMagnifier();
+  });
+
+  document.getElementById("btn-circle-magnify").addEventListener("click", openMagnifier);
+  document.getElementById("magnifier-close").addEventListener("click", closeMagnifier);
+  document.getElementById("magnifier-overlay").addEventListener("click", e => {
+    if (e.target === document.getElementById("magnifier-overlay")) closeMagnifier();
   });
 
   // ── Vis modal filter chips ──
@@ -393,6 +467,8 @@ function renderAll() {
   if (document.getElementById("visibility-modal-overlay").classList.contains("open")) {
     renderVisibilityPanel();
   }
+  if (circleSel) renderCircleSelect();
+  if (magnifierOpen) renderMagnifier();
 }
 
 function renderVisibilityPanel() {
@@ -567,6 +643,7 @@ function buildHeroDot(h, pos, { isHighlighted, isSelected, isDimmed, isGhost }) 
   if (isHighlighted) cls += " highlighted";
   if (isDimmed)      cls += " dimmed";
   if (isGhost)       cls += " ghost";
+  if (dotMode)       cls += " dot-mode";
 
   const dot = document.createElement("div");
   dot.className = cls;
@@ -593,7 +670,10 @@ function buildHeroDot(h, pos, { isHighlighted, isSelected, isDimmed, isGhost }) 
     inner.style.boxShadow   = "0 0 10px " + meta.border + "66";
   }
 
-  if (h.iconData) {
+  if (dotMode && !isGhost) {
+    // Dot mode: plain coloured circle keyed to element, no artwork
+    inner.style.background = ELEMENT_DOT_COLORS[h.element] || ELEMENT_DOT_COLORS[""];
+  } else if (h.iconData) {
     const img = document.createElement("img");
     img.src = h.iconData;
     img.style.cssText = "width:100%;height:100%;border-radius:50%;object-fit:cover;";
@@ -611,7 +691,8 @@ function buildHeroDot(h, pos, { isHighlighted, isSelected, isDimmed, isGhost }) 
 
   const label = document.createElement("div");
   label.className = "hero-dot-label" + (isGhost ? " ghost-label" : "");
-  label.textContent = isGhost ? "👻 " + (h.name || "Hero") : (h.name || "Hero");
+  const displayName = dotMode ? shortenHeroName(h.name) : (h.name || "Hero");
+  label.textContent = isGhost ? "👻 " + displayName : displayName;
 
   dot.appendChild(inner);
   dot.appendChild(label);
@@ -638,6 +719,206 @@ function buildHeroDot(h, pos, { isHighlighted, isSelected, isDimmed, isGhost }) 
   });
 
   return dot;
+}
+
+/* ═══════════════════════════════════════
+   CIRCLE SELECT + MAGNIFIER
+═══════════════════════════════════════ */
+
+// Heroes (visible, non-ghost primary position) whose distance from the
+// circle centre is within its radius — all in chart percent coordinates.
+function getHeroesInCircle() {
+  if (!circleSel) return [];
+  return heroes.filter(h => {
+    if (h.hidden) return false;
+    const { x, y } = scoresToXY(h.vType || "SPD", h.vScore || 0, h.hType || "SUR", h.hScore || 0);
+    const dx = x - circleSel.cx, dy = y - circleSel.cy;
+    return Math.sqrt(dx * dx + dy * dy) <= circleSel.r;
+  });
+}
+
+function renderCircleSelect() {
+  const ring  = document.getElementById("circle-select-ring");
+  const panel = document.getElementById("circle-control-panel");
+  if (!circleSel) {
+    ring.style.display  = "none";
+    panel.style.display = "none";
+    return;
+  }
+  ring.style.display = "block";
+  ring.style.left    = circleSel.cx + "%";
+  ring.style.top     = circleSel.cy + "%";
+  ring.style.width   = (circleSel.r * 2) + "%";
+  ring.style.height  = (circleSel.r * 2) + "%";
+
+  panel.style.display = "flex";
+  document.getElementById("circle-radius-input").value = circleSel.r;
+  const count = getHeroesInCircle().length;
+  document.getElementById("circle-count-label").textContent = count + " hero" + (count === 1 ? "" : "s") + " in range";
+}
+
+function openMagnifier() {
+  if (!circleSel) return;
+  magnifierOpen = true;
+  document.getElementById("magnifier-overlay").classList.add("open");
+  renderMagnifier();
+}
+
+function closeMagnifier() {
+  magnifierOpen = false;
+  document.getElementById("magnifier-overlay").classList.remove("open");
+}
+
+function renderMagnifier() {
+  if (!circleSel) { closeMagnifier(); return; }
+
+  const inCircle = getHeroesInCircle();
+  document.getElementById("magnifier-count-label").textContent =
+    inCircle.length + " hero" + (inCircle.length === 1 ? "" : "s") + " in selection · radius " + circleSel.r.toFixed(0);
+
+  renderMagnifierFilterBar(inCircle);
+
+  const filtered = inCircle.filter(h =>
+    !magnifierExcluded.rarity.has(h.rarity) &&
+    !magnifierExcluded.role.has(h.role ?? "") &&
+    !magnifierExcluded.element.has(h.element ?? "")
+  );
+
+  // ── Mini grid: remap each hero's position from the circle's bounding
+  //    square (cx±r, cy±r) onto a fresh 0–100% square. This is a real
+  //    re-plot on a cropped sub-grid, not a CSS zoom/scale of the main chart. ──
+  const grid = document.getElementById("magnifier-grid");
+  grid.querySelectorAll(".magnifier-dot").forEach(el => el.remove());
+
+  const left = circleSel.cx - circleSel.r;
+  const top  = circleSel.cy - circleSel.r;
+  const size = circleSel.r * 2;
+
+  filtered.forEach(h => {
+    const { x, y } = scoresToXY(h.vType || "SPD", h.vScore || 0, h.hType || "SUR", h.hScore || 0);
+    const nx = ((x - left) / size) * 100;
+    const ny = ((y - top)  / size) * 100;
+    grid.appendChild(buildMagnifierDot(h, nx, ny));
+  });
+
+  renderMagnifierList(filtered);
+}
+
+function buildMagnifierDot(h, x, y) {
+  const meta = RARITY_META[h.rarity] || RARITY_META["5r"];
+  const dot  = document.createElement("div");
+  dot.className    = "hero-dot magnifier-dot" + (dotMode ? " dot-mode" : "");
+  dot.style.left   = x + "%";
+  dot.style.top    = y + "%";
+
+  const inner = document.createElement("div");
+  inner.className = "hero-dot-inner";
+  inner.style.borderColor = meta.border;
+  inner.style.boxShadow   = "0 0 10px " + meta.border + "66";
+
+  if (dotMode) {
+    inner.style.background = ELEMENT_DOT_COLORS[h.element] || ELEMENT_DOT_COLORS[""];
+  } else if (h.iconData) {
+    const img = document.createElement("img");
+    img.src = h.iconData;
+    img.style.cssText = "width:100%;height:100%;border-radius:50%;object-fit:cover;";
+    inner.appendChild(img);
+  } else {
+    inner.textContent = "⚔️";
+  }
+
+  const label = document.createElement("div");
+  label.className = "hero-dot-label";
+  label.textContent = dotMode ? shortenHeroName(h.name) : (h.name || "Hero");
+
+  dot.appendChild(inner);
+  dot.appendChild(label);
+  dot.addEventListener("click", e => { e.stopPropagation(); openHeroDetails(h); });
+  return dot;
+}
+
+// Filter chips scoped only to the heroes currently inside the circle
+function renderMagnifierFilterBar(inCircle) {
+  const bar = document.getElementById("magnifier-filter-bar");
+
+  const rarities = [...new Set(inCircle.map(h => h.rarity))];
+  const roles    = [...new Set(inCircle.map(h => h.role ?? ""))];
+  const elements = [...new Set(inCircle.map(h => h.element ?? ""))];
+
+  function chip(val, excludedSet, label) {
+    const active = !excludedSet.has(val);
+    return `<button type="button" class="chip magnifier-chip${active ? " active" : ""}" data-val="${val}">${label}</button>`;
+  }
+
+  const groups = [];
+  if (rarities.length > 1) {
+    groups.push(`<div class="filter-group"><div class="filter-label">RARITY</div><div class="filter-chips" data-group="rarity">${
+      rarities.map(v => chip(v, magnifierExcluded.rarity, (RARITY_META[v] || RARITY_META["5r"]).label)).join("")
+    }</div></div>`);
+  }
+  if (roles.length > 1) {
+    groups.push(`<div class="filter-group"><div class="filter-label">ROLE</div><div class="filter-chips" data-group="role">${
+      roles.map(v => chip(v, magnifierExcluded.role, v || "— None —")).join("")
+    }</div></div>`);
+  }
+  if (elements.length > 1) {
+    groups.push(`<div class="filter-group"><div class="filter-label">ELEMENT</div><div class="filter-chips" data-group="element">${
+      elements.map(v => chip(v, magnifierExcluded.element, v || "— None —")).join("")
+    }</div></div>`);
+  }
+
+  bar.innerHTML = groups.join("") || `<div style="color:#607a90;font-size:11px;font-style:italic">All heroes shown — nothing to filter by.</div>`;
+
+  bar.querySelectorAll(".magnifier-chip").forEach(btn => {
+    btn.addEventListener("click", () => {
+      const group = btn.parentElement.dataset.group;
+      const val   = btn.dataset.val;
+      const set   = magnifierExcluded[group];
+      if (set.has(val)) set.delete(val); else set.add(val);
+      renderMagnifier();
+    });
+  });
+}
+
+function renderMagnifierList(filtered) {
+  const list = document.getElementById("magnifier-list");
+  list.innerHTML = "";
+
+  if (filtered.length === 0) {
+    list.innerHTML = `<div class="empty-state">No heroes match the current filters.</div>`;
+    return;
+  }
+
+  filtered.forEach(h => {
+    const meta   = RARITY_META[h.rarity] || RARITY_META["5r"];
+    const scores = xyToScores(h._x ?? 50, h._y ?? 50);
+    const avg    = avgScore(scores.vScore, scores.hScore);
+
+    const iconHTML = h.iconData
+      ? `<div class="hero-card-icon"><img src="${h.iconData}" style="width:32px;height:32px;border-radius:50%;object-fit:cover;"></div>`
+      : `<div class="hero-card-icon">⚔️</div>`;
+    const roleEl = h.role    ? `<span class="tag tag-role">${h.role}</span>`    : "";
+    const elemEl = h.element ? `<span class="tag tag-elem">${h.element}</span>` : "";
+
+    const card = document.createElement("div");
+    card.className = "hero-card";
+    card.innerHTML = `
+      ${iconHTML}
+      <div class="hero-card-info">
+        <div class="hero-card-name">${h.name || "Unnamed Hero"}</div>
+        <div class="hero-card-rarity" style="color:${meta.color}">${meta.label}</div>
+        <div class="hero-card-tags">${roleEl}${elemEl}</div>
+        <div class="hero-card-scores">
+          <div class="scores-row">
+            <span class="score-badge">${scores.vType} ${scores.vScore}</span>
+            <span class="score-badge">${scores.hType} ${scores.hScore}</span>
+            <span class="score-badge avg">Avg ${avg}</span>
+          </div>
+        </div>
+      </div>`;
+    card.addEventListener("click", () => openHeroDetails(h));
+    list.appendChild(card);
+  });
 }
 
 function renderRoster() {
