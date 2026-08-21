@@ -441,8 +441,8 @@ main {
   transform: translateY(-18px);
   color: var(--blue2);
 }
-/* RS 10 — just inside the right arrow */
-.axis-num-rs {
+/* SST 10 — just inside the right arrow */
+.axis-num-sst {
   right: 6px;
   top: 50%;
   transform: translateY(-18px);
@@ -454,6 +454,73 @@ main {
   transform: translate(6px, 4px);
   color: rgba(255,255,255,.3);
   font-size: clamp(9px, 1.5vw, 13px);
+}
+
+/* ── Origin dot (the true 0,0 point) ──
+   Always present, but only clickable in Dot Mode — otherwise hero
+   portraits sitting on top of it make it too easy to click by accident. */
+.origin-dot {
+  position: absolute;
+  left: 50%; top: 50%;
+  width: 9px; height: 9px;
+  transform: translate(-50%, -50%);
+  border-radius: 50%;
+  background: rgba(255,255,255,.12);
+  border: 1px solid rgba(255,255,255,.25);
+  pointer-events: none;
+  z-index: 5;
+  transition: background .15s, border-color .15s, box-shadow .15s, transform .15s;
+}
+body.dot-mode .origin-dot {
+  pointer-events: auto;
+  cursor: pointer;
+  width: 12px; height: 12px;
+  background: rgba(232,200,74,.35);
+  border-color: var(--gold2);
+  box-shadow: 0 0 10px rgba(201,162,39,.6);
+}
+body.dot-mode .origin-dot:hover {
+  background: rgba(232,200,74,.6);
+  box-shadow: 0 0 16px rgba(201,162,39,.85);
+  transform: translate(-50%, -50%) scale(1.2);
+}
+
+/* ── Origin legend (plus-sign popup) ── */
+.origin-legend-modal {
+  max-width: 340px;
+}
+.origin-legend-plus {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  grid-template-rows: 1fr 1fr 1fr;
+  gap: 8px;
+  width: 260px;
+  height: 260px;
+  margin: 22px auto 6px;
+}
+.origin-legend-circle {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  border-radius: 50%;
+  font-family: 'Cinzel', serif;
+  font-size: 11px;
+  letter-spacing: .04em;
+  line-height: 1.35;
+  padding: 6px;
+}
+.origin-legend-top    { grid-column: 2; grid-row: 1; background: rgba(59,159,212,.12); border: 1px solid var(--blue); color: var(--blue2); }
+.origin-legend-bottom { grid-column: 2; grid-row: 3; background: rgba(59,159,212,.12); border: 1px solid var(--blue); color: var(--blue2); }
+.origin-legend-left   { grid-column: 1; grid-row: 2; background: rgba(201,162,39,.12); border: 1px solid var(--gold); color: var(--gold2); }
+.origin-legend-right  { grid-column: 3; grid-row: 2; background: rgba(201,162,39,.12); border: 1px solid var(--gold); color: var(--gold2); }
+.origin-legend-center {
+  grid-column: 2; grid-row: 2;
+  background: rgba(255,255,255,.08);
+  border: 1px dashed rgba(255,255,255,.35);
+  color: var(--text-dim);
+  font-size: 13px;
+  font-weight: 700;
 }
 
 /* ── Arrow heads ── */

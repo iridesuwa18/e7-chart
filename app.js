@@ -2,7 +2,7 @@
    EPIC SEVEN — app.js  (v2)
    Sections A–F implemented:
    A) Image-based icons with crop/pan editor
-   B) Score system (SPD/TNK, SUR/RS) with axis numbers
+   B) Score system (SPD/TNK, SUR/SST) with axis numbers
    C) Roster: Role, Element, scores display, sort, filter, lock
    D) Average score calculation
    E) Admin password gate for save/load
@@ -330,6 +330,18 @@ const saveStatus   = document.getElementById("save-status");
     renderChart();
   });
 
+  // Origin dot (chart center, 0/0) — only clickable in Dot Mode (CSS also
+  // enforces this via pointer-events, this is a belt-and-suspenders check).
+  document.getElementById("origin-dot").addEventListener("click", e => {
+    e.stopPropagation();
+    if (!dotMode) return;
+    openOriginLegend();
+  });
+  document.getElementById("origin-legend-close").addEventListener("click", closeOriginLegend);
+  document.getElementById("origin-legend-overlay").addEventListener("click", e => {
+    if (e.target === document.getElementById("origin-legend-overlay")) closeOriginLegend();
+  });
+
   // ── Circle Select mode ──
   document.getElementById("btn-circle-toggle").addEventListener("click", () => {
     circleMode = !circleMode;
@@ -402,8 +414,8 @@ const saveStatus   = document.getElementById("save-status");
 
 /* ═══════════════════════════════════════
    SCORE ↔ POSITION CONVERSION
-   X axis: SUR(left) 0=50% / RS(right) 0=50%
-     SUR 10 → x=0%, SUR 0 → x=50%, RS 0 → x=50%, RS 10 → x=100%
+   X axis: SUR(left) 0=50% / SST(right) 0=50%   [SST = Sustainability, formerly "RS"]
+     SUR 10 → x=0%, SUR 0 → x=50%, SST 0 → x=50%, SST 10 → x=100%
    Y axis: SPD(top) / TNK(bottom)
      SPD 10 → y=0%, SPD 0 → y=50%, TNK 0 → y=50%, TNK 10 → y=100%
 ═══════════════════════════════════════ */
@@ -422,14 +434,14 @@ function scoresToXY(vType, vScore, hType, hScore) {
   if (hType === "SUR") {
     x = 50 - (h / 10) * 50; // SUR 10 → 0%, SUR 0 → 50%
   } else {
-    x = 50 + (h / 10) * 50; // RS 0 → 50%, RS 10 → 100%
+    x = 50 + (h / 10) * 50; // SST 0 → 50%, SST 10 → 100%
   }
 
   return { x, y };
 }
 
 function xyToScores(x, y) {
-  // x: 0..100 → SUR 10..0 (left half) or RS 0..10 (right half)
+  // x: 0..100 → SUR 10..0 (left half) or SST 0..10 (right half)
   // y: 0..100 → SPD 10..0 (top half)  or TNK 0..10 (bottom half)
   let vType, vScore, hType, hScore;
 
@@ -445,11 +457,29 @@ function xyToScores(x, y) {
     hType  = "SUR";
     hScore = +((50 - x) / 50 * 10).toFixed(1);
   } else {
-    hType  = "RS";
+    hType  = "SST";
     hScore = +((x - 50) / 50 * 10).toFixed(1);
   }
 
   return { vType, vScore, hType, hScore };
+}
+
+/* Back-compat: any hero data saved before the RS → SST rename still has
+   hType (or altStats.hType) === "RS". scoresToXY treats anything that
+   isn't "SUR" as the right-hand side, so old heroes still plot correctly
+   without this — but this keeps displayed labels (roster, tooltips,
+   compare panel) showing "SST" instead of the retired "RS" code. */
+function migrateHeroTypes(list) {
+  if (!Array.isArray(list)) return list;
+  return list.map(h => {
+    const needsFix = h.hType === "RS" || h.altStats?.hType === "RS";
+    if (!needsFix) return h;
+    return {
+      ...h,
+      hType: h.hType === "RS" ? "SST" : h.hType,
+      altStats: h.altStats ? { ...h.altStats, hType: h.altStats.hType === "RS" ? "SST" : h.altStats.hType } : h.altStats,
+    };
+  });
 }
 
 function avgScore(vScore, hScore) {
@@ -1449,6 +1479,16 @@ function normScore(v) {
   return Math.round((Number(v) || 0) * 10) / 10;
 }
 
+/* ── Origin legend (plus-sign popup) ──
+   Explains what a score of 0 means on each axis. Triggered by clicking
+   the origin dot at chart center — Dot Mode only, see wiring above. */
+function openOriginLegend() {
+  document.getElementById("origin-legend-overlay").classList.add("open");
+}
+function closeOriginLegend() {
+  document.getElementById("origin-legend-overlay").classList.remove("open");
+}
+
 function openStatCompare(axis) {
   const type   = (axis === "v" ? fVType : fHType).value;
   const target = normScore((axis === "v" ? fVScore : fHScore).value);
@@ -1541,6 +1581,7 @@ function loadLocal() {
       }
       return h;
     });
+    heroes = migrateHeroTypes(heroes);
   } catch { heroes = []; }
 }
 
@@ -1669,6 +1710,7 @@ async function autoLoadFromServer() {
           altStats: serverHero.altStats ?? local.altStats ?? null,
         };
       });
+      heroes = migrateHeroTypes(heroes);
 
       saveLocal();
       renderAll();
@@ -1725,7 +1767,7 @@ async function loadFromServer(password) {
     }
     setCachedAdminPassword(password);
     if (Array.isArray(data.heroes)) {
-      heroes = data.heroes;
+      heroes = migrateHeroTypes(data.heroes);
       saveLocal();
       renderAll();
       setStatus("✅ Loaded from GitHub");

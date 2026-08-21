@@ -44,7 +44,7 @@
       <div class="axis-label axis-top">SPEED / CR GAIN</div>
       <div class="axis-label axis-bottom">SLOW / TANKER</div>
       <div class="axis-label axis-left"><span style="opacity:1">SURVIVABILITY</span><span>Can 1v4</span></div>
-      <div class="axis-label axis-right"><span style="opacity:1">REQUIRES SUPPORT</span><span>Loses 1v4</span></div>
+      <div class="axis-label axis-right"><span style="opacity:1">SUSTAINABILITY</span><span>Self-Sustaining</span></div>
 
       <!-- The chart -->
       <div class="chart" id="chart">
@@ -65,10 +65,15 @@
         <!-- Vertical axis: 10 near top arrow (SPD), 10 near bottom arrow (TNK) -->
         <div class="axis-num axis-num-spd">10</div>
         <div class="axis-num axis-num-tnk">10</div>
-        <!-- Horizontal axis: 10 near left arrow (SUR), 10 near right arrow (RS) -->
+        <!-- Horizontal axis: 10 near left arrow (SUR), 10 near right arrow (SST) -->
         <div class="axis-num axis-num-sur">10</div>
-        <div class="axis-num axis-num-rs">10</div>
+        <div class="axis-num axis-num-sst">10</div>
         <div class="axis-num axis-num-center">0</div>
+
+        <!-- Origin dot — the true (0,0) point. Only clickable in Dot Mode
+             (otherwise hero portraits sitting on top of it would make it
+             too easy to click by accident). Opens the axis-zero legend. -->
+        <div class="origin-dot" id="origin-dot" title="Click to see what 0 means on each axis (Dot Mode only)"></div>
 
         <!-- Quadrant corner labels -->
         <div class="quad-label quad-tl">
@@ -362,11 +367,11 @@
           <button type="button" class="stat-info-btn" id="btn-compare-v" title="Compare with heroes near this value">i</button>
         </div>
         <div class="form-group">
-          <label>Horizontal (SUR / RS)</label>
+          <label>Horizontal (SUR / SST)</label>
           <div class="score-input-group">
             <select id="f-h-type">
               <option value="SUR">SUR</option>
-              <option value="RS">RS</option>
+              <option value="SST">SST</option>
             </select>
             <input type="number" id="f-h-score" min="0" max="10" step="0.1" value="0" placeholder="0.0" />
           </div>
@@ -433,11 +438,11 @@
               </div>
             </div>
             <div class="form-group">
-              <label>Horizontal (SUR / RS)</label>
+              <label>Horizontal (SUR / SST)</label>
               <div class="score-input-group">
                 <select id="f-alt-h-type">
                   <option value="SUR">SUR</option>
-                  <option value="RS">RS</option>
+                  <option value="SST">SST</option>
                 </select>
                 <input type="number" id="f-alt-h-score" min="0" max="10" step="0.1" value="0" placeholder="0.0" />
               </div>
@@ -500,6 +505,32 @@
         <div class="magnifier-sidebar">
           <div class="magnifier-filter-bar" id="magnifier-filter-bar"></div>
           <div class="magnifier-list" id="magnifier-list"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ORIGIN LEGEND (plus-sign popup) — what "0" means on each axis.
+       Opened by clicking the origin dot at chart center, Dot Mode only. -->
+  <div class="overlay" id="origin-legend-overlay">
+    <div class="modal origin-legend-modal" id="origin-legend-modal">
+      <div class="details-modal-header">
+        <div class="modal-title" style="margin:0;padding:0;border:none">AT ZERO, EACH AXIS MEANS…</div>
+        <button class="det-close-btn" id="origin-legend-close">×</button>
+      </div>
+      <div class="origin-legend-plus">
+        <div class="origin-legend-circle origin-legend-top">
+          <span>Requires<br>Support</span>
+        </div>
+        <div class="origin-legend-circle origin-legend-left">
+          <span>Lacks<br>Speed</span>
+        </div>
+        <div class="origin-legend-circle origin-legend-center">0</div>
+        <div class="origin-legend-circle origin-legend-right">
+          <span>Not<br>Tanky</span>
+        </div>
+        <div class="origin-legend-circle origin-legend-bottom">
+          <span>Cannot<br>Sustain</span>
         </div>
       </div>
     </div>
