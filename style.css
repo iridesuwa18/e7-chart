@@ -300,6 +300,56 @@ main {
   pointer-events: none;
 }
 
+/* ══════════════════════════════════════
+   CIRCLE SELECT — ring + control panel
+   (positioned/sized via JS: left/top = centre %, width/height = diameter %)
+══════════════════════════════════════ */
+.circle-select-ring {
+  position: absolute;
+  transform: translate(-50%, -50%);
+  border-radius: 50%;
+  border: 2px dashed var(--gold2);
+  background: rgba(232,200,74,.08);
+  box-shadow: 0 0 14px rgba(201,162,39,.5), inset 0 0 14px rgba(201,162,39,.15);
+  pointer-events: none;
+  z-index: 25;
+}
+
+.circle-control-panel {
+  margin-top: 8px;
+  flex-direction: column;
+  gap: 8px;
+  padding: 10px 12px;
+  background: var(--bg2);
+  border: 1px solid var(--gold-dim);
+  border-radius: 6px;
+}
+.circle-control-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.circle-control-label {
+  font-family: 'Cinzel', serif;
+  font-size: 10px;
+  letter-spacing: .08em;
+  color: var(--gold2);
+  flex-shrink: 0;
+}
+.circle-control-row input[type="range"]#circle-radius-input {
+  flex: 1;
+  accent-color: var(--gold);
+}
+.circle-count-label {
+  font-size: 11px;
+  color: var(--text-dim);
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+.circle-control-actions {
+  justify-content: flex-end;
+}
+
 /* Clips all visual backgrounds to the chart box */
 .chart-bg {
   position: absolute;
