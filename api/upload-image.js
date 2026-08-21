@@ -1,9 +1,9 @@
 // api/upload-image.js
 // Uploads a base64 image to iridesuwa18/e7-chart and returns the raw GitHub URL.
-// Called automatically by draft.js whenever a user sets a hero icon or tag icon.
-// Env vars required: GITHUB_TOKEN
+// Called automatically by app.js whenever a user sets a hero icon or tag icon.
+// Env vars required: GITHUB_TOKEN, ADMIN_PASSWORD
 //
-// POST body: { data: "data:image/jpeg;base64,…", folder: "heroes"|"icons", filename: "abc123.jpg" }
+// POST body: { data: "data:image/jpeg;base64,…", folder: "heroes"|"icons", filename: "abc123.jpg", password: "…" }
 // Response:  { url: "https://raw.githubusercontent.com/…" }
 
 const REPO  = "iridesuwa18/e7-chart";
@@ -17,12 +17,18 @@ export default async function handler(req, res) {
   if (req.method !== "POST")
     return res.status(405).json({ error: "Method not allowed" });
 
-  const token = process.env.GITHUB_TOKEN;
-  if (!token) return res.status(500).json({ error: "GITHUB_TOKEN not set" });
+  const token         = process.env.GITHUB_TOKEN;
+  const adminPassword = process.env.ADMIN_PASSWORD;
+
+  if (!token)         return res.status(500).json({ error: "GITHUB_TOKEN not set" });
+  if (!adminPassword) return res.status(500).json({ error: "ADMIN_PASSWORD not set" });
 
   let body;
   try { body = typeof req.body === "string" ? JSON.parse(req.body) : req.body; }
   catch { return res.status(400).json({ error: "Invalid JSON body" }); }
+
+  if (!body.password || body.password !== adminPassword)
+    return res.status(401).json({ error: "Incorrect password. Admin access only." });
 
   const { data, folder, filename } = body;
   if (!data || !folder || !filename)
