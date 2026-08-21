@@ -8,14 +8,19 @@
       "element": "Light",
       "vType": "TNK",
       "vScore": 9,
-      "hType": "SUR",
+      "hType": "SST",
       "hScore": 10,
       "notes": "",
       "iconData": "https://raw.githubusercontent.com/iridesuwa18/e7-chart/main/assets/heroes/ruele-of-light.webp",
       "locked": true,
-      "_x": 0,
+      "_x": 100,
       "_y": 95,
-      "altStats": null,
+      "altStats": {
+        "vType": "TNK",
+        "vScore": 9,
+        "hType": "SUR",
+        "hScore": 3
+      },
       "hidden": false
     },
     {
@@ -379,5 +384,5 @@
     }
   ],
   "draftData": null,
-  "savedAt": "2026-08-21T12:29:56.078Z"
+  "savedAt": "2026-08-21T12:52:06.830Z"
 }
