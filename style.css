@@ -1730,8 +1730,8 @@ body.hide-labels .hero-dot-label {
   border-top: 2px solid var(--gold);
   border-radius: 6px;
   width: 100%;
-  max-width: 900px;
-  max-height: 86vh;
+  max-width: 720px;
+  max-height: 92vh;
   display: flex;
   flex-direction: column;
   box-shadow: 0 20px 60px rgba(0,0,0,.8), 0 0 40px rgba(201,162,39,.08);
@@ -1763,25 +1763,24 @@ body.hide-labels .hero-dot-label {
 
 #magnifier-body {
   display: flex;
+  flex-direction: column;
   gap: 0;
   min-height: 0;
   flex: 1;
 }
 
 .magnifier-grid-wrap {
-  flex: 1 1 60%;
-  min-width: 0;
+  flex-shrink: 0;
   padding: 20px;
   display: flex;
   align-items: center;
   justify-content: center;
-  border-right: 1px solid var(--border);
-  overflow: auto;
+  border-bottom: 1px solid var(--border);
 }
 .magnifier-grid {
   position: relative;
   width: 100%;
-  max-width: 560px;
+  max-width: 640px;
   aspect-ratio: 1 / 1;
   border: 1px solid var(--border);
   border-radius: 4px;
@@ -1804,18 +1803,18 @@ body.hide-labels .hero-dot-label {
 .magnifier-crosshair-v { top: 0; bottom: 0; left: 50%; width: 1px; }
 
 .magnifier-sidebar {
-  flex: 1 1 40%;
-  min-width: 240px;
-  max-width: 320px;
+  flex: 1;
+  min-width: 0;
+  max-width: none;
   display: flex;
   flex-direction: column;
-  min-height: 0;
+  min-height: 120px;
 }
 .magnifier-filter-bar {
-  padding: 12px 14px;
+  padding: 10px 14px;
   border-bottom: 1px solid var(--border);
   flex-shrink: 0;
-  max-height: 40%;
+  max-height: 96px;
   overflow-y: auto;
 }
 .magnifier-list {
