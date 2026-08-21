@@ -313,7 +313,12 @@
       "notes": "",
       "iconData": "https://raw.githubusercontent.com/iridesuwa18/e7-chart/main/assets/heroes/empyrean-ilynav.webp",
       "locked": true,
-      "altStats": null,
+      "altStats": {
+        "vType": "TNK",
+        "vScore": 8.5,
+        "hType": "SUR",
+        "hScore": 8.2
+      },
       "_x": 9,
       "_y": 6.500000000000007,
       "hidden": false
@@ -349,13 +354,13 @@
       "element": "Light",
       "vType": "SPD",
       "vScore": 6.5,
-      "hType": "SST",
-      "hScore": 8.2,
+      "hType": "SUR",
+      "hScore": 4,
       "notes": "",
       "iconData": "https://raw.githubusercontent.com/iridesuwa18/e7-chart/main/assets/heroes/astromancer-elena.webp",
       "locked": true,
       "altStats": null,
-      "_x": 91,
+      "_x": 30,
       "_y": 17.5
     },
     {
@@ -394,5 +399,5 @@
     }
   ],
   "draftData": null,
-  "savedAt": "2026-08-21T13:02:25.752Z"
+  "savedAt": "2026-08-21T13:05:58.581Z"
 }
