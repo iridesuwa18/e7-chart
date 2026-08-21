@@ -1416,7 +1416,37 @@ function closeModal() {
   editorImg = null;
 }
 
-function onModalConfirm() {
+// Turns a hero name into a safe filename slug, e.g. "Lots of Legend Yufine!" -> "lots-of-legend-yufine"
+function slugifyName(name) {
+  return (name || "hero")
+    .toLowerCase()
+    .trim()
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-+|-+$/g, "") || "hero";
+}
+
+// If iconData is a freshly-pasted/uploaded/cropped image, it'll be a base64
+// data: URL. Upload it to assets/heroes/ on GitHub and swap in the raw URL
+// instead, so we never store base64 blobs in e7_data.json. If it's already
+// a URL (unchanged existing icon, or no icon at all), leave it as-is.
+async function uploadIconIfNeeded(name, iconData) {
+  if (!iconData || !iconData.startsWith("data:")) return iconData;
+  const filename = `${slugifyName(name)}.webp`;
+  const password = getCachedAdminPassword();
+  const res = await fetch("https://e7-chart.vercel.app/api/upload-image", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ data: iconData, folder: "heroes", filename, password }),
+  });
+  const data = await res.json();
+  if (!res.ok) {
+    if (res.status === 401) clearCachedAdminPassword();
+    throw new Error(data.error || "Icon upload failed");
+  }
+  return data.url;
+}
+
+async function onModalConfirm() {
   const name     = fName.value.trim() || "Unnamed Hero";
   const rarity   = fRarity.value;
   const role     = fRole.value;
@@ -1426,8 +1456,24 @@ function onModalConfirm() {
   const hType    = fHType.value;
   const hScore   = Math.max(0, Math.min(10, parseFloat(fHScore.value) || 0));
   const notes    = fNotes.value.trim();
-  const iconData = fIconData.value || null;
+  let   iconData = fIconData.value || null;
   const locked   = document.getElementById("f-locked").checked;
+
+  // Upload any new pasted/cropped image to GitHub before saving the hero,
+  // so heroes[] and e7_data.json only ever hold a small URL, not base64.
+  if (iconData && iconData.startsWith("data:")) {
+    modalConfirm.disabled = true;
+    setStatus("⏳ Uploading icon…", 0);
+    try {
+      iconData = await uploadIconIfNeeded(name, iconData);
+    } catch (e) {
+      setStatus("❌ " + e.message);
+      modalConfirm.disabled = false;
+      return;
+    }
+    modalConfirm.disabled = false;
+    setStatus("✅ Icon uploaded");
+  }
 
   // Alt / ghost stats
   const altEnabled = document.getElementById("f-alt-enabled").checked;
