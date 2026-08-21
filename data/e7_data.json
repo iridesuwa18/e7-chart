@@ -56,7 +56,12 @@
       "locked": true,
       "_x": 5,
       "_y": 100,
-      "altStats": null,
+      "altStats": {
+        "vType": "SPD",
+        "vScore": 9,
+        "hType": "SST",
+        "hScore": 8
+      },
       "hidden": false
     },
     {
@@ -109,12 +114,17 @@
       "vType": "SPD",
       "vScore": 7,
       "hType": "SUR",
-      "hScore": 10,
+      "hScore": 9,
       "notes": "",
       "iconData": "https://raw.githubusercontent.com/iridesuwa18/e7-chart/main/assets/heroes/setsuka.webp",
       "locked": true,
-      "altStats": null,
-      "_x": 0,
+      "altStats": {
+        "vType": "SPD",
+        "vScore": 7,
+        "hType": "SST",
+        "hScore": 7.8
+      },
+      "_x": 5,
       "_y": 15,
       "hidden": false
     },
@@ -125,7 +135,7 @@
       "role": "Warrior",
       "element": "Light",
       "vType": "SPD",
-      "vScore": 7,
+      "vScore": 7.8,
       "hType": "SUR",
       "hScore": 8,
       "notes": "",
@@ -133,7 +143,7 @@
       "locked": true,
       "altStats": null,
       "_x": 10,
-      "_y": 15,
+      "_y": 11,
       "hidden": false
     },
     {
@@ -384,5 +394,5 @@
     }
   ],
   "draftData": null,
-  "savedAt": "2026-08-21T12:52:06.830Z"
+  "savedAt": "2026-08-21T12:56:59.671Z"
 }
