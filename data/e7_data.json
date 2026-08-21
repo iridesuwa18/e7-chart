@@ -484,8 +484,25 @@
       },
       "_x": 100,
       "_y": 99
+    },
+    {
+      "id": 1787318417148,
+      "name": "Twisted Eidolon Kayron",
+      "rarity": "5ml",
+      "role": "Thief",
+      "element": "Light",
+      "vType": "TNK",
+      "vScore": 7.8,
+      "hType": "SUR",
+      "hScore": 7.8,
+      "notes": "",
+      "iconData": "https://raw.githubusercontent.com/iridesuwa18/e7-chart/main/assets/heroes/twisted-eidolon-kayron.webp",
+      "locked": true,
+      "altStats": null,
+      "_x": 11,
+      "_y": 89
     }
   ],
   "draftData": null,
-  "savedAt": "2026-08-21T13:18:21.582Z"
+  "savedAt": "2026-08-21T13:20:41.623Z"
 }
