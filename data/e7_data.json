@@ -418,8 +418,30 @@
       },
       "_x": 90,
       "_y": 15
+    },
+    {
+      "id": 1787317989913,
+      "name": "Spirit Eye Celine",
+      "rarity": "5ml",
+      "role": "Thief",
+      "element": "Light",
+      "vType": "SPD",
+      "vScore": 9,
+      "hType": "SST",
+      "hScore": 8.5,
+      "notes": "",
+      "iconData": "https://raw.githubusercontent.com/iridesuwa18/e7-chart/main/assets/heroes/spirit-eye-celine.webp",
+      "locked": true,
+      "altStats": {
+        "vType": "SPD",
+        "vScore": 9,
+        "hType": "SUR",
+        "hScore": 9.5
+      },
+      "_x": 92.5,
+      "_y": 5
     }
   ],
   "draftData": null,
-  "savedAt": "2026-08-21T13:12:41.003Z"
+  "savedAt": "2026-08-21T13:14:07.195Z"
 }
