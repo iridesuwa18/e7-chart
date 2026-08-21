@@ -440,8 +440,30 @@
       },
       "_x": 92.5,
       "_y": 5
+    },
+    {
+      "id": 1787318177165,
+      "name": "Navy Captain Landy",
+      "rarity": "5ml",
+      "role": "Knight",
+      "element": "Light",
+      "vType": "SPD",
+      "vScore": 8,
+      "hType": "SST",
+      "hScore": 7.5,
+      "notes": "",
+      "iconData": "https://raw.githubusercontent.com/iridesuwa18/e7-chart/main/assets/heroes/navy-captain-landy.webp",
+      "locked": true,
+      "altStats": {
+        "vType": "SPD",
+        "vScore": 8,
+        "hType": "SUR",
+        "hScore": 7
+      },
+      "_x": 87.5,
+      "_y": 10
     }
   ],
   "draftData": null,
-  "savedAt": "2026-08-21T13:14:07.195Z"
+  "savedAt": "2026-08-21T13:16:21.979Z"
 }
