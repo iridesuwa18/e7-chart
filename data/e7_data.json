@@ -396,8 +396,30 @@
       "altStats": null,
       "_x": 40,
       "_y": 2.5
+    },
+    {
+      "id": 1787317815758,
+      "name": "Specimen Sez",
+      "rarity": "5ml",
+      "role": "Thief",
+      "element": "Light",
+      "vType": "SPD",
+      "vScore": 7,
+      "hType": "SST",
+      "hScore": 8,
+      "notes": "",
+      "iconData": "https://raw.githubusercontent.com/iridesuwa18/e7-chart/main/assets/heroes/specimen-sez.webp",
+      "locked": true,
+      "altStats": {
+        "vType": "SPD",
+        "vScore": 7,
+        "hType": "SUR",
+        "hScore": 6.3
+      },
+      "_x": 90,
+      "_y": 15
     }
   ],
   "draftData": null,
-  "savedAt": "2026-08-21T13:09:03.998Z"
+  "savedAt": "2026-08-21T13:12:41.003Z"
 }
