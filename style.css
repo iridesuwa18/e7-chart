@@ -481,8 +481,9 @@ main {
 }
 .hero-dot.dot-mode .hero-dot-label {
   margin-top: 1px;
-  font-size: 10px;
-  padding: 0 3px;
+  font-size: 5px;
+  padding: 0 2px;
+  letter-spacing: 0;
 }
 
 /* ══════════════════════════════════════
