@@ -154,13 +154,13 @@
       "element": "Light",
       "vType": "SPD",
       "vScore": 6,
-      "hType": "SST",
-      "hScore": 8,
+      "hType": "SUR",
+      "hScore": 3,
       "notes": "",
       "iconData": "https://raw.githubusercontent.com/iridesuwa18/e7-chart/main/assets/heroes/conqueror-lilias.webp",
       "locked": true,
       "altStats": null,
-      "_x": 90,
+      "_x": 35,
       "_y": 20,
       "hidden": false
     },
@@ -172,13 +172,13 @@
       "element": "Light",
       "vType": "SPD",
       "vScore": 6.5,
-      "hType": "SST",
-      "hScore": 8.5,
+      "hType": "SUR",
+      "hScore": 4,
       "notes": "",
       "iconData": "https://raw.githubusercontent.com/iridesuwa18/e7-chart/main/assets/heroes/judge-kise.webp",
       "locked": true,
       "altStats": null,
-      "_x": 92.5,
+      "_x": 30,
       "_y": 17.5,
       "hidden": false
     },
@@ -198,7 +198,7 @@
       "altStats": {
         "vType": "TNK",
         "vScore": 8,
-        "hType": "SUR",
+        "hType": "SST",
         "hScore": 9
       },
       "_x": 5,
@@ -254,13 +254,13 @@
       "element": "Light",
       "vType": "TNK",
       "vScore": 7.5,
-      "hType": "SST",
-      "hScore": 8.9,
+      "hType": "SUR",
+      "hScore": 3,
       "notes": "",
       "iconData": "https://raw.githubusercontent.com/iridesuwa18/e7-chart/main/assets/heroes/ambitious-tywin.webp",
       "locked": true,
       "altStats": null,
-      "_x": 94.5,
+      "_x": 35,
       "_y": 87.5,
       "hidden": false
     },
@@ -394,5 +394,5 @@
     }
   ],
   "draftData": null,
-  "savedAt": "2026-08-21T12:56:59.671Z"
+  "savedAt": "2026-08-21T13:02:25.752Z"
 }
