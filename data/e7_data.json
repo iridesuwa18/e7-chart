@@ -501,8 +501,25 @@
       "altStats": null,
       "_x": 11,
       "_y": 89
+    },
+    {
+      "id": 1787318531072,
+      "name": "Architect Laika",
+      "rarity": "5ml",
+      "role": "Mage",
+      "element": "Light",
+      "vType": "SPD",
+      "vScore": 9.1,
+      "hType": "SUR",
+      "hScore": 4,
+      "notes": "",
+      "iconData": "https://raw.githubusercontent.com/iridesuwa18/e7-chart/main/assets/heroes/architect-laika.webp",
+      "locked": true,
+      "altStats": null,
+      "_x": 30,
+      "_y": 4.500000000000007
     }
   ],
   "draftData": null,
-  "savedAt": "2026-08-21T13:20:41.623Z"
+  "savedAt": "2026-08-21T13:23:08.629Z"
 }
