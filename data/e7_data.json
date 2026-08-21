@@ -371,13 +371,13 @@
       "element": "Light",
       "vType": "SPD",
       "vScore": 8.9,
-      "hType": "SST",
-      "hScore": 6.5,
+      "hType": "SUR",
+      "hScore": 6,
       "notes": "",
       "iconData": "https://raw.githubusercontent.com/iridesuwa18/e7-chart/main/assets/heroes/commander-pavel.webp",
       "locked": true,
       "altStats": null,
-      "_x": 82.5,
+      "_x": 20,
       "_y": 5.5
     },
     {
@@ -388,16 +388,16 @@
       "element": "Light",
       "vType": "SPD",
       "vScore": 9.5,
-      "hType": "SST",
-      "hScore": 9.1,
+      "hType": "SUR",
+      "hScore": 2,
       "notes": "",
       "iconData": "https://raw.githubusercontent.com/iridesuwa18/e7-chart/main/assets/heroes/faithless-lidica.webp",
       "locked": true,
       "altStats": null,
-      "_x": 95.5,
+      "_x": 40,
       "_y": 2.5
     }
   ],
   "draftData": null,
-  "savedAt": "2026-08-21T13:05:58.581Z"
+  "savedAt": "2026-08-21T13:07:38.733Z"
 }
