@@ -485,7 +485,7 @@
       "role": "Knight",
       "element": "Light",
       "vType": "TNK",
-      "vScore": 9.8,
+      "vScore": 10,
       "hType": "SST",
       "hScore": 10,
       "notes": "",
@@ -495,10 +495,10 @@
         "vType": "SPD",
         "vScore": 1,
         "hType": "SUR",
-        "hScore": 8
+        "hScore": 6
       },
       "_x": 100,
-      "_y": 99
+      "_y": 100
     },
     {
       "id": 1787318417148,
@@ -536,5 +536,5 @@
     }
   ],
   "draftData": null,
-  "savedAt": "2026-08-22T13:28:56.729Z"
+  "savedAt": "2026-08-22T13:30:21.023Z"
 }
