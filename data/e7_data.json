@@ -19,7 +19,7 @@
         "vType": "TNK",
         "vScore": 8,
         "hType": "SUR",
-        "hScore": 10
+        "hScore": 6
       },
       "hidden": false
     },
@@ -521,5 +521,5 @@
     }
   ],
   "draftData": null,
-  "savedAt": "2026-08-22T11:51:52.956Z"
+  "savedAt": "2026-08-22T11:53:16.202Z"
 }
