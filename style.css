@@ -979,6 +979,310 @@ body.dot-mode .origin-dot:hover {
 /* ── Reuse details-modal header spacing for compare modal ── */
 #compare-modal .details-modal-header { border-bottom: 1px solid var(--gold-dim); }
 
+/* ══════════════════════════════════════════════════════════
+   FULL-SCREEN AXIS SLIDERS
+   Visual drag-to-set popups for Horizontal (SUR/SST) and
+   Vertical (SPD/TNK) scores, opened from the Add Hero form.
+══════════════════════════════════════════════════════════ */
+.slider-trigger-btn { margin-left: 4px; font-size: 12px; }
+.ghost-trigger-btn {
+  border-color: #7a3a90;
+  color: #e0a0fb;
+  background: rgba(224,64,251,.06);
+}
+.ghost-trigger-btn:hover {
+  background: rgba(224,64,251,.18);
+  border-color: #e040fb;
+  box-shadow: 0 0 8px rgba(224,64,251,.35);
+}
+
+.axis-slider-overlay {
+  display: none;
+  position: fixed; inset: 0;
+  background: rgba(2,6,10,.94);
+  backdrop-filter: blur(6px);
+  z-index: 400;
+  align-items: center;
+  justify-content: center;
+  padding: 18px;
+}
+.axis-slider-overlay.open { display: flex; }
+
+.axis-slider-screen {
+  width: 100%;
+  max-width: 920px;
+  height: 100%;
+  max-height: 660px;
+  display: flex;
+  flex-direction: column;
+  background: linear-gradient(180deg, var(--bg3), var(--bg2));
+  border: 1px solid var(--border);
+  border-top: 2px solid var(--gold);
+  border-radius: 10px;
+  padding: 20px 26px 26px;
+  box-shadow: 0 30px 80px rgba(0,0,0,.8), 0 0 60px rgba(201,162,39,.08);
+  animation: modalIn .22s ease;
+}
+
+.axis-slider-header {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+  margin-bottom: 6px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid var(--gold-dim);
+  flex-shrink: 0;
+}
+.axis-slider-title {
+  font-family: 'Cinzel', serif;
+  font-size: 13px;
+  letter-spacing: .18em;
+  color: var(--gold2);
+  flex: 1;
+}
+
+/* Ghost badge — only visible when a slider is opened for the secondary/ghost stat */
+.ghost-badge {
+  display: none;
+  font-family: 'Cinzel', serif;
+  font-size: 9px;
+  letter-spacing: .12em;
+  color: #e0a0fb;
+  background: rgba(224,64,251,.12);
+  border: 1px solid #b060c8;
+  border-radius: 12px;
+  padding: 4px 10px;
+  flex-shrink: 0;
+}
+.axis-slider-screen.ghost-mode .ghost-badge { display: inline-block; }
+.axis-slider-screen.ghost-mode .axis-slider-title { color: #e0a0fb; }
+.axis-slider-screen.ghost-mode { border-top-color: #b060c8; }
+.axis-slider-screen.ghost-mode .axis-slider-handle,
+.axis-slider-screen.ghost-mode .axis-slider-handle-y {
+  background: #e040fb;
+  box-shadow: 0 0 14px rgba(224,64,251,.7), 0 2px 6px rgba(0,0,0,.6);
+}
+.axis-slider-screen.ghost-mode .axis-slider-fill { background: linear-gradient(90deg, #6a2080, #e040fb); }
+.axis-slider-screen.ghost-mode .axis-slider-fill-y { background: linear-gradient(180deg, #e040fb, #6a2080); }
+.axis-slider-screen.ghost-mode .axis-slider-portrait canvas {
+  border-color: #e040fb;
+  box-shadow: 0 0 16px rgba(224,64,251,.55), 0 4px 12px rgba(0,0,0,.6);
+  opacity: .8;
+  filter: saturate(.85);
+}
+.axis-slider-screen.ghost-mode .axis-tick-mid,
+.axis-slider-screen.ghost-mode .axis-tick-y.axis-tick-mid { background: #e0a0fb; }
+.axis-slider-screen.ghost-mode .axis-slider-readout-num { color: #e0a0fb; }
+.axis-slider-screen.ghost-mode .axis-slider-endval { color: #e0a0fb; }
+.axis-slider-close {
+  width: 30px; height: 30px;
+  border-radius: 50%;
+  border: 1px solid var(--gold-dim);
+  background: rgba(201,162,39,.06);
+  color: var(--gold2);
+  font-size: 14px;
+  cursor: pointer;
+  flex-shrink: 0;
+}
+.axis-slider-close:hover { background: rgba(201,162,39,.18); border-color: var(--gold); }
+
+/* Fine (0.1) toggle switch */
+.fine-toggle { display: flex; align-items: center; gap: 8px; cursor: pointer; user-select: none; flex-shrink: 0; }
+.fine-toggle input { display: none; }
+.fine-toggle-label {
+  font-family: 'Cinzel', serif; font-size: 9px; letter-spacing: .14em;
+  color: var(--text-dim); text-transform: uppercase;
+}
+.fine-toggle-track {
+  width: 34px; height: 18px;
+  border-radius: 10px;
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  position: relative;
+  transition: background .2s, border-color .2s;
+  flex-shrink: 0;
+}
+.fine-toggle-thumb {
+  position: absolute; top: 1px; left: 1px;
+  width: 14px; height: 14px;
+  border-radius: 50%;
+  background: var(--text-dim);
+  transition: left .18s cubic-bezier(.34,1.56,.64,1), background .2s;
+}
+.fine-toggle input:checked + .fine-toggle-track { background: rgba(201,162,39,.18); border-color: var(--gold); }
+.fine-toggle input:checked + .fine-toggle-track .fine-toggle-thumb { left: 17px; background: var(--gold2); }
+
+/* ── X axis (horizontal) layout ── */
+.axis-slider-stage {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  gap: 18px;
+  min-height: 0;
+  padding-top: 46px; /* room for portrait riding above the rail */
+}
+.axis-slider-endlabel { display: flex; flex-direction: column; align-items: center; gap: 4px; width: 96px; flex-shrink: 0; }
+.axis-slider-endname { font-family: 'Cinzel', serif; font-size: 10px; letter-spacing: .1em; color: var(--text-dim); text-align: center; }
+.axis-slider-endval { font-family: 'Cinzel', serif; font-size: 22px; color: var(--gold2); }
+
+.axis-slider-track-wrap { position: relative; flex: 1; height: 40px; display: flex; align-items: center; }
+.axis-slider-track {
+  position: relative;
+  width: 100%; height: 6px;
+  border-radius: 4px;
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  touch-action: none;
+  cursor: pointer;
+}
+.axis-slider-fill {
+  position: absolute; top: 0; bottom: 0; left: 50%;
+  background: linear-gradient(90deg, var(--gold-dim), var(--gold));
+  border-radius: 4px;
+  width: 0;
+}
+.axis-ticks { position: absolute; inset: 0; pointer-events: none; }
+.axis-tick {
+  position: absolute; top: 50%; transform: translate(-50%, -50%);
+  width: 2px; height: 10px;
+  background: var(--border);
+}
+.axis-tick-major { height: 15px; background: var(--gold-dim); }
+.axis-tick-mid { height: 20px; width: 3px; background: var(--gold2); }
+.axis-tick-label {
+  position: absolute; top: 15px; left: 50%; transform: translateX(-50%);
+  font-family: 'Cinzel', serif; font-size: 9px; color: var(--text-dim); white-space: nowrap;
+}
+.axis-slider-handle {
+  position: absolute; top: 50%; left: 50%;
+  width: 20px; height: 20px;
+  border-radius: 50%;
+  background: var(--gold2);
+  border: 2px solid var(--bg);
+  box-shadow: 0 0 14px rgba(232,200,74,.7), 0 2px 6px rgba(0,0,0,.6);
+  transform: translate(-50%, -50%);
+  transition: left .16s cubic-bezier(.34,1.56,.64,1);
+  pointer-events: none;
+}
+.axis-slider-portrait {
+  position: absolute; bottom: calc(100% + 14px); left: 50%;
+  width: 60px; height: 60px;
+  transform: translateX(-50%);
+  transition: left .16s cubic-bezier(.34,1.56,.64,1);
+  pointer-events: none;
+}
+.axis-slider-portrait canvas {
+  width: 60px; height: 60px; border-radius: 50%;
+  border: 2px solid var(--gold);
+  box-shadow: 0 0 16px rgba(201,162,39,.5), 0 4px 12px rgba(0,0,0,.6);
+  background: var(--bg2);
+  display: block;
+}
+#xslider-track.fine-mode .axis-slider-handle,
+#xslider-track.fine-mode .axis-slider-portrait { transition: left .04s linear; }
+
+@keyframes axisSnapPulse {
+  0%   { transform: translate(-50%, -50%) scale(1); }
+  45%  { transform: translate(-50%, -50%) scale(1.4); }
+  100% { transform: translate(-50%, -50%) scale(1); }
+}
+.axis-slider-handle.snap-pulse { animation: axisSnapPulse .26s ease; }
+@keyframes axisSnapPulsePortrait {
+  0%   { transform: translateX(-50%) scale(1); }
+  45%  { transform: translateX(-50%) scale(1.18); }
+  100% { transform: translateX(-50%) scale(1); }
+}
+.axis-slider-portrait.snap-pulse { animation: axisSnapPulsePortrait .26s ease; }
+
+.axis-slider-readout { text-align: center; margin-top: 20px; flex-shrink: 0; }
+.axis-slider-readout-num { font-family: 'Cinzel', serif; font-size: 19px; letter-spacing: .1em; color: var(--gold2); }
+.axis-slider-desc {
+  text-align: center; margin-top: 6px;
+  font-family: 'Crimson Pro', serif; font-size: 15px; font-style: italic;
+  color: var(--text); min-height: 22px;
+}
+.axis-slider-actions { display: flex; gap: 10px; justify-content: center; margin-top: 18px; flex-shrink: 0; }
+
+/* ── Y axis (vertical) layout ── */
+.axis-slider-stage-y {
+  flex: 1;
+  display: flex; flex-direction: column; align-items: center;
+  gap: 8px; min-height: 0;
+  padding-right: 300px; /* room for the side panel riding beside the rail */
+}
+.axis-slider-endlabel-y { display: flex; flex-direction: column; align-items: center; gap: 2px; flex-shrink: 0; }
+.axis-slider-track-wrap-y { position: relative; flex: 1; width: 100%; display: flex; justify-content: center; min-height: 0; overflow: visible; }
+.axis-slider-track-y {
+  position: relative;
+  width: 6px; height: 100%;
+  border-radius: 4px;
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  touch-action: none;
+  cursor: pointer;
+}
+.axis-slider-fill-y {
+  position: absolute; left: 0; right: 0; top: 50%;
+  background: linear-gradient(180deg, var(--gold), var(--gold-dim));
+  border-radius: 4px;
+  height: 0;
+}
+.axis-ticks-y { position: absolute; inset: 0; pointer-events: none; }
+.axis-tick-y {
+  position: absolute; left: 50%; transform: translate(-50%, -50%);
+  height: 2px; width: 10px;
+  background: var(--border);
+}
+.axis-tick-y.axis-tick-major { width: 15px; background: var(--gold-dim); }
+.axis-tick-y.axis-tick-mid { width: 20px; height: 3px; background: var(--gold2); }
+.axis-tick-label-y {
+  position: absolute; right: 14px; top: 50%; transform: translateY(-50%);
+  font-family: 'Cinzel', serif; font-size: 9px; color: var(--text-dim); white-space: nowrap;
+}
+.axis-slider-handle-y {
+  position: absolute; left: 50%; top: 50%;
+  width: 20px; height: 20px; border-radius: 50%;
+  background: var(--gold2);
+  border: 2px solid var(--bg);
+  box-shadow: 0 0 14px rgba(232,200,74,.7), 0 2px 6px rgba(0,0,0,.6);
+  transform: translate(-50%, -50%);
+  transition: top .16s cubic-bezier(.34,1.56,.64,1);
+  pointer-events: none;
+}
+.axis-slider-side-panel {
+  position: absolute; left: 40px; top: 50%;
+  transform: translateY(-50%);
+  display: flex; align-items: center; gap: 14px;
+  transition: top .16s cubic-bezier(.34,1.56,.64,1);
+  pointer-events: none;
+  width: 260px;
+}
+.axis-slider-side-panel .axis-slider-portrait { position: static; transform: none; width: 60px; height: 60px; flex-shrink: 0; }
+.axis-slider-side-text { text-align: left; }
+.axis-slider-side-text .axis-slider-readout-num { text-align: left; }
+.axis-slider-side-text .axis-slider-desc { text-align: left; margin-top: 4px; }
+#yslider-track.fine-mode .axis-slider-handle-y,
+#yslider-track.fine-mode .axis-slider-side-panel { transition: top .04s linear; }
+.axis-slider-side-panel.snap-pulse .axis-slider-portrait canvas { animation: axisSnapPulseScale .26s ease; }
+@keyframes axisSnapPulseScale {
+  0%   { transform: scale(1); }
+  45%  { transform: scale(1.18); }
+  100% { transform: scale(1); }
+}
+
+@media (max-width: 720px) {
+  .axis-slider-endlabel { width: 60px; }
+  .axis-slider-endname { font-size: 8px; }
+  .axis-slider-endval { font-size: 16px; }
+  .axis-tick-label, .axis-tick-label-y { font-size: 7px; }
+  .axis-slider-stage-y { padding-right: 190px; }
+  .axis-slider-side-panel { width: 170px; gap: 8px; }
+  .axis-slider-side-panel .axis-slider-portrait { width: 46px; height: 46px; }
+  .axis-slider-side-panel .axis-slider-portrait canvas { width: 46px; height: 46px; }
+  .axis-slider-side-text .axis-slider-readout-num { font-size: 15px; }
+  .axis-slider-side-text .axis-slider-desc { font-size: 12px; }
+}
+
 
 /* ── Image icon editor (Section A) ── */
 .icon-image-area {

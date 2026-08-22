@@ -193,6 +193,44 @@ const saveStatus   = document.getElementById("save-status");
     if (e.target === document.getElementById("compare-overlay")) closeStatCompare();
   });
 
+  // Full-screen axis sliders
+  document.getElementById("btn-open-h-slider").addEventListener("click", () => openXSlider("main"));
+  document.getElementById("btn-open-v-slider").addEventListener("click", () => openYSlider("main"));
+  document.getElementById("btn-open-alt-h-slider").addEventListener("click", () => openXSlider("alt"));
+  document.getElementById("btn-open-alt-v-slider").addEventListener("click", () => openYSlider("alt"));
+
+  document.getElementById("xslider-close").addEventListener("click", closeXSlider);
+  document.getElementById("xslider-cancel").addEventListener("click", closeXSlider);
+  document.getElementById("xslider-apply").addEventListener("click", applyXSlider);
+  document.getElementById("xslider-overlay").addEventListener("click", e => {
+    if (e.target === document.getElementById("xslider-overlay")) closeXSlider();
+  });
+  document.getElementById("xslider-fine-toggle").addEventListener("change", e => {
+    xSliderState.fine = e.target.checked;
+    document.getElementById("xslider-track").classList.toggle("fine-mode", xSliderState.fine);
+  });
+  const xTrack = document.getElementById("xslider-track");
+  xTrack.addEventListener("pointerdown", xSliderPointerDown);
+  xTrack.addEventListener("pointermove", xSliderPointerMove);
+  xTrack.addEventListener("pointerup",   xSliderPointerUp);
+  xTrack.addEventListener("pointercancel", xSliderPointerUp);
+
+  document.getElementById("yslider-close").addEventListener("click", closeYSlider);
+  document.getElementById("yslider-cancel").addEventListener("click", closeYSlider);
+  document.getElementById("yslider-apply").addEventListener("click", applyYSlider);
+  document.getElementById("yslider-overlay").addEventListener("click", e => {
+    if (e.target === document.getElementById("yslider-overlay")) closeYSlider();
+  });
+  document.getElementById("yslider-fine-toggle").addEventListener("change", e => {
+    ySliderState.fine = e.target.checked;
+    document.getElementById("yslider-track").classList.toggle("fine-mode", ySliderState.fine);
+  });
+  const yTrack = document.getElementById("yslider-track");
+  yTrack.addEventListener("pointerdown", ySliderPointerDown);
+  yTrack.addEventListener("pointermove", ySliderPointerMove);
+  yTrack.addEventListener("pointerup",   ySliderPointerUp);
+  yTrack.addEventListener("pointercancel", ySliderPointerUp);
+
   // Admin modal
   document.getElementById("admin-confirm").addEventListener("click", onAdminConfirm);
   document.getElementById("admin-cancel").addEventListener("click", closeAdminGate);
@@ -1606,6 +1644,319 @@ function compareCardHTML(h, axis) {
 
 function closeStatCompare() {
   document.getElementById("compare-overlay").classList.remove("open");
+}
+
+/* ═══════════════════════════════════════
+   FULL-SCREEN AXIS SLIDERS
+   Visual drag-to-set popups for the Horizontal (SUR/SST) and
+   Vertical (SPD/TNK) score fields on the Add/Edit Hero form.
+
+   Internally each slider works on a single unified position `p`
+   from -10..+10, then converts back to {type, score} on apply:
+     X axis: p<0 → SUR side, p>0 → SST side, 0 = midpoint
+     Y axis: p>0 → SPD side (top), p<0 → TNK side (bottom), 0 = midpoint
+═══════════════════════════════════════ */
+
+const SUR_DESC = {
+  10: "Can survive in a 1v4 without support",
+  9:  "Can survive in a 1v3 without support",
+  8:  "Can survive in a 1v2 without support",
+  7:  "Can survive in a 1v1 without support",
+  6:  "Can survive in a 1v4 with support",
+  5:  "Can survive in a 1v3 with support",
+  4:  "Can survive in a 1v2 with support",
+  3:  "Can survive in a 1v1 with support",
+  2:  "Requires support to survive",
+  1:  "Cannot survive without any support",
+  0:  "Cannot survive or sustain at all.",
+};
+const SST_DESC = {
+  0:  "Cannot survive or sustain at all.",
+  1:  "Cannot sustain without any support",
+  2:  "Requires support to sustain",
+  3:  "Can sustain in a 1v1 with support",
+  4:  "Can sustain in a 1v2 with support",
+  5:  "Can sustain in a 1v3 with support",
+  6:  "Can sustain in a 1v4 with support",
+  7:  "Can sustain in a 1v1 without support",
+  8:  "Can sustain in a 1v2 without support",
+  9:  "Can sustain in a 1v3 without support",
+  10: "Can sustain in a 1v4 without support",
+};
+const SPD_DESC = {
+  10: "Can gain 3 turns effectively.",
+  9:  "Can gain 2 turns effectively.",
+  8:  "Can gain 1 turn effectively.",
+  7:  "Can gain 50% CR / equivalent of that speed effectively",
+  6:  "Can gain 40% CR / equivalent of that speed effectively",
+  5:  "Can gain 30% CR / equivalent of that speed effectively",
+  4:  "Can gain 20% CR / equivalent of that speed effectively",
+  3:  "Can gain 10% CR / equivalent of that speed effectively",
+  2:  "Can gain 5% CR or less / equivalent of that speed effectively",
+  1:  "Cannot gain CR efficiently / lack of speed",
+  0:  "No speed / tanky at all.",
+};
+const TNK_DESC = {
+  0:  "No speed / tanky at all.",
+  1:  "No in-built tankiness",
+  2:  "Has one of HP / DEF / SHD",
+  3:  "Has one of HP / DEF / SHD + minor defensive utility",
+  4:  "Has two of HP / DEF / SHD",
+  5:  "Has HP / DEF / SHD + Tank Passive",
+  6:  "Has two of HP / DEF / SHD + Damage Prevention OR Tank Passive",
+  7:  "Has two of HP / DEF / SHD + Tank Passive",
+  8:  "Has two of HP / DEF / SHD + Damage Prevention + Tank Passive",
+  9:  "Has all three HP / DEF / SHD + either Damage Prevention OR Tank Passive",
+  10: "Has HP + DEF + SHD + Damage Prevention + Tank Passive",
+};
+
+let xSliderState = { p: 0, fine: false, dragging: false, mode: "main" };
+let ySliderState = { p: 0, fine: false, dragging: false, mode: "main" };
+
+/* ── conversions between the form's {type, score} model and unified p ── */
+function hFields(mode) {
+  return mode === "alt"
+    ? { type: document.getElementById("f-alt-h-type"), score: document.getElementById("f-alt-h-score") }
+    : { type: fHType, score: fHScore };
+}
+function vFields(mode) {
+  return mode === "alt"
+    ? { type: document.getElementById("f-alt-v-type"), score: document.getElementById("f-alt-v-score") }
+    : { type: fVType, score: fVScore };
+}
+
+function hToP(hType, hScore) {
+  const s = Math.max(0, Math.min(10, Number(hScore) || 0));
+  if (s === 0) return 0;
+  return hType === "SST" ? s : -s;
+}
+function pToH(p, mode) {
+  const r = Math.round(p * 10) / 10;
+  if (r === 0) return { hType: hFields(mode).type.value || "SUR", hScore: 0 };
+  return r > 0 ? { hType: "SST", hScore: r } : { hType: "SUR", hScore: -r };
+}
+function vToP(vType, vScore) {
+  const s = Math.max(0, Math.min(10, Number(vScore) || 0));
+  if (s === 0) return 0;
+  return vType === "SPD" ? s : -s;
+}
+function pToV(p, mode) {
+  const r = Math.round(p * 10) / 10;
+  if (r === 0) return { vType: vFields(mode).type.value || "SPD", vScore: 0 };
+  return r > 0 ? { vType: "SPD", vScore: r } : { vType: "TNK", vScore: -r };
+}
+
+function sliderQuantize(p, fine) {
+  const clamped = Math.max(-10, Math.min(10, p));
+  return fine ? Math.round(clamped * 10) / 10 : Math.round(clamped);
+}
+
+/* ── ticks ── */
+function buildAxisTicksX(container) {
+  let html = "";
+  for (let i = -10; i <= 10; i++) {
+    const pct = ((i + 10) / 20) * 100;
+    const cls = i === 0 ? "axis-tick axis-tick-mid" : (i % 5 === 0 ? "axis-tick axis-tick-major" : "axis-tick");
+    html += `<div class="${cls}" style="left:${pct}%"><span class="axis-tick-label">${Math.abs(i)}</span></div>`;
+  }
+  container.innerHTML = html;
+}
+function buildAxisTicksY(container) {
+  let html = "";
+  for (let i = -10; i <= 10; i++) {
+    const pct = ((10 - i) / 20) * 100;
+    const cls = i === 0 ? "axis-tick-y axis-tick-mid" : (i % 5 === 0 ? "axis-tick-y axis-tick-major" : "axis-tick-y");
+    html += `<div class="${cls}" style="top:${pct}%"><span class="axis-tick-label-y">${Math.abs(i)}</span></div>`;
+  }
+  container.innerHTML = html;
+}
+
+/* ── portrait preview, reusing whatever icon is currently on the form ── */
+function drawSliderPortrait(canvasEl) {
+  const ctx = canvasEl.getContext("2d");
+  ctx.clearRect(0, 0, 128, 128);
+  const src = fIconData.value;
+  if (!src) {
+    ctx.fillStyle = "#1a3050";
+    ctx.beginPath(); ctx.arc(64, 64, 62, 0, Math.PI * 2); ctx.fill();
+    return;
+  }
+  const img = new Image();
+  img.onload = () => {
+    ctx.save();
+    ctx.beginPath(); ctx.arc(64, 64, 64, 0, Math.PI * 2); ctx.clip();
+    ctx.drawImage(img, 0, 0, 128, 128);
+    ctx.restore();
+  };
+  img.src = src;
+}
+
+function pulseNode(el) {
+  el.classList.remove("snap-pulse");
+  void el.offsetWidth; // restart animation
+  el.classList.add("snap-pulse");
+}
+
+/* ── X (horizontal) slider ── */
+function renderXSlider() {
+  const p   = xSliderState.p;
+  const pct = ((p + 10) / 20) * 100;
+
+  document.getElementById("xslider-handle").style.left   = pct + "%";
+  document.getElementById("xslider-portrait").style.left = pct + "%";
+
+  const fill = document.getElementById("xslider-fill");
+  const left = Math.min(50, pct);
+  fill.style.left  = left + "%";
+  fill.style.width = Math.abs(pct - 50) + "%";
+
+  const fine    = xSliderState.fine;
+  const dispVal = Math.abs(fine ? Math.round(p * 10) / 10 : Math.round(p));
+  const side    = p < 0 ? "SUR" : (p > 0 ? "SST" : (hFields(xSliderState.mode).type.value === "SST" ? "SST" : "SUR"));
+  document.getElementById("xslider-readout-num").textContent = `${side} ${dispVal.toFixed(fine ? 1 : 0)}`;
+
+  const key   = Math.max(0, Math.min(10, Math.round(Math.abs(p))));
+  const table = p <= 0 ? SUR_DESC : SST_DESC;
+  document.getElementById("xslider-desc").textContent = table[key] || "";
+}
+
+function xSliderPToClientX(clientX) {
+  const rect = document.getElementById("xslider-track").getBoundingClientRect();
+  let frac = (clientX - rect.left) / rect.width;
+  frac = Math.max(0, Math.min(1, frac));
+  return frac * 20 - 10;
+}
+
+function xSliderPointerDown(e) {
+  const track = document.getElementById("xslider-track");
+  track.setPointerCapture(e.pointerId);
+  xSliderState.dragging = true;
+  updateXSliderFromClientX(e.clientX);
+}
+function xSliderPointerMove(e) {
+  if (!xSliderState.dragging) return;
+  updateXSliderFromClientX(e.clientX);
+}
+function xSliderPointerUp() {
+  xSliderState.dragging = false;
+}
+function updateXSliderFromClientX(clientX) {
+  const raw = xSliderPToClientX(clientX);
+  const q   = sliderQuantize(raw, xSliderState.fine);
+  const changed = q !== xSliderState.p;
+  xSliderState.p = q;
+  renderXSlider();
+  if (changed && !xSliderState.fine) {
+    pulseNode(document.getElementById("xslider-handle"));
+    pulseNode(document.getElementById("xslider-portrait"));
+  }
+}
+
+function openXSlider(mode) {
+  xSliderState.dragging = false;
+  xSliderState.fine     = false;
+  xSliderState.mode     = mode || "main";
+  const { type, score } = hFields(xSliderState.mode);
+  xSliderState.p = hToP(type.value, parseFloat(score.value) || 0);
+  document.getElementById("xslider-fine-toggle").checked = false;
+  document.getElementById("xslider-track").classList.remove("fine-mode");
+  document.getElementById("xslider-overlay").querySelector(".axis-slider-screen")
+    .classList.toggle("ghost-mode", xSliderState.mode === "alt");
+  buildAxisTicksX(document.getElementById("xslider-ticks"));
+  drawSliderPortrait(document.getElementById("xslider-portrait-canvas"));
+  renderXSlider();
+  document.getElementById("xslider-overlay").classList.add("open");
+}
+function closeXSlider() {
+  document.getElementById("xslider-overlay").classList.remove("open");
+}
+function applyXSlider() {
+  const { hType, hScore } = pToH(xSliderState.p, xSliderState.mode);
+  const { type, score }   = hFields(xSliderState.mode);
+  type.value  = hType;
+  score.value = (Math.round(hScore * 10) / 10).toFixed(1);
+  closeXSlider();
+}
+
+/* ── Y (vertical) slider ── */
+function renderYSlider() {
+  const p   = ySliderState.p;
+  const pct = ((10 - p) / 20) * 100;
+
+  document.getElementById("yslider-handle").style.top     = pct + "%";
+  document.getElementById("yslider-side-panel").style.top = pct + "%";
+
+  const fill = document.getElementById("yslider-fill");
+  const top  = Math.min(50, pct);
+  fill.style.top    = top + "%";
+  fill.style.height = Math.abs(pct - 50) + "%";
+
+  const fine    = ySliderState.fine;
+  const dispVal = Math.abs(fine ? Math.round(p * 10) / 10 : Math.round(p));
+  const side    = p > 0 ? "SPD" : (p < 0 ? "TNK" : (vFields(ySliderState.mode).type.value === "TNK" ? "TNK" : "SPD"));
+  document.getElementById("yslider-readout-num").textContent = `${side} ${dispVal.toFixed(fine ? 1 : 0)}`;
+
+  const key   = Math.max(0, Math.min(10, Math.round(Math.abs(p))));
+  const table = p >= 0 ? SPD_DESC : TNK_DESC;
+  document.getElementById("yslider-desc").textContent = table[key] || "";
+}
+
+function ySliderPFromClientY(clientY) {
+  const rect = document.getElementById("yslider-track").getBoundingClientRect();
+  let frac = (clientY - rect.top) / rect.height;
+  frac = Math.max(0, Math.min(1, frac));
+  return 10 - frac * 20;
+}
+
+function ySliderPointerDown(e) {
+  const track = document.getElementById("yslider-track");
+  track.setPointerCapture(e.pointerId);
+  ySliderState.dragging = true;
+  updateYSliderFromClientY(e.clientY);
+}
+function ySliderPointerMove(e) {
+  if (!ySliderState.dragging) return;
+  updateYSliderFromClientY(e.clientY);
+}
+function ySliderPointerUp() {
+  ySliderState.dragging = false;
+}
+function updateYSliderFromClientY(clientY) {
+  const raw = ySliderPFromClientY(clientY);
+  const q   = sliderQuantize(raw, ySliderState.fine);
+  const changed = q !== ySliderState.p;
+  ySliderState.p = q;
+  renderYSlider();
+  if (changed && !ySliderState.fine) {
+    pulseNode(document.getElementById("yslider-handle"));
+    pulseNode(document.getElementById("yslider-side-panel"));
+  }
+}
+
+function openYSlider(mode) {
+  ySliderState.dragging = false;
+  ySliderState.fine     = false;
+  ySliderState.mode     = mode || "main";
+  const { type, score } = vFields(ySliderState.mode);
+  ySliderState.p = vToP(type.value, parseFloat(score.value) || 0);
+  document.getElementById("yslider-fine-toggle").checked = false;
+  document.getElementById("yslider-track").classList.remove("fine-mode");
+  document.getElementById("yslider-overlay").querySelector(".axis-slider-screen")
+    .classList.toggle("ghost-mode", ySliderState.mode === "alt");
+  buildAxisTicksY(document.getElementById("yslider-ticks"));
+  drawSliderPortrait(document.getElementById("yslider-portrait-canvas"));
+  renderYSlider();
+  document.getElementById("yslider-overlay").classList.add("open");
+}
+function closeYSlider() {
+  document.getElementById("yslider-overlay").classList.remove("open");
+}
+function applyYSlider() {
+  const { vType, vScore } = pToV(ySliderState.p, ySliderState.mode);
+  const { type, score }   = vFields(ySliderState.mode);
+  type.value  = vType;
+  score.value = (Math.round(vScore * 10) / 10).toFixed(1);
+  closeYSlider();
 }
 
 /* ═══════════════════════════════════════

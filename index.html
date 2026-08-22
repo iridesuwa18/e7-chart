@@ -365,6 +365,7 @@
             <input type="number" id="f-v-score" min="0" max="10" step="0.1" value="0" placeholder="0.0" />
           </div>
           <button type="button" class="stat-info-btn" id="btn-compare-v" title="Compare with heroes near this value">i</button>
+          <button type="button" class="stat-info-btn slider-trigger-btn" id="btn-open-v-slider" title="Open visual vertical slider">⇕</button>
         </div>
         <div class="form-group">
           <label>Horizontal (SUR / SST)</label>
@@ -376,6 +377,7 @@
             <input type="number" id="f-h-score" min="0" max="10" step="0.1" value="0" placeholder="0.0" />
           </div>
           <button type="button" class="stat-info-btn" id="btn-compare-h" title="Compare with heroes near this value">i</button>
+          <button type="button" class="stat-info-btn slider-trigger-btn" id="btn-open-h-slider" title="Open visual horizontal slider">⇔</button>
         </div>
       </div>
 
@@ -436,6 +438,7 @@
                 </select>
                 <input type="number" id="f-alt-v-score" min="0" max="10" step="0.1" value="0" placeholder="0.0" />
               </div>
+              <button type="button" class="stat-info-btn slider-trigger-btn ghost-trigger-btn" id="btn-open-alt-v-slider" title="Open visual vertical slider (ghost)">⇕</button>
             </div>
             <div class="form-group">
               <label>Horizontal (SUR / SST)</label>
@@ -446,6 +449,7 @@
                 </select>
                 <input type="number" id="f-alt-h-score" min="0" max="10" step="0.1" value="0" placeholder="0.0" />
               </div>
+              <button type="button" class="stat-info-btn slider-trigger-btn ghost-trigger-btn" id="btn-open-alt-h-slider" title="Open visual horizontal slider (ghost)">⇔</button>
             </div>
           </div>
           <div style="font-size:11px;color:#b060c8;font-style:italic;margin-top:2px;font-family:'Crimson Pro',serif;">
@@ -483,6 +487,113 @@
         <button class="det-close-btn" id="compare-close">×</button>
       </div>
       <div class="compare-body" id="compare-body"></div>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════════
+       X-AXIS (HORIZONTAL) FULL-SCREEN SLIDER
+       Sets SUR / SST. Drag or tap the rail; portrait
+       rides along the top, description reads out below.
+  ═══════════════════════════════════════ -->
+  <div class="axis-slider-overlay" id="xslider-overlay">
+    <div class="axis-slider-screen axis-slider-x">
+      <div class="axis-slider-header">
+        <div class="axis-slider-title">SURVIVABILITY ⟷ SUSTAINABILITY</div>
+        <span class="ghost-badge" id="xslider-ghost-badge">👻 GHOST</span>
+        <label class="fine-toggle">
+          <input type="checkbox" id="xslider-fine-toggle" />
+          <span class="fine-toggle-track"><span class="fine-toggle-thumb"></span></span>
+          <span class="fine-toggle-label">Fine (0.1)</span>
+        </label>
+        <button class="axis-slider-close" id="xslider-close" title="Close">✕</button>
+      </div>
+
+      <div class="axis-slider-stage">
+        <div class="axis-slider-endlabel">
+          <span class="axis-slider-endname">SURVIVABILITY</span>
+          <span class="axis-slider-endval">10</span>
+        </div>
+
+        <div class="axis-slider-track-wrap">
+          <div class="axis-slider-track" id="xslider-track">
+            <div class="axis-slider-fill" id="xslider-fill"></div>
+            <div class="axis-ticks" id="xslider-ticks"></div>
+            <div class="axis-slider-handle" id="xslider-handle"></div>
+            <div class="axis-slider-portrait" id="xslider-portrait">
+              <canvas id="xslider-portrait-canvas" width="128" height="128"></canvas>
+            </div>
+          </div>
+        </div>
+
+        <div class="axis-slider-endlabel">
+          <span class="axis-slider-endname">SUSTAINABILITY</span>
+          <span class="axis-slider-endval">10</span>
+        </div>
+      </div>
+
+      <div class="axis-slider-readout">
+        <div class="axis-slider-readout-num" id="xslider-readout-num">SUR 10</div>
+        <div class="axis-slider-desc" id="xslider-desc">Can survive in a 1v4 without support</div>
+      </div>
+
+      <div class="axis-slider-actions">
+        <button class="btn btn-gold" id="xslider-apply">✓ Set Value</button>
+        <button class="btn btn-ghost" id="xslider-cancel">Cancel</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════════
+       Y-AXIS (VERTICAL) FULL-SCREEN SLIDER
+       Sets SPD / TNK. Drag or tap the rail; portrait +
+       description ride alongside it as it moves up/down.
+  ═══════════════════════════════════════ -->
+  <div class="axis-slider-overlay" id="yslider-overlay">
+    <div class="axis-slider-screen axis-slider-y">
+      <div class="axis-slider-header">
+        <div class="axis-slider-title">SPEED / CR GAIN ⟷ TANKY</div>
+        <span class="ghost-badge" id="yslider-ghost-badge">👻 GHOST</span>
+        <label class="fine-toggle">
+          <input type="checkbox" id="yslider-fine-toggle" />
+          <span class="fine-toggle-track"><span class="fine-toggle-thumb"></span></span>
+          <span class="fine-toggle-label">Fine (0.1)</span>
+        </label>
+        <button class="axis-slider-close" id="yslider-close" title="Close">✕</button>
+      </div>
+
+      <div class="axis-slider-stage-y">
+        <div class="axis-slider-endlabel-y">
+          <span class="axis-slider-endname">SPEED / CR GAIN</span>
+          <span class="axis-slider-endval">10</span>
+        </div>
+
+        <div class="axis-slider-track-wrap-y">
+          <div class="axis-slider-track-y" id="yslider-track">
+            <div class="axis-slider-fill-y" id="yslider-fill"></div>
+            <div class="axis-ticks-y" id="yslider-ticks"></div>
+            <div class="axis-slider-handle-y" id="yslider-handle"></div>
+            <div class="axis-slider-side-panel" id="yslider-side-panel">
+              <div class="axis-slider-portrait" id="yslider-portrait">
+                <canvas id="yslider-portrait-canvas" width="128" height="128"></canvas>
+              </div>
+              <div class="axis-slider-side-text">
+                <div class="axis-slider-readout-num" id="yslider-readout-num">SPD 10</div>
+                <div class="axis-slider-desc" id="yslider-desc">Can gain 3 turns effectively.</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="axis-slider-endlabel-y">
+          <span class="axis-slider-endname">TANKY</span>
+          <span class="axis-slider-endval">10</span>
+        </div>
+      </div>
+
+      <div class="axis-slider-actions">
+        <button class="btn btn-gold" id="yslider-apply">✓ Set Value</button>
+        <button class="btn btn-ghost" id="yslider-cancel">Cancel</button>
+      </div>
     </div>
   </div>
 
