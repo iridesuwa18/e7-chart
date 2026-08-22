@@ -394,6 +394,10 @@ const saveStatus   = document.getElementById("save-status");
     chart.classList.toggle("circle-armed", circleMode);
   });
 
+  // ── Capture chart as a downloadable JPG (includes axis labels + all hero icons) ──
+  document.getElementById("btn-capture-chart").addEventListener("click", captureChartImage);
+
+
   document.getElementById("circle-radius-input").addEventListener("input", e => {
     if (!circleSel) return;
     circleSel.r = Math.max(CIRCLE_MIN_R, Math.min(CIRCLE_MAX_R, Number(e.target.value) || CIRCLE_DEFAULT_R));
@@ -635,6 +639,63 @@ function computeStackCounts(visibleHeroes) {
     }
   }
   return counts;
+}
+
+/* ── Capture the chart (grid, axis labels, quadrant labels, and every
+   hero icon currently on it) and download it as a JPG. Uses html2canvas
+   since the chart is plain DOM/CSS, not a single canvas element. ── */
+function captureChartImage() {
+  const btn = document.getElementById("btn-capture-chart");
+  if (btn.dataset.busy === "1") return; // guard against double-clicks
+  if (typeof html2canvas !== "function") {
+    alert("Image capture library failed to load — check your connection and try again.");
+    return;
+  }
+
+  const chartOuter   = document.querySelector(".chart-outer");
+  const optionsBar   = document.querySelector(".chart-options-bar");
+  const circlePanel  = document.getElementById("circle-control-panel");
+  const circleRing   = document.getElementById("circle-select-ring");
+
+  // Hide the floating UI chrome that sits inside .chart-outer so the
+  // exported image only shows the chart itself, then restore afterward.
+  const restoreDisplay = [];
+  [optionsBar, circlePanel].forEach(el => {
+    if (el) { restoreDisplay.push([el, el.style.display]); el.style.display = "none"; }
+  });
+  let ringWasHidden = false;
+  if (circleRing && circleRing.style.display !== "none") {
+    ringWasHidden = true;
+    circleRing.style.display = "none";
+  }
+
+  btn.dataset.busy = "1";
+  btn.classList.add("active");
+
+  const bg = getComputedStyle(document.documentElement).getPropertyValue("--bg").trim() || "#04090f";
+
+  html2canvas(chartOuter, {
+    backgroundColor: bg,
+    scale: Math.min(3, (window.devicePixelRatio || 1) * 2),
+    useCORS: true,
+    logging: false
+  }).then(canvas => {
+    const link = document.createElement("a");
+    const stamp = new Date().toISOString().slice(0, 19).replace(/[:T]/g, "-");
+    link.download = `hero-chart-${stamp}.jpg`;
+    link.href = canvas.toDataURL("image/jpeg", 0.95);
+    document.body.appendChild(link);
+    link.click();
+    link.remove();
+  }).catch(err => {
+    console.error("Chart capture failed:", err);
+    alert("Sorry, capturing the chart image failed. Please try again.");
+  }).finally(() => {
+    restoreDisplay.forEach(([el, val]) => { el.style.display = val; });
+    if (ringWasHidden) circleRing.style.display = "";
+    btn.dataset.busy = "0";
+    btn.classList.remove("active");
+  });
 }
 
 function renderChart() {
