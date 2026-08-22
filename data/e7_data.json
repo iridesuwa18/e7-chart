@@ -29,15 +29,15 @@
       "rarity": "5ml",
       "role": "Knight",
       "element": "Light",
-      "vType": "TNK",
-      "vScore": 6.5,
+      "vType": "SPD",
+      "vScore": 4.5,
       "hType": "SUR",
       "hScore": 10,
       "notes": "",
       "iconData": "https://raw.githubusercontent.com/iridesuwa18/e7-chart/main/assets/heroes/genesis-ras.webp",
       "locked": true,
       "_x": 0,
-      "_y": 82.5,
+      "_y": 27.5,
       "altStats": null,
       "hidden": false
     },
@@ -521,5 +521,5 @@
     }
   ],
   "draftData": null,
-  "savedAt": "2026-08-22T11:39:48.441Z"
+  "savedAt": "2026-08-22T11:46:24.362Z"
 }
