@@ -240,15 +240,15 @@
       "role": "Warrior",
       "element": "Light",
       "vType": "SPD",
-      "vScore": 8.7,
+      "vScore": 8,
       "hType": "SUR",
-      "hScore": 9,
+      "hScore": 8,
       "notes": "",
       "iconData": "https://raw.githubusercontent.com/iridesuwa18/e7-chart/main/assets/heroes/successor-taeyou.webp",
       "locked": true,
       "altStats": null,
-      "_x": 5,
-      "_y": 6.500000000000007,
+      "_x": 10,
+      "_y": 10,
       "hidden": false
     },
     {
@@ -526,5 +526,5 @@
     }
   ],
   "draftData": null,
-  "savedAt": "2026-08-22T12:51:31.126Z"
+  "savedAt": "2026-08-22T12:53:01.481Z"
 }
