@@ -159,7 +159,12 @@
       "notes": "",
       "iconData": "https://raw.githubusercontent.com/iridesuwa18/e7-chart/main/assets/heroes/conqueror-lilias.webp",
       "locked": true,
-      "altStats": null,
+      "altStats": {
+        "vType": "TNK",
+        "vScore": 3,
+        "hType": "SUR",
+        "hScore": 3
+      },
       "_x": 35,
       "_y": 20,
       "hidden": false
@@ -521,5 +526,5 @@
     }
   ],
   "draftData": null,
-  "savedAt": "2026-08-22T12:34:45.889Z"
+  "savedAt": "2026-08-22T12:37:56.176Z"
 }
