@@ -1022,6 +1022,9 @@ body.dot-mode .origin-dot:hover {
   padding: 20px 26px 26px;
   box-shadow: 0 30px 80px rgba(0,0,0,.8), 0 0 60px rgba(201,162,39,.08);
   animation: modalIn .22s ease;
+  user-select: none;
+  -webkit-user-select: none;
+  -webkit-touch-callout: none;
 }
 
 .axis-slider-header {

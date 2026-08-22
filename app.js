@@ -1828,6 +1828,7 @@ function xSliderPToClientX(clientX) {
 }
 
 function xSliderPointerDown(e) {
+  e.preventDefault();
   const track = document.getElementById("xslider-track");
   track.setPointerCapture(e.pointerId);
   xSliderState.dragging = true;
@@ -1909,6 +1910,7 @@ function ySliderPFromClientY(clientY) {
 }
 
 function ySliderPointerDown(e) {
+  e.preventDefault();
   const track = document.getElementById("yslider-track");
   track.setPointerCapture(e.pointerId);
   ySliderState.dragging = true;
