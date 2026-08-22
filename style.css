@@ -558,6 +558,10 @@ body.dot-mode .origin-dot:hover {
 .hero-dot:hover   { z-index: 20; }
 
 .hero-dot-inner {
+  position: relative; /* so children sized with inset:0 (e.g. .ghost-overlay)
+                          are contained to this circle, not a grandparent —
+                          browsers papered over this via overflow:hidden, but
+                          html2canvas's chart-capture export did not */
   width: var(--icon-size, 38px); height: var(--icon-size, 38px);
   border-radius: 50%;
   background: rgba(10,20,35,.9);
