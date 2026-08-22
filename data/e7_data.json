@@ -368,7 +368,7 @@
       "role": "Ranger",
       "element": "Light",
       "vType": "SPD",
-      "vScore": 6.5,
+      "vScore": 7,
       "hType": "SUR",
       "hScore": 4,
       "notes": "",
@@ -376,7 +376,7 @@
       "locked": true,
       "altStats": null,
       "_x": 30,
-      "_y": 17.5
+      "_y": 15
     },
     {
       "id": 1787306592684,
@@ -536,5 +536,5 @@
     }
   ],
   "draftData": null,
-  "savedAt": "2026-08-22T13:11:28.449Z"
+  "savedAt": "2026-08-22T13:12:56.399Z"
 }
