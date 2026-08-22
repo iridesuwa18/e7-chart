@@ -111,8 +111,8 @@
       "rarity": "5r",
       "role": "Thief",
       "element": "Fire",
-      "vType": "TNK",
-      "vScore": 3,
+      "vType": "SPD",
+      "vScore": 7,
       "hType": "SUR",
       "hScore": 8,
       "notes": "",
@@ -125,7 +125,7 @@
         "hScore": 8
       },
       "_x": 10,
-      "_y": 65,
+      "_y": 15,
       "hidden": false
     },
     {
@@ -521,5 +521,5 @@
     }
   ],
   "draftData": null,
-  "savedAt": "2026-08-22T12:29:45.156Z"
+  "savedAt": "2026-08-22T12:30:38.511Z"
 }
