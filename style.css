@@ -797,7 +797,13 @@ body.dot-mode .origin-dot:hover {
   background: rgba(0,0,0,.7);
   backdrop-filter: blur(4px);
   z-index: 200;
-  align-items: center;
+  /* flex-start (not center) so tall modals dock to the top of the scroll
+     area instead of being centered and having their top half pushed off
+     -screen and unreachable — a centered flex item in a scrolling
+     container can't be scrolled past its own top edge. The modal below
+     uses margin:auto to still *look* centered whenever it's short enough
+     to fit, so short modals are unaffected. */
+  align-items: flex-start;
   justify-content: center;
   padding: 16px;
   overflow-y: auto;
@@ -814,6 +820,10 @@ body.dot-mode .origin-dot:hover {
   max-width: 480px;
   box-shadow: 0 20px 60px rgba(0,0,0,.7), 0 0 40px rgba(201,162,39,.08);
   animation: modalIn .2s ease;
+  /* Auto vertical margin centers the modal when it fits the viewport, and
+     gracefully collapses to 0 (docking it to the top, fully scrollable)
+     when it's taller than the viewport. */
+  margin: auto 0;
 }
 @keyframes modalIn {
   from { opacity:0; transform:scale(.95) translateY(10px); }
