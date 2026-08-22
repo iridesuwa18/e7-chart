@@ -231,6 +231,13 @@ const saveStatus   = document.getElementById("save-status");
   yTrack.addEventListener("pointerup",   ySliderPointerUp);
   yTrack.addEventListener("pointercancel", ySliderPointerUp);
 
+  // Re-run layout for whichever slider is open on resize/rotate, so the
+  // neighbor previews keep fitting the track at its new size.
+  window.addEventListener("resize", () => {
+    if (document.getElementById("xslider-overlay").classList.contains("open")) renderXSlider();
+    if (document.getElementById("yslider-overlay").classList.contains("open")) renderYSlider();
+  });
+
   // Admin modal
   document.getElementById("admin-confirm").addEventListener("click", onAdminConfirm);
   document.getElementById("admin-cancel").addEventListener("click", closeAdminGate);
@@ -1771,24 +1778,82 @@ function buildAxisTicksY(container) {
   container.innerHTML = html;
 }
 
-/* ── portrait preview, reusing whatever icon is currently on the form ── */
-function drawSliderPortrait(canvasEl) {
-  const ctx = canvasEl.getContext("2d");
-  ctx.clearRect(0, 0, 128, 128);
-  const src = fIconData.value;
+/* ── portrait preview. Defaults to whatever icon is currently on the form;
+   pass iconSrc explicitly (e.g. for neighbor previews) to draw a different
+   hero's icon instead. ── */
+function drawSliderPortrait(canvasEl, iconSrc) {
+  const ctx  = canvasEl.getContext("2d");
+  const size = canvasEl.width || 128;
+  ctx.clearRect(0, 0, size, size);
+  const src = iconSrc !== undefined ? iconSrc : fIconData.value;
   if (!src) {
     ctx.fillStyle = "#1a3050";
-    ctx.beginPath(); ctx.arc(64, 64, 62, 0, Math.PI * 2); ctx.fill();
+    ctx.beginPath(); ctx.arc(size / 2, size / 2, size / 2 - 2, 0, Math.PI * 2); ctx.fill();
     return;
   }
   const img = new Image();
   img.onload = () => {
     ctx.save();
-    ctx.beginPath(); ctx.arc(64, 64, 64, 0, Math.PI * 2); ctx.clip();
-    ctx.drawImage(img, 0, 0, 128, 128);
+    ctx.beginPath(); ctx.arc(size / 2, size / 2, size / 2, 0, Math.PI * 2); ctx.clip();
+    ctx.drawImage(img, 0, 0, size, size);
     ctx.restore();
   };
   img.src = src;
+}
+
+/* ── Live "who's above/below" lookup for the axis sliders ──
+   Returns the closest hero on each side of `targetP` on the unified -10..10
+   scale, so it works whether the neighbor uses the opposite type (e.g.
+   SUR vs SST) — same trick the {h,v}ToP conversions already use elsewhere.
+   In "alt" (ghost) mode it compares against other heroes' ghost stats,
+   since that's the more meaningful comparison for a ghost value. */
+function heroAxisP(h, axis, mode) {
+  if (mode === "alt") {
+    if (!h.altStats) return null;
+    return axis === "h" ? hToP(h.altStats.hType, h.altStats.hScore) : vToP(h.altStats.vType, h.altStats.vScore);
+  }
+  return axis === "h" ? hToP(h.hType, h.hScore) : vToP(h.vType, h.vScore);
+}
+function getSliderNeighbors(axis, mode, targetP) {
+  let below = null, belowP = -Infinity;
+  let above = null, aboveP = Infinity;
+  heroes.forEach(h => {
+    if (h.id === editingId) return;
+    const s = heroAxisP(h, axis, mode);
+    if (s === null) return;
+    if (s < targetP && s > belowP) { belowP = s; below = h; }
+    if (s > targetP && s < aboveP) { aboveP = s; above = h; }
+  });
+  return {
+    below: below ? { hero: below, p: belowP } : null,
+    above: above ? { hero: above, p: aboveP } : null,
+  };
+}
+
+/* Clamp one neighbor's pixel position: keep it on its correct side of the
+   handle (at least minGap away, so it never crosses over/collides with the
+   handle or its sibling — this is what keeps things safe when two heroes'
+   real values are only 0.1 apart), then keep it inside the visible track
+   so it never gets cut off, however close to an edge the handle is. */
+function clampNeighborPx(desired, center, sign, minGap, half, lo, hi) {
+  let px = sign > 0 ? Math.max(desired, center + minGap) : Math.min(desired, center - minGap);
+  return Math.max(lo + half, Math.min(hi - half, px));
+}
+
+/* Fill in one neighbor preview (or hide it if there's no hero on that side) */
+function paintNeighbor(elId, labelId, canvasId, entry, axis) {
+  const el = document.getElementById(elId);
+  if (!entry) {
+    el.classList.add("is-hidden");
+    return;
+  }
+  el.classList.remove("is-hidden");
+  const h    = entry.hero;
+  const val  = Math.abs(Math.round(entry.p * 10) / 10).toFixed(1);
+  const type = axis === "h" ? (entry.p < 0 ? "SUR" : "SST") : (entry.p > 0 ? "SPD" : "TNK");
+  document.getElementById(labelId).innerHTML =
+    `<span class="aneigh-stat">${type} ${val}</span><span class="aneigh-name">${h.name || "Unnamed"}</span>`;
+  drawSliderPortrait(document.getElementById(canvasId), h.iconData || "");
 }
 
 function pulseNode(el) {
@@ -1818,6 +1883,37 @@ function renderXSlider() {
   const key   = Math.max(0, Math.min(10, Math.round(Math.abs(p))));
   const table = p <= 0 ? SUR_DESC : SST_DESC;
   document.getElementById("xslider-desc").textContent = table[key] || "";
+
+  layoutXNeighbors(pct);
+}
+
+/* Position + paint the two flanking previews. They dock a fixed pixel
+   distance to either side of the handle (not at their own literal value
+   position) and are clamped to stay inside the track — this is what keeps
+   them from ever overlapping each other, the handle, or their own text,
+   even when the real values are 0.1 apart or the handle sits at an
+   extreme (-10/+10) edge of the track. Runs on every drag frame so the
+   identity of "closest below/above" stays live as the value moves. */
+function layoutXNeighbors(pct) {
+  const track = document.getElementById("xslider-track");
+  const w     = track.clientWidth;
+  if (!w) return;
+  const narrow  = window.innerWidth <= 720;
+  const offset  = narrow ? 38 : 62;
+  const minGap  = narrow ? 34 : 36;
+  const half    = narrow ? 26 : 42; // half-width of a neighbor block, incl. label
+  const centerPx = (pct / 100) * w;
+
+  const { below, above } = getSliderNeighbors("h", xSliderState.mode, xSliderState.p);
+
+  const belowPx = clampNeighborPx(centerPx - offset, centerPx, -1, minGap, half, 0, w);
+  const abovePx = clampNeighborPx(centerPx + offset, centerPx, +1, minGap, half, 0, w);
+
+  document.getElementById("xslider-neighbor-below").style.left = belowPx + "px";
+  document.getElementById("xslider-neighbor-above").style.left = abovePx + "px";
+
+  paintNeighbor("xslider-neighbor-below", "xslider-neighbor-below-label", "xslider-neighbor-below-canvas", below, "h");
+  paintNeighbor("xslider-neighbor-above", "xslider-neighbor-above-label", "xslider-neighbor-above-canvas", above, "h");
 }
 
 function xSliderPToClientX(clientX) {
@@ -1865,8 +1961,8 @@ function openXSlider(mode) {
     .classList.toggle("ghost-mode", xSliderState.mode === "alt");
   buildAxisTicksX(document.getElementById("xslider-ticks"));
   drawSliderPortrait(document.getElementById("xslider-portrait-canvas"));
-  renderXSlider();
   document.getElementById("xslider-overlay").classList.add("open");
+  renderXSlider(); // after "open" so the track has real dimensions for neighbor layout
 }
 function closeXSlider() {
   document.getElementById("xslider-overlay").classList.remove("open");
@@ -1900,6 +1996,37 @@ function renderYSlider() {
   const key   = Math.max(0, Math.min(10, Math.round(Math.abs(p))));
   const table = p >= 0 ? SPD_DESC : TNK_DESC;
   document.getElementById("yslider-desc").textContent = table[key] || "";
+
+  layoutYNeighbors(pct);
+}
+
+/* Same fixed-offset docking approach as layoutXNeighbors, just vertical:
+   the "above" (higher-value) neighbor docks above the handle, the "below"
+   one docks under it, both clamped to stay inside the track and never
+   cross past the handle — which is what keeps the whole 3-portrait cluster
+   readable and centered around the handle no matter how tall the track is
+   or how close to an edge the handle sits. */
+function layoutYNeighbors(pct) {
+  const track = document.getElementById("yslider-track");
+  const h     = track.clientHeight;
+  if (!h) return;
+  const narrow  = window.innerWidth <= 720;
+  const offset  = narrow ? 46 : 58;
+  const minGap  = narrow ? 30 : 40;
+  const half    = narrow ? 18 : 24; // half-height of a neighbor row
+  const centerPx = (pct / 100) * h;
+
+  const { below, above } = getSliderNeighbors("v", ySliderState.mode, ySliderState.p);
+
+  // below-value → lower on screen (larger px); above-value → higher (smaller px)
+  const belowPx = clampNeighborPx(centerPx + offset, centerPx, +1, minGap, half, 0, h);
+  const abovePx = clampNeighborPx(centerPx - offset, centerPx, -1, minGap, half, 0, h);
+
+  document.getElementById("yslider-neighbor-below").style.top = belowPx + "px";
+  document.getElementById("yslider-neighbor-above").style.top = abovePx + "px";
+
+  paintNeighbor("yslider-neighbor-below", "yslider-neighbor-below-label", "yslider-neighbor-below-canvas", below, "v");
+  paintNeighbor("yslider-neighbor-above", "yslider-neighbor-above-label", "yslider-neighbor-above-canvas", above, "v");
 }
 
 function ySliderPFromClientY(clientY) {
@@ -1947,8 +2074,8 @@ function openYSlider(mode) {
     .classList.toggle("ghost-mode", ySliderState.mode === "alt");
   buildAxisTicksY(document.getElementById("yslider-ticks"));
   drawSliderPortrait(document.getElementById("yslider-portrait-canvas"));
-  renderYSlider();
   document.getElementById("yslider-overlay").classList.add("open");
+  renderYSlider(); // after "open" so the track has real dimensions for neighbor layout
 }
 function closeYSlider() {
   document.getElementById("yslider-overlay").classList.remove("open");

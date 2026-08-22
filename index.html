@@ -519,6 +519,18 @@
             <div class="axis-slider-fill" id="xslider-fill"></div>
             <div class="axis-ticks" id="xslider-ticks"></div>
             <div class="axis-slider-handle" id="xslider-handle"></div>
+
+            <!-- Neighbor previews: closest hero below/above the current value, riding above the rail -->
+            <div class="axis-neighbor axis-neighbor-x axis-neighbor-below is-hidden" id="xslider-neighbor-below">
+              <div class="axis-neighbor-label" id="xslider-neighbor-below-label"></div>
+              <div class="axis-neighbor-portrait"><canvas id="xslider-neighbor-below-canvas" width="80" height="80"></canvas></div>
+            </div>
+            <div class="axis-neighbor axis-neighbor-x axis-neighbor-above is-hidden" id="xslider-neighbor-above">
+              <div class="axis-neighbor-label" id="xslider-neighbor-above-label"></div>
+              <div class="axis-neighbor-portrait"><canvas id="xslider-neighbor-above-canvas" width="80" height="80"></canvas></div>
+            </div>
+
+            <!-- The hero being set now rides below the rail -->
             <div class="axis-slider-portrait" id="xslider-portrait">
               <canvas id="xslider-portrait-canvas" width="128" height="128"></canvas>
             </div>
@@ -572,6 +584,12 @@
             <div class="axis-slider-fill-y" id="yslider-fill"></div>
             <div class="axis-ticks-y" id="yslider-ticks"></div>
             <div class="axis-slider-handle-y" id="yslider-handle"></div>
+            <!-- Neighbor previews: closest hero below/above the current value -->
+            <div class="axis-neighbor axis-neighbor-y axis-neighbor-above is-hidden" id="yslider-neighbor-above">
+              <div class="axis-neighbor-portrait"><canvas id="yslider-neighbor-above-canvas" width="80" height="80"></canvas></div>
+              <div class="axis-neighbor-label" id="yslider-neighbor-above-label"></div>
+            </div>
+
             <div class="axis-slider-side-panel" id="yslider-side-panel">
               <div class="axis-slider-portrait" id="yslider-portrait">
                 <canvas id="yslider-portrait-canvas" width="128" height="128"></canvas>
@@ -580,6 +598,11 @@
                 <div class="axis-slider-readout-num" id="yslider-readout-num">SPD 10</div>
                 <div class="axis-slider-desc" id="yslider-desc">Can gain 3 turns effectively.</div>
               </div>
+            </div>
+
+            <div class="axis-neighbor axis-neighbor-y axis-neighbor-below is-hidden" id="yslider-neighbor-below">
+              <div class="axis-neighbor-portrait"><canvas id="yslider-neighbor-below-canvas" width="80" height="80"></canvas></div>
+              <div class="axis-neighbor-label" id="yslider-neighbor-below-label"></div>
             </div>
           </div>
         </div>
