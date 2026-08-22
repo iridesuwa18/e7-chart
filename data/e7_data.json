@@ -217,20 +217,20 @@
       "role": "Warrior",
       "element": "Light",
       "vType": "SPD",
-      "vScore": 8,
+      "vScore": 6,
       "hType": "SUR",
-      "hScore": 9.5,
+      "hScore": 9,
       "notes": "",
       "iconData": "https://raw.githubusercontent.com/iridesuwa18/e7-chart/main/assets/heroes/little-queen-charlotte.webp",
       "locked": true,
       "altStats": {
         "vType": "TNK",
-        "vScore": 8.5,
-        "hType": "SUR",
-        "hScore": 9.5
+        "vScore": 5,
+        "hType": "SST",
+        "hScore": 8
       },
-      "_x": 2.5,
-      "_y": 10,
+      "_x": 5,
+      "_y": 20,
       "hidden": false
     },
     {
@@ -526,5 +526,5 @@
     }
   ],
   "draftData": null,
-  "savedAt": "2026-08-22T12:46:33.106Z"
+  "savedAt": "2026-08-22T12:51:31.126Z"
 }
