@@ -299,15 +299,20 @@
       "role": "Knight",
       "element": "Light",
       "vType": "TNK",
-      "vScore": 8.6,
+      "vScore": 7,
       "hType": "SUR",
       "hScore": 8,
       "notes": "",
       "iconData": "https://raw.githubusercontent.com/iridesuwa18/e7-chart/main/assets/heroes/dragon-bride-senya.webp",
       "locked": true,
-      "altStats": null,
+      "altStats": {
+        "vType": "SPD",
+        "vScore": 5,
+        "hType": "SUR",
+        "hScore": 8
+      },
       "_x": 10,
-      "_y": 93,
+      "_y": 85,
       "hidden": false
     },
     {
@@ -531,5 +536,5 @@
     }
   ],
   "draftData": null,
-  "savedAt": "2026-08-22T13:01:19.466Z"
+  "savedAt": "2026-08-22T13:05:35.476Z"
 }
