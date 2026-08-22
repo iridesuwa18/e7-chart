@@ -71,14 +71,14 @@
       "role": "Mage",
       "element": "Earth",
       "vType": "TNK",
-      "vScore": 3,
+      "vScore": 5,
       "hType": "SUR",
       "hScore": 10,
       "notes": "Her shield makes her a \"tank\"",
       "iconData": "https://raw.githubusercontent.com/iridesuwa18/e7-chart/main/assets/heroes/frieren.webp",
       "locked": true,
       "_x": 0,
-      "_y": 65,
+      "_y": 75,
       "altStats": {
         "vType": "SPD",
         "vScore": 6,
@@ -521,5 +521,5 @@
     }
   ],
   "draftData": null,
-  "savedAt": "2026-08-22T12:18:23.087Z"
+  "savedAt": "2026-08-22T12:19:08.809Z"
 }
