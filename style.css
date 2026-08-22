@@ -1261,17 +1261,18 @@ body.dot-mode .origin-dot:hover {
 .axis-neighbor-x .axis-neighbor-portrait canvas { width: 40px; height: 40px; }
 .axis-neighbor-x .axis-neighbor-label { max-width: 84px; text-align: center; }
 
-/* Y axis: mini portrait + text riding beside the rail, above/below the main panel */
+/* Y axis: mini portrait + text riding beside the rail, on the opposite side from the chosen-hero panel */
 .axis-neighbor-y {
-  left: 40px;
+  right: calc(100% + 14px);
   transform: translateY(-50%);
   display: flex;
+  flex-direction: row-reverse;
   align-items: center;
   gap: 8px;
   width: 190px;
 }
 .axis-neighbor-y .axis-neighbor-portrait canvas { width: 32px; height: 32px; flex-shrink: 0; }
-.axis-neighbor-y .axis-neighbor-label { max-width: 150px; text-align: left; }
+.axis-neighbor-y .axis-neighbor-label { max-width: 150px; text-align: right; }
 
 #yslider-track.fine-mode .axis-neighbor-y { transition: top .04s linear; }
 
@@ -1289,7 +1290,11 @@ body.dot-mode .origin-dot:hover {
   flex: 1;
   display: flex; flex-direction: column; align-items: center;
   gap: 8px; min-height: 0;
-  padding-right: 300px; /* room for the side panel riding beside the rail */
+  /* Balanced side padding so the rail sits centered between the neighbor
+     previews (left) and the chosen-hero panel (right) rather than the
+     whole assembly being pushed off to one side. */
+  padding-left: 220px;  /* room for the neighbor previews riding beside the rail */
+  padding-right: 290px; /* room for the side panel riding beside the rail */
 }
 .axis-slider-endlabel-y { display: flex; flex-direction: column; align-items: center; gap: 2px; flex-shrink: 0; }
 .axis-slider-track-wrap-y { position: relative; flex: 1; width: 100%; display: flex; justify-content: center; min-height: 0; overflow: visible; }
@@ -1331,7 +1336,7 @@ body.dot-mode .origin-dot:hover {
   pointer-events: none;
 }
 .axis-slider-side-panel {
-  position: absolute; left: 40px; top: 50%;
+  position: absolute; left: calc(100% + 14px); top: 50%;
   transform: translateY(-50%);
   display: flex; align-items: center; gap: 14px;
   transition: top .16s cubic-bezier(.34,1.56,.64,1);
@@ -1356,7 +1361,7 @@ body.dot-mode .origin-dot:hover {
   .axis-slider-endname { font-size: 8px; }
   .axis-slider-endval { font-size: 16px; }
   .axis-tick-label, .axis-tick-label-y { font-size: 7px; }
-  .axis-slider-stage-y { padding-right: 190px; }
+  .axis-slider-stage-y { padding-left: 150px; padding-right: 190px; }
   .axis-slider-side-panel { width: 170px; gap: 8px; }
   .axis-slider-side-panel .axis-slider-portrait { width: 46px; height: 46px; }
   .axis-slider-side-panel .axis-slider-portrait canvas { width: 46px; height: 46px; }
