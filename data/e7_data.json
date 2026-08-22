@@ -50,15 +50,15 @@
       "vType": "TNK",
       "vScore": 10,
       "hType": "SUR",
-      "hScore": 9,
+      "hScore": 8,
       "notes": "",
       "iconData": "https://raw.githubusercontent.com/iridesuwa18/e7-chart/main/assets/heroes/estelle.webp",
       "locked": true,
-      "_x": 5,
+      "_x": 10,
       "_y": 100,
       "altStats": {
         "vType": "SPD",
-        "vScore": 9,
+        "vScore": 6,
         "hType": "SST",
         "hScore": 8
       },
@@ -521,5 +521,5 @@
     }
   ],
   "draftData": null,
-  "savedAt": "2026-08-22T11:48:08.532Z"
+  "savedAt": "2026-08-22T11:51:52.956Z"
 }
