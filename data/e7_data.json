@@ -81,7 +81,7 @@
       "_y": 65,
       "altStats": {
         "vType": "SPD",
-        "vScore": 3,
+        "vScore": 6,
         "hType": "SUR",
         "hScore": 10
       },
@@ -521,5 +521,5 @@
     }
   ],
   "draftData": null,
-  "savedAt": "2026-08-22T12:17:24.174Z"
+  "savedAt": "2026-08-22T12:18:23.087Z"
 }
