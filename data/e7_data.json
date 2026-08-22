@@ -7,19 +7,19 @@
       "role": "Soul Weaver",
       "element": "Light",
       "vType": "TNK",
-      "vScore": 9,
+      "vScore": 8,
       "hType": "SST",
       "hScore": 10,
       "notes": "",
       "iconData": "https://raw.githubusercontent.com/iridesuwa18/e7-chart/main/assets/heroes/ruele-of-light.webp",
       "locked": true,
       "_x": 100,
-      "_y": 95,
+      "_y": 90,
       "altStats": {
         "vType": "TNK",
-        "vScore": 9,
+        "vScore": 8,
         "hType": "SUR",
-        "hScore": 3
+        "hScore": 10
       },
       "hidden": false
     },
@@ -521,5 +521,5 @@
     }
   ],
   "draftData": null,
-  "savedAt": "2026-08-21T13:23:08.629Z"
+  "savedAt": "2026-08-22T11:39:48.441Z"
 }
