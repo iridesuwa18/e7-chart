@@ -322,20 +322,20 @@
       "role": "",
       "element": "Light",
       "vType": "SPD",
-      "vScore": 8.7,
+      "vScore": 6,
       "hType": "SUR",
-      "hScore": 8.2,
+      "hScore": 5,
       "notes": "",
       "iconData": "https://raw.githubusercontent.com/iridesuwa18/e7-chart/main/assets/heroes/empyrean-ilynav.webp",
       "locked": true,
       "altStats": {
         "vType": "TNK",
-        "vScore": 8.5,
-        "hType": "SUR",
-        "hScore": 8.2
+        "vScore": 5,
+        "hType": "SST",
+        "hScore": 4
       },
-      "_x": 9,
-      "_y": 6.500000000000007,
+      "_x": 25,
+      "_y": 20,
       "hidden": false
     },
     {
@@ -536,5 +536,5 @@
     }
   ],
   "draftData": null,
-  "savedAt": "2026-08-22T13:05:35.476Z"
+  "savedAt": "2026-08-22T13:08:30.732Z"
 }
