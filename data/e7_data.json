@@ -135,7 +135,7 @@
       "role": "Warrior",
       "element": "Light",
       "vType": "SPD",
-      "vScore": 7.8,
+      "vScore": 7,
       "hType": "SUR",
       "hScore": 8,
       "notes": "",
@@ -143,7 +143,7 @@
       "locked": true,
       "altStats": null,
       "_x": 10,
-      "_y": 11,
+      "_y": 15,
       "hidden": false
     },
     {
@@ -521,5 +521,5 @@
     }
   ],
   "draftData": null,
-  "savedAt": "2026-08-22T12:30:38.511Z"
+  "savedAt": "2026-08-22T12:34:19.680Z"
 }
