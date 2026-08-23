@@ -1135,8 +1135,30 @@
       },
       "_x": 25,
       "_y": 20
+    },
+    {
+      "id": 1787461117863,
+      "name": "Operator Sigret",
+      "rarity": "5ml",
+      "role": "Ranger",
+      "element": "Dark",
+      "vType": "SPD",
+      "vScore": 8,
+      "hType": "SST",
+      "hScore": 7,
+      "notes": "",
+      "iconData": "https://raw.githubusercontent.com/iridesuwa18/e7-chart/main/assets/heroes/operator-sigret.webp",
+      "locked": true,
+      "altStats": {
+        "vType": "SPD",
+        "vScore": 8,
+        "hType": "SUR",
+        "hScore": 7
+      },
+      "_x": 85,
+      "_y": 10
     }
   ],
   "draftData": null,
-  "savedAt": "2026-08-23T04:53:04.866Z"
+  "savedAt": "2026-08-23T04:58:41.566Z"
 }
