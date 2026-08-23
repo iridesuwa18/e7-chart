@@ -550,8 +550,25 @@
       "altStats": null,
       "_x": 30,
       "_y": 15
+    },
+    {
+      "id": 1787447162534,
+      "name": "Sage Baal & Sezan",
+      "rarity": "5ml",
+      "role": "Mage",
+      "element": "Light",
+      "vType": "SPD",
+      "vScore": 7,
+      "hType": "SUR",
+      "hScore": 4,
+      "notes": "",
+      "iconData": "https://raw.githubusercontent.com/iridesuwa18/e7-chart/main/assets/heroes/sage-baal-sezan.webp",
+      "locked": true,
+      "altStats": null,
+      "_x": 30,
+      "_y": 15
     }
   ],
   "draftData": null,
-  "savedAt": "2026-08-23T00:14:17.452Z"
+  "savedAt": "2026-08-23T01:06:09.920Z"
 }
