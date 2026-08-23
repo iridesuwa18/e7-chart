@@ -2099,8 +2099,25 @@
       },
       "_x": 70,
       "_y": 10
+    },
+    {
+      "id": 1787486061259,
+      "name": "Politis",
+      "rarity": "5ml",
+      "role": "Mage",
+      "element": "Fire",
+      "vType": "SPD",
+      "vScore": 8,
+      "hType": "SUR",
+      "hScore": 4,
+      "notes": "",
+      "iconData": "https://raw.githubusercontent.com/iridesuwa18/e7-chart/main/assets/heroes/politis.webp",
+      "locked": true,
+      "altStats": null,
+      "_x": 30,
+      "_y": 10
     }
   ],
   "draftData": null,
-  "savedAt": "2026-08-23T11:53:03.157Z"
+  "savedAt": "2026-08-23T11:54:26.205Z"
 }
