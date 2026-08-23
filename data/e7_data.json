@@ -701,8 +701,30 @@
       },
       "_x": 75,
       "_y": 0
+    },
+    {
+      "id": 1787449100475,
+      "name": "Maid Chloe",
+      "rarity": "5ml",
+      "role": "Soul Weaver",
+      "element": "Light",
+      "vType": "SPD",
+      "vScore": 6,
+      "hType": "SST",
+      "hScore": 6,
+      "notes": "",
+      "iconData": "https://raw.githubusercontent.com/iridesuwa18/e7-chart/main/assets/heroes/maid-chloe.webp",
+      "locked": true,
+      "altStats": {
+        "vType": "TNK",
+        "vScore": 6,
+        "hType": "SST",
+        "hScore": 6
+      },
+      "_x": 80,
+      "_y": 20
     }
   ],
   "draftData": null,
-  "savedAt": "2026-08-23T01:36:12.284Z"
+  "savedAt": "2026-08-23T01:38:58.137Z"
 }
