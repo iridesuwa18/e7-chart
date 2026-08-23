@@ -1313,8 +1313,25 @@
       },
       "_x": 20,
       "_y": 75
+    },
+    {
+      "id": 1787463364042,
+      "name": "Specter Tenebria",
+      "rarity": "5ml",
+      "role": "Mage",
+      "element": "Dark",
+      "vType": "SPD",
+      "vScore": 6,
+      "hType": "SUR",
+      "hScore": 5,
+      "notes": "",
+      "iconData": "https://raw.githubusercontent.com/iridesuwa18/e7-chart/main/assets/heroes/specter-tenebria.webp",
+      "locked": true,
+      "altStats": null,
+      "_x": 25,
+      "_y": 20
     }
   ],
   "draftData": null,
-  "savedAt": "2026-08-23T05:33:38.975Z"
+  "savedAt": "2026-08-23T05:36:08.866Z"
 }
