@@ -723,8 +723,30 @@
       },
       "_x": 80,
       "_y": 20
+    },
+    {
+      "id": 1787449475162,
+      "name": "Apocalypse Ravi",
+      "rarity": "5ml",
+      "role": "Warrior",
+      "element": "Dark",
+      "vType": "SPD",
+      "vScore": 7,
+      "hType": "SUR",
+      "hScore": 8,
+      "notes": "",
+      "iconData": "https://raw.githubusercontent.com/iridesuwa18/e7-chart/main/assets/heroes/apocalypse-ravi.webp",
+      "locked": true,
+      "altStats": {
+        "vType": "TNK",
+        "vScore": 6,
+        "hType": "SST",
+        "hScore": 8
+      },
+      "_x": 10,
+      "_y": 15
     }
   ],
   "draftData": null,
-  "savedAt": "2026-08-23T01:40:11.740Z"
+  "savedAt": "2026-08-23T01:44:39.076Z"
 }
