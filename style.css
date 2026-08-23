@@ -403,6 +403,60 @@ main {
 .qd-stat.warn { color: #ffb74d; border-color: rgba(255,183,77,.35); background: rgba(255,183,77,.08); }
 .quickdraft-toolbar-actions { display: flex; gap: 6px; flex-wrap: wrap; }
 
+.quickdraft-mode-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 10px;
+  padding-top: 10px;
+  border-top: 1px solid var(--border);
+}
+.qd-toggle {
+  position: relative;
+  display: inline-flex;
+  cursor: pointer;
+  flex-shrink: 0;
+}
+.qd-toggle input {
+  position: absolute;
+  opacity: 0;
+  width: 0; height: 0;
+}
+.qd-toggle-track {
+  width: 34px; height: 18px;
+  background: rgba(255,255,255,.08);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  position: relative;
+  transition: background .15s, border-color .15s;
+  flex-shrink: 0;
+}
+.qd-toggle-thumb {
+  position: absolute;
+  top: 1px; left: 1px;
+  width: 14px; height: 14px;
+  border-radius: 50%;
+  background: var(--text-dim);
+  transition: transform .18s, background .15s;
+}
+.qd-toggle input:checked + .qd-toggle-track {
+  background: rgba(201,162,39,.25);
+  border-color: var(--gold);
+}
+.qd-toggle input:checked + .qd-toggle-track .qd-toggle-thumb {
+  transform: translateX(16px);
+  background: var(--gold2);
+}
+.qd-toggle-text {
+  font-size: 10.5px;
+  font-family: 'Cinzel', serif;
+  color: var(--text-dim);
+  letter-spacing: .02em;
+}
+.quickdraft-mode-row:has(input:checked) .qd-toggle-text {
+  color: var(--gold2);
+}
+
 .quickdraft-suggestions {
   margin-top: 10px;
   padding-top: 10px;

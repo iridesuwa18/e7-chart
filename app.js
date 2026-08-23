@@ -118,6 +118,7 @@ const QD_SPEED_TARGET   = 3; // want 3-of-5 heroes to be high-speed/CR so a ban 
 const QD_SUSTAIN_SPD_TARGET = 2; // want at least 2 heroes that are BOTH high-sustain AND high-speed (fast buffers/self-sustainers) — top priority pick type
 const QD_RGB_ELEMENTS = new Set(["Fire", "Ice", "Earth"]);
 const QD_RGB_STACK_SOFT_CAP = 2; // once 2 of one Fire/Ice/Earth element are picked, a 3rd is discouraged — a single enemy counter-element can sweep them all
+let qdAntiDebuffMode = false; // when true, favors Tankiness + mid-range "rounder" heroes over Survivability/revive specialists
 
 /* ── Image editor state ── */
 let editorImg   = null;   // loaded HTMLImageElement
@@ -215,6 +216,13 @@ const saveStatus   = document.getElementById("save-status");
   document.getElementById("btn-quickdraft-clear").addEventListener("click", () => {
     if (quickDraft.some(id => id !== null) && !confirm("Clear all Quick Draft slots?")) return;
     clearQuickDraft();
+  });
+  const qdAntiDebuffToggle = document.getElementById("quickdraft-antidebuff-toggle");
+  qdAntiDebuffToggle.checked = qdAntiDebuffMode;
+  qdAntiDebuffToggle.addEventListener("change", () => {
+    qdAntiDebuffMode = qdAntiDebuffToggle.checked;
+    saveQuickDraftModeLocal();
+    if (quickDraftSuggestOpen) renderQuickDraftSuggestions();
   });
   document.getElementById("modal-cancel").addEventListener("click", closeModal);
   document.getElementById("modal-overlay").addEventListener("click", e => { if (e.target === overlay) closeModal(); });
@@ -598,10 +606,10 @@ function rankValue(h) {
 
    NOTE: the state (quickDraft, QD_SIZE, QD_HIGH,
    etc.) is declared up near the top of the file,
-   above init() — see the comment there for why. ═══════════════════════════════════════ */
+   above init() — see the comment there for why.
+═══════════════════════════════════════ */
 
-/* Rating bands used to call a stat "high" or "low".
-   5.0 doubles as the "passable average score" bar from the design brief. */function saveQuickDraftLocal() {
+function saveQuickDraftLocal() {
   try { localStorage.setItem("e7_quickdraft", JSON.stringify(quickDraft)); } catch { /* ignore */ }
 }
 function loadQuickDraftLocal() {
@@ -614,6 +622,12 @@ function loadQuickDraftLocal() {
       }
     }
   } catch { /* ignore, keep default empty slots */ }
+  try {
+    qdAntiDebuffMode = localStorage.getItem("e7_qd_antidebuff") === "1";
+  } catch { /* ignore, keep default false */ }
+}
+function saveQuickDraftModeLocal() {
+  try { localStorage.setItem("e7_qd_antidebuff", qdAntiDebuffMode ? "1" : "0"); } catch { /* ignore */ }
 }
 
 /* Reads a hero build's raw axis values into 4 independent stat lanes.
@@ -699,11 +713,14 @@ function qdComputeTeamNeeds(currentPicks) {
 /* Scores one candidate hero for whatever slot is next empty. Higher is
    better. This is a one-slot-ahead greedy heuristic, not a full 5-hero
    optimizer — it only reasons about the heroes already locked in, same
-   as how you'd actually draft in real time. */
-function qdScoreCandidate(candidate, currentPicks) {
+   as how you'd actually draft in real time.
+   `slotIndex` is which slot we're filling (0-4) — the middle/Protect
+   slot (QD_PROTECT_INDEX) is scored with its own priorities below. */
+function qdScoreCandidate(candidate, currentPicks, slotIndex) {
   const t = qdHeroTraits(candidate);
   const needs = qdComputeTeamNeeds(currentPicks);
   const slotsRemaining = QD_SIZE - currentPicks.length;
+  const isProtectSlot = slotIndex === QD_PROTECT_INDEX;
   const reasons = [];
   let score = 0;
 
@@ -716,32 +733,74 @@ function qdScoreCandidate(candidate, currentPicks) {
     reasons.push(`Below passable score (${t.score.toFixed(1)} < ${QD_PASSABLE_SCORE})`);
   }
 
-  // Sustain + Speed is the top-priority pick type — fast buffers/self-sustainers
-  // keep the team alive AND let it act first. Target: at least 2 of these.
-  if (needs.highSstSpdCount < QD_SUSTAIN_SPD_TARGET && t.isHighSst && t.isHighSpd) {
-    score += 48;
-    reasons.push(`High-Sustain + High-Speed (priority pick, team ${needs.highSstSpdCount}/${QD_SUSTAIN_SPD_TARGET})`);
-    if (candidate.role === "Soul Weaver") reasons.push("Soul Weaver buffer");
-  } else if (t.isHighSst && candidate.role === "Soul Weaver") {
-    score += 10;
-    reasons.push("Soul Weaver buffer");
+  // ── Anti-Debuff / Anti-Revive Mode ──
+  // Against heavy-debuff or anti-revive comps, a hero whose value comes
+  // mainly from a high Survivability stat (usually a revive/self-sustain
+  // kit) gets neutralized. Flip priority toward Tankiness and toward
+  // "rounder" mid-range heroes that aren't leaning on one extreme stat.
+  if (qdAntiDebuffMode) {
+    if (t.isHighSur) {
+      score -= 22;
+      reasons.push("High-Survivability (often revive-based) — weaker vs debuff/anti-revive");
+    }
+    if (t.isHighTnk) {
+      score += 26;
+      reasons.push("Tanky pick — holds up better vs debuff/anti-revive");
+    }
+    if (t.score >= 5.5 && t.score <= 7.5) {
+      score += 12;
+      reasons.push("Rounder, mid-range score — not over-reliant on one extreme stat");
+    }
   }
 
-  // Rule 3 — chase 3 high-speed/CR heroes across the 5 so a single ban
-  // still leaves 2 to cycle the team.
-  if (needs.highSpdCount < QD_SPEED_TARGET && t.isHighSpd) {
-    score += 40;
-    reasons.push(`High-Speed pick (team ${needs.highSpdCount}/${QD_SPEED_TARGET} so far)`);
-  } else if (needs.highSpdCount >= QD_SPEED_TARGET && t.isHighSpd && slotsRemaining <= 2) {
-    // Quota already met — nudge remaining slots toward tank/sustain instead of stacking more speed.
-    score -= 8;
+  if (isProtectSlot) {
+    // The Protect slot is the one guaranteed survivor after bans, so it
+    // should plug your team's biggest current hole rather than chase
+    // speed — speed is intentionally NOT scored here.
+    const defenseTrait = qdAntiDebuffMode ? "isHighTnk" : "isHighSur";
+    if (t[defenseTrait]) {
+      score += 45;
+      reasons.push(qdAntiDebuffMode ? "High-Tankiness Protect pick" : "High-Survivability Protect pick");
+    }
+    const usedElements = new Set(currentPicks.map(h => h.element || "").filter(Boolean));
+    if (candidate.element && usedElements.has(candidate.element)) {
+      score -= 15;
+      reasons.push("Shares an element with an existing pick — Protect ideally covers a new one");
+    } else if (candidate.element) {
+      score += 18;
+      reasons.push("Different element from the rest of the team");
+    }
+  } else {
+    // Sustain + Speed is the top-priority pick type for non-Protect slots —
+    // fast buffers/self-sustainers keep the team alive AND act first.
+    if (needs.highSstSpdCount < QD_SUSTAIN_SPD_TARGET && t.isHighSst && t.isHighSpd) {
+      score += 48;
+      reasons.push(`High-Sustain + High-Speed (priority pick, team ${needs.highSstSpdCount}/${QD_SUSTAIN_SPD_TARGET})`);
+      if (candidate.role === "Soul Weaver") reasons.push("Soul Weaver buffer");
+    } else if (t.isHighSst && candidate.role === "Soul Weaver") {
+      score += 10;
+      reasons.push("Soul Weaver buffer");
+    }
+
+    // Rule 3 — chase 3 high-speed/CR heroes across the 5 so a single ban
+    // still leaves 2 to cycle the team.
+    if (needs.highSpdCount < QD_SPEED_TARGET && t.isHighSpd) {
+      score += 40;
+      reasons.push(`High-Speed pick (team ${needs.highSpdCount}/${QD_SPEED_TARGET} so far)`);
+    } else if (needs.highSpdCount >= QD_SPEED_TARGET && t.isHighSpd && slotsRemaining <= 2) {
+      // Quota already met — nudge remaining slots toward tank/sustain instead of stacking more speed.
+      score -= 8;
+    }
   }
 
-  // Rules 1/2/3/4/5/6/7/8 — reward covering whatever gaps the current picks created.
-  if (needs.needSpd > 0 && t.isHighSpd) { score += 18 * needs.needSpd; reasons.push("Covers a Speed gap"); }
-  if (needs.needTnk > 0 && t.isHighTnk) { score += 18 * needs.needTnk; reasons.push("Covers a Tankiness gap"); }
-  if (needs.needSur > 0 && t.isHighSur) { score += 16 * needs.needSur; reasons.push("Covers a Survivability gap"); }
-  if (needs.needSst > 0 && t.isHighSst) { score += 16 * needs.needSst; reasons.push("Covers a Sustainability gap"); }
+  // Rules 1/2/3/4/5/6/7/8 — reward covering whatever gaps the current picks
+  // created. Weighted up for the Protect slot since it's meant to be the
+  // pick that "turns the tide" on whatever the team is missing.
+  const gapMul = isProtectSlot ? 1.3 : 1;
+  if (needs.needSpd > 0 && t.isHighSpd) { score += 18 * needs.needSpd * gapMul; reasons.push("Covers a Speed gap"); }
+  if (needs.needTnk > 0 && t.isHighTnk) { score += 18 * needs.needTnk * gapMul; reasons.push("Covers a Tankiness gap"); }
+  if (needs.needSur > 0 && t.isHighSur) { score += 16 * needs.needSur * gapMul; reasons.push("Covers a Survivability gap"); }
+  if (needs.needSst > 0 && t.isHighSst) { score += 16 * needs.needSst * gapMul; reasons.push("Covers a Sustainability gap"); }
 
   // Element balance — Fire/Ice/Earth form a single-counter triangle, so
   // stacking one of them risks a full sweep from one matching enemy element.
@@ -796,8 +855,9 @@ function qdElementHint(currentPicks) {
 function qdSuggestForNextSlot() {
   const currentIds = quickDraft.filter(id => id !== null);
   const currentPicks = currentIds.map(id => heroes.find(h => h.id === id)).filter(Boolean);
+  const nextIdx = quickDraft.indexOf(null);
   const candidates = heroes.filter(h => !currentIds.includes(h.id));
-  const scored = candidates.map(c => qdScoreCandidate(c, currentPicks));
+  const scored = candidates.map(c => qdScoreCandidate(c, currentPicks, nextIdx));
   scored.sort((a, b) => b.score - a.score);
   return scored;
 }
