@@ -162,7 +162,13 @@ const saveStatus   = document.getElementById("save-status");
   // ONLY the Quick Draft drawer full-screen, for use as a lightweight
   // side app while playing Epic Seven. Everything still reads/writes the
   // same heroes/quickDraft state and still pulls live data from the server.
-  const qdCompanionMode = new URLSearchParams(location.search).get("view") === "quickdraft";
+  // Companion mode is detected two ways: a ?view=quickdraft URL param
+  // (works from any link/shortcut), OR the qd-companion class already
+  // being present on <body> (quickdraft.html hardcodes it directly in
+  // its markup so there's zero flash of the full site on load).
+  const qdCompanionMode =
+    document.body.classList.contains("qd-companion") ||
+    new URLSearchParams(location.search).get("view") === "quickdraft";
   if (qdCompanionMode) {
     document.body.classList.add("qd-companion");
     quickDraftOpen = true;
