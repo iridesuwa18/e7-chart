@@ -767,8 +767,25 @@
       },
       "_x": 10,
       "_y": 30
+    },
+    {
+      "id": 1787449914285,
+      "name": "Dark Corvus",
+      "rarity": "5ml",
+      "role": "Warrior",
+      "element": "Dark",
+      "vType": "TNK",
+      "vScore": 5,
+      "hType": "SST",
+      "hScore": 8,
+      "notes": "",
+      "iconData": "https://raw.githubusercontent.com/iridesuwa18/e7-chart/main/assets/heroes/dark-corvus.webp",
+      "locked": true,
+      "altStats": null,
+      "_x": 90,
+      "_y": 75
     }
   ],
   "draftData": null,
-  "savedAt": "2026-08-23T01:47:54.161Z"
+  "savedAt": "2026-08-23T01:51:58.859Z"
 }
