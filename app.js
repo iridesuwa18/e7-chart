@@ -116,6 +116,7 @@ const QD_LOW  = 4;
 const QD_PASSABLE_SCORE = 5;
 const QD_SPEED_TARGET   = 3; // want 3-of-5 heroes to be high-speed/CR so a ban still leaves 2 to cycle
 const QD_SUSTAIN_SPD_TARGET = 2; // want at least 2 heroes that are BOTH high-sustain AND high-speed (fast buffers/self-sustainers) — top priority pick type
+const QD_VARIETY_CEILING = 7; // once Speed + Sustain+Speed targets are both met, remaining picks should aim under this score for variety
 const QD_RGB_ELEMENTS = new Set(["Fire", "Ice", "Earth"]);
 const QD_RGB_STACK_SOFT_CAP = 2; // once 2 of one Fire/Ice/Earth element are picked, a 3rd is discouraged — a single enemy counter-element can sweep them all
 let qdAntiDebuffMode = false; // when true, favors Tankiness + mid-range "rounder" heroes over Survivability/revive specialists
@@ -782,30 +783,34 @@ function qdScoreCandidate(candidate, currentPicks, slotIndex) {
       reasons.push("Soul Weaver buffer");
     }
 
-    // Rule 3 — chase 3 high-speed/CR heroes across the 5 so a single ban
-    // still leaves 2 to cycle the team.
-    if (needs.highSpdCount < QD_SPEED_TARGET && t.isHighSpd) {
-      score += 40;
-      reasons.push(`High-Speed pick (team ${needs.highSpdCount}/${QD_SPEED_TARGET} so far)`);
-    } else if (needs.highSpdCount >= QD_SPEED_TARGET && t.isHighSpd && slotsRemaining <= 2) {
-      // Quota already met — nudge remaining slots toward tank/sustain instead of stacking more speed.
-      score -= 8;
-    }
-
     // Once BOTH core targets are met (3 high-speed, 2 high-sustain+speed),
-    // stop defaulting to the same handful of top-score Survivability/revive
-    // heroes for the rest of the team. Actively favor lower/mid-score,
-    // still-passable heroes instead so the remaining slots add variety
-    // rather than repeating your priciest picks.
+    // the team's cycling needs are covered — stop chasing more speed
+    // entirely and stop defaulting to the same high-cost, high-score
+    // Survivability/revival heroes. Aim for a sub-7 score "rounder" pick
+    // instead so the remaining slots add real variety.
     const coreTargetsMet = needs.highSpdCount >= QD_SPEED_TARGET && needs.highSstSpdCount >= QD_SUSTAIN_SPD_TARGET;
+
     if (coreTargetsMet) {
-      if (t.isHighSur && t.score >= 8) {
-        score -= 30;
-        reasons.push("Core targets already met — avoid another high-cost Survivability/revival hero");
-      } else if (t.score < 8) {
-        const varietyBonus = (8 - t.score) * 5;
-        score += varietyBonus;
-        reasons.push("Adds variety (core Speed/Sustain targets already met)");
+      if (t.isHighSpd) {
+        score -= 35;
+        reasons.push("Speed targets already met — no longer prioritizing High-Speed picks");
+      }
+      if (t.score >= QD_VARIETY_CEILING) {
+        score -= (t.score - QD_VARIETY_CEILING + 1) * 15;
+        reasons.push(`Core targets met — favoring picks under ${QD_VARIETY_CEILING} score for variety`);
+      } else {
+        score += (QD_VARIETY_CEILING - t.score) * 6;
+        reasons.push(`Adds variety (core targets met, aiming under ${QD_VARIETY_CEILING} score)`);
+      }
+    } else {
+      // Rule 3 — chase 3 high-speed/CR heroes across the 5 so a single ban
+      // still leaves 2 to cycle the team.
+      if (needs.highSpdCount < QD_SPEED_TARGET && t.isHighSpd) {
+        score += 40;
+        reasons.push(`High-Speed pick (team ${needs.highSpdCount}/${QD_SPEED_TARGET} so far)`);
+      } else if (needs.highSpdCount >= QD_SPEED_TARGET && t.isHighSpd && slotsRemaining <= 2) {
+        // Speed quota already met but sustain+speed quota isn't — nudge toward tank/sustain instead of stacking more speed.
+        score -= 8;
       }
     }
   }
@@ -873,7 +878,7 @@ function qdVarietyHint(currentPicks) {
   if (currentPicks.length === 0) return "";
   const needs = qdComputeTeamNeeds(currentPicks);
   if (needs.highSpdCount >= QD_SPEED_TARGET && needs.highSstSpdCount >= QD_SUSTAIN_SPD_TARGET) {
-    return `✅ Speed (${needs.highSpdCount}/${QD_SPEED_TARGET}) and Sustain+Speed (${needs.highSstSpdCount}/${QD_SUSTAIN_SPD_TARGET}) targets are met — now favoring lower/mid-score picks for variety instead of repeating the same high-cost Survivability heroes.`;
+    return `✅ Speed (${needs.highSpdCount}/${QD_SPEED_TARGET}) and Sustain+Speed (${needs.highSstSpdCount}/${QD_SUSTAIN_SPD_TARGET}) targets are met — no longer chasing High-Speed picks, now favoring under-${QD_VARIETY_CEILING} score picks for variety instead of repeating the same high-cost Survivability heroes.`;
   }
   return "";
 }
