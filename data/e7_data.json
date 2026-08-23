@@ -584,8 +584,25 @@
       "altStats": null,
       "_x": 10,
       "_y": 20
+    },
+    {
+      "id": 1787447565605,
+      "name": "Solitaria of the Snow",
+      "rarity": "5ml",
+      "role": "Soul Weaver",
+      "element": "Light",
+      "vType": "SPD",
+      "vScore": 7,
+      "hType": "SUR",
+      "hScore": 7,
+      "notes": "",
+      "iconData": "https://raw.githubusercontent.com/iridesuwa18/e7-chart/main/assets/heroes/solitaria-of-the-snow.webp",
+      "locked": true,
+      "altStats": null,
+      "_x": 15,
+      "_y": 15
     }
   ],
   "draftData": null,
-  "savedAt": "2026-08-23T01:09:18.793Z"
+  "savedAt": "2026-08-23T01:13:14.732Z"
 }
