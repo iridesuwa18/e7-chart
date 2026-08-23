@@ -901,8 +901,25 @@
       },
       "_x": 15,
       "_y": 15
+    },
+    {
+      "id": 1787451700035,
+      "name": "Salome",
+      "rarity": "5ml",
+      "role": "Warrior",
+      "element": "Dark",
+      "vType": "SPD",
+      "vScore": 8,
+      "hType": "SUR",
+      "hScore": 8,
+      "notes": "",
+      "iconData": "https://raw.githubusercontent.com/iridesuwa18/e7-chart/main/assets/heroes/salome.webp",
+      "locked": true,
+      "altStats": null,
+      "_x": 10,
+      "_y": 10
     }
   ],
   "draftData": null,
-  "savedAt": "2026-08-23T02:18:25.909Z"
+  "savedAt": "2026-08-23T02:22:03.655Z"
 }
