@@ -1788,7 +1788,7 @@
     {
       "id": 1787484099059,
       "name": "Immortal Wukong",
-      "rarity": "5ml",
+      "rarity": "5r",
       "role": "Warrior",
       "element": "Earth",
       "vType": "SPD",
@@ -1828,8 +1828,30 @@
       },
       "_x": 15,
       "_y": 10
+    },
+    {
+      "id": 1787484423032,
+      "name": "Mort",
+      "rarity": "5r",
+      "role": "Knight",
+      "element": "Earth",
+      "vType": "TNK",
+      "vScore": 5,
+      "hType": "SST",
+      "hScore": 7,
+      "notes": "",
+      "iconData": "https://raw.githubusercontent.com/iridesuwa18/e7-chart/main/assets/heroes/mort.webp",
+      "locked": true,
+      "altStats": {
+        "vType": "SPD",
+        "vScore": 6,
+        "hType": "SUR",
+        "hScore": 6
+      },
+      "_x": 85,
+      "_y": 75
     }
   ],
   "draftData": null,
-  "savedAt": "2026-08-23T11:23:56.313Z"
+  "savedAt": "2026-08-23T11:27:05.783Z"
 }
