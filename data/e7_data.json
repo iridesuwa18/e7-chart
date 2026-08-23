@@ -806,8 +806,25 @@
       "altStats": null,
       "_x": 30,
       "_y": 15
+    },
+    {
+      "id": 1787450410417,
+      "name": "Disciplinary Prefect Aria",
+      "rarity": "5ml",
+      "role": "Warrior",
+      "element": "Dark",
+      "vType": "TNK",
+      "vScore": 5,
+      "hType": "SUR",
+      "hScore": 4,
+      "notes": "",
+      "iconData": "https://raw.githubusercontent.com/iridesuwa18/e7-chart/main/assets/heroes/disciplinary-prefect-aria.webp",
+      "locked": true,
+      "altStats": null,
+      "_x": 30,
+      "_y": 75
     }
   ],
   "draftData": null,
-  "savedAt": "2026-08-23T01:56:30.199Z"
+  "savedAt": "2026-08-23T02:00:19.690Z"
 }
