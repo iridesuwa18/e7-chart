@@ -1052,8 +1052,30 @@
       "altStats": null,
       "_x": 10,
       "_y": 15
+    },
+    {
+      "id": 1787459885926,
+      "name": "Rhianna and Luciella",
+      "rarity": "5ml",
+      "role": "Thief",
+      "element": "Dark",
+      "vType": "SPD",
+      "vScore": 10,
+      "hType": "SUR",
+      "hScore": 9,
+      "notes": "",
+      "iconData": "https://raw.githubusercontent.com/iridesuwa18/e7-chart/main/assets/heroes/rhianna-and-luciella.webp",
+      "locked": false,
+      "altStats": {
+        "vType": "SPD",
+        "vScore": 10,
+        "hType": "SST",
+        "hScore": 7
+      },
+      "_x": 5,
+      "_y": 0
     }
   ],
   "draftData": null,
-  "savedAt": "2026-08-23T04:35:34.007Z"
+  "savedAt": "2026-08-23T04:38:11.568Z"
 }
