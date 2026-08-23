@@ -823,8 +823,30 @@
       "altStats": null,
       "_x": 25,
       "_y": 75
+    },
+    {
+      "id": 1787450689561,
+      "name": "Lone Crescent Bellona",
+      "rarity": "5ml",
+      "role": "Warrior",
+      "element": "Dark",
+      "vType": "SPD",
+      "vScore": 8,
+      "hType": "SUR",
+      "hScore": 9,
+      "notes": "",
+      "iconData": "https://raw.githubusercontent.com/iridesuwa18/e7-chart/main/assets/heroes/lone-crescent-bellona.webp",
+      "locked": true,
+      "altStats": {
+        "vType": "SPD",
+        "vScore": 8,
+        "hType": "SST",
+        "hScore": 7
+      },
+      "_x": 5,
+      "_y": 10
     }
   ],
   "draftData": null,
-  "savedAt": "2026-08-23T02:02:01.586Z"
+  "savedAt": "2026-08-23T02:04:54.482Z"
 }
