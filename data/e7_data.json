@@ -1552,8 +1552,30 @@
       },
       "_x": 75,
       "_y": 10
+    },
+    {
+      "id": 1787482285976,
+      "name": "Perfumer Byblis",
+      "rarity": "5ml",
+      "role": "Soul Weaver",
+      "element": "Fire",
+      "vType": "TNK",
+      "vScore": 5,
+      "hType": "SST",
+      "hScore": 8,
+      "notes": "",
+      "iconData": "https://raw.githubusercontent.com/iridesuwa18/e7-chart/main/assets/heroes/perfumer-byblis.webp",
+      "locked": true,
+      "altStats": {
+        "vType": "TNK",
+        "vScore": 5,
+        "hType": "SUR",
+        "hScore": 6
+      },
+      "_x": 90,
+      "_y": 75
     }
   ],
   "draftData": null,
-  "savedAt": "2026-08-23T10:49:13.866Z"
+  "savedAt": "2026-08-23T10:51:30.089Z"
 }
