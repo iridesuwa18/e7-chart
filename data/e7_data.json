@@ -1933,8 +1933,25 @@
       },
       "_x": 15,
       "_y": 25
+    },
+    {
+      "id": 1787485157932,
+      "name": "Landy",
+      "rarity": "5ml",
+      "role": "Ranger",
+      "element": "Earth",
+      "vType": "SPD",
+      "vScore": 9,
+      "hType": "SUR",
+      "hScore": 6,
+      "notes": "",
+      "iconData": "https://raw.githubusercontent.com/iridesuwa18/e7-chart/main/assets/heroes/landy.webp",
+      "locked": true,
+      "altStats": null,
+      "_x": 20,
+      "_y": 5
     }
   ],
   "draftData": null,
-  "savedAt": "2026-08-23T11:37:37.057Z"
+  "savedAt": "2026-08-23T11:39:37.268Z"
 }
