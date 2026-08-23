@@ -1491,8 +1491,30 @@
       },
       "_x": 10,
       "_y": 15
+    },
+    {
+      "id": 1787481781359,
+      "name": "Jenua",
+      "rarity": "5r",
+      "role": "Thief",
+      "element": "Fire",
+      "vType": "SPD",
+      "vScore": 7,
+      "hType": "SST",
+      "hScore": 7,
+      "notes": "",
+      "iconData": "https://raw.githubusercontent.com/iridesuwa18/e7-chart/main/assets/heroes/jenua.webp",
+      "locked": true,
+      "altStats": {
+        "vType": "TNK",
+        "vScore": 5,
+        "hType": "SUR",
+        "hScore": 7
+      },
+      "_x": 85,
+      "_y": 15
     }
   ],
   "draftData": null,
-  "savedAt": "2026-08-23T10:39:53.360Z"
+  "savedAt": "2026-08-23T10:43:05.038Z"
 }
