@@ -781,11 +781,16 @@
       "notes": "",
       "iconData": "https://raw.githubusercontent.com/iridesuwa18/e7-chart/main/assets/heroes/dark-corvus.webp",
       "locked": true,
-      "altStats": null,
+      "altStats": {
+        "vType": "TNK",
+        "vScore": 5,
+        "hType": "SUR",
+        "hScore": 7
+      },
       "_x": 90,
       "_y": 75
     }
   ],
   "draftData": null,
-  "savedAt": "2026-08-23T01:51:58.859Z"
+  "savedAt": "2026-08-23T01:52:43.025Z"
 }
