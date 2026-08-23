@@ -745,8 +745,30 @@
       },
       "_x": 10,
       "_y": 15
+    },
+    {
+      "id": 1787449670038,
+      "name": "Bystander Hwayoung",
+      "rarity": "5ml",
+      "role": "Warrior",
+      "element": "Dark",
+      "vType": "SPD",
+      "vScore": 4,
+      "hType": "SUR",
+      "hScore": 8,
+      "notes": "",
+      "iconData": "https://raw.githubusercontent.com/iridesuwa18/e7-chart/main/assets/heroes/bystander-hwayoung.webp",
+      "locked": true,
+      "altStats": {
+        "vType": "TNK",
+        "vScore": 5,
+        "hType": "SUR",
+        "hScore": 8
+      },
+      "_x": 10,
+      "_y": 30
     }
   ],
   "draftData": null,
-  "savedAt": "2026-08-23T01:44:39.076Z"
+  "savedAt": "2026-08-23T01:47:54.161Z"
 }
