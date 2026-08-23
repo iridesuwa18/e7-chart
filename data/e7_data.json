@@ -1430,8 +1430,30 @@
       "altStats": null,
       "_x": 20,
       "_y": 10
+    },
+    {
+      "id": 1787481229729,
+      "name": "Moon Bunny Dominiel",
+      "rarity": "4",
+      "role": "Soul Weaver",
+      "element": "Light",
+      "vType": "SPD",
+      "vScore": 5,
+      "hType": "SUR",
+      "hScore": 6,
+      "notes": "",
+      "iconData": "https://raw.githubusercontent.com/iridesuwa18/e7-chart/main/assets/heroes/moon-bunny-dominiel.webp",
+      "locked": true,
+      "altStats": {
+        "vType": "TNK",
+        "vScore": 8,
+        "hType": "SUR",
+        "hScore": 6
+      },
+      "_x": 20,
+      "_y": 25
     }
   ],
   "draftData": null,
-  "savedAt": "2026-08-23T06:42:03.636Z"
+  "savedAt": "2026-08-23T10:33:58.068Z"
 }
