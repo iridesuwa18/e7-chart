@@ -996,8 +996,47 @@
       "altStats": null,
       "_x": 40,
       "_y": 75
+    },
+    {
+      "id": 1787453874571,
+      "name": "Arbiter Vildred",
+      "rarity": "5ml",
+      "role": "Thief",
+      "element": "Dark",
+      "vType": "SPD",
+      "vScore": 7,
+      "hType": "SST",
+      "hScore": 9,
+      "notes": "",
+      "iconData": "https://raw.githubusercontent.com/iridesuwa18/e7-chart/main/assets/heroes/arbiter-vildred.webp",
+      "locked": true,
+      "altStats": {
+        "vType": "SPD",
+        "vScore": 7,
+        "hType": "SUR",
+        "hScore": 9
+      },
+      "_x": 95,
+      "_y": 15
+    },
+    {
+      "id": 1787454123086,
+      "name": "Closer Charles",
+      "rarity": "5ml",
+      "role": "Thief",
+      "element": "Dark",
+      "vType": "SPD",
+      "vScore": 7,
+      "hType": "SUR",
+      "hScore": 4,
+      "notes": "",
+      "iconData": "https://raw.githubusercontent.com/iridesuwa18/e7-chart/main/assets/heroes/closer-charles.webp",
+      "locked": true,
+      "altStats": null,
+      "_x": 30,
+      "_y": 15
     }
   ],
   "draftData": null,
-  "savedAt": "2026-08-23T02:55:33.153Z"
+  "savedAt": "2026-08-23T03:02:06.391Z"
 }
