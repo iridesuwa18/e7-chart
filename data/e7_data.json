@@ -1096,8 +1096,25 @@
       },
       "_x": 80,
       "_y": 15
+    },
+    {
+      "id": 1787460558755,
+      "name": "Briar Witch Iseria",
+      "rarity": "5ml",
+      "role": "Ranger",
+      "element": "Dark",
+      "vType": "SPD",
+      "vScore": 1,
+      "hType": "SUR",
+      "hScore": 8,
+      "notes": "",
+      "iconData": "https://raw.githubusercontent.com/iridesuwa18/e7-chart/main/assets/heroes/briar-witch-iseria.webp",
+      "locked": true,
+      "altStats": null,
+      "_x": 10,
+      "_y": 45
     }
   ],
   "draftData": null,
-  "savedAt": "2026-08-23T04:45:03.873Z"
+  "savedAt": "2026-08-23T04:49:24.863Z"
 }
