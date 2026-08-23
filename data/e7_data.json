@@ -962,8 +962,25 @@
       },
       "_x": 15,
       "_y": 30
+    },
+    {
+      "id": 1787452547937,
+      "name": "Abyssal Yufine",
+      "rarity": "5ml",
+      "role": "Knight",
+      "element": "Dark",
+      "vType": "SPD",
+      "vScore": 8,
+      "hType": "SUR",
+      "hScore": 7,
+      "notes": "",
+      "iconData": "https://raw.githubusercontent.com/iridesuwa18/e7-chart/main/assets/heroes/abyssal-yufine.webp",
+      "locked": true,
+      "altStats": null,
+      "_x": 15,
+      "_y": 10
     }
   ],
   "draftData": null,
-  "savedAt": "2026-08-23T02:30:50.300Z"
+  "savedAt": "2026-08-23T02:36:00.644Z"
 }
