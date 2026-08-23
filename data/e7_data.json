@@ -1530,8 +1530,30 @@
       "altStats": null,
       "_x": 20,
       "_y": 20
+    },
+    {
+      "id": 1787482079169,
+      "name": "Ivana",
+      "rarity": "5ml",
+      "role": "Soul Weaver",
+      "element": "Fire",
+      "vType": "SPD",
+      "vScore": 8,
+      "hType": "SST",
+      "hScore": 3,
+      "notes": "",
+      "iconData": "https://raw.githubusercontent.com/iridesuwa18/e7-chart/main/assets/heroes/ivana.webp",
+      "locked": true,
+      "altStats": {
+        "vType": "TNK",
+        "vScore": 5,
+        "hType": "SUR",
+        "hScore": 3
+      },
+      "_x": 65,
+      "_y": 10
     }
   ],
   "draftData": null,
-  "savedAt": "2026-08-23T10:46:02.970Z"
+  "savedAt": "2026-08-23T10:48:42.130Z"
 }
