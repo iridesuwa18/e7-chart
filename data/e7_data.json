@@ -623,8 +623,25 @@
       },
       "_x": 10,
       "_y": 20
+    },
+    {
+      "id": 1787447994045,
+      "name": "Witch of the Mere Tenebria",
+      "rarity": "5ml",
+      "role": "Mage",
+      "element": "Light",
+      "vType": "SPD",
+      "vScore": 8,
+      "hType": "SUR",
+      "hScore": 7,
+      "notes": "",
+      "iconData": "https://raw.githubusercontent.com/iridesuwa18/e7-chart/main/assets/heroes/witch-of-the-mere-tenebria.webp",
+      "locked": true,
+      "altStats": null,
+      "_x": 15,
+      "_y": 10
     }
   ],
   "draftData": null,
-  "savedAt": "2026-08-23T01:17:09.021Z"
+  "savedAt": "2026-08-23T01:20:12.404Z"
 }
