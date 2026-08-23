@@ -1291,8 +1291,30 @@
       "altStats": null,
       "_x": 30,
       "_y": 5
+    },
+    {
+      "id": 1787463182981,
+      "name": "Shepherd of the Dark Diene",
+      "rarity": "5ml",
+      "role": "Mage",
+      "element": "Dark",
+      "vType": "TNK",
+      "vScore": 5,
+      "hType": "SUR",
+      "hScore": 6,
+      "notes": "",
+      "iconData": "https://raw.githubusercontent.com/iridesuwa18/e7-chart/main/assets/heroes/shepherd-of-the-dark-diene.webp",
+      "locked": true,
+      "altStats": {
+        "vType": "SPD",
+        "vScore": 7,
+        "hType": "SUR",
+        "hScore": 6
+      },
+      "_x": 20,
+      "_y": 75
     }
   ],
   "draftData": null,
-  "savedAt": "2026-08-23T05:31:34.749Z"
+  "savedAt": "2026-08-23T05:33:38.975Z"
 }
