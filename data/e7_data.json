@@ -1035,8 +1035,25 @@
       "altStats": null,
       "_x": 30,
       "_y": 15
+    },
+    {
+      "id": 1787459730131,
+      "name": "Remnant Violet",
+      "rarity": "5ml",
+      "role": "Thief",
+      "element": "Dark",
+      "vType": "SPD",
+      "vScore": 7,
+      "hType": "SUR",
+      "hScore": 8,
+      "notes": "",
+      "iconData": "https://raw.githubusercontent.com/iridesuwa18/e7-chart/main/assets/heroes/remnant-violet.webp",
+      "locked": true,
+      "altStats": null,
+      "_x": 10,
+      "_y": 15
     }
   ],
   "draftData": null,
-  "savedAt": "2026-08-23T03:02:06.391Z"
+  "savedAt": "2026-08-23T04:35:34.007Z"
 }
