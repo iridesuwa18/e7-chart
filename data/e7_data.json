@@ -1196,8 +1196,25 @@
       "altStats": null,
       "_x": 20,
       "_y": 15
+    },
+    {
+      "id": 1787462320641,
+      "name": "Ainz Ooal Gown",
+      "rarity": "5ml",
+      "role": "Mage",
+      "element": "Dark",
+      "vType": "TNK",
+      "vScore": 3,
+      "hType": "SUR",
+      "hScore": 3,
+      "notes": "",
+      "iconData": "https://raw.githubusercontent.com/iridesuwa18/e7-chart/main/assets/heroes/ainz-ooal-gown.webp",
+      "locked": true,
+      "altStats": null,
+      "_x": 35,
+      "_y": 65
     }
   ],
   "draftData": null,
-  "savedAt": "2026-08-23T05:04:41.716Z"
+  "savedAt": "2026-08-23T05:20:24.850Z"
 }
