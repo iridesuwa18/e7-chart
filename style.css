@@ -154,6 +154,7 @@ header {
   line-height: 1;
 }
 .btn:active { transform: scale(.96); }
+.btn:disabled { opacity: .4; cursor: not-allowed; transform: none; }
 .btn-sm { padding: 6px 12px; font-size: 10px; }
 .btn-xs { padding: 3px 8px; font-size: 9px; }
 
@@ -228,6 +229,14 @@ main {
 }
 
 /* ══════════════════════════════════════
+   CHART COLUMN (wraps Quick Draft + chart-outer
+   so both sit in the grid's 1fr column together)
+══════════════════════════════════════ */
+.chart-column {
+  min-width: 0;
+}
+
+/* ══════════════════════════════════════
    CHART OUTER (axis labels space)
 ══════════════════════════════════════ */
 .chart-outer {
@@ -237,6 +246,237 @@ main {
 
 @media (max-width: 500px) {
   .chart-outer { padding: 28px 28px 28px 46px; }
+}
+
+/* ══════════════════════════════════════
+   QUICK DRAFT — drawer hidden above the chart.
+   Opening it just adds height in normal flow,
+   which pushes chart-outer down beneath it.
+══════════════════════════════════════ */
+.quickdraft-handle {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  background: linear-gradient(180deg, rgba(201,162,39,.10), rgba(201,162,39,.03));
+  border: 1px solid var(--gold-dim);
+  border-radius: 8px;
+  color: var(--gold2);
+  font-family: 'Cinzel', serif;
+  font-size: 11px;
+  letter-spacing: .12em;
+  padding: 8px 12px;
+  cursor: pointer;
+  transition: background .15s, border-color .15s;
+}
+.quickdraft-handle:hover { background: rgba(201,162,39,.14); border-color: var(--gold); }
+.quickdraft-handle-label { text-transform: uppercase; }
+.quickdraft-handle-sub {
+  font-size: 10px;
+  color: var(--text-dim);
+  background: rgba(255,255,255,.05);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 1px 7px;
+}
+.quickdraft-handle-chevron {
+  font-size: 10px;
+  transition: transform .2s;
+  color: var(--text-dim);
+}
+.quickdraft-handle.open .quickdraft-handle-chevron { transform: rotate(180deg); }
+
+.quickdraft-drawer {
+  max-height: 0;
+  overflow: hidden;
+  opacity: 0;
+  transition: max-height .25s ease, opacity .2s ease, margin .25s ease;
+  margin-top: 0;
+}
+.quickdraft-drawer.open {
+  max-height: 900px;
+  opacity: 1;
+  margin-top: 8px;
+}
+.quickdraft-inner {
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 12px;
+}
+
+.quickdraft-slots {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 8px;
+}
+
+.qd-slot {
+  position: relative;
+  border-radius: 8px;
+  border: 1px dashed var(--border);
+  background: rgba(255,255,255,.02);
+  min-height: 88px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 3px;
+  padding: 6px 4px;
+  cursor: pointer;
+  transition: border-color .15s, background .15s, transform .1s;
+  text-align: center;
+}
+.qd-slot.empty:hover { border-color: var(--gold-dim); background: rgba(201,162,39,.05); }
+.qd-slot.filled {
+  border-style: solid;
+  border-color: var(--gold-dim);
+  background: rgba(201,162,39,.06);
+}
+.qd-slot.filled:hover { border-color: var(--danger); background: rgba(192,57,43,.10); transform: scale(.98); }
+.qd-slot.filled:hover .qd-slot-name::after { content: " ✕"; color: var(--danger); }
+.qd-slot.protect { box-shadow: inset 0 0 0 1px rgba(201,162,39,.35); }
+
+.qd-slot-placeholder {
+  font-size: 20px;
+  color: var(--text-dim);
+  line-height: 1;
+}
+.qd-slot-index {
+  font-size: 9px;
+  color: var(--text-dim);
+  font-family: 'Cinzel', serif;
+  letter-spacing: .08em;
+}
+.qd-slot-portrait {
+  width: 34px; height: 34px;
+  border-radius: 50%;
+  overflow: hidden;
+  display: flex; align-items: center; justify-content: center;
+  background: var(--bg3);
+  border: 1px solid var(--gold-dim);
+  font-size: 16px;
+}
+.qd-slot-portrait img { width: 100%; height: 100%; object-fit: cover; }
+.qd-slot-name {
+  font-size: 9.5px;
+  font-family: 'Cinzel', serif;
+  color: var(--text);
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.qd-slot-score {
+  font-size: 10px;
+  color: var(--gold2);
+  font-weight: 700;
+}
+.qd-slot-protect-badge {
+  position: absolute;
+  top: 3px; right: 4px;
+  font-size: 9px;
+  opacity: .75;
+}
+
+.quickdraft-toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  margin-top: 10px;
+  flex-wrap: wrap;
+}
+.quickdraft-stats { display: flex; gap: 6px; flex-wrap: wrap; }
+.qd-stat {
+  font-size: 9.5px;
+  font-family: 'Cinzel', serif;
+  padding: 2px 7px;
+  border-radius: 9px;
+  background: rgba(255,255,255,.05);
+  border: 1px solid var(--border);
+  color: var(--text-dim);
+}
+.qd-stat.good { color: #81c784; border-color: rgba(129,199,132,.35); background: rgba(129,199,132,.08); }
+.qd-stat.warn { color: #ffb74d; border-color: rgba(255,183,77,.35); background: rgba(255,183,77,.08); }
+.quickdraft-toolbar-actions { display: flex; gap: 6px; }
+
+.quickdraft-suggestions {
+  margin-top: 10px;
+  padding-top: 10px;
+  border-top: 1px solid var(--border);
+}
+.quickdraft-suggestions-title {
+  font-family: 'Cinzel', serif;
+  font-size: 9.5px;
+  letter-spacing: .2em;
+  color: var(--text-dim);
+  margin-bottom: 6px;
+}
+#quickdraft-suggest-slot-label { color: var(--gold2); letter-spacing: normal; }
+.quickdraft-suggestions-list {
+  max-height: 260px;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+.qd-suggest-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 8px;
+  border-radius: 6px;
+  border: 1px solid var(--border);
+  background: rgba(255,255,255,.02);
+  cursor: pointer;
+  transition: background .15s, border-color .15s;
+}
+.qd-suggest-row:hover { background: rgba(201,162,39,.08); border-color: var(--gold-dim); }
+.qd-suggest-row.best { border-color: var(--gold); background: rgba(201,162,39,.09); }
+.qd-suggest-portrait {
+  width: 28px; height: 28px;
+  border-radius: 50%;
+  overflow: hidden;
+  flex-shrink: 0;
+  display: flex; align-items: center; justify-content: center;
+  background: var(--bg3);
+  border: 1px solid var(--border);
+  font-size: 13px;
+}
+.qd-suggest-portrait img { width: 100%; height: 100%; object-fit: cover; }
+.qd-suggest-info { flex: 1; min-width: 0; }
+.qd-suggest-name {
+  font-family: 'Cinzel', serif;
+  font-size: 11px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.qd-suggest-reasons {
+  font-size: 9px;
+  color: var(--text-dim);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.qd-suggest-score {
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--gold2);
+  flex-shrink: 0;
+}
+.qd-suggest-empty {
+  font-size: 11px;
+  color: var(--text-dim);
+  font-style: italic;
+  padding: 8px 2px;
+}
+
+@media (max-width: 500px) {
+  .qd-slot { min-height: 76px; }
+  .qd-slot-portrait { width: 28px; height: 28px; }
 }
 
 /* ── Axis labels ── */
@@ -779,6 +1019,10 @@ body.dot-mode .origin-dot:hover {
   line-height: 1;
 }
 .icon-btn:hover { opacity: 1; }
+
+.btn-quickdraft-add { color: var(--gold2); }
+.btn-quickdraft-add.active { color: #81c784; opacity: 1; }
+.btn-quickdraft-add:hover { opacity: 1; }
 
 /* ── Legend ── */
 .legend {

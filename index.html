@@ -38,6 +38,37 @@
   <main>
 
     <!-- CHART AREA -->
+    <div class="chart-column">
+
+      <!-- QUICK DRAFT drawer — hidden above the chart; opening it pushes
+           the chart down since everything here shares normal flow. -->
+      <button class="quickdraft-handle" id="quickdraft-handle" title="Quick Draft">
+        <span class="quickdraft-handle-label">⚔ QUICK DRAFT</span>
+        <span class="quickdraft-handle-sub" id="quickdraft-handle-sub">0/5</span>
+        <span class="quickdraft-handle-chevron" id="quickdraft-chevron">▾</span>
+      </button>
+
+      <div class="quickdraft-drawer" id="quickdraft-drawer">
+        <div class="quickdraft-inner">
+          <div class="quickdraft-slots" id="quickdraft-slots"></div>
+
+          <div class="quickdraft-toolbar">
+            <div class="quickdraft-stats" id="quickdraft-stats"></div>
+            <div class="quickdraft-toolbar-actions">
+              <button class="btn btn-gold btn-sm" id="btn-quickdraft-suggest">🔮 Suggest</button>
+              <button class="btn btn-ghost btn-xs" id="btn-quickdraft-clear">✕ Clear</button>
+            </div>
+          </div>
+
+          <div class="quickdraft-suggestions" id="quickdraft-suggestions" style="display:none">
+            <div class="quickdraft-suggestions-title">
+              BEST PICKS <span id="quickdraft-suggest-slot-label"></span>
+            </div>
+            <div class="quickdraft-suggestions-list" id="quickdraft-suggestions-list"></div>
+          </div>
+        </div>
+      </div>
+
     <div class="chart-outer">
 
       <!-- Axis labels -->
@@ -81,7 +112,7 @@
           <div class="quad-sub">Self-Sufficient Speedster</div>
         </div>
         <div class="quad-label quad-tr">
-          <div class="quad-title" style="color:#ffd54f">Speed + Support Needed</div>
+          <div class="quad-title" style="color:#ffd54f">Speed + Sustainability</div>
           <div class="quad-sub">Glass Cannon</div>
         </div>
         <div class="quad-label quad-bl">
@@ -89,7 +120,7 @@
           <div class="quad-sub">Immovable Wall</div>
         </div>
         <div class="quad-label quad-br">
-          <div class="quad-title" style="color:#ef9a9a">Slow + Requires Support</div>
+          <div class="quad-title" style="color:#ef9a9a">Slow + Sustainability</div>
           <div class="quad-sub">Burden Mode</div>
         </div>
 
@@ -143,6 +174,9 @@
         </div>
       </div>
     </div>
+    <!-- /chart-outer -->
+    </div>
+    <!-- /chart-column -->
 
     <!-- SIDEBAR -->
     <aside class="sidebar">

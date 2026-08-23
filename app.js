@@ -134,6 +134,7 @@ const saveStatus   = document.getElementById("save-status");
 ═══════════════════════════════════════ */
 (function init() {
   loadLocal();
+  loadQuickDraftLocal();
   renderAll();
 
   // If an admin password was already verified earlier this browser session,
@@ -180,6 +181,21 @@ const saveStatus   = document.getElementById("save-status");
   });
   document.getElementById("btn-save").addEventListener("click", () => openAdminGate("save"));
   document.getElementById("btn-load").addEventListener("click", () => openAdminGate("load"));
+
+  // Quick Draft
+  document.getElementById("quickdraft-handle").addEventListener("click", toggleQuickDraftDrawer);
+  document.getElementById("btn-quickdraft-suggest").addEventListener("click", () => {
+    if (quickDraftSuggestOpen) {
+      quickDraftSuggestOpen = false;
+      document.getElementById("quickdraft-suggestions").style.display = "none";
+    } else {
+      renderQuickDraftSuggestions();
+    }
+  });
+  document.getElementById("btn-quickdraft-clear").addEventListener("click", () => {
+    if (quickDraft.some(id => id !== null) && !confirm("Clear all Quick Draft slots?")) return;
+    clearQuickDraft();
+  });
   document.getElementById("modal-cancel").addEventListener("click", closeModal);
   document.getElementById("modal-overlay").addEventListener("click", e => { if (e.target === overlay) closeModal(); });
   modalConfirm.addEventListener("click", onModalConfirm);
@@ -551,11 +567,321 @@ function rankValue(h) {
 }
 
 /* ═══════════════════════════════════════
+   QUICK DRAFT
+   A 5-slot PVP draft board, filled left→right
+   from the Roster. Slots compact left when a
+   hero is removed. A "Suggest" tool ranks the
+   Roster's remaining heroes for whichever slot
+   is next empty, using the axis scores plus a
+   handful of team-composition rules (see the
+   scoreCandidate() comment block below).
+═══════════════════════════════════════ */
+const QD_SIZE = 5;
+const QD_PROTECT_INDEX = 2; // middle slot — where you'd usually place your 1 protect
+let quickDraft = [null, null, null, null, null];
+let quickDraftOpen = false;
+let quickDraftSuggestOpen = false;
+
+/* Rating bands used to call a stat "high" or "low".
+   5.0 doubles as the "passable average score" bar from the design brief. */
+const QD_HIGH = 6;
+const QD_LOW  = 4;
+const QD_PASSABLE_SCORE = 5;
+const QD_SPEED_TARGET   = 3; // want 3-of-5 heroes to be high-speed/CR so a ban still leaves 2 to cycle
+
+function saveQuickDraftLocal() {
+  try { localStorage.setItem("e7_quickdraft", JSON.stringify(quickDraft)); } catch { /* ignore */ }
+}
+function loadQuickDraftLocal() {
+  try {
+    const raw = localStorage.getItem("e7_quickdraft");
+    if (raw) {
+      const parsed = JSON.parse(raw);
+      if (Array.isArray(parsed)) {
+        quickDraft = [0,1,2,3,4].map(i => parsed[i] ?? null);
+      }
+    }
+  } catch { /* ignore, keep default empty slots */ }
+}
+
+/* Reads a hero build's raw axis values into 4 independent stat lanes.
+   Only one of spd/tnk is ever non-zero (a hero is plotted as EITHER a
+   speed unit OR a tank on the vertical axis) and likewise for sur/sst —
+   that mirrors how the quadrant chart itself works, and means "low tank"
+   is automatically true for a speed-leaning hero, etc. */
+function qdAxisValues(vType, vScore, hType, hScore) {
+  const v = Math.max(0, Math.min(10, Number(vScore) || 0));
+  const h = Math.max(0, Math.min(10, Number(hScore) || 0));
+  return {
+    spd: vType === "SPD" ? v : 0,
+    tnk: vType === "TNK" ? v : 0,
+    sur: hType === "SUR" ? h : 0,
+    sst: hType === "SST" ? h : 0,
+  };
+}
+
+/* A hero's build(s) — primary, plus Ghost if they have one. Ghost builds
+   are considered everywhere a stat is checked (per the design brief),
+   because in-game you'd simply play whichever build the team needs. */
+function qdHeroBuilds(h) {
+  const builds = [qdAxisValues(h.vType, h.vScore, h.hType, h.hScore)];
+  if (h.altStats) builds.push(qdAxisValues(h.altStats.vType, h.altStats.vScore, h.altStats.hType, h.altStats.hScore));
+  return builds;
+}
+
+/* Collapses a hero's build(s) into the best available value per stat lane,
+   then derives high/low flags off those bests. */
+function qdHeroTraits(h) {
+  const builds = qdHeroBuilds(h);
+  const best = { spd: 0, tnk: 0, sur: 0, sst: 0 };
+  builds.forEach(b => {
+    best.spd = Math.max(best.spd, b.spd);
+    best.tnk = Math.max(best.tnk, b.tnk);
+    best.sur = Math.max(best.sur, b.sur);
+    best.sst = Math.max(best.sst, b.sst);
+  });
+  return {
+    best,
+    hasGhost: !!h.altStats,
+    score: rankValue(h), // Total Avg if ghosted, else Avg — same number shown on the roster card
+    isHighSpd: best.spd >= QD_HIGH, isLowSpd: best.spd < QD_LOW,
+    isHighTnk: best.tnk >= QD_HIGH, isLowTnk: best.tnk < QD_LOW,
+    isHighSur: best.sur >= QD_HIGH, isLowSur: best.sur < QD_LOW,
+    isHighSst: best.sst >= QD_HIGH, isLowSst: best.sst < QD_LOW,
+  };
+}
+
+/* Aggregates the heroes already placed in Quick Draft into "team needs" —
+   how many high-speed heroes we already have towards the target of 3
+   (Rule 3), and how many of Rules 1/3/5/7 (a picked hero is weak in a
+   lane) and Rules 2/4/6/8 (a picked hero is strong in one lane but
+   exposed in another) are currently unaddressed. */
+function qdComputeTeamNeeds(currentPicks) {
+  const traits = currentPicks.map(qdHeroTraits);
+  const n = traits.length;
+  const highSpdCount = traits.filter(t => t.isHighSpd).length;
+  const avgScore = n ? traits.reduce((s, t) => s + t.score, 0) / n : 0;
+
+  let needSpd = 0, needTnk = 0, needSur = 0, needSst = 0;
+  traits.forEach(t => {
+    if (t.isLowSpd) needSpd++;                                         // Rule 1: low speed → needs a speedster
+    if (t.isLowTnk) needTnk++;                                         // Rule 3: low tank → needs a tank
+    if (t.isLowSur) needSur++;                                         // Rule 5: low survivability → needs survivability
+    if (t.isLowSst) needSst++;                                         // Rule 7: low sustain → needs sustain
+    if (t.isHighSpd && t.isLowSur && t.isLowSst) { needSur++; needSst++; }               // Rule 2
+    if (t.isHighTnk && t.isLowSur && t.isLowSst) { needSpd++; needSur++; needSst++; }     // Rule 4
+    if (t.isHighSur && (t.isLowTnk || t.isLowSpd)) { needSst++; }                         // Rule 6
+    if (t.isHighSst && (t.isLowSpd || t.isLowTnk)) { needSpd++; needTnk++; }              // Rule 8
+  });
+
+  return { traits, n, highSpdCount, avgScore, needSpd, needTnk, needSur, needSst };
+}
+
+/* Scores one candidate hero for whatever slot is next empty. Higher is
+   better. This is a one-slot-ahead greedy heuristic, not a full 5-hero
+   optimizer — it only reasons about the heroes already locked in, same
+   as how you'd actually draft in real time. */
+function qdScoreCandidate(candidate, currentPicks) {
+  const t = qdHeroTraits(candidate);
+  const needs = qdComputeTeamNeeds(currentPicks);
+  const slotsRemaining = QD_SIZE - currentPicks.length;
+  const reasons = [];
+  let score = 0;
+
+  // Base hero quality — always matters, ghost-inclusive Total Avg / Avg.
+  score += t.score * 10;
+  if (t.score >= QD_PASSABLE_SCORE) {
+    score += 15;
+  } else {
+    score -= (QD_PASSABLE_SCORE - t.score) * 12;
+    reasons.push(`Below passable score (${t.score.toFixed(1)} < ${QD_PASSABLE_SCORE})`);
+  }
+
+  // Rule 3 — chase 3 high-speed/CR heroes across the 5 so a single ban
+  // still leaves 2 to cycle the team.
+  if (needs.highSpdCount < QD_SPEED_TARGET && t.isHighSpd) {
+    score += 40;
+    reasons.push(`High-Speed pick (team ${needs.highSpdCount}/${QD_SPEED_TARGET} so far)`);
+  } else if (needs.highSpdCount >= QD_SPEED_TARGET && t.isHighSpd && slotsRemaining <= 2) {
+    // Quota already met — nudge remaining slots toward tank/sustain instead of stacking more speed.
+    score -= 8;
+  }
+
+  // Rules 1/2/3/4/5/6/7/8 — reward covering whatever gaps the current picks created.
+  if (needs.needSpd > 0 && t.isHighSpd) { score += 18 * needs.needSpd; reasons.push("Covers a Speed gap"); }
+  if (needs.needTnk > 0 && t.isHighTnk) { score += 18 * needs.needTnk; reasons.push("Covers a Tankiness gap"); }
+  if (needs.needSur > 0 && t.isHighSur) { score += 16 * needs.needSur; reasons.push("Covers a Survivability gap"); }
+  if (needs.needSst > 0 && t.isHighSst) { score += 16 * needs.needSst; reasons.push("Covers a Sustainability gap"); }
+
+  // Global support scaling — a squad running below-average so far should
+  // lean harder on a strong pick to carry it back up (per the brief:
+  // "if the first three are really weak, the last two have to be really strong").
+  if (needs.n > 0 && needs.avgScore < 6) {
+    score += (t.score - needs.avgScore) * 6;
+    if (t.score > needs.avgScore) reasons.push("Lifts a below-average squad");
+  }
+
+  // Small nudge for flexibility — a Ghost build gives this pick two
+  // possible roles instead of one.
+  if (t.hasGhost) { score += 4; reasons.push("Has a Ghost build (flexible)"); }
+
+  if (reasons.length === 0) reasons.push("Solid, balanced pick");
+
+  return { hero: candidate, score, reasons, traits: t };
+}
+
+/* Ranks every Roster hero not already drafted for the next empty slot.
+   Always returns a full ranked list (best first) as long as there's at
+   least one hero left in the Roster to suggest. */
+function qdSuggestForNextSlot() {
+  const currentIds = quickDraft.filter(id => id !== null);
+  const currentPicks = currentIds.map(id => heroes.find(h => h.id === id)).filter(Boolean);
+  const candidates = heroes.filter(h => !currentIds.includes(h.id));
+  const scored = candidates.map(c => qdScoreCandidate(c, currentPicks));
+  scored.sort((a, b) => b.score - a.score);
+  return scored;
+}
+
+function addToQuickDraft(id) {
+  if (quickDraft.includes(id)) return;
+  const idx = quickDraft.indexOf(null);
+  if (idx === -1) { setStatus("⚠️ Quick Draft is full (5/5)"); return; }
+  quickDraft[idx] = id;
+  saveQuickDraftLocal();
+  renderQuickDraft();
+  renderRoster();
+}
+
+/* Removing a hero compacts the array so everything behind it shifts
+   one space left — matches "fills left to right". */
+function removeFromQuickDraft(id) {
+  quickDraft = quickDraft.filter(x => x !== id);
+  while (quickDraft.length < QD_SIZE) quickDraft.push(null);
+  saveQuickDraftLocal();
+  renderQuickDraft();
+  renderRoster();
+}
+
+function toggleQuickDraftDrawer() {
+  quickDraftOpen = !quickDraftOpen;
+  document.getElementById("quickdraft-drawer").classList.toggle("open", quickDraftOpen);
+  document.getElementById("quickdraft-handle").classList.toggle("open", quickDraftOpen);
+  document.getElementById("quickdraft-chevron").textContent = quickDraftOpen ? "▴" : "▾";
+}
+
+function clearQuickDraft() {
+  quickDraft = [null, null, null, null, null];
+  quickDraftSuggestOpen = false;
+  document.getElementById("quickdraft-suggestions").style.display = "none";
+  saveQuickDraftLocal();
+  renderQuickDraft();
+  renderRoster();
+}
+
+function renderQuickDraft() {
+  const slotsWrap = document.getElementById("quickdraft-slots");
+  slotsWrap.innerHTML = "";
+
+  quickDraft.forEach((id, i) => {
+    const h = id !== null ? heroes.find(x => x.id === id) : null;
+    const slot = document.createElement("div");
+    const isProtect = i === QD_PROTECT_INDEX;
+    slot.className = "qd-slot " + (h ? "filled" : "empty") + (isProtect ? " protect" : "");
+
+    const protectBadge = isProtect ? `<div class="qd-slot-protect-badge" title="Usually your protected slot">🛡</div>` : "";
+
+    if (h) {
+      const t = qdHeroTraits(h);
+      const portrait = h.iconData ? `<img src="${h.iconData}">` : "⚔️";
+      slot.innerHTML = `
+        ${protectBadge}
+        <div class="qd-slot-portrait">${portrait}</div>
+        <div class="qd-slot-name">${h.name || "Unnamed"}</div>
+        <div class="qd-slot-score">${t.score.toFixed(1)}</div>`;
+      slot.title = `Tap to remove ${h.name || "this hero"} from Quick Draft`;
+      slot.addEventListener("click", () => removeFromQuickDraft(h.id));
+    } else {
+      slot.innerHTML = `
+        ${protectBadge}
+        <div class="qd-slot-placeholder">＋</div>
+        <div class="qd-slot-index">Slot ${i + 1}</div>`;
+      slot.title = "Empty — tap ＋ on a Roster hero, or use Suggest";
+    }
+    slotsWrap.appendChild(slot);
+  });
+
+  const filledCount = quickDraft.filter(id => id !== null).length;
+  document.getElementById("quickdraft-handle-sub").textContent = filledCount + "/5";
+
+  const picks = quickDraft.filter(id => id !== null).map(id => heroes.find(h => h.id === id)).filter(Boolean);
+  const needs = qdComputeTeamNeeds(picks);
+  const statsEl = document.getElementById("quickdraft-stats");
+  const avgTxt = filledCount ? needs.avgScore.toFixed(1) : "—";
+  const spdClass = needs.highSpdCount >= QD_SPEED_TARGET ? "good" : (filledCount ? "warn" : "");
+  statsEl.innerHTML = `
+    <span class="qd-stat">${filledCount}/5 Picked</span>
+    <span class="qd-stat">Avg ${avgTxt}</span>
+    <span class="qd-stat ${spdClass}">⚡ High-SPD ${needs.highSpdCount}/${QD_SPEED_TARGET}</span>`;
+
+  document.getElementById("btn-quickdraft-suggest").disabled = filledCount >= QD_SIZE;
+
+  if (quickDraftSuggestOpen) renderQuickDraftSuggestions();
+}
+
+function renderQuickDraftSuggestions() {
+  const panel = document.getElementById("quickdraft-suggestions");
+  const listEl = document.getElementById("quickdraft-suggestions-list");
+  const label = document.getElementById("quickdraft-suggest-slot-label");
+  const nextIdx = quickDraft.indexOf(null);
+
+  if (nextIdx === -1) {
+    panel.style.display = "none";
+    quickDraftSuggestOpen = false;
+    setStatus("Quick Draft is already full (5/5)");
+    return;
+  }
+
+  label.textContent = `for Slot ${nextIdx + 1}` + (nextIdx === QD_PROTECT_INDEX ? " (Protect)" : "");
+  const scored = qdSuggestForNextSlot();
+
+  if (scored.length === 0) {
+    listEl.innerHTML = `<div class="qd-suggest-empty">No more heroes left in your Roster to suggest.</div>`;
+  } else {
+    listEl.innerHTML = scored.map((s, rank) => {
+      const h = s.hero;
+      const portrait = h.iconData ? `<img src="${h.iconData}">` : "⚔️";
+      const topReasons = s.reasons.slice(0, 2).join(" · ");
+      return `
+        <div class="qd-suggest-row${rank === 0 ? " best" : ""}" data-id="${h.id}">
+          <div class="qd-suggest-portrait">${portrait}</div>
+          <div class="qd-suggest-info">
+            <div class="qd-suggest-name">${rank === 0 ? "👑 " : ""}${h.name || "Unnamed"}</div>
+            <div class="qd-suggest-reasons">${topReasons}</div>
+          </div>
+          <div class="qd-suggest-score">${s.traits.score.toFixed(1)}</div>
+        </div>`;
+    }).join("");
+
+    listEl.querySelectorAll(".qd-suggest-row").forEach(row => {
+      row.addEventListener("click", () => {
+        addToQuickDraft(Number(row.dataset.id));
+        if (quickDraft.indexOf(null) !== -1) renderQuickDraftSuggestions();
+        else { panel.style.display = "none"; quickDraftSuggestOpen = false; }
+      });
+    });
+  }
+
+  panel.style.display = "block";
+  quickDraftSuggestOpen = true;
+}
+
+/* ═══════════════════════════════════════
    RENDER
 ═══════════════════════════════════════ */
 function renderAll() {
   renderChart();
   renderRoster();
+  renderQuickDraft();
   if (document.getElementById("visibility-modal-overlay").classList.contains("open")) {
     renderVisibilityPanel();
   }
@@ -1141,9 +1467,19 @@ function renderRoster() {
         <button class="icon-btn btn-view" title="Hero Details">
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
         </button>
+        <button class="icon-btn btn-quickdraft-add${quickDraft.includes(h.id) ? " active" : ""}" title="${quickDraft.includes(h.id) ? "Remove from Quick Draft" : "Add to Quick Draft"}">
+          ${quickDraft.includes(h.id)
+            ? `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>`
+            : `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>`}
+        </button>
       </div>`;
 
     card.querySelector(".btn-view").addEventListener("click", e => { e.stopPropagation(); openHeroDetails(h); });
+    card.querySelector(".btn-quickdraft-add").addEventListener("click", e => {
+      e.stopPropagation();
+      if (quickDraft.includes(h.id)) removeFromQuickDraft(h.id);
+      else addToQuickDraft(h.id);
+    });
     card.addEventListener("click", () => setHighlighted(h.id));
 
     rosterList.appendChild(card);
