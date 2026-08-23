@@ -1889,8 +1889,30 @@
       },
       "_x": 85,
       "_y": 30
+    },
+    {
+      "id": 1787484970637,
+      "name": "Rinak",
+      "rarity": "5ml",
+      "role": "Thief",
+      "element": "Earth",
+      "vType": "SPD",
+      "vScore": 8,
+      "hType": "SUR",
+      "hScore": 10,
+      "notes": "",
+      "iconData": "https://raw.githubusercontent.com/iridesuwa18/e7-chart/main/assets/heroes/rinak.webp",
+      "locked": true,
+      "altStats": {
+        "vType": "TNK",
+        "vScore": 5,
+        "hType": "SUR",
+        "hScore": 10
+      },
+      "_x": 0,
+      "_y": 10
     }
   ],
   "draftData": null,
-  "savedAt": "2026-08-23T11:32:46.904Z"
+  "savedAt": "2026-08-23T11:36:14.239Z"
 }
