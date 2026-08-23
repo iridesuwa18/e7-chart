@@ -1850,8 +1850,47 @@
       },
       "_x": 85,
       "_y": 75
+    },
+    {
+      "id": 1787484575372,
+      "name": "Rimuru",
+      "rarity": "5ml",
+      "role": "Warrior",
+      "element": "Earth",
+      "vType": "SPD",
+      "vScore": 5,
+      "hType": "SUR",
+      "hScore": 5,
+      "notes": "",
+      "iconData": "https://raw.githubusercontent.com/iridesuwa18/e7-chart/main/assets/heroes/rimuru.webp",
+      "locked": true,
+      "altStats": null,
+      "_x": 25,
+      "_y": 25
+    },
+    {
+      "id": 1787484762650,
+      "name": "Yulha",
+      "rarity": "5ml",
+      "role": "Knight",
+      "element": "Earth",
+      "vType": "SPD",
+      "vScore": 4,
+      "hType": "SST",
+      "hScore": 7,
+      "notes": "",
+      "iconData": "https://raw.githubusercontent.com/iridesuwa18/e7-chart/main/assets/heroes/yulha.webp",
+      "locked": true,
+      "altStats": {
+        "vType": "TNK",
+        "vScore": 6,
+        "hType": "SUR",
+        "hScore": 5
+      },
+      "_x": 85,
+      "_y": 30
     }
   ],
   "draftData": null,
-  "savedAt": "2026-08-23T11:27:05.783Z"
+  "savedAt": "2026-08-23T11:32:46.904Z"
 }
