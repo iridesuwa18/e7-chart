@@ -1213,8 +1213,30 @@
       "altStats": null,
       "_x": 35,
       "_y": 65
+    },
+    {
+      "id": 1787462525837,
+      "name": "Archdemon's Shadow",
+      "rarity": "5ml",
+      "role": "Mage",
+      "element": "Dark",
+      "vType": "SPD",
+      "vScore": 5,
+      "hType": "SUR",
+      "hScore": 6,
+      "notes": "",
+      "iconData": "https://raw.githubusercontent.com/iridesuwa18/e7-chart/main/assets/heroes/archdemon-s-shadow.webp",
+      "locked": true,
+      "altStats": {
+        "vType": "TNK",
+        "vScore": 3,
+        "hType": "SUR",
+        "hScore": 6
+      },
+      "_x": 20,
+      "_y": 25
     }
   ],
   "draftData": null,
-  "savedAt": "2026-08-23T05:20:24.850Z"
+  "savedAt": "2026-08-23T05:23:00.322Z"
 }
