@@ -156,6 +156,19 @@ const saveStatus   = document.getElementById("save-status");
 (function init() {
   loadLocal();
   loadQuickDraftLocal();
+
+  // Quick Draft "companion mode" — visiting index.html?view=quickdraft
+  // (e.g. installed as its own home-screen shortcut on Android) shows
+  // ONLY the Quick Draft drawer full-screen, for use as a lightweight
+  // side app while playing Epic Seven. Everything still reads/writes the
+  // same heroes/quickDraft state and still pulls live data from the server.
+  const qdCompanionMode = new URLSearchParams(location.search).get("view") === "quickdraft";
+  if (qdCompanionMode) {
+    document.body.classList.add("qd-companion");
+    quickDraftOpen = true;
+    document.getElementById("quickdraft-drawer").classList.add("open");
+  }
+
   renderAll();
 
   // If an admin password was already verified earlier this browser session,

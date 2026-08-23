@@ -556,6 +556,36 @@ main {
   .qd-slot-name { font-size: 7.6px; }
 }
 
+/* ══════════════════════════════════════
+   QUICK DRAFT COMPANION MODE
+   Reached via index.html?view=quickdraft — e.g. installed as its own
+   home-screen shortcut so it opens straight into a full-screen Quick
+   Draft, for use as a lightweight side app while playing Epic Seven.
+══════════════════════════════════════ */
+body.qd-companion header .brand-text p,
+body.qd-companion .header-actions,
+body.qd-companion .chart-outer,
+body.qd-companion .sidebar,
+body.qd-companion .quickdraft-handle {
+  display: none !important;
+}
+body.qd-companion header { padding: 10px 14px; }
+body.qd-companion main { display: block; padding: 10px; }
+body.qd-companion .chart-column { width: 100%; }
+body.qd-companion .quickdraft-drawer {
+  max-height: none !important;
+  opacity: 1 !important;
+  margin-top: 0 !important;
+  overflow: visible;
+}
+body.qd-companion .quickdraft-inner {
+  min-height: calc(100vh - 90px);
+  min-height: calc(100dvh - 90px);
+}
+body.qd-companion .qd-slot { min-height: 100px; }
+body.qd-companion .qd-slot-portrait { width: 40px; height: 40px; }
+body.qd-companion .qd-slot-name { font-size: 10.5px; }
+
 /* ── Axis labels ── */
 .axis-label {
   position: absolute;
