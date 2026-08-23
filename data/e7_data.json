@@ -1911,8 +1911,30 @@
       },
       "_x": 0,
       "_y": 10
+    },
+    {
+      "id": 1787485053714,
+      "name": "Celine",
+      "rarity": "5r",
+      "role": "Thief",
+      "element": "Earth",
+      "vType": "SPD",
+      "vScore": 5,
+      "hType": "SUR",
+      "hScore": 7,
+      "notes": "",
+      "iconData": "https://raw.githubusercontent.com/iridesuwa18/e7-chart/main/assets/heroes/celine.webp",
+      "locked": true,
+      "altStats": {
+        "vType": "TNK",
+        "vScore": 3,
+        "hType": "SST",
+        "hScore": 7
+      },
+      "_x": 15,
+      "_y": 25
     }
   ],
   "draftData": null,
-  "savedAt": "2026-08-23T11:36:15.898Z"
+  "savedAt": "2026-08-23T11:37:37.057Z"
 }
