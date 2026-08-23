@@ -1513,8 +1513,25 @@
       },
       "_x": 85,
       "_y": 15
+    },
+    {
+      "id": 1787481943306,
+      "name": "Festive Eda",
+      "rarity": "5ml",
+      "role": "Mage",
+      "element": "Fire",
+      "vType": "SPD",
+      "vScore": 6,
+      "hType": "SUR",
+      "hScore": 6,
+      "notes": "",
+      "iconData": "https://raw.githubusercontent.com/iridesuwa18/e7-chart/main/assets/heroes/festive-eda.webp",
+      "locked": true,
+      "altStats": null,
+      "_x": 20,
+      "_y": 20
     }
   ],
   "draftData": null,
-  "savedAt": "2026-08-23T10:43:07.914Z"
+  "savedAt": "2026-08-23T10:46:02.970Z"
 }
