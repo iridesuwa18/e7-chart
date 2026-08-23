@@ -1596,8 +1596,30 @@
       },
       "_x": 70,
       "_y": 15
+    },
+    {
+      "id": 1787482639641,
+      "name": "Argent Waves Hwayoung",
+      "rarity": "5ml",
+      "role": "Thief",
+      "element": "Ice",
+      "vType": "SPD",
+      "vScore": 5,
+      "hType": "SUR",
+      "hScore": 8,
+      "notes": "",
+      "iconData": "https://raw.githubusercontent.com/iridesuwa18/e7-chart/main/assets/heroes/argent-waves-hwayoung.webp",
+      "locked": true,
+      "altStats": {
+        "vType": "TNK",
+        "vScore": 2,
+        "hType": "SUR",
+        "hScore": 8
+      },
+      "_x": 10,
+      "_y": 25
     }
   ],
   "draftData": null,
-  "savedAt": "2026-08-23T10:53:49.775Z"
+  "savedAt": "2026-08-23T10:57:22.338Z"
 }
