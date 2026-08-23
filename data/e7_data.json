@@ -1806,8 +1806,30 @@
       },
       "_x": 15,
       "_y": 30
+    },
+    {
+      "id": 1787484228422,
+      "name": "Laia",
+      "rarity": "5ml",
+      "role": "Warrior",
+      "element": "Earth",
+      "vType": "SPD",
+      "vScore": 8,
+      "hType": "SUR",
+      "hScore": 7,
+      "notes": "",
+      "iconData": "https://raw.githubusercontent.com/iridesuwa18/e7-chart/main/assets/heroes/laia.webp",
+      "locked": true,
+      "altStats": {
+        "vType": "TNK",
+        "vScore": 2,
+        "hType": "SST",
+        "hScore": 7
+      },
+      "_x": 15,
+      "_y": 10
     }
   ],
   "draftData": null,
-  "savedAt": "2026-08-23T11:21:41.583Z"
+  "savedAt": "2026-08-23T11:23:56.313Z"
 }
