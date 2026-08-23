@@ -100,6 +100,22 @@ let filterRarity  = new Set(["5ml","5r","4","3"]);
 let filterRole    = new Set(["Warrior","Knight","Thief","Ranger","Mage","Soul Weaver",""]);
 let filterElement = new Set(["Fire","Ice","Earth","Light","Dark",""]);
 
+/* ── Quick Draft state ──
+   Declared up here (not down by the rest of the Quick Draft logic) because
+   init() runs immediately below and calls renderRoster() synchronously,
+   which reads quickDraft — a `let` further down the file would still be in
+   its temporal-dead-zone at that point and throw, which would also abort
+   init() before it ever reaches autoLoadFromServer(). ── */
+const QD_SIZE = 5;
+const QD_PROTECT_INDEX = 2; // middle slot — where you'd usually place your 1 protect
+let quickDraft = [null, null, null, null, null];
+let quickDraftOpen = false;
+let quickDraftSuggestOpen = false;
+const QD_HIGH = 6;
+const QD_LOW  = 4;
+const QD_PASSABLE_SCORE = 5;
+const QD_SPEED_TARGET   = 3; // want 3-of-5 heroes to be high-speed/CR so a ban still leaves 2 to cycle
+
 /* ── Image editor state ── */
 let editorImg   = null;   // loaded HTMLImageElement
 let editorPanX  = 0;
@@ -575,21 +591,13 @@ function rankValue(h) {
    is next empty, using the axis scores plus a
    handful of team-composition rules (see the
    scoreCandidate() comment block below).
-═══════════════════════════════════════ */
-const QD_SIZE = 5;
-const QD_PROTECT_INDEX = 2; // middle slot — where you'd usually place your 1 protect
-let quickDraft = [null, null, null, null, null];
-let quickDraftOpen = false;
-let quickDraftSuggestOpen = false;
+
+   NOTE: the state (quickDraft, QD_SIZE, QD_HIGH,
+   etc.) is declared up near the top of the file,
+   above init() — see the comment there for why. ═══════════════════════════════════════ */
 
 /* Rating bands used to call a stat "high" or "low".
-   5.0 doubles as the "passable average score" bar from the design brief. */
-const QD_HIGH = 6;
-const QD_LOW  = 4;
-const QD_PASSABLE_SCORE = 5;
-const QD_SPEED_TARGET   = 3; // want 3-of-5 heroes to be high-speed/CR so a ban still leaves 2 to cycle
-
-function saveQuickDraftLocal() {
+   5.0 doubles as the "passable average score" bar from the design brief. */function saveQuickDraftLocal() {
   try { localStorage.setItem("e7_quickdraft", JSON.stringify(quickDraft)); } catch { /* ignore */ }
 }
 function loadQuickDraftLocal() {
