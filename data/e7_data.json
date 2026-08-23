@@ -1469,8 +1469,30 @@
       "altStats": null,
       "_x": 25,
       "_y": 20
+    },
+    {
+      "id": 1787481548962,
+      "name": "Tori",
+      "rarity": "5ml",
+      "role": "Thief",
+      "element": "Fire",
+      "vType": "SPD",
+      "vScore": 7,
+      "hType": "SUR",
+      "hScore": 8,
+      "notes": "",
+      "iconData": "https://raw.githubusercontent.com/iridesuwa18/e7-chart/main/assets/heroes/tori.webp",
+      "locked": true,
+      "altStats": {
+        "vType": "TNK",
+        "vScore": 5,
+        "hType": "SUR",
+        "hScore": 8
+      },
+      "_x": 10,
+      "_y": 15
     }
   ],
   "draftData": null,
-  "savedAt": "2026-08-23T10:36:51.573Z"
+  "savedAt": "2026-08-23T10:39:53.360Z"
 }
