@@ -2077,8 +2077,30 @@
       },
       "_x": 5,
       "_y": 90
+    },
+    {
+      "id": 1787485980143,
+      "name": "Young Senya",
+      "rarity": "5ml",
+      "role": "Soul Weaver",
+      "element": "Earth",
+      "vType": "SPD",
+      "vScore": 8,
+      "hType": "SST",
+      "hScore": 4,
+      "notes": "",
+      "iconData": "https://raw.githubusercontent.com/iridesuwa18/e7-chart/main/assets/heroes/young-senya.webp",
+      "locked": true,
+      "altStats": {
+        "vType": "TNK",
+        "vScore": 3,
+        "hType": "SUR",
+        "hScore": 2
+      },
+      "_x": 70,
+      "_y": 10
     }
   ],
   "draftData": null,
-  "savedAt": "2026-08-23T11:51:16.691Z"
+  "savedAt": "2026-08-23T11:53:03.157Z"
 }
