@@ -879,8 +879,30 @@
       "altStats": null,
       "_x": 5,
       "_y": 60
+    },
+    {
+      "id": 1787451503915,
+      "name": "Mediator Kawerik",
+      "rarity": "5ml",
+      "role": "Warrior",
+      "element": "Dark",
+      "vType": "SPD",
+      "vScore": 7,
+      "hType": "SUR",
+      "hScore": 7,
+      "notes": "",
+      "iconData": "https://raw.githubusercontent.com/iridesuwa18/e7-chart/main/assets/heroes/mediator-kawerik.webp",
+      "locked": true,
+      "altStats": {
+        "vType": "SPD",
+        "vScore": 2,
+        "hType": "SUR",
+        "hScore": 7
+      },
+      "_x": 15,
+      "_y": 15
     }
   ],
   "draftData": null,
-  "savedAt": "2026-08-23T02:17:24.438Z"
+  "savedAt": "2026-08-23T02:18:25.909Z"
 }
