@@ -1413,8 +1413,25 @@
       },
       "_x": 25,
       "_y": 85
+    },
+    {
+      "id": 1787465023888,
+      "name": "Death Dealer Ray",
+      "rarity": "5ml",
+      "role": "Soul Weaver",
+      "element": "Dark",
+      "vType": "SPD",
+      "vScore": 8,
+      "hType": "SUR",
+      "hScore": 6,
+      "notes": "",
+      "iconData": "https://raw.githubusercontent.com/iridesuwa18/e7-chart/main/assets/heroes/death-dealer-ray.webp",
+      "locked": true,
+      "altStats": null,
+      "_x": 20,
+      "_y": 10
     }
   ],
   "draftData": null,
-  "savedAt": "2026-08-23T05:54:30.005Z"
+  "savedAt": "2026-08-23T06:03:47.354Z"
 }
