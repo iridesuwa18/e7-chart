@@ -537,6 +537,19 @@ function avgScore(vScore, hScore) {
   return +((v + h) / 2).toFixed(1);
 }
 
+/* Ranking value used by the "Rank" roster sort options.
+   If the hero has a ghost (altStats), rank by the Total Avg
+   (primary + ghost scores averaged across all 4 axes) — matching the
+   "Total Avg" badge shown in the roster card.
+   Otherwise, fall back to the hero's regular Avg score. */
+function rankValue(h) {
+  const scores = xyToScores(h._x ?? 50, h._y ?? 50);
+  if (h.altStats) {
+    return +((Number(h.vScore || 0) + Number(h.hScore || 0) + Number(h.altStats.vScore) + Number(h.altStats.hScore)) / 4).toFixed(1);
+  }
+  return avgScore(scores.vScore, scores.hScore);
+}
+
 /* ═══════════════════════════════════════
    RENDER
 ═══════════════════════════════════════ */
@@ -1065,6 +1078,8 @@ function renderRoster() {
   if (rosterSort === "az")        list.sort((a,b) => (a.name||"").localeCompare(b.name||""));
   else if (rosterSort === "za")   list.sort((a,b) => (b.name||"").localeCompare(a.name||""));
   else if (rosterSort === "date-asc")  list.sort((a,b) => a.id - b.id);
+  else if (rosterSort === "rank-desc") list.sort((a,b) => rankValue(b) - rankValue(a));
+  else if (rosterSort === "rank-asc")  list.sort((a,b) => rankValue(a) - rankValue(b));
   else                                 list.sort((a,b) => b.id - a.id);
 
   // Filter — role/element use exact value; "" matches unassigned heroes via "None" chip
