@@ -789,8 +789,25 @@
       },
       "_x": 90,
       "_y": 75
+    },
+    {
+      "id": 1787450174455,
+      "name": "Designer Lilibet",
+      "rarity": "5ml",
+      "role": "Warrior",
+      "element": "Dark",
+      "vType": "SPD",
+      "vScore": 7,
+      "hType": "SUR",
+      "hScore": 4,
+      "notes": "",
+      "iconData": "https://raw.githubusercontent.com/iridesuwa18/e7-chart/main/assets/heroes/designer-lilibet.webp",
+      "locked": true,
+      "altStats": null,
+      "_x": 30,
+      "_y": 15
     }
   ],
   "draftData": null,
-  "savedAt": "2026-08-23T01:52:43.025Z"
+  "savedAt": "2026-08-23T01:56:30.199Z"
 }
