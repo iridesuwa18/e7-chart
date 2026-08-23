@@ -979,8 +979,25 @@
       "altStats": null,
       "_x": 15,
       "_y": 10
+    },
+    {
+      "id": 1787453649890,
+      "name": "Fallen Cecilia",
+      "rarity": "5ml",
+      "role": "Knight",
+      "element": "Dark",
+      "vType": "TNK",
+      "vScore": 5,
+      "hType": "SUR",
+      "hScore": 2,
+      "notes": "",
+      "iconData": "https://raw.githubusercontent.com/iridesuwa18/e7-chart/main/assets/heroes/fallen-cecilia.webp",
+      "locked": true,
+      "altStats": null,
+      "_x": 40,
+      "_y": 75
     }
   ],
   "draftData": null,
-  "savedAt": "2026-08-23T02:52:18.985Z"
+  "savedAt": "2026-08-23T02:55:33.153Z"
 }
