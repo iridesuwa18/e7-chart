@@ -1171,11 +1171,16 @@
       "notes": "",
       "iconData": "https://raw.githubusercontent.com/iridesuwa18/e7-chart/main/assets/heroes/pirate-captain-flan.webp",
       "locked": true,
-      "altStats": null,
+      "altStats": {
+        "vType": "TNK",
+        "vScore": 3,
+        "hType": "SUR",
+        "hScore": 7
+      },
       "_x": 15,
       "_y": 10
     }
   ],
   "draftData": null,
-  "savedAt": "2026-08-23T05:01:50.625Z"
+  "savedAt": "2026-08-23T05:02:29.564Z"
 }
