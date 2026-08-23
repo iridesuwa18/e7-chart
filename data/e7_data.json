@@ -1157,8 +1157,25 @@
       },
       "_x": 85,
       "_y": 10
+    },
+    {
+      "id": 1787461305233,
+      "name": "Pirate Captain Flan",
+      "rarity": "5ml",
+      "role": "Ranger",
+      "element": "Dark",
+      "vType": "SPD",
+      "vScore": 8,
+      "hType": "SUR",
+      "hScore": 7,
+      "notes": "",
+      "iconData": "https://raw.githubusercontent.com/iridesuwa18/e7-chart/main/assets/heroes/pirate-captain-flan.webp",
+      "locked": true,
+      "altStats": null,
+      "_x": 15,
+      "_y": 10
     }
   ],
   "draftData": null,
-  "savedAt": "2026-08-23T04:58:41.566Z"
+  "savedAt": "2026-08-23T05:01:50.625Z"
 }
