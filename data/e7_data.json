@@ -1950,8 +1950,113 @@
       "altStats": null,
       "_x": 20,
       "_y": 5
+    },
+    {
+      "id": 1787485284319,
+      "name": "Saria",
+      "rarity": "5ml",
+      "role": "Ranger",
+      "element": "Earth",
+      "vType": "SPD",
+      "vScore": 5,
+      "hType": "SUR",
+      "hScore": 6,
+      "notes": "",
+      "iconData": "https://raw.githubusercontent.com/iridesuwa18/e7-chart/main/assets/heroes/saria.webp",
+      "locked": true,
+      "altStats": {
+        "vType": "TNK",
+        "vScore": 3,
+        "hType": "SUR",
+        "hScore": 6
+      },
+      "_x": 20,
+      "_y": 25
+    },
+    {
+      "id": 1787485374820,
+      "name": "Eye of the Abyss Fumyr",
+      "rarity": "5ml",
+      "role": "Mage",
+      "element": "Earth",
+      "vType": "SPD",
+      "vScore": 9,
+      "hType": "SUR",
+      "hScore": 5,
+      "notes": "",
+      "iconData": "https://raw.githubusercontent.com/iridesuwa18/e7-chart/main/assets/heroes/eye-of-the-abyss-fumyr.webp",
+      "locked": true,
+      "altStats": null,
+      "_x": 25,
+      "_y": 5
+    },
+    {
+      "id": 1787485506656,
+      "name": "Roana",
+      "rarity": "5ml",
+      "role": "Soul Weaver",
+      "element": "Earth",
+      "vType": "TNK",
+      "vScore": 8,
+      "hType": "SST",
+      "hScore": 6,
+      "notes": "",
+      "iconData": "https://raw.githubusercontent.com/iridesuwa18/e7-chart/main/assets/heroes/roana.webp",
+      "locked": true,
+      "altStats": {
+        "vType": "SPD",
+        "vScore": 4,
+        "hType": "SUR",
+        "hScore": 2
+      },
+      "_x": 80,
+      "_y": 90
+    },
+    {
+      "id": 1787485640144,
+      "name": "Ocean Breeze Luluca",
+      "rarity": "5ml",
+      "role": "Soul Weaver",
+      "element": "Earth",
+      "vType": "SPD",
+      "vScore": 7,
+      "hType": "SST",
+      "hScore": 6,
+      "notes": "",
+      "iconData": "https://raw.githubusercontent.com/iridesuwa18/e7-chart/main/assets/heroes/ocean-breeze-luluca.webp",
+      "locked": true,
+      "altStats": {
+        "vType": "TNK",
+        "vScore": 6,
+        "hType": "SUR",
+        "hScore": 4
+      },
+      "_x": 80,
+      "_y": 15
+    },
+    {
+      "id": 1787485759696,
+      "name": "Destina",
+      "rarity": "5r",
+      "role": "Soul Weaver",
+      "element": "Earth",
+      "vType": "SPD",
+      "vScore": 5,
+      "hType": "SST",
+      "hScore": 6,
+      "notes": "",
+      "iconData": "https://raw.githubusercontent.com/iridesuwa18/e7-chart/main/assets/heroes/destina.webp",
+      "locked": true,
+      "altStats": {
+        "vType": "TNK",
+        "vScore": 6,
+        "hType": "SUR",
+        "hScore": 2
+      },
+      "_x": 80,
+      "_y": 25
     }
   ],
   "draftData": null,
-  "savedAt": "2026-08-23T11:39:37.268Z"
+  "savedAt": "2026-08-23T11:49:24.555Z"
 }
