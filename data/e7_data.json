@@ -640,8 +640,30 @@
       "altStats": null,
       "_x": 15,
       "_y": 10
+    },
+    {
+      "id": 1787448179695,
+      "name": "Desert Jewel Basar",
+      "rarity": "5ml",
+      "role": "Soul Weaver",
+      "element": "Light",
+      "vType": "SPD",
+      "vScore": 7,
+      "hType": "SST",
+      "hScore": 7,
+      "notes": "",
+      "iconData": "https://raw.githubusercontent.com/iridesuwa18/e7-chart/main/assets/heroes/desert-jewel-basar.webp",
+      "locked": true,
+      "altStats": {
+        "vType": "TNK",
+        "vScore": 3,
+        "hType": "SUR",
+        "hScore": 7
+      },
+      "_x": 85,
+      "_y": 15
     }
   ],
   "draftData": null,
-  "savedAt": "2026-08-23T01:20:12.404Z"
+  "savedAt": "2026-08-23T01:23:56.421Z"
 }
