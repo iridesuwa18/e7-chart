@@ -1657,8 +1657,30 @@
       },
       "_x": 0,
       "_y": 20
+    },
+    {
+      "id": 1787483149440,
+      "name": "Fern",
+      "rarity": "5ml",
+      "role": "Mage",
+      "element": "Ice",
+      "vType": "SPD",
+      "vScore": 7,
+      "hType": "SUR",
+      "hScore": 8,
+      "notes": "",
+      "iconData": "https://raw.githubusercontent.com/iridesuwa18/e7-chart/main/assets/heroes/fern.webp",
+      "locked": true,
+      "altStats": {
+        "vType": "TNK",
+        "vScore": 3,
+        "hType": "SUR",
+        "hScore": 8
+      },
+      "_x": 10,
+      "_y": 15
     }
   ],
   "draftData": null,
-  "savedAt": "2026-08-23T11:03:20.191Z"
+  "savedAt": "2026-08-23T11:05:53.646Z"
 }
