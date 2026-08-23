@@ -1065,10 +1065,10 @@
       "hScore": 9,
       "notes": "",
       "iconData": "https://raw.githubusercontent.com/iridesuwa18/e7-chart/main/assets/heroes/rhianna-and-luciella.webp",
-      "locked": false,
+      "locked": true,
       "altStats": {
-        "vType": "SPD",
-        "vScore": 10,
+        "vType": "TNK",
+        "vScore": 5,
         "hType": "SST",
         "hScore": 7
       },
@@ -1077,5 +1077,5 @@
     }
   ],
   "draftData": null,
-  "savedAt": "2026-08-23T04:38:11.568Z"
+  "savedAt": "2026-08-23T04:39:09.484Z"
 }
