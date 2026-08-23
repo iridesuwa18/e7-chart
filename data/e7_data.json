@@ -862,8 +862,25 @@
       "altStats": null,
       "_x": 15,
       "_y": 5
+    },
+    {
+      "id": 1787451132936,
+      "name": "Martial Artist Ken",
+      "rarity": "5ml",
+      "role": "Warrior",
+      "element": "Dark",
+      "vType": "TNK",
+      "vScore": 2,
+      "hType": "SUR",
+      "hScore": 9,
+      "notes": "",
+      "iconData": "https://raw.githubusercontent.com/iridesuwa18/e7-chart/main/assets/heroes/martial-artist-ken.webp",
+      "locked": true,
+      "altStats": null,
+      "_x": 5,
+      "_y": 60
     }
   ],
   "draftData": null,
-  "savedAt": "2026-08-23T02:09:05.044Z"
+  "savedAt": "2026-08-23T02:12:15.148Z"
 }
