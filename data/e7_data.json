@@ -616,8 +616,8 @@
       "iconData": "https://raw.githubusercontent.com/iridesuwa18/e7-chart/main/assets/heroes/sylvan-sage-vivian.webp",
       "locked": true,
       "altStats": {
-        "vType": "SPD",
-        "vScore": 6,
+        "vType": "TNK",
+        "vScore": 3,
         "hType": "SST",
         "hScore": 7
       },
@@ -665,5 +665,5 @@
     }
   ],
   "draftData": null,
-  "savedAt": "2026-08-23T01:23:56.421Z"
+  "savedAt": "2026-08-23T01:24:38.604Z"
 }
