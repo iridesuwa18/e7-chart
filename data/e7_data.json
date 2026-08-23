@@ -1679,8 +1679,30 @@
       },
       "_x": 10,
       "_y": 15
+    },
+    {
+      "id": 1787483255516,
+      "name": "Diene",
+      "rarity": "5ml",
+      "role": "Soul Weaver",
+      "element": "Ice",
+      "vType": "SPD",
+      "vScore": 8,
+      "hType": "SUR",
+      "hScore": 2,
+      "notes": "",
+      "iconData": "https://raw.githubusercontent.com/iridesuwa18/e7-chart/main/assets/heroes/diene.webp",
+      "locked": true,
+      "altStats": {
+        "vType": "TNK",
+        "vScore": 8,
+        "hType": "SST",
+        "hScore": 6
+      },
+      "_x": 40,
+      "_y": 10
     }
   ],
   "draftData": null,
-  "savedAt": "2026-08-23T11:05:53.646Z"
+  "savedAt": "2026-08-23T11:07:43.133Z"
 }
