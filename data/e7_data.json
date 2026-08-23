@@ -601,8 +601,30 @@
       "altStats": null,
       "_x": 15,
       "_y": 15
+    },
+    {
+      "id": 1787447823454,
+      "name": "Sylvan Sage Vivian",
+      "rarity": "5ml",
+      "role": "Mage",
+      "element": "Light",
+      "vType": "SPD",
+      "vScore": 6,
+      "hType": "SUR",
+      "hScore": 8,
+      "notes": "",
+      "iconData": "https://raw.githubusercontent.com/iridesuwa18/e7-chart/main/assets/heroes/sylvan-sage-vivian.webp",
+      "locked": true,
+      "altStats": {
+        "vType": "SPD",
+        "vScore": 6,
+        "hType": "SST",
+        "hScore": 7
+      },
+      "_x": 10,
+      "_y": 20
     }
   ],
   "draftData": null,
-  "savedAt": "2026-08-23T01:13:14.732Z"
+  "savedAt": "2026-08-23T01:17:09.021Z"
 }
