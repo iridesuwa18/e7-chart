@@ -1352,8 +1352,25 @@
       },
       "_x": 90,
       "_y": 5
+    },
+    {
+      "id": 1787463963854,
+      "name": "Top Model Luluca",
+      "rarity": "5ml",
+      "role": "Mage",
+      "element": "Dark",
+      "vType": "SPD",
+      "vScore": 8,
+      "hType": "SUR",
+      "hScore": 7,
+      "notes": "",
+      "iconData": "https://raw.githubusercontent.com/iridesuwa18/e7-chart/main/assets/heroes/top-model-luluca.webp",
+      "locked": true,
+      "altStats": null,
+      "_x": 15,
+      "_y": 10
     }
   ],
   "draftData": null,
-  "savedAt": "2026-08-23T05:44:18.269Z"
+  "savedAt": "2026-08-23T05:46:28.265Z"
 }
