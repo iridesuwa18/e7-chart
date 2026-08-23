@@ -2055,8 +2055,30 @@
       },
       "_x": 80,
       "_y": 25
+    },
+    {
+      "id": 1787485873709,
+      "name": "Schniel",
+      "rarity": "5r",
+      "role": "Soul Weaver",
+      "element": "Earth",
+      "vType": "TNK",
+      "vScore": 8,
+      "hType": "SUR",
+      "hScore": 9,
+      "notes": "",
+      "iconData": "https://raw.githubusercontent.com/iridesuwa18/e7-chart/main/assets/heroes/schniel.webp",
+      "locked": true,
+      "altStats": {
+        "vType": "SPD",
+        "vScore": 4,
+        "hType": "SUR",
+        "hScore": 9
+      },
+      "_x": 5,
+      "_y": 90
     }
   ],
   "draftData": null,
-  "savedAt": "2026-08-23T11:49:24.555Z"
+  "savedAt": "2026-08-23T11:51:16.691Z"
 }
