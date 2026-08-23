@@ -1074,8 +1074,30 @@
       },
       "_x": 5,
       "_y": 0
+    },
+    {
+      "id": 1787460248038,
+      "name": "School Nurse Yulha",
+      "rarity": "5ml",
+      "role": "Thief",
+      "element": "Dark",
+      "vType": "SPD",
+      "vScore": 7,
+      "hType": "SST",
+      "hScore": 6,
+      "notes": "",
+      "iconData": "https://raw.githubusercontent.com/iridesuwa18/e7-chart/main/assets/heroes/school-nurse-yulha.webp",
+      "locked": true,
+      "altStats": {
+        "vType": "TNK",
+        "vScore": 3,
+        "hType": "SUR",
+        "hScore": 8
+      },
+      "_x": 80,
+      "_y": 15
     }
   ],
   "draftData": null,
-  "savedAt": "2026-08-23T04:39:09.484Z"
+  "savedAt": "2026-08-23T04:44:42.402Z"
 }
