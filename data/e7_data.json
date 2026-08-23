@@ -2103,7 +2103,7 @@
     {
       "id": 1787486061259,
       "name": "Politis",
-      "rarity": "5ml",
+      "rarity": "5r",
       "role": "Mage",
       "element": "Fire",
       "vType": "SPD",
@@ -2138,8 +2138,25 @@
       },
       "_x": 15,
       "_y": 5
+    },
+    {
+      "id": 1787486263796,
+      "name": "Seaside Bellona",
+      "rarity": "5ml",
+      "role": "Ranger",
+      "element": "Ice",
+      "vType": "TNK",
+      "vScore": 4,
+      "hType": "SUR",
+      "hScore": 6,
+      "notes": "",
+      "iconData": "https://raw.githubusercontent.com/iridesuwa18/e7-chart/main/assets/heroes/seaside-bellona.webp",
+      "locked": true,
+      "altStats": null,
+      "_x": 20,
+      "_y": 70
     }
   ],
   "draftData": null,
-  "savedAt": "2026-08-23T11:56:17.982Z"
+  "savedAt": "2026-08-23T11:57:56.618Z"
 }
