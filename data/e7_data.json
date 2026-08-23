@@ -1330,8 +1330,30 @@
       "altStats": null,
       "_x": 25,
       "_y": 20
+    },
+    {
+      "id": 1787463784814,
+      "name": "Tidal Rift Elvira",
+      "rarity": "5ml",
+      "role": "Mage",
+      "element": "Dark",
+      "vType": "SPD",
+      "vScore": 9,
+      "hType": "SST",
+      "hScore": 8,
+      "notes": "",
+      "iconData": "https://raw.githubusercontent.com/iridesuwa18/e7-chart/main/assets/heroes/tidal-rift-elvira.webp",
+      "locked": true,
+      "altStats": {
+        "vType": "TNK",
+        "vScore": 5,
+        "hType": "SUR",
+        "hScore": 8
+      },
+      "_x": 90,
+      "_y": 5
     }
   ],
   "draftData": null,
-  "savedAt": "2026-08-23T05:36:08.866Z"
+  "savedAt": "2026-08-23T05:43:56.421Z"
 }
