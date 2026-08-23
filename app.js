@@ -791,6 +791,23 @@ function qdScoreCandidate(candidate, currentPicks, slotIndex) {
       // Quota already met — nudge remaining slots toward tank/sustain instead of stacking more speed.
       score -= 8;
     }
+
+    // Once BOTH core targets are met (3 high-speed, 2 high-sustain+speed),
+    // stop defaulting to the same handful of top-score Survivability/revive
+    // heroes for the rest of the team. Actively favor lower/mid-score,
+    // still-passable heroes instead so the remaining slots add variety
+    // rather than repeating your priciest picks.
+    const coreTargetsMet = needs.highSpdCount >= QD_SPEED_TARGET && needs.highSstSpdCount >= QD_SUSTAIN_SPD_TARGET;
+    if (coreTargetsMet) {
+      if (t.isHighSur && t.score >= 8) {
+        score -= 30;
+        reasons.push("Core targets already met — avoid another high-cost Survivability/revival hero");
+      } else if (t.score < 8) {
+        const varietyBonus = (8 - t.score) * 5;
+        score += varietyBonus;
+        reasons.push("Adds variety (core Speed/Sustain targets already met)");
+      }
+    }
   }
 
   // Rules 1/2/3/4/5/6/7/8 — reward covering whatever gaps the current picks
@@ -845,6 +862,18 @@ function qdElementHint(currentPicks) {
   }
   if (currentPicks.length >= 2 && !counts["Light"] && !counts["Dark"]) {
     return `💠 No Light or Dark yet — they only counter each other, so they're a statistically safer pick than a 3rd Fire/Ice/Earth hero.`;
+  }
+  return "";
+}
+
+/* Short advisory text once the Speed and Sustain+Speed targets are both
+   met — tells the player why suggestions have shifted away from their
+   top-score heroes. */
+function qdVarietyHint(currentPicks) {
+  if (currentPicks.length === 0) return "";
+  const needs = qdComputeTeamNeeds(currentPicks);
+  if (needs.highSpdCount >= QD_SPEED_TARGET && needs.highSstSpdCount >= QD_SUSTAIN_SPD_TARGET) {
+    return `✅ Speed (${needs.highSpdCount}/${QD_SPEED_TARGET}) and Sustain+Speed (${needs.highSstSpdCount}/${QD_SUSTAIN_SPD_TARGET}) targets are met — now favoring lower/mid-score picks for variety instead of repeating the same high-cost Survivability heroes.`;
   }
   return "";
 }
@@ -983,8 +1012,8 @@ function renderQuickDraftSuggestions() {
 
   const currentPicks = quickDraft.filter(id => id !== null).map(id => heroes.find(h => h.id === id)).filter(Boolean);
   const hintEl = document.getElementById("quickdraft-element-hint");
-  const hintText = qdElementHint(currentPicks);
-  if (hintText) { hintEl.textContent = hintText; hintEl.style.display = "block"; }
+  const hints = [qdElementHint(currentPicks), qdVarietyHint(currentPicks)].filter(Boolean);
+  if (hints.length) { hintEl.innerHTML = hints.join("<br>"); hintEl.style.display = "block"; }
   else { hintEl.style.display = "none"; }
 
   const scored = qdSuggestForNextSlot();

@@ -472,7 +472,7 @@ main {
 #quickdraft-suggest-slot-label { color: var(--gold2); letter-spacing: normal; }
 .quickdraft-element-hint {
   font-size: 10px;
-  line-height: 1.4;
+  line-height: 1.5;
   color: var(--text-dim);
   background: rgba(255,255,255,.03);
   border: 1px solid var(--border);
