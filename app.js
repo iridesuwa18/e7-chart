@@ -115,6 +115,9 @@ const QD_HIGH = 6;
 const QD_LOW  = 4;
 const QD_PASSABLE_SCORE = 5;
 const QD_SPEED_TARGET   = 3; // want 3-of-5 heroes to be high-speed/CR so a ban still leaves 2 to cycle
+const QD_SUSTAIN_SPD_TARGET = 2; // want at least 2 heroes that are BOTH high-sustain AND high-speed (fast buffers/self-sustainers) — top priority pick type
+const QD_RGB_ELEMENTS = new Set(["Fire", "Ice", "Earth"]);
+const QD_RGB_STACK_SOFT_CAP = 2; // once 2 of one Fire/Ice/Earth element are picked, a 3rd is discouraged — a single enemy counter-element can sweep them all
 
 /* ── Image editor state ── */
 let editorImg   = null;   // loaded HTMLImageElement
@@ -200,6 +203,7 @@ const saveStatus   = document.getElementById("save-status");
 
   // Quick Draft
   document.getElementById("quickdraft-handle").addEventListener("click", toggleQuickDraftDrawer);
+  document.getElementById("btn-quickdraft-random").addEventListener("click", randomizeQuickDraft);
   document.getElementById("btn-quickdraft-suggest").addEventListener("click", () => {
     if (quickDraftSuggestOpen) {
       quickDraftSuggestOpen = false;
@@ -668,7 +672,14 @@ function qdComputeTeamNeeds(currentPicks) {
   const traits = currentPicks.map(qdHeroTraits);
   const n = traits.length;
   const highSpdCount = traits.filter(t => t.isHighSpd).length;
+  const highSstSpdCount = traits.filter(t => t.isHighSst && t.isHighSpd).length; // fast buffers/self-sustainers
   const avgScore = n ? traits.reduce((s, t) => s + t.score, 0) / n : 0;
+
+  const elementCounts = {};
+  currentPicks.forEach(h => {
+    const el = h.element || "";
+    elementCounts[el] = (elementCounts[el] || 0) + 1;
+  });
 
   let needSpd = 0, needTnk = 0, needSur = 0, needSst = 0;
   traits.forEach(t => {
@@ -682,7 +693,7 @@ function qdComputeTeamNeeds(currentPicks) {
     if (t.isHighSst && (t.isLowSpd || t.isLowTnk)) { needSpd++; needTnk++; }              // Rule 8
   });
 
-  return { traits, n, highSpdCount, avgScore, needSpd, needTnk, needSur, needSst };
+  return { traits, n, highSpdCount, highSstSpdCount, avgScore, elementCounts, needSpd, needTnk, needSur, needSst };
 }
 
 /* Scores one candidate hero for whatever slot is next empty. Higher is
@@ -705,6 +716,17 @@ function qdScoreCandidate(candidate, currentPicks) {
     reasons.push(`Below passable score (${t.score.toFixed(1)} < ${QD_PASSABLE_SCORE})`);
   }
 
+  // Sustain + Speed is the top-priority pick type — fast buffers/self-sustainers
+  // keep the team alive AND let it act first. Target: at least 2 of these.
+  if (needs.highSstSpdCount < QD_SUSTAIN_SPD_TARGET && t.isHighSst && t.isHighSpd) {
+    score += 48;
+    reasons.push(`High-Sustain + High-Speed (priority pick, team ${needs.highSstSpdCount}/${QD_SUSTAIN_SPD_TARGET})`);
+    if (candidate.role === "Soul Weaver") reasons.push("Soul Weaver buffer");
+  } else if (t.isHighSst && candidate.role === "Soul Weaver") {
+    score += 10;
+    reasons.push("Soul Weaver buffer");
+  }
+
   // Rule 3 — chase 3 high-speed/CR heroes across the 5 so a single ban
   // still leaves 2 to cycle the team.
   if (needs.highSpdCount < QD_SPEED_TARGET && t.isHighSpd) {
@@ -721,6 +743,18 @@ function qdScoreCandidate(candidate, currentPicks) {
   if (needs.needSur > 0 && t.isHighSur) { score += 16 * needs.needSur; reasons.push("Covers a Survivability gap"); }
   if (needs.needSst > 0 && t.isHighSst) { score += 16 * needs.needSst; reasons.push("Covers a Sustainability gap"); }
 
+  // Element balance — Fire/Ice/Earth form a single-counter triangle, so
+  // stacking one of them risks a full sweep from one matching enemy element.
+  // Light/Dark only counter each other, so they're statistically safer.
+  const candidateEl = candidate.element || "";
+  if (QD_RGB_ELEMENTS.has(candidateEl) && (needs.elementCounts[candidateEl] || 0) >= QD_RGB_STACK_SOFT_CAP) {
+    score -= 20;
+    reasons.push(`Team already has ${needs.elementCounts[candidateEl]}× ${candidateEl} — risks a single-element sweep`);
+  } else if ((candidateEl === "Light" || candidateEl === "Dark") && !needs.elementCounts["Light"] && !needs.elementCounts["Dark"] && needs.n >= 2) {
+    score += 8;
+    reasons.push(`Adds ${candidateEl} coverage (fewer natural counters than Fire/Ice/Earth)`);
+  }
+
   // Global support scaling — a squad running below-average so far should
   // lean harder on a strong pick to carry it back up (per the brief:
   // "if the first three are really weak, the last two have to be really strong").
@@ -736,6 +770,24 @@ function qdScoreCandidate(candidate, currentPicks) {
   if (reasons.length === 0) reasons.push("Solid, balanced pick");
 
   return { hero: candidate, score, reasons, traits: t };
+}
+
+/* Short advisory text about the current elemental spread — shown above
+   the suggestion list. Fire/Ice/Earth form a single-counter triangle, so
+   stacking one risks a full sweep; Light/Dark only counter each other. */
+function qdElementHint(currentPicks) {
+  if (currentPicks.length === 0) return "";
+  const counts = {};
+  currentPicks.forEach(h => { const el = h.element || ""; counts[el] = (counts[el] || 0) + 1; });
+
+  const stackedEntry = Object.entries(counts).find(([el, n]) => QD_RGB_ELEMENTS.has(el) && n >= QD_RGB_STACK_SOFT_CAP);
+  if (stackedEntry) {
+    return `⚠️ ${stackedEntry[1]}× ${stackedEntry[0]} already picked — a single matching enemy element could sweep them. Try Light, Dark, or a different element next.`;
+  }
+  if (currentPicks.length >= 2 && !counts["Light"] && !counts["Dark"]) {
+    return `💠 No Light or Dark yet — they only counter each other, so they're a statistically safer pick than a 3rd Fire/Ice/Earth hero.`;
+  }
+  return "";
 }
 
 /* Ranks every Roster hero not already drafted for the next empty slot.
@@ -758,6 +810,21 @@ function addToQuickDraft(id) {
   saveQuickDraftLocal();
   renderQuickDraft();
   renderRoster();
+}
+
+/* Randomize — picks a uniformly random hero from the Roster (excluding
+   anyone already drafted) for the next empty slot, then opens Suggest
+   for the following slot so the rest of the team strategizes around
+   whatever the randomizer landed on. */
+function randomizeQuickDraft() {
+  const idx = quickDraft.indexOf(null);
+  if (idx === -1) { setStatus("⚠️ Quick Draft is full (5/5)"); return; }
+  const currentIds = quickDraft.filter(id => id !== null);
+  const pool = heroes.filter(h => !currentIds.includes(h.id));
+  if (pool.length === 0) { setStatus("⚠️ No more heroes left in your Roster."); return; }
+  const pick = pool[Math.floor(Math.random() * pool.length)];
+  addToQuickDraft(pick.id);
+  if (quickDraft.indexOf(null) !== -1) renderQuickDraftSuggestions();
 }
 
 /* Removing a hero compacts the array so everything behind it shifts
@@ -826,12 +893,15 @@ function renderQuickDraft() {
   const statsEl = document.getElementById("quickdraft-stats");
   const avgTxt = filledCount ? needs.avgScore.toFixed(1) : "—";
   const spdClass = needs.highSpdCount >= QD_SPEED_TARGET ? "good" : (filledCount ? "warn" : "");
+  const sstSpdClass = needs.highSstSpdCount >= QD_SUSTAIN_SPD_TARGET ? "good" : (filledCount ? "warn" : "");
   statsEl.innerHTML = `
     <span class="qd-stat">${filledCount}/5 Picked</span>
     <span class="qd-stat">Avg ${avgTxt}</span>
-    <span class="qd-stat ${spdClass}">⚡ High-SPD ${needs.highSpdCount}/${QD_SPEED_TARGET}</span>`;
+    <span class="qd-stat ${spdClass}">⚡ High-SPD ${needs.highSpdCount}/${QD_SPEED_TARGET}</span>
+    <span class="qd-stat ${sstSpdClass}">💠 Sust+SPD ${needs.highSstSpdCount}/${QD_SUSTAIN_SPD_TARGET}</span>`;
 
   document.getElementById("btn-quickdraft-suggest").disabled = filledCount >= QD_SIZE;
+  document.getElementById("btn-quickdraft-random").disabled = filledCount >= QD_SIZE;
 
   if (quickDraftSuggestOpen) renderQuickDraftSuggestions();
 }
@@ -850,6 +920,13 @@ function renderQuickDraftSuggestions() {
   }
 
   label.textContent = `for Slot ${nextIdx + 1}` + (nextIdx === QD_PROTECT_INDEX ? " (Protect)" : "");
+
+  const currentPicks = quickDraft.filter(id => id !== null).map(id => heroes.find(h => h.id === id)).filter(Boolean);
+  const hintEl = document.getElementById("quickdraft-element-hint");
+  const hintText = qdElementHint(currentPicks);
+  if (hintText) { hintEl.textContent = hintText; hintEl.style.display = "block"; }
+  else { hintEl.style.display = "none"; }
+
   const scored = qdSuggestForNextSlot();
 
   if (scored.length === 0) {

@@ -401,7 +401,7 @@ main {
 }
 .qd-stat.good { color: #81c784; border-color: rgba(129,199,132,.35); background: rgba(129,199,132,.08); }
 .qd-stat.warn { color: #ffb74d; border-color: rgba(255,183,77,.35); background: rgba(255,183,77,.08); }
-.quickdraft-toolbar-actions { display: flex; gap: 6px; }
+.quickdraft-toolbar-actions { display: flex; gap: 6px; flex-wrap: wrap; }
 
 .quickdraft-suggestions {
   margin-top: 10px;
@@ -416,6 +416,16 @@ main {
   margin-bottom: 6px;
 }
 #quickdraft-suggest-slot-label { color: var(--gold2); letter-spacing: normal; }
+.quickdraft-element-hint {
+  font-size: 10px;
+  line-height: 1.4;
+  color: var(--text-dim);
+  background: rgba(255,255,255,.03);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 6px 8px;
+  margin-bottom: 8px;
+}
 .quickdraft-suggestions-list {
   max-height: 260px;
   overflow-y: auto;
