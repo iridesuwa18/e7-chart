@@ -1762,8 +1762,30 @@
       },
       "_x": 10,
       "_y": 10
+    },
+    {
+      "id": 1787483937003,
+      "name": "Hecate",
+      "rarity": "5ml",
+      "role": "Warrior",
+      "element": "Earth",
+      "vType": "SPD",
+      "vScore": 4,
+      "hType": "SUR",
+      "hScore": 8,
+      "notes": "",
+      "iconData": "https://raw.githubusercontent.com/iridesuwa18/e7-chart/main/assets/heroes/hecate.webp",
+      "locked": true,
+      "altStats": {
+        "vType": "TNK",
+        "vScore": 3,
+        "hType": "SUR",
+        "hScore": 8
+      },
+      "_x": 10,
+      "_y": 30
     }
   ],
   "draftData": null,
-  "savedAt": "2026-08-23T11:15:03.694Z"
+  "savedAt": "2026-08-23T11:19:03.227Z"
 }
