@@ -1740,8 +1740,30 @@
       "altStats": null,
       "_x": 40,
       "_y": 5
+    },
+    {
+      "id": 1787483700087,
+      "name": "Inheritor Amiki",
+      "rarity": "3",
+      "role": "Warrior",
+      "element": "Ice",
+      "vType": "SPD",
+      "vScore": 8,
+      "hType": "SUR",
+      "hScore": 8,
+      "notes": "",
+      "iconData": "https://raw.githubusercontent.com/iridesuwa18/e7-chart/main/assets/heroes/inheritor-amiki.webp",
+      "locked": true,
+      "altStats": {
+        "vType": "TNK",
+        "vScore": 3,
+        "hType": "SUR",
+        "hScore": 8
+      },
+      "_x": 10,
+      "_y": 10
     }
   ],
   "draftData": null,
-  "savedAt": "2026-08-23T11:12:55.990Z"
+  "savedAt": "2026-08-23T11:15:03.694Z"
 }
