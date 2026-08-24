@@ -995,6 +995,50 @@ body.dot-mode .origin-dot:hover {
   height: 22px;
 }
 
+/* Roster search */
+.roster-search-wrap {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+.roster-search-input {
+  width: 100%;
+  font-size: 11px;
+  font-family: 'Cinzel', serif;
+  letter-spacing: .03em;
+  color: var(--text);
+  background: rgba(255,255,255,.02);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  padding: 6px 26px 6px 9px;
+  height: 26px;
+  box-sizing: border-box;
+}
+.roster-search-input:focus {
+  outline: none;
+  border-color: var(--gold-dim);
+}
+.roster-search-input::placeholder {
+  color: var(--text-dim);
+  opacity: .7;
+}
+.roster-search-clear {
+  position: absolute;
+  right: 6px;
+  top: 50%;
+  transform: translateY(-50%);
+  background: none;
+  border: none;
+  color: var(--text-dim);
+  font-size: 11px;
+  cursor: pointer;
+  line-height: 1;
+  padding: 2px;
+}
+.roster-search-clear:hover {
+  color: var(--gold);
+}
+
 /* Filter panel */
 .filter-panel {
   background: rgba(255,255,255,.02);

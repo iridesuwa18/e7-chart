@@ -96,6 +96,7 @@ let detailsHeroId = null; // which hero's details panel is open
 
 /* ── Roster UI state ── */
 let rosterSort = "date-desc";
+let rosterSearchQuery = "";
 let filterRarity  = new Set(["5ml","5r","4","3"]);
 let filterRole    = new Set(["Warrior","Knight","Thief","Ranger","Mage","Soul Weaver",""]);
 let filterElement = new Set(["Fire","Ice","Earth","Light","Dark",""]);
@@ -411,6 +412,22 @@ const saveStatus   = document.getElementById("save-status");
   document.getElementById("roster-sort").addEventListener("change", e => {
     rosterSort = e.target.value;
     renderRoster();
+  });
+
+  // Roster search box
+  const rosterSearchInput = document.getElementById("roster-search");
+  const rosterSearchClear = document.getElementById("roster-search-clear");
+  rosterSearchInput.addEventListener("input", e => {
+    rosterSearchQuery = e.target.value.trim();
+    rosterSearchClear.style.display = rosterSearchQuery ? "block" : "none";
+    renderRoster();
+  });
+  rosterSearchClear.addEventListener("click", () => {
+    rosterSearchInput.value = "";
+    rosterSearchQuery = "";
+    rosterSearchClear.style.display = "none";
+    renderRoster();
+    rosterSearchInput.focus();
   });
 
   // ── Chart option buttons ──
@@ -1613,7 +1630,18 @@ function renderRoster() {
     filterElement.has(h.element ?? "")
   );
 
+  // Search — case-insensitive substring match on hero name
+  if (rosterSearchQuery) {
+    const q = rosterSearchQuery.toLowerCase();
+    list = list.filter(h => (h.name || "").toLowerCase().includes(q));
+  }
+
   emptyMsg.style.display = list.length === 0 ? "block" : "none";
+  if (list.length === 0) {
+    emptyMsg.innerHTML = heroes.length === 0
+      ? "No heroes yet.<br>Tap ＋ Hero to add one."
+      : "No heroes match your search/filters.";
+  }
 
   list.forEach(h => {
     const meta = RARITY_META[h.rarity] || RARITY_META["5r"];
