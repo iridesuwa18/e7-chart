@@ -966,6 +966,31 @@ function qdScoreCandidate(candidate, currentPicks, slotIndex) {
     reasons.push(`Team already has a Healer/Support-type pick (high-Sustain Soul Weaver) — avoid stacking multiple healers`);
   }
 
+  // Protect-slot role guard — the Protect pick (index QD_PROTECT_INDEX)
+  // can't be banned, so once it's locked in, the closing slots should
+  // diversify away from its role rather than piling on more of the same
+  // class. The 5th/final slot is strictest — a different role altogether
+  // is expected there, since Protect already guarantees that role survives
+  // any ban. The 4th slot is more lenient: matching Protect's role there
+  // is fine if the team still has a genuine gap (e.g. still needs more
+  // Sustain and only Protect has it so far) — UNLESS that same role
+  // already showed up before Protect too (in the 1st or 2nd pick), in
+  // which case even a 3rd copy at the 4th slot is discouraged.
+  const protectPick = currentPicks[QD_PROTECT_INDEX];
+  const protectRole = protectPick ? (protectPick.role || "") : "";
+  if (protectRole && candidateRole === protectRole) {
+    if (slotIndex === 4) {
+      score -= 70;
+      reasons.push(`Matches the Protect slot's role (${protectRole}) — Protect can't be banned, so the final slot should be a different class`);
+    } else if (slotIndex === 3) {
+      const preProtectRoleCount = currentPicks.slice(0, QD_PROTECT_INDEX).filter(h => (h.role || "") === protectRole).length;
+      if (preProtectRoleCount > 0) {
+        score -= 30;
+        reasons.push(`${protectRole} already appeared before the Protect slot too — a 3rd copy is discouraged even here`);
+      }
+    }
+  }
+
   // Global support scaling — a squad running below-average so far should
   // lean harder on a strong pick to carry it back up (per the brief:
   // "if the first three are really weak, the last two have to be really strong").
