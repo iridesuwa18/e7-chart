@@ -79,6 +79,19 @@
             <span class="qd-toggle-text">🛡️ vs Debuff / Anti-Revive comps</span>
           </div>
 
+          <!-- Enemy element toggles — mark which elements the opponent is
+               stacking; suggestions boost that element's counter. -->
+          <div class="quickdraft-enemy-elements">
+            <span class="qd-enemy-el-label">Enemy has too many:</span>
+            <div class="qd-enemy-el-chips" id="qd-enemy-el-chips">
+              <button type="button" class="qd-el-chip qd-el-fire" data-el="Fire" title="Enemy heavy Fire → boost Ice picks">🔥</button>
+              <button type="button" class="qd-el-chip qd-el-ice" data-el="Ice" title="Enemy heavy Ice → boost Earth picks">❄️</button>
+              <button type="button" class="qd-el-chip qd-el-earth" data-el="Earth" title="Enemy heavy Earth → boost Fire picks">🌿</button>
+              <button type="button" class="qd-el-chip qd-el-light" data-el="Light" title="Enemy heavy Light → boost Dark picks">☀️</button>
+              <button type="button" class="qd-el-chip qd-el-dark" data-el="Dark" title="Enemy heavy Dark → boost Light picks">🌙</button>
+            </div>
+          </div>
+
           <div class="quickdraft-suggestions" id="quickdraft-suggestions" style="display:none">
             <div class="quickdraft-suggestions-title">
               BEST PICKS <span id="quickdraft-suggest-slot-label"></span>

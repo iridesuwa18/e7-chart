@@ -457,6 +457,57 @@ main {
   color: var(--gold2);
 }
 
+/* Enemy element toggles — simple color chips, tap to mark "enemy has too
+   many of this element", tap again to clear. */
+.quickdraft-enemy-elements {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 8px;
+  padding-top: 8px;
+  border-top: 1px solid var(--border);
+  flex-wrap: wrap;
+}
+.qd-enemy-el-label {
+  font-size: 10.5px;
+  font-family: 'Cinzel', serif;
+  color: var(--text-dim);
+  letter-spacing: .02em;
+  flex-shrink: 0;
+}
+.qd-enemy-el-chips {
+  display: flex;
+  gap: 6px;
+}
+.qd-el-chip {
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  border: 1.5px solid var(--border);
+  background: rgba(255,255,255,.04);
+  font-size: 13px;
+  line-height: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  opacity: .5;
+  filter: grayscale(60%);
+  transition: opacity .15s, filter .15s, border-color .15s, transform .1s, background .15s;
+  padding: 0;
+}
+.qd-el-chip:active { transform: scale(.92); }
+.qd-el-chip.active {
+  opacity: 1;
+  filter: none;
+  transform: scale(1.05);
+}
+.qd-el-chip.qd-el-fire.active   { border-color: #e05a3a; background: rgba(224,90,58,.18); }
+.qd-el-chip.qd-el-ice.active    { border-color: #4fc3e8; background: rgba(79,195,232,.18); }
+.qd-el-chip.qd-el-earth.active  { border-color: #7cb342; background: rgba(124,179,66,.18); }
+.qd-el-chip.qd-el-light.active  { border-color: #e8d24f; background: rgba(232,210,79,.18); }
+.qd-el-chip.qd-el-dark.active   { border-color: #9a6fd0; background: rgba(154,111,208,.18); }
+
 .quickdraft-suggestions {
   margin-top: 10px;
   padding-top: 10px;

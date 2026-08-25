@@ -124,6 +124,8 @@ const QD_HEALER_SOFT_CAP = 1; // at most 1 dedicated Healer/Support-type pick (s
 const QD_RGB_ELEMENTS = new Set(["Fire", "Ice", "Earth"]);
 const QD_RGB_STACK_SOFT_CAP = 2; // once 2 of one Fire/Ice/Earth element are picked, a 3rd is discouraged — a single enemy counter-element can sweep them all
 let qdAntiDebuffMode = false; // when true, favors Tankiness + mid-range "rounder" heroes over Survivability/revive specialists
+let qdEnemyHeavyElements = new Set(); // elements the player has flagged as "enemy has too many of" — boosts that element's counter in suggestions
+const QD_ELEMENT_COUNTER = { Fire: "Ice", Ice: "Earth", Earth: "Fire", Light: "Dark", Dark: "Light" }; // which element beats which
 
 /* ── Image editor state ── */
 let editorImg   = null;   // loaded HTMLImageElement
@@ -247,6 +249,24 @@ const saveStatus   = document.getElementById("save-status");
     qdAntiDebuffMode = qdAntiDebuffToggle.checked;
     saveQuickDraftModeLocal();
     if (quickDraftSuggestOpen) renderQuickDraftSuggestions();
+  });
+
+  // Enemy element chips — tap to mark/unmark "enemy has too many of this
+  // element"; suggestions boost whichever element counters it.
+  document.querySelectorAll("#qd-enemy-el-chips .qd-el-chip").forEach(chip => {
+    if (qdEnemyHeavyElements.has(chip.dataset.el)) chip.classList.add("active");
+    chip.addEventListener("click", () => {
+      const el = chip.dataset.el;
+      if (qdEnemyHeavyElements.has(el)) {
+        qdEnemyHeavyElements.delete(el);
+        chip.classList.remove("active");
+      } else {
+        qdEnemyHeavyElements.add(el);
+        chip.classList.add("active");
+      }
+      saveQuickDraftModeLocal();
+      if (quickDraftSuggestOpen) renderQuickDraftSuggestions();
+    });
   });
   document.getElementById("modal-cancel").addEventListener("click", closeModal);
   document.getElementById("modal-overlay").addEventListener("click", e => { if (e.target === overlay) closeModal(); });
@@ -665,9 +685,14 @@ function loadQuickDraftLocal() {
   try {
     qdAntiDebuffMode = localStorage.getItem("e7_qd_antidebuff") === "1";
   } catch { /* ignore, keep default false */ }
+  try {
+    const rawEls = localStorage.getItem("e7_qd_enemy_elements");
+    if (rawEls) qdEnemyHeavyElements = new Set(JSON.parse(rawEls));
+  } catch { /* ignore, keep default empty */ }
 }
 function saveQuickDraftModeLocal() {
   try { localStorage.setItem("e7_qd_antidebuff", qdAntiDebuffMode ? "1" : "0"); } catch { /* ignore */ }
+  try { localStorage.setItem("e7_qd_enemy_elements", JSON.stringify([...qdEnemyHeavyElements])); } catch { /* ignore */ }
 }
 
 /* Reads a hero build's raw axis values into 4 independent stat lanes.
@@ -948,6 +973,16 @@ function qdScoreCandidate(candidate, currentPicks, slotIndex) {
     reasons.push(`Adds ${candidateEl} coverage (fewer natural counters than Fire/Ice/Earth)`);
   }
 
+  // Enemy element toggles — the player flags which elements the opponent
+  // is stacking (simple on/off chips), and we boost whichever element
+  // counters each flagged one. Fire→Ice→Earth→Fire is the RGB triangle;
+  // Light and Dark counter each other.
+  const enemyCounterHits = [...qdEnemyHeavyElements].filter(enemyEl => QD_ELEMENT_COUNTER[enemyEl] === candidateEl);
+  if (enemyCounterHits.length > 0) {
+    score += 30 * enemyCounterHits.length;
+    reasons.push(`Counters enemy ${enemyCounterHits.join("/")} (${candidateEl} beats it)`);
+  }
+
   // Role diversity — once a role has shown up a couple times, later picks
   // are nudged toward a different role so the team isn't front-loaded with
   // near-duplicate kits. Healer/Support-type picks (see qdIsHealerArchetype)
@@ -1055,6 +1090,15 @@ function qdRoleHint(currentPicks) {
   return hints.join("<br>");
 }
 
+/* Short advisory showing which element counters are currently boosted by
+   the enemy element toggles, so it's clear why certain elements are
+   ranking higher in the suggestion list. */
+function qdEnemyElementHint() {
+  if (qdEnemyHeavyElements.size === 0) return "";
+  const parts = [...qdEnemyHeavyElements].map(el => `${el}→${QD_ELEMENT_COUNTER[el]}`);
+  return `🎯 Boosting counters for enemy: ${parts.join(", ")}`;
+}
+
 /* Ranks every Roster hero not already drafted for the next empty slot.
    Always returns a full ranked list (best first) as long as there's at
    least one hero left in the Roster to suggest. */
@@ -1115,6 +1159,12 @@ function clearQuickDraft() {
   quickDraftSuggestOpen = false;
   document.getElementById("quickdraft-suggestions").style.display = "none";
   saveQuickDraftLocal();
+
+  // Reset enemy element toggles back to default (none active).
+  qdEnemyHeavyElements.clear();
+  document.querySelectorAll("#qd-enemy-el-chips .qd-el-chip").forEach(chip => chip.classList.remove("active"));
+  saveQuickDraftModeLocal();
+
   renderQuickDraft();
   renderRoster();
 }
@@ -1189,7 +1239,7 @@ function renderQuickDraftSuggestions() {
 
   const currentPicks = quickDraft.filter(id => id !== null).map(id => heroes.find(h => h.id === id)).filter(Boolean);
   const hintEl = document.getElementById("quickdraft-element-hint");
-  const hints = [qdElementHint(currentPicks), qdVarietyHint(currentPicks), qdRoleHint(currentPicks)].filter(Boolean);
+  const hints = [qdElementHint(currentPicks), qdVarietyHint(currentPicks), qdRoleHint(currentPicks), qdEnemyElementHint()].filter(Boolean);
   if (hints.length) { hintEl.innerHTML = hints.join("<br>"); hintEl.style.display = "block"; }
   else { hintEl.style.display = "none"; }
 
