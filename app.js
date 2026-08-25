@@ -130,6 +130,7 @@ const QD_ELEMENT_COUNTER = { Fire: "Ice", Ice: "Earth", Earth: "Fire", Light: "D
    the support classes and are favored specifically for the Protect slot. */
 const QD_STAT_FIRST_BONUS = 30;       // bonus for being the 1st High pick covering a stat lane
 const QD_STAT_SECOND_BONUS = 12;      // smaller bonus for being the 2nd High pick in that lane
+const QD_STAT_GAP_BONUS = 8;          // ongoing bonus per lane the candidate's stat is BEHIND the team's most-stacked stat lane — keeps Rule 2 balancing even after every lane has 1+ High picks (i.e. past 4/4), instead of going to 0
 const QD_CLASS_MAX = 2;               // hard cap: at most 2 of any one class per team
 const QD_CLASS_CAP_PENALTY = 100;     // heavy penalty once a class is already at QD_CLASS_MAX
 const QD_OFFENSE_CLASSES = new Set(["Warrior", "Thief", "Mage"]);       // hard-hitting, typically no revives
@@ -799,15 +800,27 @@ function qdScoreCandidate(candidate, currentPicks, slotIndex) {
   // exactly the "covers multiple gaps in one pick" hero the team wants.
   const STAT_LABELS = { spd: "Speed", tnk: "Tankiness", sur: "Survivability", sst: "Sustainability" };
   const statFlag = { spd: t.isHighSpd, tnk: t.isHighTnk, sur: t.isHighSur, sst: t.isHighSst };
+  // How stacked the team's leading lane already is — used below so that,
+  // even once every lane has at least one High pick (4/4), the candidate
+  // keeps getting rewarded for covering whichever lane(s) are still
+  // relatively behind the team's most-covered lane, instead of the bonus
+  // dropping to 0 after the lane's 2nd High pick.
+  const maxStatCount = Math.max(needs.statCounts.spd, needs.statCounts.tnk, needs.statCounts.sur, needs.statCounts.sst);
   const covered = [];
+  const caughtUp = [];
   Object.keys(STAT_LABELS).forEach(key => {
     if (!statFlag[key]) return;
     const count = needs.statCounts[key];
-    const bonus = count === 0 ? QD_STAT_FIRST_BONUS : count === 1 ? QD_STAT_SECOND_BONUS : 0;
+    const gapBehindLeader = maxStatCount - count; // 0 = already tied with (or leading) the most-covered lane
+    let bonus;
+    if (count === 0) bonus = QD_STAT_FIRST_BONUS;
+    else if (count === 1) bonus = QD_STAT_SECOND_BONUS + gapBehindLeader * QD_STAT_GAP_BONUS;
+    else bonus = gapBehindLeader * QD_STAT_GAP_BONUS; // 3rd+ pick in a lane: only rewarded while it's still catching up
     if (bonus > 0) { score += bonus; covered.push(STAT_LABELS[key]); }
+    else if (statFlag[key]) caughtUp.push(STAT_LABELS[key]);
   });
   if (covered.length >= 2) reasons.push(`Covers multiple team gaps at once (${covered.join(" + ")})`);
-  else if (covered.length === 1) reasons.push(`Covers the team's ${covered[0]} gap`);
+  else if (covered.length === 1) reasons.push(`Helps balance the team's ${covered[0]} lane`);
 
   // ── Rule 3: class caps + role priorities ──
   const role = candidate.role || "";
@@ -851,7 +864,14 @@ function qdStatHint(currentPicks) {
   const labels = { spd: "Speed", tnk: "Tankiness", sur: "Survivability", sst: "Sustainability" };
   const missing = Object.entries(needs.statCounts).filter(([, n]) => n === 0).map(([k]) => labels[k]);
   if (missing.length) return `⚖️ Still no High pick for: ${missing.join(", ")}.`;
-  return `✅ All 4 stats (Speed, Tankiness, Survivability, Sustainability) have at least one High pick.`;
+
+  // All 4 lanes covered — keep showing which lane(s) are lagging behind
+  // the team's most-stacked lane, since suggestions keep balancing toward
+  // them (Rule 2 doesn't stop just because every lane hit 1/1).
+  const maxCount = Math.max(...Object.values(needs.statCounts));
+  const behind = Object.entries(needs.statCounts).filter(([, n]) => n < maxCount).map(([k]) => labels[k]);
+  if (behind.length) return `⚖️ All 4 stats covered — still favoring ${behind.join(", ")} to catch up to the team's most-stacked lane.`;
+  return `✅ All 4 stats (Speed, Tankiness, Survivability, Sustainability) are evenly covered.`;
 }
 
 /* Rule 3 hint — class cap / offense-count status, so it's clear why
