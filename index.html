@@ -72,53 +72,10 @@
             </div>
           </div>
 
-          <div class="quickdraft-mode-row">
-            <label class="qd-toggle" title="Favors Tankiness + mid-range 'rounder' heroes over Survivability/revive specialists">
-              <input type="checkbox" id="quickdraft-antidebuff-toggle">
-              <span class="qd-toggle-track"><span class="qd-toggle-thumb"></span></span>
-            </label>
-            <span class="qd-toggle-text">🛡️ vs Debuff / Anti-Revive comps</span>
-          </div>
-
-          <!-- Enemy team composition — set how many opposing heroes are
-               each element (steppers, 0-5) and which element the enemy's
-               un-bannable "Ban Protect" pick is. Suggestions boost each
-               element's counter proportional to count, with extra
-               priority on countering the Ban Protect element. -->
+          <!-- Rule 1: mark only the opponent's un-bannable "Ban Protect"
+               element. Suggestions lock the remaining picks to whichever
+               element counters it. -->
           <div class="quickdraft-enemy-elements">
-            <span class="qd-enemy-el-label">Enemy team elements:</span>
-            <div class="qd-enemy-el-steppers" id="qd-enemy-el-steppers">
-              <div class="qd-el-stepper qd-el-fire" data-el="Fire">
-                <button type="button" class="qd-el-step-btn" data-el="Fire" data-dir="-1">−</button>
-                <span class="qd-el-step-icon">🔥</span>
-                <span class="qd-el-step-count" id="qd-el-count-Fire">0</span>
-                <button type="button" class="qd-el-step-btn" data-el="Fire" data-dir="1">+</button>
-              </div>
-              <div class="qd-el-stepper qd-el-ice" data-el="Ice">
-                <button type="button" class="qd-el-step-btn" data-el="Ice" data-dir="-1">−</button>
-                <span class="qd-el-step-icon">❄️</span>
-                <span class="qd-el-step-count" id="qd-el-count-Ice">0</span>
-                <button type="button" class="qd-el-step-btn" data-el="Ice" data-dir="1">+</button>
-              </div>
-              <div class="qd-el-stepper qd-el-earth" data-el="Earth">
-                <button type="button" class="qd-el-step-btn" data-el="Earth" data-dir="-1">−</button>
-                <span class="qd-el-step-icon">🌿</span>
-                <span class="qd-el-step-count" id="qd-el-count-Earth">0</span>
-                <button type="button" class="qd-el-step-btn" data-el="Earth" data-dir="1">+</button>
-              </div>
-              <div class="qd-el-stepper qd-el-light" data-el="Light">
-                <button type="button" class="qd-el-step-btn" data-el="Light" data-dir="-1">−</button>
-                <span class="qd-el-step-icon">☀️</span>
-                <span class="qd-el-step-count" id="qd-el-count-Light">0</span>
-                <button type="button" class="qd-el-step-btn" data-el="Light" data-dir="1">+</button>
-              </div>
-              <div class="qd-el-stepper qd-el-dark" data-el="Dark">
-                <button type="button" class="qd-el-step-btn" data-el="Dark" data-dir="-1">−</button>
-                <span class="qd-el-step-icon">🌙</span>
-                <span class="qd-el-step-count" id="qd-el-count-Dark">0</span>
-                <button type="button" class="qd-el-step-btn" data-el="Dark" data-dir="1">+</button>
-              </div>
-            </div>
             <div class="qd-ban-protect-row">
               <span class="qd-enemy-el-label">🛡 Ban Protect element:</span>
               <div class="qd-ban-protect-chips" id="qd-ban-protect-chips">

@@ -403,62 +403,7 @@ main {
 .qd-stat.warn { color: #ffb74d; border-color: rgba(255,183,77,.35); background: rgba(255,183,77,.08); }
 .quickdraft-toolbar-actions { display: flex; gap: 6px; flex-wrap: wrap; }
 
-.quickdraft-mode-row {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  margin-top: 10px;
-  padding-top: 10px;
-  border-top: 1px solid var(--border);
-}
-.qd-toggle {
-  position: relative;
-  display: inline-flex;
-  cursor: pointer;
-  flex-shrink: 0;
-}
-.qd-toggle input {
-  position: absolute;
-  opacity: 0;
-  width: 0; height: 0;
-}
-.qd-toggle-track {
-  width: 34px; height: 18px;
-  background: rgba(255,255,255,.08);
-  border: 1px solid var(--border);
-  border-radius: 10px;
-  position: relative;
-  transition: background .15s, border-color .15s;
-  flex-shrink: 0;
-}
-.qd-toggle-thumb {
-  position: absolute;
-  top: 1px; left: 1px;
-  width: 14px; height: 14px;
-  border-radius: 50%;
-  background: var(--text-dim);
-  transition: transform .18s, background .15s;
-}
-.qd-toggle input:checked + .qd-toggle-track {
-  background: rgba(201,162,39,.25);
-  border-color: var(--gold);
-}
-.qd-toggle input:checked + .qd-toggle-track .qd-toggle-thumb {
-  transform: translateX(16px);
-  background: var(--gold2);
-}
-.qd-toggle-text {
-  font-size: 10.5px;
-  font-family: 'Cinzel', serif;
-  color: var(--text-dim);
-  letter-spacing: .02em;
-}
-.quickdraft-mode-row:has(input:checked) .qd-toggle-text {
-  color: var(--gold2);
-}
-
-/* Enemy element toggles — simple color chips, tap to mark "enemy has too
-   many of this element", tap again to clear. */
+/* Rule 1: only the Ban Protect element is tracked now. */
 .quickdraft-enemy-elements {
   display: flex;
   align-items: center;
@@ -474,10 +419,6 @@ main {
   color: var(--text-dim);
   letter-spacing: .02em;
   flex-shrink: 0;
-}
-.qd-enemy-el-chips {
-  display: flex;
-  gap: 6px;
 }
 .qd-el-chip {
   width: 26px;
@@ -507,65 +448,6 @@ main {
 .qd-el-chip.qd-el-earth.active  { border-color: #7cb342; background: rgba(124,179,66,.18); }
 .qd-el-chip.qd-el-light.active  { border-color: #e8d24f; background: rgba(232,210,79,.18); }
 .qd-el-chip.qd-el-dark.active   { border-color: #9a6fd0; background: rgba(154,111,208,.18); }
-
-/* Enemy element steppers — quickly set HOW MANY opposing heroes are each
-   element (0-5), instead of a plain on/off toggle. More of an element
-   pushes that element's counter harder in suggestions. */
-.qd-enemy-el-steppers {
-  display: flex;
-  gap: 5px;
-  flex-wrap: wrap;
-}
-.qd-el-stepper {
-  display: flex;
-  align-items: center;
-  gap: 3px;
-  border: 1.5px solid var(--border);
-  border-radius: 14px;
-  padding: 2px 3px;
-  background: rgba(255,255,255,.03);
-}
-.qd-el-step-btn {
-  width: 18px;
-  height: 18px;
-  border-radius: 50%;
-  border: 1px solid var(--border);
-  background: rgba(255,255,255,.05);
-  color: var(--text-dim);
-  font-size: 12px;
-  line-height: 1;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
-  padding: 0;
-}
-.qd-el-step-btn:active { transform: scale(.9); }
-.qd-el-step-icon {
-  width: 20px;
-  height: 20px;
-  border-radius: 50%;
-  font-size: 12px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  filter: grayscale(60%);
-  opacity: .6;
-}
-.qd-el-step-count {
-  min-width: 13px;
-  text-align: center;
-  font-size: 11px;
-  font-family: 'Cinzel', serif;
-  color: var(--text-dim);
-}
-.qd-el-stepper.has-count .qd-el-step-icon { filter: none; opacity: 1; }
-.qd-el-stepper.has-count .qd-el-step-count { color: var(--gold2); font-weight: 600; }
-.qd-el-stepper.has-count.qd-el-fire   { border-color: #e05a3a; background: rgba(224,90,58,.12); }
-.qd-el-stepper.has-count.qd-el-ice    { border-color: #4fc3e8; background: rgba(79,195,232,.12); }
-.qd-el-stepper.has-count.qd-el-earth  { border-color: #7cb342; background: rgba(124,179,66,.12); }
-.qd-el-stepper.has-count.qd-el-light  { border-color: #e8d24f; background: rgba(232,210,79,.12); }
-.qd-el-stepper.has-count.qd-el-dark   { border-color: #9a6fd0; background: rgba(154,111,208,.12); }
 
 /* Ban Protect element — the opponent's un-bannable pick. Single-select;
    suggestions prioritize countering this element, most strongly when it's

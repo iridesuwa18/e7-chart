@@ -81,53 +81,10 @@
             </div>
           </div>
 
-          <div class="quickdraft-mode-row">
-            <label class="qd-toggle" title="Favors Tankiness + mid-range 'rounder' heroes over Survivability/revive specialists">
-              <input type="checkbox" id="quickdraft-antidebuff-toggle">
-              <span class="qd-toggle-track"><span class="qd-toggle-thumb"></span></span>
-            </label>
-            <span class="qd-toggle-text">🛡️ vs Debuff / Anti-Revive comps</span>
-          </div>
-
-          <!-- Enemy team composition — set how many opposing heroes are
-               each element (steppers, 0-5) and which element the enemy's
-               un-bannable "Ban Protect" pick is. Suggestions boost each
-               element's counter proportional to count, with extra
-               priority on countering the Ban Protect element. -->
+          <!-- Rule 1: mark only the opponent's un-bannable "Ban Protect"
+               element. Suggestions lock the remaining picks to whichever
+               element counters it. -->
           <div class="quickdraft-enemy-elements">
-            <span class="qd-enemy-el-label">Enemy team elements:</span>
-            <div class="qd-enemy-el-steppers" id="qd-enemy-el-steppers">
-              <div class="qd-el-stepper qd-el-fire" data-el="Fire">
-                <button type="button" class="qd-el-step-btn" data-el="Fire" data-dir="-1">−</button>
-                <span class="qd-el-step-icon">🔥</span>
-                <span class="qd-el-step-count" id="qd-el-count-Fire">0</span>
-                <button type="button" class="qd-el-step-btn" data-el="Fire" data-dir="1">+</button>
-              </div>
-              <div class="qd-el-stepper qd-el-ice" data-el="Ice">
-                <button type="button" class="qd-el-step-btn" data-el="Ice" data-dir="-1">−</button>
-                <span class="qd-el-step-icon">❄️</span>
-                <span class="qd-el-step-count" id="qd-el-count-Ice">0</span>
-                <button type="button" class="qd-el-step-btn" data-el="Ice" data-dir="1">+</button>
-              </div>
-              <div class="qd-el-stepper qd-el-earth" data-el="Earth">
-                <button type="button" class="qd-el-step-btn" data-el="Earth" data-dir="-1">−</button>
-                <span class="qd-el-step-icon">🌿</span>
-                <span class="qd-el-step-count" id="qd-el-count-Earth">0</span>
-                <button type="button" class="qd-el-step-btn" data-el="Earth" data-dir="1">+</button>
-              </div>
-              <div class="qd-el-stepper qd-el-light" data-el="Light">
-                <button type="button" class="qd-el-step-btn" data-el="Light" data-dir="-1">−</button>
-                <span class="qd-el-step-icon">☀️</span>
-                <span class="qd-el-step-count" id="qd-el-count-Light">0</span>
-                <button type="button" class="qd-el-step-btn" data-el="Light" data-dir="1">+</button>
-              </div>
-              <div class="qd-el-stepper qd-el-dark" data-el="Dark">
-                <button type="button" class="qd-el-step-btn" data-el="Dark" data-dir="-1">−</button>
-                <span class="qd-el-step-icon">🌙</span>
-                <span class="qd-el-step-count" id="qd-el-count-Dark">0</span>
-                <button type="button" class="qd-el-step-btn" data-el="Dark" data-dir="1">+</button>
-              </div>
-            </div>
             <div class="qd-ban-protect-row">
               <span class="qd-enemy-el-label">🛡 Ban Protect element:</span>
               <div class="qd-ban-protect-chips" id="qd-ban-protect-chips">
@@ -823,109 +780,59 @@
           One candidate hero at a time, for whichever slot is next empty. It's a
           <strong style="color:var(--gold2)">one-slot-ahead greedy heuristic</strong> —
           not a full 5-hero optimizer — so it only ever reasons about the heroes
-          already locked in, same as drafting in real time. Every rule below adds
-          or subtracts points; whichever remaining hero ends up with the highest
-          total score is ranked #1 (and is what Autofill/👑 picks).
+          already locked in, same as drafting in real time. Three simple rules
+          drive every score; whichever remaining hero ends up highest is ranked
+          #1 (and is what Autofill/👑 picks).
         </p>
 
         <div class="qd-logic-section">
           <div class="qd-logic-heading">1 · Base hero quality</div>
-          <p>Score starts at <code>hero score × 10</code>. A hero at/above the passable
-          threshold (5.0) gets a flat +15; below it, the shortfall is punished at ×12 —
-          so a weak hero is unlikely to ever outrank a strong one regardless of the
-          bonuses below.</p>
+          <p>Score starts at <code>hero score × 10</code>. Below the passable
+          threshold (5.0), the shortfall is punished at ×12 — so a weak hero is
+          unlikely to ever outrank a strong one regardless of the rules below.</p>
         </div>
 
         <div class="qd-logic-section">
-          <div class="qd-logic-heading">2 · Anti-Debuff / Anti-Revive mode (toggle)</div>
-          <p>When on: High-Survivability heroes (usually revive-based) take −22 since
-          debuff/anti-revive comps neutralize them. High-Tankiness gets +26. A
-          "rounder" mid-range score (5.5–7.5) gets +12 for not over-relying on one
-          extreme stat.</p>
+          <div class="qd-logic-heading">2 · Rule 1 — counter the Ban Protect element only</div>
+          <p>The only enemy-side signal Quick Draft tracks is which element the
+          opponent's un-bannable "Ban Protect" pick is. Once set, the candidate
+          pool for every remaining slot is <strong style="color:var(--gold2)">locked</strong>
+          to whichever element counters it (Fire→Ice→Earth→Fire, Light↔Dark) —
+          falling back to the full Roster only if no counter-element hero is
+          left. On top of the lock, a matching candidate also gets a +50 bonus
+          so it's clear in the reasons why it's ranked where it is.</p>
         </div>
 
         <div class="qd-logic-section">
-          <div class="qd-logic-heading">3 · The Protect slot (middle slot, 3rd)</div>
-          <p>Scored differently — it's the one guaranteed survivor after bans, so it
-          should plug your biggest hole rather than chase speed (speed is
-          intentionally NOT scored here). High-Survivability (or High-Tankiness in
-          Anti-Debuff mode) gets +45. A NEW element vs. the rest of the team gets
-          +18; repeating an existing element gets −15.</p>
+          <div class="qd-logic-heading">3 · Rule 2 — balance the 4 stat lanes</div>
+          <p>Every hero is read as High or not in 4 lanes — Speed, Tankiness,
+          Survivability, Sustainability (ghost stats included, whichever build
+          is best). A candidate gets +30 for being the team's <em>first</em>
+          High pick in a lane that's currently uncovered, or +12 if it'd be the
+          <em>second</em> High pick in a lane the team already has one of. A
+          hero that's High in two still-needed lanes at once (e.g. both High
+          Speed and High Tankiness) stacks both bonuses — that's how "the hero
+          that covers the most gaps" naturally floats to the top, no dice roll
+          needed.</p>
         </div>
 
         <div class="qd-logic-section">
-          <div class="qd-logic-heading">4 · Non-Protect slots — priority pick type</div>
-          <p>High-Sustain + High-Speed (fast buffers/self-sustainers) is the top
-          priority until the team has 2 of them: +48 (only +20 if it'd be a 2nd
-          Healer/Support-type pick). Otherwise, chasing the 3-High-Speed target gets
-          +40 per pick while under target.</p>
-        </div>
-
-        <div class="qd-logic-section">
-          <div class="qd-logic-heading">5 · Once core targets are met (3 High-Speed + 2 Sustain-Speed)</div>
-          <p>Stops chasing High-Speed (−35) and shifts the closing 4th/5th slots
-          toward mid-range "rounder" picks instead of maxed stats: sustain/survivability
-          above the mid-range cap (6) is penalized (−22), at/under it is rewarded
-          (+22), and an overall score ≥7 is pushed back down for variety while a
-          score under 7 is pushed up.</p>
-        </div>
-
-        <div class="qd-logic-section">
-          <div class="qd-logic-heading">6 · Stat gap coverage (Rules 1–8)</div>
-          <p>Each already-picked hero that's weak in a lane (low Speed/Tank/Survivability
-          /Sustain) — or strong in one lane but exposed in another — creates a
-          "need." A candidate that's high in a needed lane gets +16 to +18 per unmet
-          need (×1.3 for the Protect slot). Survivability/Sustain gap bonuses are
-          skipped on the closing slots once core targets are met, so rule 5's
-          mid-range shaping isn't undone.</p>
-        </div>
-
-        <div class="qd-logic-section">
-          <div class="qd-logic-heading">7 · Element balance (self-team)</div>
-          <p>Fire/Ice/Earth form a single-counter triangle, so stacking 2+ of one
-          risks a full sweep from one matching enemy element: −20 once you already
-          have 2. Light/Dark only counter each other — a safer 3rd+ element pick, so
-          the first Light/Dark pick (once 2+ heroes are drafted) gets +8.</p>
-        </div>
-
-        <div class="qd-logic-section">
-          <div class="qd-logic-heading">8 · Enemy team elements + Ban Protect (the steppers)</div>
-          <p>Each enemy element count boosts its counter by <code>+14 × count</code> —
-          2× enemy Fire pushes Ice harder than 1× would. On top of that, if the Ban
-          Protect element is also the enemy's <em>sole majority</em> element, its
-          counter gets a further +45 (biggest threat + unbannable). If the enemy
-          elements are flat (exactly 1 of each entered, no majority), Ban Protect's
-          counter instead gets +30 as the tie-break signal. If no enemy counts are
-          set at all, Ban Protect alone still adds +30 to its counter.</p>
-        </div>
-
-        <div class="qd-logic-section">
-          <div class="qd-logic-heading">9 · Role diversity</div>
-          <p>A role that's shown up 2+ times already gets −14 per extra copy beyond
-          the soft cap. A 2nd Healer/Support-type pick (Soul Weaver, high-Sustain,
-          not high-Survivability) is penalized harder: −32.</p>
-        </div>
-
-        <div class="qd-logic-section">
-          <div class="qd-logic-heading">10 · Protect-slot role guard</div>
-          <p>Once Protect is locked in, its role is discouraged for the closing
-          slots — the 5th slot especially (−70, since Protect can't be banned so the
-          final slot should diversify), and the 4th slot too (−30) if that role
-          already showed up before Protect as well.</p>
-        </div>
-
-        <div class="qd-logic-section">
-          <div class="qd-logic-heading">11 · Weak-squad rescue + Ghost builds</div>
-          <p>If the squad's average score so far is under 6, a strong candidate gets
-          an extra boost proportional to how far above average it is (×6) — the
-          brief being "if the first three are weak, the last two have to carry."
-          A Ghost build (a 2nd usable build) adds a flat +4 for flexibility.</p>
+          <div class="qd-logic-heading">4 · Rule 3 — class caps</div>
+          <p>At most 2 of any one class per team (Warrior/Knight/Thief/Ranger/
+          Mage/Soul Weaver) — a 3rd copy of a class already at 2 takes a heavy
+          −100. Warrior/Thief/Mage are the hard-hitting classes that usually
+          don't carry revives, so each gets +20 while the team has fewer than 2
+          of them. Knight/Soul Weaver/Ranger are the more support-leaning
+          classes, so they get a +30 bonus specifically in the Protect slot
+          (slot 3) — since that pick can't be banned away, it's the safest spot
+          for a support-type hero.</p>
         </div>
 
         <p style="font-size:11px;color:var(--text-dim);line-height:1.6;margin-top:16px;padding-top:12px;border-top:1px solid var(--border)">
-          All of this lives in <code>qdScoreCandidate()</code> in <code>app.js</code>
-          (search that function name) — the exact point values (+45, ×14, etc.) are
-          the easiest things to tune first if a suggestion feels off.
+          All of this lives in <code>qdScoreCandidate()</code> (plus the
+          Rule 1 filter in <code>qdSuggestForNextSlot()</code>) in
+          <code>app.js</code> — the point values (+50, +30, −100, etc.) are the
+          easiest things to tune first if a suggestion feels off.
         </p>
       </div>
     </div>

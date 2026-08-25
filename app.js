@@ -115,18 +115,29 @@ let quickDraftSuggestOpen = false;
 const QD_HIGH = 6;
 const QD_LOW  = 4;
 const QD_PASSABLE_SCORE = 5;
-const QD_SPEED_TARGET   = 3; // want 3-of-5 heroes to be high-speed/CR so a ban still leaves 2 to cycle
-const QD_SUSTAIN_SPD_TARGET = 2; // want at least 2 heroes that are BOTH high-sustain AND high-speed (fast buffers/self-sustainers) — top priority pick type
-const QD_VARIETY_CEILING = 7; // once Speed + Sustain+Speed targets are both met, remaining picks should aim under this score for variety
-const QD_MIDRANGE_CAP = 6; // closing-slot (4th/5th pick) cap: Sustain/Survivability and Speed/Tank aim for "around 6 or less" instead of maxed stats
-const QD_ROLE_STACK_SOFT_CAP = 2; // more than 2 of the same role starts to feel repetitive for a 5-hero team
-const QD_HEALER_SOFT_CAP = 1; // at most 1 dedicated Healer/Support-type pick (see qdIsHealerArchetype) by default — most comps run one healer, not several
-const QD_RGB_ELEMENTS = new Set(["Fire", "Ice", "Earth"]);
-const QD_RGB_STACK_SOFT_CAP = 2; // once 2 of one Fire/Ice/Earth element are picked, a 3rd is discouraged — a single enemy counter-element can sweep them all
-let qdAntiDebuffMode = false; // when true, favors Tankiness + mid-range "rounder" heroes over Survivability/revive specialists
-let qdEnemyElementCounts = { Fire: 0, Ice: 0, Earth: 0, Light: 0, Dark: 0 }; // how many opposing heroes are each element — more of an element boosts its counter harder
-let qdBanProtectElement = null; // the element of the enemy's un-bannable "Ban Protect" pick, if set — gets extra counter priority (see qdScoreCandidate)
+let qdBanProtectElement = null; // the element of the enemy's un-bannable "Ban Protect" pick, if set (Rule 1)
 const QD_ELEMENT_COUNTER = { Fire: "Ice", Ice: "Earth", Earth: "Fire", Light: "Dark", Dark: "Light" }; // which element beats which
+
+/* ── Quick Draft rules (simplified 3-rule strategy) ──
+   Rule 1 (Ban Protect counter): see qdBanProtectElement / qdSuggestForNextSlot.
+   Rule 2 (stat balance): a hero counts as "High" in Speed/Tank/Survivability/
+   Sustainability at QD_HIGH — suggestions favor whichever of those 4 lanes
+   the team doesn't have covered yet, with a smaller top-up bonus for being
+   the 2nd cover of a lane.
+   Rule 3 (class caps): at most QD_CLASS_MAX of any one class per team;
+   Warrior/Thief/Mage are the hard-hitting "no revive" classes and the team
+   should aim for QD_OFFENSE_TARGET of them; Knight/Soul Weaver/Ranger are
+   the support classes and are favored specifically for the Protect slot. */
+const QD_STAT_FIRST_BONUS = 30;       // bonus for being the 1st High pick covering a stat lane
+const QD_STAT_SECOND_BONUS = 12;      // smaller bonus for being the 2nd High pick in that lane
+const QD_CLASS_MAX = 2;               // hard cap: at most 2 of any one class per team
+const QD_CLASS_CAP_PENALTY = 100;     // heavy penalty once a class is already at QD_CLASS_MAX
+const QD_OFFENSE_CLASSES = new Set(["Warrior", "Thief", "Mage"]);       // hard-hitting, typically no revives
+const QD_SUPPORT_CLASSES = new Set(["Knight", "Soul Weaver", "Ranger"]); // more likely to be revive/support kits
+const QD_OFFENSE_TARGET = 2;          // aim for at least 2 offense-class heroes on the team
+const QD_OFFENSE_BONUS = 20;
+const QD_PROTECT_SUPPORT_BONUS = 30;  // Rule 3: support classes are prioritized for the Protect slot
+const QD_BAN_PROTECT_COUNTER_BONUS = 50; // Rule 1: bonus for countering the Ban Protect element
 
 /* ── Image editor state ── */
 let editorImg   = null;   // loaded HTMLImageElement
@@ -244,32 +255,9 @@ const saveStatus   = document.getElementById("save-status");
     if (quickDraft.some(id => id !== null) && !confirm("Clear all Quick Draft slots?")) return;
     clearQuickDraft();
   });
-  const qdAntiDebuffToggle = document.getElementById("quickdraft-antidebuff-toggle");
-  qdAntiDebuffToggle.checked = qdAntiDebuffMode;
-  qdAntiDebuffToggle.addEventListener("change", () => {
-    qdAntiDebuffMode = qdAntiDebuffToggle.checked;
-    saveQuickDraftModeLocal();
-    if (quickDraftSuggestOpen) renderQuickDraftSuggestions();
-  });
-
-  // Enemy element steppers — quickly set how many opposing heroes are each
-  // element (0-5). More of an element pushes that element's counter
-  // harder in suggestions (see qdScoreCandidate).
-  qdSyncEnemyElementStepperUI();
-  document.querySelectorAll("#qd-enemy-el-steppers .qd-el-step-btn").forEach(btn => {
-    btn.addEventListener("click", () => {
-      const el = btn.dataset.el;
-      const dir = Number(btn.dataset.dir);
-      qdEnemyElementCounts[el] = Math.max(0, Math.min(5, (qdEnemyElementCounts[el] || 0) + dir));
-      qdSyncEnemyElementStepperUI();
-      saveQuickDraftModeLocal();
-      if (quickDraftSuggestOpen) renderQuickDraftSuggestions();
-    });
-  });
-
-  // Ban Protect element — the opponent's un-bannable pick. Single-select
-  // (tap again to clear); suggestions prioritize countering this element,
-  // most strongly when it's also the enemy's majority element.
+  // Ban Protect element — the opponent's un-bannable pick (Rule 1).
+  // Single-select (tap again to clear); once set, suggestions lock onto
+  // whichever element counters it (see qdSuggestForNextSlot).
   document.querySelectorAll("#qd-ban-protect-chips .qd-el-chip").forEach(chip => {
     if (qdBanProtectElement === chip.dataset.el) chip.classList.add("active");
     chip.addEventListener("click", () => {
@@ -699,43 +687,12 @@ function loadQuickDraftLocal() {
     }
   } catch { /* ignore, keep default empty slots */ }
   try {
-    qdAntiDebuffMode = localStorage.getItem("e7_qd_antidebuff") === "1";
-  } catch { /* ignore, keep default false */ }
-  try {
-    const rawCounts = localStorage.getItem("e7_qd_enemy_element_counts");
-    if (rawCounts) {
-      qdEnemyElementCounts = { Fire: 0, Ice: 0, Earth: 0, Light: 0, Dark: 0, ...JSON.parse(rawCounts) };
-    } else {
-      // Migrate from the older on/off toggle format (a Set of flagged
-      // elements) — each flagged element becomes a count of 1.
-      const rawEls = localStorage.getItem("e7_qd_enemy_elements");
-      if (rawEls) {
-        const oldFlagged = JSON.parse(rawEls);
-        if (Array.isArray(oldFlagged)) oldFlagged.forEach(el => { if (el in qdEnemyElementCounts) qdEnemyElementCounts[el] = 1; });
-      }
-    }
-  } catch { /* ignore, keep default zeros */ }
-  try {
     const rawBp = localStorage.getItem("e7_qd_ban_protect_element");
     qdBanProtectElement = rawBp && rawBp !== "null" ? rawBp : null;
   } catch { /* ignore, keep default null */ }
 }
 function saveQuickDraftModeLocal() {
-  try { localStorage.setItem("e7_qd_antidebuff", qdAntiDebuffMode ? "1" : "0"); } catch { /* ignore */ }
-  try { localStorage.setItem("e7_qd_enemy_element_counts", JSON.stringify(qdEnemyElementCounts)); } catch { /* ignore */ }
   try { localStorage.setItem("e7_qd_ban_protect_element", qdBanProtectElement || "null"); } catch { /* ignore */ }
-}
-
-/* Syncs the enemy-element stepper UI (counts + highlighted state) with
-   qdEnemyElementCounts. Called on init and after every stepper tap. */
-function qdSyncEnemyElementStepperUI() {
-  document.querySelectorAll("#qd-enemy-el-steppers .qd-el-stepper").forEach(stepperEl => {
-    const el = stepperEl.dataset.el;
-    const n = qdEnemyElementCounts[el] || 0;
-    const countSpan = document.getElementById(`qd-el-count-${el}`);
-    if (countSpan) countSpan.textContent = n;
-    stepperEl.classList.toggle("has-count", n > 0);
-  });
 }
 
 /* Reads a hero build's raw axis values into 4 independent stat lanes.
@@ -785,397 +742,136 @@ function qdHeroTraits(h) {
   };
 }
 
-/* A "Healer/Support" archetype flag — role is Soul Weaver (this game's
-   dedicated support class) AND the hero leans on Sustain rather than
-   Survivability (high-Sustain, not-high-Survivability). This matches the
-   usual healer profile: keeps the team topped up (high Sustain) but isn't
-   itself a tank/revive-carry (Survivability often only 2–4). Used to avoid
-   Quick Draft stacking multiple healers once one is already picked. */
-function qdIsHealerArchetype(t, hero) {
-  return (hero.role || "") === "Soul Weaver" && t.isHighSst && !t.isHighSur;
-}
-
-/* Aggregates the heroes already placed in Quick Draft into "team needs" —
-   how many high-speed heroes we already have towards the target of 3
-   (Rule 3), and how many of Rules 1/3/5/7 (a picked hero is weak in a
-   lane) and Rules 2/4/6/8 (a picked hero is strong in one lane but
-   exposed in another) are currently unaddressed. */
+/* Aggregates the heroes already placed in Quick Draft into "team needs"
+   for the 3-rule strategy:
+   - statCounts: how many current picks are already a High in each of the
+     4 stat lanes (Rule 2) — Speed, Tank, Survivability, Sustainability.
+   - classCounts / offenseCount: how many of each class, and how many of
+     the hard-hitting Warrior/Thief/Mage classes, are already picked
+     (Rule 3). */
 function qdComputeTeamNeeds(currentPicks) {
   const traits = currentPicks.map(qdHeroTraits);
   const n = traits.length;
-  const highSpdCount = traits.filter(t => t.isHighSpd).length;
-  const highSstSpdCount = traits.filter(t => t.isHighSst && t.isHighSpd).length; // fast buffers/self-sustainers
   const avgScore = n ? traits.reduce((s, t) => s + t.score, 0) / n : 0;
 
-  const elementCounts = {};
-  currentPicks.forEach(h => {
-    const el = h.element || "";
-    elementCounts[el] = (elementCounts[el] || 0) + 1;
+  const statCounts = { spd: 0, tnk: 0, sur: 0, sst: 0 };
+  traits.forEach(t => {
+    if (t.isHighSpd) statCounts.spd++;
+    if (t.isHighTnk) statCounts.tnk++;
+    if (t.isHighSur) statCounts.sur++;
+    if (t.isHighSst) statCounts.sst++;
   });
 
-  // Role counts — used to nudge Quick Draft away from repeating the same
-  // role too many times, and the healerCount specifically tracks how many
-  // Healer/Support-type picks (see qdIsHealerArchetype) are already locked
-  // in, since most comps want at most one dedicated healer.
-  const roleCounts = {};
+  const classCounts = {};
   currentPicks.forEach(h => {
     const role = h.role || "";
-    roleCounts[role] = (roleCounts[role] || 0) + 1;
+    classCounts[role] = (classCounts[role] || 0) + 1;
   });
-  const healerCount = currentPicks.reduce((sum, h, i) => sum + (qdIsHealerArchetype(traits[i], h) ? 1 : 0), 0);
+  const offenseCount = currentPicks.reduce((sum, h) => sum + (QD_OFFENSE_CLASSES.has(h.role || "") ? 1 : 0), 0);
 
-  let needSpd = 0, needTnk = 0, needSur = 0, needSst = 0;
-  traits.forEach(t => {
-    if (t.isLowSpd) needSpd++;                                         // Rule 1: low speed → needs a speedster
-    if (t.isLowTnk) needTnk++;                                         // Rule 3: low tank → needs a tank
-    if (t.isLowSur) needSur++;                                         // Rule 5: low survivability → needs survivability
-    if (t.isLowSst) needSst++;                                         // Rule 7: low sustain → needs sustain
-    if (t.isHighSpd && t.isLowSur && t.isLowSst) { needSur++; needSst++; }               // Rule 2
-    if (t.isHighTnk && t.isLowSur && t.isLowSst) { needSpd++; needSur++; needSst++; }     // Rule 4
-    if (t.isHighSur && (t.isLowTnk || t.isLowSpd)) { needSst++; }                         // Rule 6
-    if (t.isHighSst && (t.isLowSpd || t.isLowTnk)) { needSpd++; needTnk++; }              // Rule 8
-  });
-
-  return { traits, n, highSpdCount, highSstSpdCount, avgScore, elementCounts, roleCounts, healerCount, needSpd, needTnk, needSur, needSst };
+  return { traits, n, avgScore, statCounts, classCounts, offenseCount };
 }
 
 /* Scores one candidate hero for whatever slot is next empty. Higher is
-   better. This is a one-slot-ahead greedy heuristic, not a full 5-hero
-   optimizer — it only reasons about the heroes already locked in, same
-   as how you'd actually draft in real time.
-   `slotIndex` is which slot we're filling (0-4) — the middle/Protect
-   slot (QD_PROTECT_INDEX) is scored with its own priorities below. */
+   better. This is a one-slot-ahead greedy heuristic — it only reasons
+   about the heroes already locked in, same as how you'd actually draft
+   in real time. `slotIndex` is which slot we're filling (0-4) — the
+   middle/Protect slot (QD_PROTECT_INDEX) gets its own Rule 3 bonus below. */
 function qdScoreCandidate(candidate, currentPicks, slotIndex) {
   const t = qdHeroTraits(candidate);
   const needs = qdComputeTeamNeeds(currentPicks);
-  const slotsRemaining = QD_SIZE - currentPicks.length;
   const isProtectSlot = slotIndex === QD_PROTECT_INDEX;
   const reasons = [];
-  let score = 0;
-  // The two closing slots (4th = index 3, 5th = index 4) get their own shaping
-  // once core targets are met, so they stop just re-picking whichever hero has
-  // the single highest Sustain/Survivability stat. Computed here (not inside
-  // the isProtectSlot/else branch below) so it's still in scope for the gap
-  // bonuses further down.
-  let isClosingSlot = false;
 
-  // Base hero quality — always matters, ghost-inclusive Total Avg / Avg.
-  score += t.score * 10;
-  if (t.score >= QD_PASSABLE_SCORE) {
-    score += 15;
-  } else {
+  // Base hero quality — ghost-inclusive Total Avg / Avg.
+  let score = t.score * 10;
+  if (t.score < QD_PASSABLE_SCORE) {
     score -= (QD_PASSABLE_SCORE - t.score) * 12;
     reasons.push(`Below passable score (${t.score.toFixed(1)} < ${QD_PASSABLE_SCORE})`);
   }
 
-  // ── Anti-Debuff / Anti-Revive Mode ──
-  // Against heavy-debuff or anti-revive comps, a hero whose value comes
-  // mainly from a high Survivability stat (usually a revive/self-sustain
-  // kit) gets neutralized. Flip priority toward Tankiness and toward
-  // "rounder" mid-range heroes that aren't leaning on one extreme stat.
-  if (qdAntiDebuffMode) {
-    if (t.isHighSur) {
-      score -= 22;
-      reasons.push("High-Survivability (often revive-based) — weaker vs debuff/anti-revive");
-    }
-    if (t.isHighTnk) {
-      score += 26;
-      reasons.push("Tanky pick — holds up better vs debuff/anti-revive");
-    }
-    if (t.score >= 5.5 && t.score <= 7.5) {
-      score += 12;
-      reasons.push("Rounder, mid-range score — not over-reliant on one extreme stat");
-    }
+  // ── Rule 2: stat balance ──
+  // Analyze the team's current Speed / Tankiness / Survivability /
+  // Sustainability coverage (ghost stats included, see qdHeroTraits) and
+  // reward this candidate for being High in whichever lane(s) the team
+  // doesn't have covered yet. A hero that's High in two needed lanes at
+  // once (e.g. both high Speed and high Tankiness) gets both bonuses —
+  // exactly the "covers multiple gaps in one pick" hero the team wants.
+  const STAT_LABELS = { spd: "Speed", tnk: "Tankiness", sur: "Survivability", sst: "Sustainability" };
+  const statFlag = { spd: t.isHighSpd, tnk: t.isHighTnk, sur: t.isHighSur, sst: t.isHighSst };
+  const covered = [];
+  Object.keys(STAT_LABELS).forEach(key => {
+    if (!statFlag[key]) return;
+    const count = needs.statCounts[key];
+    const bonus = count === 0 ? QD_STAT_FIRST_BONUS : count === 1 ? QD_STAT_SECOND_BONUS : 0;
+    if (bonus > 0) { score += bonus; covered.push(STAT_LABELS[key]); }
+  });
+  if (covered.length >= 2) reasons.push(`Covers multiple team gaps at once (${covered.join(" + ")})`);
+  else if (covered.length === 1) reasons.push(`Covers the team's ${covered[0]} gap`);
+
+  // ── Rule 3: class caps + role priorities ──
+  const role = candidate.role || "";
+  const classCount = needs.classCounts[role] || 0;
+  if (role && classCount >= QD_CLASS_MAX) {
+    score -= QD_CLASS_CAP_PENALTY;
+    reasons.push(`Team already has ${classCount}× ${role} (max ${QD_CLASS_MAX} per class)`);
+  }
+  if (QD_OFFENSE_CLASSES.has(role) && needs.offenseCount < QD_OFFENSE_TARGET) {
+    score += QD_OFFENSE_BONUS;
+    reasons.push(`Hard-hitting ${role} (team has ${needs.offenseCount}/${QD_OFFENSE_TARGET} Warrior/Thief/Mage)`);
+  }
+  if (isProtectSlot && QD_SUPPORT_CLASSES.has(role)) {
+    score += QD_PROTECT_SUPPORT_BONUS;
+    reasons.push(`${role} in the Protect slot — support classes are safest here since this pick can't be banned`);
   }
 
-  if (isProtectSlot) {
-    // The Protect slot is the one guaranteed survivor after bans, so it
-    // should plug your team's biggest current hole rather than chase
-    // speed — speed is intentionally NOT scored here.
-    const defenseTrait = qdAntiDebuffMode ? "isHighTnk" : "isHighSur";
-    if (t[defenseTrait]) {
-      score += 45;
-      reasons.push(qdAntiDebuffMode ? "High-Tankiness Protect pick" : "High-Survivability Protect pick");
-    }
-    const usedElements = new Set(currentPicks.map(h => h.element || "").filter(Boolean));
-    if (candidate.element && usedElements.has(candidate.element)) {
-      score -= 15;
-      reasons.push("Shares an element with an existing pick — Protect ideally covers a new one");
-    } else if (candidate.element) {
-      score += 18;
-      reasons.push("Different element from the rest of the team");
-    }
-  } else {
-    // Sustain + Speed is the top-priority pick type for non-Protect slots —
-    // fast buffers/self-sustainers keep the team alive AND act first.
-    // A duplicate Healer/Support pick gets a much smaller version of this
-    // bonus — the later Healer-stacking penalty (below) would otherwise be
-    // outweighed by this +48, still resulting in a 2nd healer getting picked.
-    if (needs.highSstSpdCount < QD_SUSTAIN_SPD_TARGET && t.isHighSst && t.isHighSpd) {
-      const isDupHealer = qdIsHealerArchetype(t, candidate) && needs.healerCount >= QD_HEALER_SOFT_CAP;
-      score += isDupHealer ? 20 : 48;
-      reasons.push(`High-Sustain + High-Speed (priority pick, team ${needs.highSstSpdCount}/${QD_SUSTAIN_SPD_TARGET})`);
-      if (candidate.role === "Soul Weaver" && !isDupHealer) reasons.push("Soul Weaver buffer");
-    } else if (t.isHighSst && candidate.role === "Soul Weaver" && needs.healerCount < QD_HEALER_SOFT_CAP) {
-      score += 10;
-      reasons.push("Soul Weaver buffer");
-    }
-
-    // Once BOTH core targets are met (3 high-speed, 2 high-sustain+speed),
-    // the team's cycling needs are covered — stop chasing more speed
-    // entirely and stop defaulting to the same high-cost, high-score
-    // Survivability/revival heroes. Aim for a sub-7 score "rounder" pick
-    // instead so the remaining slots add real variety.
-    const coreTargetsMet = needs.highSpdCount >= QD_SPEED_TARGET && needs.highSstSpdCount >= QD_SUSTAIN_SPD_TARGET;
-    // The two closing slots (4th = index 3, 5th = index 4) get their own shaping
-    // once core targets are met, so they stop just re-picking whichever hero has
-    // the single highest Sustain/Survivability stat.
-    isClosingSlot = coreTargetsMet && (slotIndex === 3 || slotIndex === 4);
-
-    if (coreTargetsMet) {
-      if (t.isHighSpd) {
-        score -= 35;
-        reasons.push("Speed targets already met — no longer prioritizing High-Speed picks");
-      }
-
-      if (slotIndex === 3) {
-        // 4th pick — mid-range Sustainability, not a maxed-out sustain stat,
-        // and a Speed/Tank pairing that stays around 6 or under so this pick
-        // isn't also an extreme-stat outlier.
-        if (t.best.sst > QD_MIDRANGE_CAP) {
-          score -= 22;
-          reasons.push(`Sustainability above ${QD_MIDRANGE_CAP} — closing picks favor mid-range sustain instead of maxed sustain`);
-        } else if (t.best.sst >= QD_LOW) {
-          score += 22;
-          reasons.push(`Mid-range Sustainability (${t.best.sst} ≤ ${QD_MIDRANGE_CAP}) — rounds out the team without over-stacking sustain`);
-        }
-        if (t.best.spd <= QD_MIDRANGE_CAP || t.best.tnk <= QD_MIDRANGE_CAP) {
-          score += 10;
-          reasons.push(`Speed or Tank at ${QD_MIDRANGE_CAP} or under — keeps this pick from stacking extremes`);
-        }
-      } else if (slotIndex === 4) {
-        // 5th pick — mid-range Survivability, same idea: not the single
-        // tankiest/reviviest hero available, and Speed/Tank kept moderate.
-        if (t.best.sur > QD_MIDRANGE_CAP) {
-          score -= 22;
-          reasons.push(`Survivability above ${QD_MIDRANGE_CAP} — closing picks favor mid-range survivability instead of maxed survivability`);
-        } else if (t.best.sur >= QD_LOW) {
-          score += 22;
-          reasons.push(`Mid-range Survivability (${t.best.sur} ≤ ${QD_MIDRANGE_CAP}) — rounds out the team without leaning on revive-stacking`);
-        }
-        if (t.best.spd <= QD_MIDRANGE_CAP || t.best.tnk <= QD_MIDRANGE_CAP) {
-          score += 10;
-          reasons.push(`Speed or Tank at ${QD_MIDRANGE_CAP} or under — keeps this pick from stacking extremes`);
-        }
-      }
-
-      if (t.score >= QD_VARIETY_CEILING) {
-        score -= (t.score - QD_VARIETY_CEILING + 1) * 15;
-        reasons.push(`Core targets met — favoring picks under ${QD_VARIETY_CEILING} score for variety`);
-      } else {
-        score += (QD_VARIETY_CEILING - t.score) * 6;
-        reasons.push(`Adds variety (core targets met, aiming under ${QD_VARIETY_CEILING} score)`);
-      }
-    } else {
-      // Rule 3 — chase 3 high-speed/CR heroes across the 5 so a single ban
-      // still leaves 2 to cycle the team.
-      if (needs.highSpdCount < QD_SPEED_TARGET && t.isHighSpd) {
-        score += 40;
-        reasons.push(`High-Speed pick (team ${needs.highSpdCount}/${QD_SPEED_TARGET} so far)`);
-      } else if (needs.highSpdCount >= QD_SPEED_TARGET && t.isHighSpd && slotsRemaining <= 2) {
-        // Speed quota already met but sustain+speed quota isn't — nudge toward tank/sustain instead of stacking more speed.
-        score -= 8;
-      }
+  // ── Rule 1: counter the Ban Protect element ──
+  // (qdSuggestForNextSlot already restricts the candidate pool to the
+  // counter element once Ban Protect is set and a counter is available —
+  // this bonus keeps it visible in the reasons and still helps ranking
+  // in the fallback case where no counter-element hero is left.)
+  if (qdBanProtectElement) {
+    const counterEl = QD_ELEMENT_COUNTER[qdBanProtectElement];
+    if (candidate.element === counterEl) {
+      score += QD_BAN_PROTECT_COUNTER_BONUS;
+      reasons.push(`Counters the Ban Protect element (${qdBanProtectElement} → ${counterEl})`);
     }
   }
-
-  // Rules 1/2/3/4/5/6/7/8 — reward covering whatever gaps the current picks
-  // created. Weighted up for the Protect slot since it's meant to be the
-  // pick that "turns the tide" on whatever the team is missing.
-  // On the closing slots (once core targets are met), the Survivability/
-  // Sustainability gap bonuses are skipped — those two stats are shaped by
-  // the mid-range logic above instead of the raw "isHigh" gap bonus, so we
-  // don't undo the mid-range steering by also rewarding maxed-out stats here.
-  const gapMul = isProtectSlot ? 1.3 : 1;
-  if (needs.needSpd > 0 && t.isHighSpd) { score += 18 * needs.needSpd * gapMul; reasons.push("Covers a Speed gap"); }
-  if (needs.needTnk > 0 && t.isHighTnk) { score += 18 * needs.needTnk * gapMul; reasons.push("Covers a Tankiness gap"); }
-  if (!isClosingSlot) {
-    if (needs.needSur > 0 && t.isHighSur) { score += 16 * needs.needSur * gapMul; reasons.push("Covers a Survivability gap"); }
-    if (needs.needSst > 0 && t.isHighSst) { score += 16 * needs.needSst * gapMul; reasons.push("Covers a Sustainability gap"); }
-  }
-
-  // Element balance — Fire/Ice/Earth form a single-counter triangle, so
-  // stacking one of them risks a full sweep from one matching enemy element.
-  // Light/Dark only counter each other, so they're statistically safer.
-  const candidateEl = candidate.element || "";
-  if (QD_RGB_ELEMENTS.has(candidateEl) && (needs.elementCounts[candidateEl] || 0) >= QD_RGB_STACK_SOFT_CAP) {
-    score -= 20;
-    reasons.push(`Team already has ${needs.elementCounts[candidateEl]}× ${candidateEl} — risks a single-element sweep`);
-  } else if ((candidateEl === "Light" || candidateEl === "Dark") && !needs.elementCounts["Light"] && !needs.elementCounts["Dark"] && needs.n >= 2) {
-    score += 8;
-    reasons.push(`Adds ${candidateEl} coverage (fewer natural counters than Fire/Ice/Earth)`);
-  }
-
-  // Enemy team composition — the player sets how many opposing heroes are
-  // each element (qdEnemyElementCounts), plus optionally which element the
-  // enemy's un-bannable "Ban Protect" pick is (qdBanProtectElement).
-  // Fire→Ice→Earth→Fire is the RGB triangle; Light and Dark counter each
-  // other (QD_ELEMENT_COUNTER).
-  //   1. Every element's counter gets a boost proportional to how many of
-  //      that element the enemy is running — 2× Fire pushes Ice harder
-  //      than 1× Fire would.
-  //   2. On top of that, the Ban Protect element's counter gets extra
-  //      priority: a large bonus if Ban Protect's element is ALSO the
-  //      enemy's majority element (biggest threat + guaranteed to survive
-  //      bans), or a smaller bonus if the enemy's elements are evenly
-  //      spread with no majority (1 of each element present) — in that
-  //      case Ban Protect is the only signal for which element matters
-  //      most, so it's used as the tie-break.
-  const enemyEntries = Object.entries(qdEnemyElementCounts).filter(([, n]) => n > 0);
-  if (enemyEntries.length > 0) {
-    enemyEntries.forEach(([enemyEl, count]) => {
-      if (QD_ELEMENT_COUNTER[enemyEl] !== candidateEl) return;
-      score += 14 * count;
-      reasons.push(`Counters ${count}× enemy ${enemyEl} (${candidateEl} beats it)`);
-    });
-
-    if (qdBanProtectElement && QD_ELEMENT_COUNTER[qdBanProtectElement] === candidateEl) {
-      const maxCount = Math.max(...enemyEntries.map(([, n]) => n));
-      const majorityElements = enemyEntries.filter(([, n]) => n === maxCount).map(([el]) => el);
-      const isFlatSpread = enemyEntries.every(([, n]) => n === 1); // no majority — 1 of each present element
-      const banProtectIsSoleMajority = majorityElements.length === 1 && majorityElements[0] === qdBanProtectElement;
-
-      if (banProtectIsSoleMajority) {
-        score += 45;
-        reasons.push(`Counters the Ban Protect element (${qdBanProtectElement}) — also the enemy's majority element`);
-      } else if (isFlatSpread) {
-        score += 30;
-        reasons.push(`Counters the Ban Protect element (${qdBanProtectElement}) — no clear enemy majority, so this is the priority target`);
-      }
-    }
-  } else if (qdBanProtectElement && QD_ELEMENT_COUNTER[qdBanProtectElement] === candidateEl) {
-    // No element counts set at all yet — Ban Protect alone still matters.
-    score += 30;
-    reasons.push(`Counters the Ban Protect element (${qdBanProtectElement})`);
-  }
-
-  // Role diversity — once a role has shown up a couple times, later picks
-  // are nudged toward a different role so the team isn't front-loaded with
-  // near-duplicate kits. Healer/Support-type picks (see qdIsHealerArchetype)
-  // get a much stronger duplicate penalty, since most comps run exactly one
-  // dedicated healer regardless of how many other roles get doubled up —
-  // this is what was causing Quick Draft to keep suggesting extra healers
-  // for the 4th/5th slots after an early healer pick.
-  const candidateRole = candidate.role || "";
-  const roleCount = needs.roleCounts[candidateRole] || 0;
-  if (candidateRole && roleCount >= QD_ROLE_STACK_SOFT_CAP) {
-    score -= 14 * (roleCount - QD_ROLE_STACK_SOFT_CAP + 1);
-    reasons.push(`Team already has ${roleCount}× ${candidateRole} — favors a different role for a more balanced comp`);
-  }
-  if (qdIsHealerArchetype(t, candidate) && needs.healerCount >= QD_HEALER_SOFT_CAP) {
-    score -= 32;
-    reasons.push(`Team already has a Healer/Support-type pick (high-Sustain Soul Weaver) — avoid stacking multiple healers`);
-  }
-
-  // Protect-slot role guard — the Protect pick (index QD_PROTECT_INDEX)
-  // can't be banned, so once it's locked in, the closing slots should
-  // diversify away from its role rather than piling on more of the same
-  // class. The 5th/final slot is strictest — a different role altogether
-  // is expected there, since Protect already guarantees that role survives
-  // any ban. The 4th slot is more lenient: matching Protect's role there
-  // is fine if the team still has a genuine gap (e.g. still needs more
-  // Sustain and only Protect has it so far) — UNLESS that same role
-  // already showed up before Protect too (in the 1st or 2nd pick), in
-  // which case even a 3rd copy at the 4th slot is discouraged.
-  const protectPick = currentPicks[QD_PROTECT_INDEX];
-  const protectRole = protectPick ? (protectPick.role || "") : "";
-  if (protectRole && candidateRole === protectRole) {
-    if (slotIndex === 4) {
-      score -= 70;
-      reasons.push(`Matches the Protect slot's role (${protectRole}) — Protect can't be banned, so the final slot should be a different class`);
-    } else if (slotIndex === 3) {
-      const preProtectRoleCount = currentPicks.slice(0, QD_PROTECT_INDEX).filter(h => (h.role || "") === protectRole).length;
-      if (preProtectRoleCount > 0) {
-        score -= 30;
-        reasons.push(`${protectRole} already appeared before the Protect slot too — a 3rd copy is discouraged even here`);
-      }
-    }
-  }
-
-  // Global support scaling — a squad running below-average so far should
-  // lean harder on a strong pick to carry it back up (per the brief:
-  // "if the first three are really weak, the last two have to be really strong").
-  if (needs.n > 0 && needs.avgScore < 6) {
-    score += (t.score - needs.avgScore) * 6;
-    if (t.score > needs.avgScore) reasons.push("Lifts a below-average squad");
-  }
-
-  // Small nudge for flexibility — a Ghost build gives this pick two
-  // possible roles instead of one.
-  if (t.hasGhost) { score += 4; reasons.push("Has a Ghost build (flexible)"); }
 
   if (reasons.length === 0) reasons.push("Solid, balanced pick");
 
   return { hero: candidate, score, reasons, traits: t };
 }
 
-/* Short advisory text about the current elemental spread — shown above
-   the suggestion list. Fire/Ice/Earth form a single-counter triangle, so
-   stacking one risks a full sweep; Light/Dark only counter each other. */
-function qdElementHint(currentPicks) {
-  if (currentPicks.length === 0) return "";
-  const counts = {};
-  currentPicks.forEach(h => { const el = h.element || ""; counts[el] = (counts[el] || 0) + 1; });
-
-  const stackedEntry = Object.entries(counts).find(([el, n]) => QD_RGB_ELEMENTS.has(el) && n >= QD_RGB_STACK_SOFT_CAP);
-  if (stackedEntry) {
-    return `⚠️ ${stackedEntry[1]}× ${stackedEntry[0]} already picked — a single matching enemy element could sweep them. Try Light, Dark, or a different element next.`;
-  }
-  if (currentPicks.length >= 2 && !counts["Light"] && !counts["Dark"]) {
-    return `💠 No Light or Dark yet — they only counter each other, so they're a statistically safer pick than a 3rd Fire/Ice/Earth hero.`;
-  }
-  return "";
-}
-
-/* Short advisory text once the Speed and Sustain+Speed targets are both
-   met — tells the player why suggestions have shifted away from their
-   top-score heroes. */
-function qdVarietyHint(currentPicks) {
+/* Rule 2 hint — which of the 4 stat lanes (Speed/Tank/Survivability/
+   Sustainability) the team doesn't have a High pick for yet. */
+function qdStatHint(currentPicks) {
   if (currentPicks.length === 0) return "";
   const needs = qdComputeTeamNeeds(currentPicks);
-  if (needs.highSpdCount >= QD_SPEED_TARGET && needs.highSstSpdCount >= QD_SUSTAIN_SPD_TARGET) {
-    return `✅ Speed (${needs.highSpdCount}/${QD_SPEED_TARGET}) and Sustain+Speed (${needs.highSstSpdCount}/${QD_SUSTAIN_SPD_TARGET}) targets are met — no longer chasing High-Speed picks, now favoring under-${QD_VARIETY_CEILING} score picks for variety instead of repeating the same high-cost Survivability heroes.`;
-  }
-  return "";
+  const labels = { spd: "Speed", tnk: "Tankiness", sur: "Survivability", sst: "Sustainability" };
+  const missing = Object.entries(needs.statCounts).filter(([, n]) => n === 0).map(([k]) => labels[k]);
+  if (missing.length) return `⚖️ Still no High pick for: ${missing.join(", ")}.`;
+  return `✅ All 4 stats (Speed, Tankiness, Survivability, Sustainability) have at least one High pick.`;
 }
 
-/* Short advisory about role/healer stacking — shown above the suggestion
-   list so it's clear why Quick Draft is steering away from a role or a
-   2nd Healer/Support pick, not just silently reordering the list. */
-function qdRoleHint(currentPicks) {
+/* Rule 3 hint — class cap / offense-count status, so it's clear why
+   Quick Draft is steering toward or away from a class. */
+function qdClassHint(currentPicks) {
   if (currentPicks.length === 0) return "";
   const needs = qdComputeTeamNeeds(currentPicks);
   const hints = [];
-  if (needs.healerCount >= QD_HEALER_SOFT_CAP) {
-    hints.push(`💠 Healer/Support already picked — later slots favor non-healer roles instead of stacking a 2nd Soul Weaver.`);
-  }
-  const stackedRole = Object.entries(needs.roleCounts).find(([role, n]) => role && n >= QD_ROLE_STACK_SOFT_CAP);
-  if (stackedRole) {
-    hints.push(`⚔️ ${stackedRole[1]}× ${stackedRole[0]} already picked — favoring a different role next for a more balanced comp.`);
-  }
+  const stacked = Object.entries(needs.classCounts).find(([role, n]) => role && n >= QD_CLASS_MAX);
+  if (stacked) hints.push(`⚔️ ${stacked[1]}× ${stacked[0]} already picked — that class is capped at ${QD_CLASS_MAX}.`);
+  if (needs.offenseCount < QD_OFFENSE_TARGET) hints.push(`🗡️ ${needs.offenseCount}/${QD_OFFENSE_TARGET} hard-hitting Warrior/Thief/Mage picks so far.`);
   return hints.join("<br>");
 }
 
-/* Short advisory showing which element counters are currently boosted by
-   the enemy team composition + Ban Protect element, so it's clear why
-   certain elements are ranking higher in the suggestion list. */
-function qdEnemyElementHint() {
-  const enemyEntries = Object.entries(qdEnemyElementCounts).filter(([, n]) => n > 0);
-  const parts = enemyEntries.map(([el, n]) => `${n}×${el}→${QD_ELEMENT_COUNTER[el]}`);
-  const bpPart = qdBanProtectElement ? `🛡${qdBanProtectElement}→${QD_ELEMENT_COUNTER[qdBanProtectElement]}` : "";
-  const all = [...parts, ...(bpPart ? [bpPart] : [])];
-  if (all.length === 0) return "";
-  return `🎯 Boosting counters for enemy: ${all.join(", ")}`;
+/* Rule 1 hint — shows the Ban Protect element and its counter, so it's
+   clear why suggestions are locked to (or favoring) one element. */
+function qdBanProtectHint() {
+  if (!qdBanProtectElement) return "";
+  const counterEl = QD_ELEMENT_COUNTER[qdBanProtectElement];
+  return `🛡 Ban Protect is ${qdBanProtectElement} — remaining picks are locked to ${counterEl} where possible.`;
 }
 
 /* Ranks every Roster hero not already drafted for the next empty slot.
@@ -1185,7 +881,18 @@ function qdSuggestForNextSlot() {
   const currentIds = quickDraft.filter(id => id !== null);
   const currentPicks = currentIds.map(id => heroes.find(h => h.id === id)).filter(Boolean);
   const nextIdx = quickDraft.indexOf(null);
-  const candidates = heroes.filter(h => !currentIds.includes(h.id));
+  let candidates = heroes.filter(h => !currentIds.includes(h.id));
+
+  // Rule 1 — once the opponent's un-bannable Ban Protect element is set,
+  // every remaining pick should be the element that counters it. Only
+  // enforced when the Roster actually still has a counter-element hero
+  // left to suggest, so this never empties the list.
+  if (qdBanProtectElement) {
+    const counterEl = QD_ELEMENT_COUNTER[qdBanProtectElement];
+    const countered = candidates.filter(h => h.element === counterEl);
+    if (countered.length > 0) candidates = countered;
+  }
+
   const scored = candidates.map(c => qdScoreCandidate(c, currentPicks, nextIdx));
   scored.sort((a, b) => b.score - a.score);
   return scored;
@@ -1255,9 +962,7 @@ function clearQuickDraft() {
   document.getElementById("quickdraft-suggestions").style.display = "none";
   saveQuickDraftLocal();
 
-  // Reset enemy element counts and Ban Protect element back to default.
-  Object.keys(qdEnemyElementCounts).forEach(el => { qdEnemyElementCounts[el] = 0; });
-  qdSyncEnemyElementStepperUI();
+  // Reset the Ban Protect element back to default.
   qdBanProtectElement = null;
   document.querySelectorAll("#qd-ban-protect-chips .qd-el-chip").forEach(chip => chip.classList.remove("active"));
   saveQuickDraftModeLocal();
@@ -1305,13 +1010,14 @@ function renderQuickDraft() {
   const needs = qdComputeTeamNeeds(picks);
   const statsEl = document.getElementById("quickdraft-stats");
   const avgTxt = filledCount ? needs.avgScore.toFixed(1) : "—";
-  const spdClass = needs.highSpdCount >= QD_SPEED_TARGET ? "good" : (filledCount ? "warn" : "");
-  const sstSpdClass = needs.highSstSpdCount >= QD_SUSTAIN_SPD_TARGET ? "good" : (filledCount ? "warn" : "");
+  const statsCovered = Object.values(needs.statCounts).filter(n => n > 0).length;
+  const statsClass = statsCovered >= 4 ? "good" : (filledCount ? "warn" : "");
+  const offenseClass = needs.offenseCount >= QD_OFFENSE_TARGET ? "good" : (filledCount ? "warn" : "");
   statsEl.innerHTML = `
     <span class="qd-stat">${filledCount}/5 Picked</span>
     <span class="qd-stat">Avg ${avgTxt}</span>
-    <span class="qd-stat ${spdClass}">⚡ High-SPD ${needs.highSpdCount}/${QD_SPEED_TARGET}</span>
-    <span class="qd-stat ${sstSpdClass}">💠 Sust+SPD ${needs.highSstSpdCount}/${QD_SUSTAIN_SPD_TARGET}</span>`;
+    <span class="qd-stat ${statsClass}">⚖️ Stats ${statsCovered}/4</span>
+    <span class="qd-stat ${offenseClass}">🗡️ Offense ${needs.offenseCount}/${QD_OFFENSE_TARGET}</span>`;
 
   document.getElementById("btn-quickdraft-suggest").disabled = filledCount >= QD_SIZE;
   document.getElementById("btn-quickdraft-random").disabled = filledCount >= QD_SIZE;
@@ -1337,7 +1043,7 @@ function renderQuickDraftSuggestions() {
 
   const currentPicks = quickDraft.filter(id => id !== null).map(id => heroes.find(h => h.id === id)).filter(Boolean);
   const hintEl = document.getElementById("quickdraft-element-hint");
-  const hints = [qdElementHint(currentPicks), qdVarietyHint(currentPicks), qdRoleHint(currentPicks), qdEnemyElementHint()].filter(Boolean);
+  const hints = [qdBanProtectHint(), qdStatHint(currentPicks), qdClassHint(currentPicks)].filter(Boolean);
   if (hints.length) { hintEl.innerHTML = hints.join("<br>"); hintEl.style.display = "block"; }
   else { hintEl.style.display = "none"; }
 
