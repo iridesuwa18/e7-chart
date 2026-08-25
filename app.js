@@ -125,18 +125,17 @@ const QD_ELEMENT_COUNTER = { Fire: "Ice", Ice: "Earth", Earth: "Fire", Light: "D
    the team doesn't have covered yet, with a smaller top-up bonus for being
    the 2nd cover of a lane.
    Rule 3 (class caps): at most QD_CLASS_MAX of any one class per team;
-   Warrior/Thief/Mage/Ranger are the hard-hitting "no revive" classes and
-   the team should aim for QD_OFFENSE_TARGET of them; Knight/Soul Weaver
-   are the support classes and are favored specifically for the Protect
-   slot (Ranger used to be grouped with them, but it's too squishy to be
-   a safe, un-bannable Protect pick, so it now counts toward offense). */
+   Warrior/Mage/Ranger are the hard-hitting "no revive" classes and the
+   team should aim for QD_OFFENSE_TARGET of them; Knight/Soul Weaver/Thief
+   are favored specifically for the Protect slot instead (Ranger moved out
+   of that group earlier for being too squishy there; Thief moved in). */
 const QD_STAT_FIRST_BONUS = 30;       // bonus for being the 1st High pick covering a stat lane
 const QD_STAT_SECOND_BONUS = 12;      // smaller bonus for being the 2nd High pick in that lane
 const QD_STAT_GAP_BONUS = 8;          // ongoing bonus per lane the candidate's stat is BEHIND the team's most-stacked stat lane — keeps Rule 2 balancing even after every lane has 1+ High picks (i.e. past 4/4), instead of going to 0
 const QD_CLASS_MAX = 2;               // hard cap: at most 2 of any one class per team
 const QD_CLASS_CAP_PENALTY = 100;     // heavy penalty once a class is already at QD_CLASS_MAX
-const QD_OFFENSE_CLASSES = new Set(["Warrior", "Thief", "Mage", "Ranger"]); // hard-hitting, typically no revives
-const QD_SUPPORT_CLASSES = new Set(["Knight", "Soul Weaver"]);              // more likely to be revive/support kits — Ranger moved out since it's too squishy to trust in the un-bannable Protect slot
+const QD_OFFENSE_CLASSES = new Set(["Warrior", "Mage", "Ranger"]);                  // hard-hitting, typically no revives
+const QD_SUPPORT_CLASSES = new Set(["Knight", "Soul Weaver", "Thief"]);             // more likely to be revive/support kits, or safe/tanky enough to sit in the un-bannable Protect slot — Ranger moved out earlier (too squishy for Protect), Thief moved in here
 const QD_OFFENSE_TARGET = 2;          // aim for at least 2 offense-class heroes on the team
 const QD_OFFENSE_BONUS = 20;
 const QD_PROTECT_SUPPORT_BONUS = 30;  // Rule 3: support classes are prioritized for the Protect slot
