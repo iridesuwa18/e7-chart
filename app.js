@@ -124,7 +124,8 @@ const QD_HEALER_SOFT_CAP = 1; // at most 1 dedicated Healer/Support-type pick (s
 const QD_RGB_ELEMENTS = new Set(["Fire", "Ice", "Earth"]);
 const QD_RGB_STACK_SOFT_CAP = 2; // once 2 of one Fire/Ice/Earth element are picked, a 3rd is discouraged — a single enemy counter-element can sweep them all
 let qdAntiDebuffMode = false; // when true, favors Tankiness + mid-range "rounder" heroes over Survivability/revive specialists
-let qdEnemyHeavyElements = new Set(); // elements the player has flagged as "enemy has too many of" — boosts that element's counter in suggestions
+let qdEnemyElementCounts = { Fire: 0, Ice: 0, Earth: 0, Light: 0, Dark: 0 }; // how many opposing heroes are each element — more of an element boosts its counter harder
+let qdBanProtectElement = null; // the element of the enemy's un-bannable "Ban Protect" pick, if set — gets extra counter priority (see qdScoreCandidate)
 const QD_ELEMENT_COUNTER = { Fire: "Ice", Ice: "Earth", Earth: "Fire", Light: "Dark", Dark: "Light" }; // which element beats which
 
 /* ── Image editor state ── */
@@ -251,23 +252,38 @@ const saveStatus   = document.getElementById("save-status");
     if (quickDraftSuggestOpen) renderQuickDraftSuggestions();
   });
 
-  // Enemy element chips — tap to mark/unmark "enemy has too many of this
-  // element"; suggestions boost whichever element counters it.
-  document.querySelectorAll("#qd-enemy-el-chips .qd-el-chip").forEach(chip => {
-    if (qdEnemyHeavyElements.has(chip.dataset.el)) chip.classList.add("active");
-    chip.addEventListener("click", () => {
-      const el = chip.dataset.el;
-      if (qdEnemyHeavyElements.has(el)) {
-        qdEnemyHeavyElements.delete(el);
-        chip.classList.remove("active");
-      } else {
-        qdEnemyHeavyElements.add(el);
-        chip.classList.add("active");
-      }
+  // Enemy element steppers — quickly set how many opposing heroes are each
+  // element (0-5). More of an element pushes that element's counter
+  // harder in suggestions (see qdScoreCandidate).
+  qdSyncEnemyElementStepperUI();
+  document.querySelectorAll("#qd-enemy-el-steppers .qd-el-step-btn").forEach(btn => {
+    btn.addEventListener("click", () => {
+      const el = btn.dataset.el;
+      const dir = Number(btn.dataset.dir);
+      qdEnemyElementCounts[el] = Math.max(0, Math.min(5, (qdEnemyElementCounts[el] || 0) + dir));
+      qdSyncEnemyElementStepperUI();
       saveQuickDraftModeLocal();
       if (quickDraftSuggestOpen) renderQuickDraftSuggestions();
     });
   });
+
+  // Ban Protect element — the opponent's un-bannable pick. Single-select
+  // (tap again to clear); suggestions prioritize countering this element,
+  // most strongly when it's also the enemy's majority element.
+  document.querySelectorAll("#qd-ban-protect-chips .qd-el-chip").forEach(chip => {
+    if (qdBanProtectElement === chip.dataset.el) chip.classList.add("active");
+    chip.addEventListener("click", () => {
+      const el = chip.dataset.el;
+      qdBanProtectElement = qdBanProtectElement === el ? null : el;
+      document.querySelectorAll("#qd-ban-protect-chips .qd-el-chip").forEach(c => {
+        c.classList.toggle("active", qdBanProtectElement === c.dataset.el);
+      });
+      saveQuickDraftModeLocal();
+      if (quickDraftSuggestOpen) renderQuickDraftSuggestions();
+    });
+  });
+
+  document.getElementById("btn-quickdraft-autofill").addEventListener("click", autofillTopQuickDraftPick);
   document.getElementById("modal-cancel").addEventListener("click", closeModal);
   document.getElementById("modal-overlay").addEventListener("click", e => { if (e.target === overlay) closeModal(); });
   modalConfirm.addEventListener("click", onModalConfirm);
@@ -686,13 +702,40 @@ function loadQuickDraftLocal() {
     qdAntiDebuffMode = localStorage.getItem("e7_qd_antidebuff") === "1";
   } catch { /* ignore, keep default false */ }
   try {
-    const rawEls = localStorage.getItem("e7_qd_enemy_elements");
-    if (rawEls) qdEnemyHeavyElements = new Set(JSON.parse(rawEls));
-  } catch { /* ignore, keep default empty */ }
+    const rawCounts = localStorage.getItem("e7_qd_enemy_element_counts");
+    if (rawCounts) {
+      qdEnemyElementCounts = { Fire: 0, Ice: 0, Earth: 0, Light: 0, Dark: 0, ...JSON.parse(rawCounts) };
+    } else {
+      // Migrate from the older on/off toggle format (a Set of flagged
+      // elements) — each flagged element becomes a count of 1.
+      const rawEls = localStorage.getItem("e7_qd_enemy_elements");
+      if (rawEls) {
+        const oldFlagged = JSON.parse(rawEls);
+        if (Array.isArray(oldFlagged)) oldFlagged.forEach(el => { if (el in qdEnemyElementCounts) qdEnemyElementCounts[el] = 1; });
+      }
+    }
+  } catch { /* ignore, keep default zeros */ }
+  try {
+    const rawBp = localStorage.getItem("e7_qd_ban_protect_element");
+    qdBanProtectElement = rawBp && rawBp !== "null" ? rawBp : null;
+  } catch { /* ignore, keep default null */ }
 }
 function saveQuickDraftModeLocal() {
   try { localStorage.setItem("e7_qd_antidebuff", qdAntiDebuffMode ? "1" : "0"); } catch { /* ignore */ }
-  try { localStorage.setItem("e7_qd_enemy_elements", JSON.stringify([...qdEnemyHeavyElements])); } catch { /* ignore */ }
+  try { localStorage.setItem("e7_qd_enemy_element_counts", JSON.stringify(qdEnemyElementCounts)); } catch { /* ignore */ }
+  try { localStorage.setItem("e7_qd_ban_protect_element", qdBanProtectElement || "null"); } catch { /* ignore */ }
+}
+
+/* Syncs the enemy-element stepper UI (counts + highlighted state) with
+   qdEnemyElementCounts. Called on init and after every stepper tap. */
+function qdSyncEnemyElementStepperUI() {
+  document.querySelectorAll("#qd-enemy-el-steppers .qd-el-stepper").forEach(stepperEl => {
+    const el = stepperEl.dataset.el;
+    const n = qdEnemyElementCounts[el] || 0;
+    const countSpan = document.getElementById(`qd-el-count-${el}`);
+    if (countSpan) countSpan.textContent = n;
+    stepperEl.classList.toggle("has-count", n > 0);
+  });
 }
 
 /* Reads a hero build's raw axis values into 4 independent stat lanes.
@@ -973,14 +1016,47 @@ function qdScoreCandidate(candidate, currentPicks, slotIndex) {
     reasons.push(`Adds ${candidateEl} coverage (fewer natural counters than Fire/Ice/Earth)`);
   }
 
-  // Enemy element toggles — the player flags which elements the opponent
-  // is stacking (simple on/off chips), and we boost whichever element
-  // counters each flagged one. Fire→Ice→Earth→Fire is the RGB triangle;
-  // Light and Dark counter each other.
-  const enemyCounterHits = [...qdEnemyHeavyElements].filter(enemyEl => QD_ELEMENT_COUNTER[enemyEl] === candidateEl);
-  if (enemyCounterHits.length > 0) {
-    score += 30 * enemyCounterHits.length;
-    reasons.push(`Counters enemy ${enemyCounterHits.join("/")} (${candidateEl} beats it)`);
+  // Enemy team composition — the player sets how many opposing heroes are
+  // each element (qdEnemyElementCounts), plus optionally which element the
+  // enemy's un-bannable "Ban Protect" pick is (qdBanProtectElement).
+  // Fire→Ice→Earth→Fire is the RGB triangle; Light and Dark counter each
+  // other (QD_ELEMENT_COUNTER).
+  //   1. Every element's counter gets a boost proportional to how many of
+  //      that element the enemy is running — 2× Fire pushes Ice harder
+  //      than 1× Fire would.
+  //   2. On top of that, the Ban Protect element's counter gets extra
+  //      priority: a large bonus if Ban Protect's element is ALSO the
+  //      enemy's majority element (biggest threat + guaranteed to survive
+  //      bans), or a smaller bonus if the enemy's elements are evenly
+  //      spread with no majority (1 of each element present) — in that
+  //      case Ban Protect is the only signal for which element matters
+  //      most, so it's used as the tie-break.
+  const enemyEntries = Object.entries(qdEnemyElementCounts).filter(([, n]) => n > 0);
+  if (enemyEntries.length > 0) {
+    enemyEntries.forEach(([enemyEl, count]) => {
+      if (QD_ELEMENT_COUNTER[enemyEl] !== candidateEl) return;
+      score += 14 * count;
+      reasons.push(`Counters ${count}× enemy ${enemyEl} (${candidateEl} beats it)`);
+    });
+
+    if (qdBanProtectElement && QD_ELEMENT_COUNTER[qdBanProtectElement] === candidateEl) {
+      const maxCount = Math.max(...enemyEntries.map(([, n]) => n));
+      const majorityElements = enemyEntries.filter(([, n]) => n === maxCount).map(([el]) => el);
+      const isFlatSpread = enemyEntries.every(([, n]) => n === 1); // no majority — 1 of each present element
+      const banProtectIsSoleMajority = majorityElements.length === 1 && majorityElements[0] === qdBanProtectElement;
+
+      if (banProtectIsSoleMajority) {
+        score += 45;
+        reasons.push(`Counters the Ban Protect element (${qdBanProtectElement}) — also the enemy's majority element`);
+      } else if (isFlatSpread) {
+        score += 30;
+        reasons.push(`Counters the Ban Protect element (${qdBanProtectElement}) — no clear enemy majority, so this is the priority target`);
+      }
+    }
+  } else if (qdBanProtectElement && QD_ELEMENT_COUNTER[qdBanProtectElement] === candidateEl) {
+    // No element counts set at all yet — Ban Protect alone still matters.
+    score += 30;
+    reasons.push(`Counters the Ban Protect element (${qdBanProtectElement})`);
   }
 
   // Role diversity — once a role has shown up a couple times, later picks
@@ -1091,12 +1167,15 @@ function qdRoleHint(currentPicks) {
 }
 
 /* Short advisory showing which element counters are currently boosted by
-   the enemy element toggles, so it's clear why certain elements are
-   ranking higher in the suggestion list. */
+   the enemy team composition + Ban Protect element, so it's clear why
+   certain elements are ranking higher in the suggestion list. */
 function qdEnemyElementHint() {
-  if (qdEnemyHeavyElements.size === 0) return "";
-  const parts = [...qdEnemyHeavyElements].map(el => `${el}→${QD_ELEMENT_COUNTER[el]}`);
-  return `🎯 Boosting counters for enemy: ${parts.join(", ")}`;
+  const enemyEntries = Object.entries(qdEnemyElementCounts).filter(([, n]) => n > 0);
+  const parts = enemyEntries.map(([el, n]) => `${n}×${el}→${QD_ELEMENT_COUNTER[el]}`);
+  const bpPart = qdBanProtectElement ? `🛡${qdBanProtectElement}→${QD_ELEMENT_COUNTER[qdBanProtectElement]}` : "";
+  const all = [...parts, ...(bpPart ? [bpPart] : [])];
+  if (all.length === 0) return "";
+  return `🎯 Boosting counters for enemy: ${all.join(", ")}`;
 }
 
 /* Ranks every Roster hero not already drafted for the next empty slot.
@@ -1137,6 +1216,22 @@ function randomizeQuickDraft() {
   if (quickDraft.indexOf(null) !== -1) renderQuickDraftSuggestions();
 }
 
+/* Autofill — instantly locks in whichever hero currently ranks #1 in
+   qdSuggestForNextSlot() (the same "👑 best" row shown in Suggest), then
+   opens Suggest for the next empty slot so the pace stays quick. */
+function autofillTopQuickDraftPick() {
+  const idx = quickDraft.indexOf(null);
+  if (idx === -1) { setStatus("⚠️ Quick Draft is full (5/5)"); return; }
+  const scored = qdSuggestForNextSlot();
+  if (scored.length === 0) { setStatus("⚠️ No more heroes left in your Roster."); return; }
+  addToQuickDraft(scored[0].hero.id);
+  if (quickDraft.indexOf(null) !== -1) renderQuickDraftSuggestions();
+  else {
+    document.getElementById("quickdraft-suggestions").style.display = "none";
+    quickDraftSuggestOpen = false;
+  }
+}
+
 /* Removing a hero compacts the array so everything behind it shifts
    one space left — matches "fills left to right". */
 function removeFromQuickDraft(id) {
@@ -1160,9 +1255,11 @@ function clearQuickDraft() {
   document.getElementById("quickdraft-suggestions").style.display = "none";
   saveQuickDraftLocal();
 
-  // Reset enemy element toggles back to default (none active).
-  qdEnemyHeavyElements.clear();
-  document.querySelectorAll("#qd-enemy-el-chips .qd-el-chip").forEach(chip => chip.classList.remove("active"));
+  // Reset enemy element counts and Ban Protect element back to default.
+  Object.keys(qdEnemyElementCounts).forEach(el => { qdEnemyElementCounts[el] = 0; });
+  qdSyncEnemyElementStepperUI();
+  qdBanProtectElement = null;
+  document.querySelectorAll("#qd-ban-protect-chips .qd-el-chip").forEach(chip => chip.classList.remove("active"));
   saveQuickDraftModeLocal();
 
   renderQuickDraft();
@@ -1218,6 +1315,7 @@ function renderQuickDraft() {
 
   document.getElementById("btn-quickdraft-suggest").disabled = filledCount >= QD_SIZE;
   document.getElementById("btn-quickdraft-random").disabled = filledCount >= QD_SIZE;
+  document.getElementById("btn-quickdraft-autofill").disabled = filledCount >= QD_SIZE;
 
   if (quickDraftSuggestOpen) renderQuickDraftSuggestions();
 }

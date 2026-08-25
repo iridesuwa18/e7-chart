@@ -73,8 +73,10 @@
           <div class="quickdraft-toolbar">
             <div class="quickdraft-stats" id="quickdraft-stats"></div>
             <div class="quickdraft-toolbar-actions">
+              <button class="stat-info-btn" id="btn-qd-logic-info" title="How Quick Draft picks & scores heroes">i</button>
               <button class="btn btn-ghost btn-sm" id="btn-quickdraft-random" title="Randomize the first pick, then build around it">🎲 Randomize</button>
               <button class="btn btn-gold btn-sm" id="btn-quickdraft-suggest">🔮 Suggest</button>
+              <button class="btn btn-gold btn-sm" id="btn-quickdraft-autofill" title="Add the top-suggested pick for the next empty slot">⚡ Autofill</button>
               <button class="btn btn-ghost btn-xs" id="btn-quickdraft-clear">✕ Clear</button>
             </div>
           </div>
@@ -87,16 +89,54 @@
             <span class="qd-toggle-text">🛡️ vs Debuff / Anti-Revive comps</span>
           </div>
 
-          <!-- Enemy element toggles — mark which elements the opponent is
-               stacking; suggestions boost that element's counter. -->
+          <!-- Enemy team composition — set how many opposing heroes are
+               each element (steppers, 0-5) and which element the enemy's
+               un-bannable "Ban Protect" pick is. Suggestions boost each
+               element's counter proportional to count, with extra
+               priority on countering the Ban Protect element. -->
           <div class="quickdraft-enemy-elements">
-            <span class="qd-enemy-el-label">Enemy has too many:</span>
-            <div class="qd-enemy-el-chips" id="qd-enemy-el-chips">
-              <button type="button" class="qd-el-chip qd-el-fire" data-el="Fire" title="Enemy heavy Fire → boost Ice picks">🔥</button>
-              <button type="button" class="qd-el-chip qd-el-ice" data-el="Ice" title="Enemy heavy Ice → boost Earth picks">❄️</button>
-              <button type="button" class="qd-el-chip qd-el-earth" data-el="Earth" title="Enemy heavy Earth → boost Fire picks">🌿</button>
-              <button type="button" class="qd-el-chip qd-el-light" data-el="Light" title="Enemy heavy Light → boost Dark picks">☀️</button>
-              <button type="button" class="qd-el-chip qd-el-dark" data-el="Dark" title="Enemy heavy Dark → boost Light picks">🌙</button>
+            <span class="qd-enemy-el-label">Enemy team elements:</span>
+            <div class="qd-enemy-el-steppers" id="qd-enemy-el-steppers">
+              <div class="qd-el-stepper qd-el-fire" data-el="Fire">
+                <button type="button" class="qd-el-step-btn" data-el="Fire" data-dir="-1">−</button>
+                <span class="qd-el-step-icon">🔥</span>
+                <span class="qd-el-step-count" id="qd-el-count-Fire">0</span>
+                <button type="button" class="qd-el-step-btn" data-el="Fire" data-dir="1">+</button>
+              </div>
+              <div class="qd-el-stepper qd-el-ice" data-el="Ice">
+                <button type="button" class="qd-el-step-btn" data-el="Ice" data-dir="-1">−</button>
+                <span class="qd-el-step-icon">❄️</span>
+                <span class="qd-el-step-count" id="qd-el-count-Ice">0</span>
+                <button type="button" class="qd-el-step-btn" data-el="Ice" data-dir="1">+</button>
+              </div>
+              <div class="qd-el-stepper qd-el-earth" data-el="Earth">
+                <button type="button" class="qd-el-step-btn" data-el="Earth" data-dir="-1">−</button>
+                <span class="qd-el-step-icon">🌿</span>
+                <span class="qd-el-step-count" id="qd-el-count-Earth">0</span>
+                <button type="button" class="qd-el-step-btn" data-el="Earth" data-dir="1">+</button>
+              </div>
+              <div class="qd-el-stepper qd-el-light" data-el="Light">
+                <button type="button" class="qd-el-step-btn" data-el="Light" data-dir="-1">−</button>
+                <span class="qd-el-step-icon">☀️</span>
+                <span class="qd-el-step-count" id="qd-el-count-Light">0</span>
+                <button type="button" class="qd-el-step-btn" data-el="Light" data-dir="1">+</button>
+              </div>
+              <div class="qd-el-stepper qd-el-dark" data-el="Dark">
+                <button type="button" class="qd-el-step-btn" data-el="Dark" data-dir="-1">−</button>
+                <span class="qd-el-step-icon">🌙</span>
+                <span class="qd-el-step-count" id="qd-el-count-Dark">0</span>
+                <button type="button" class="qd-el-step-btn" data-el="Dark" data-dir="1">+</button>
+              </div>
+            </div>
+            <div class="qd-ban-protect-row">
+              <span class="qd-enemy-el-label">🛡 Ban Protect element:</span>
+              <div class="qd-ban-protect-chips" id="qd-ban-protect-chips">
+                <button type="button" class="qd-el-chip qd-el-fire" data-el="Fire" title="Ban-protected character is Fire">🔥</button>
+                <button type="button" class="qd-el-chip qd-el-ice" data-el="Ice" title="Ban-protected character is Ice">❄️</button>
+                <button type="button" class="qd-el-chip qd-el-earth" data-el="Earth" title="Ban-protected character is Earth">🌿</button>
+                <button type="button" class="qd-el-chip qd-el-light" data-el="Light" title="Ban-protected character is Light">☀️</button>
+                <button type="button" class="qd-el-chip qd-el-dark" data-el="Dark" title="Ban-protected character is Dark">🌙</button>
+              </div>
             </div>
           </div>
 
@@ -768,6 +808,129 @@
     </div>
   </div>
 
+  <!-- QUICK DRAFT LOGIC INFO — Quick Draft page only. Reference doc for
+       how qdScoreCandidate() in app.js actually scores each candidate, so
+       it's easy to remember what to tune as you test. Keep this in sync
+       by hand whenever the scoring logic in app.js changes. -->
+  <div class="overlay" id="qd-logic-overlay">
+    <div class="modal compare-modal" id="qd-logic-modal">
+      <div class="details-modal-header" style="padding:20px 22px 0">
+        <div class="modal-title" style="margin:0;padding:0;border:none">HOW QUICK DRAFT SCORES A PICK</div>
+        <button class="det-close-btn" id="qd-logic-close">×</button>
+      </div>
+      <div class="compare-body" style="padding-top:10px">
+        <p style="font-size:11.5px;color:var(--text-dim);line-height:1.6;margin-bottom:14px">
+          One candidate hero at a time, for whichever slot is next empty. It's a
+          <strong style="color:var(--gold2)">one-slot-ahead greedy heuristic</strong> —
+          not a full 5-hero optimizer — so it only ever reasons about the heroes
+          already locked in, same as drafting in real time. Every rule below adds
+          or subtracts points; whichever remaining hero ends up with the highest
+          total score is ranked #1 (and is what Autofill/👑 picks).
+        </p>
+
+        <div class="qd-logic-section">
+          <div class="qd-logic-heading">1 · Base hero quality</div>
+          <p>Score starts at <code>hero score × 10</code>. A hero at/above the passable
+          threshold (5.0) gets a flat +15; below it, the shortfall is punished at ×12 —
+          so a weak hero is unlikely to ever outrank a strong one regardless of the
+          bonuses below.</p>
+        </div>
+
+        <div class="qd-logic-section">
+          <div class="qd-logic-heading">2 · Anti-Debuff / Anti-Revive mode (toggle)</div>
+          <p>When on: High-Survivability heroes (usually revive-based) take −22 since
+          debuff/anti-revive comps neutralize them. High-Tankiness gets +26. A
+          "rounder" mid-range score (5.5–7.5) gets +12 for not over-relying on one
+          extreme stat.</p>
+        </div>
+
+        <div class="qd-logic-section">
+          <div class="qd-logic-heading">3 · The Protect slot (middle slot, 3rd)</div>
+          <p>Scored differently — it's the one guaranteed survivor after bans, so it
+          should plug your biggest hole rather than chase speed (speed is
+          intentionally NOT scored here). High-Survivability (or High-Tankiness in
+          Anti-Debuff mode) gets +45. A NEW element vs. the rest of the team gets
+          +18; repeating an existing element gets −15.</p>
+        </div>
+
+        <div class="qd-logic-section">
+          <div class="qd-logic-heading">4 · Non-Protect slots — priority pick type</div>
+          <p>High-Sustain + High-Speed (fast buffers/self-sustainers) is the top
+          priority until the team has 2 of them: +48 (only +20 if it'd be a 2nd
+          Healer/Support-type pick). Otherwise, chasing the 3-High-Speed target gets
+          +40 per pick while under target.</p>
+        </div>
+
+        <div class="qd-logic-section">
+          <div class="qd-logic-heading">5 · Once core targets are met (3 High-Speed + 2 Sustain-Speed)</div>
+          <p>Stops chasing High-Speed (−35) and shifts the closing 4th/5th slots
+          toward mid-range "rounder" picks instead of maxed stats: sustain/survivability
+          above the mid-range cap (6) is penalized (−22), at/under it is rewarded
+          (+22), and an overall score ≥7 is pushed back down for variety while a
+          score under 7 is pushed up.</p>
+        </div>
+
+        <div class="qd-logic-section">
+          <div class="qd-logic-heading">6 · Stat gap coverage (Rules 1–8)</div>
+          <p>Each already-picked hero that's weak in a lane (low Speed/Tank/Survivability
+          /Sustain) — or strong in one lane but exposed in another — creates a
+          "need." A candidate that's high in a needed lane gets +16 to +18 per unmet
+          need (×1.3 for the Protect slot). Survivability/Sustain gap bonuses are
+          skipped on the closing slots once core targets are met, so rule 5's
+          mid-range shaping isn't undone.</p>
+        </div>
+
+        <div class="qd-logic-section">
+          <div class="qd-logic-heading">7 · Element balance (self-team)</div>
+          <p>Fire/Ice/Earth form a single-counter triangle, so stacking 2+ of one
+          risks a full sweep from one matching enemy element: −20 once you already
+          have 2. Light/Dark only counter each other — a safer 3rd+ element pick, so
+          the first Light/Dark pick (once 2+ heroes are drafted) gets +8.</p>
+        </div>
+
+        <div class="qd-logic-section">
+          <div class="qd-logic-heading">8 · Enemy team elements + Ban Protect (the steppers)</div>
+          <p>Each enemy element count boosts its counter by <code>+14 × count</code> —
+          2× enemy Fire pushes Ice harder than 1× would. On top of that, if the Ban
+          Protect element is also the enemy's <em>sole majority</em> element, its
+          counter gets a further +45 (biggest threat + unbannable). If the enemy
+          elements are flat (exactly 1 of each entered, no majority), Ban Protect's
+          counter instead gets +30 as the tie-break signal. If no enemy counts are
+          set at all, Ban Protect alone still adds +30 to its counter.</p>
+        </div>
+
+        <div class="qd-logic-section">
+          <div class="qd-logic-heading">9 · Role diversity</div>
+          <p>A role that's shown up 2+ times already gets −14 per extra copy beyond
+          the soft cap. A 2nd Healer/Support-type pick (Soul Weaver, high-Sustain,
+          not high-Survivability) is penalized harder: −32.</p>
+        </div>
+
+        <div class="qd-logic-section">
+          <div class="qd-logic-heading">10 · Protect-slot role guard</div>
+          <p>Once Protect is locked in, its role is discouraged for the closing
+          slots — the 5th slot especially (−70, since Protect can't be banned so the
+          final slot should diversify), and the 4th slot too (−30) if that role
+          already showed up before Protect as well.</p>
+        </div>
+
+        <div class="qd-logic-section">
+          <div class="qd-logic-heading">11 · Weak-squad rescue + Ghost builds</div>
+          <p>If the squad's average score so far is under 6, a strong candidate gets
+          an extra boost proportional to how far above average it is (×6) — the
+          brief being "if the first three are weak, the last two have to carry."
+          A Ghost build (a 2nd usable build) adds a flat +4 for flexibility.</p>
+        </div>
+
+        <p style="font-size:11px;color:var(--text-dim);line-height:1.6;margin-top:16px;padding-top:12px;border-top:1px solid var(--border)">
+          All of this lives in <code>qdScoreCandidate()</code> in <code>app.js</code>
+          (search that function name) — the exact point values (+45, ×14, etc.) are
+          the easiest things to tune first if a suggestion feels off.
+        </p>
+      </div>
+    </div>
+  </div>
+
   <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
   <script src="app.js"></script>
 
@@ -781,6 +944,22 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.2.0/umd/react-dom.production.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/babel-standalone/7.23.2/babel.min.js"></script>
   <script type="text/babel" data-presets="react" src="draft.js"></script>
+
+  <!-- Quick Draft logic info modal — self-contained, Quick Draft page
+       only, so it doesn't touch the shared app.js. -->
+  <script>
+    (function () {
+      const btn = document.getElementById("btn-qd-logic-info");
+      const overlay = document.getElementById("qd-logic-overlay");
+      const closeBtn = document.getElementById("qd-logic-close");
+      if (!btn || !overlay) return;
+      const open = () => overlay.classList.add("open");
+      const close = () => overlay.classList.remove("open");
+      btn.addEventListener("click", open);
+      closeBtn.addEventListener("click", close);
+      overlay.addEventListener("click", e => { if (e.target === overlay) close(); });
+    })();
+  </script>
 
   <!-- PWA service worker registration -->
   <script>
