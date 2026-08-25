@@ -118,7 +118,7 @@ const QD_PASSABLE_SCORE = 5;
 let qdBanProtectElement = null; // the element of the enemy's un-bannable "Ban Protect" pick, if set (Rule 1)
 const QD_ELEMENT_COUNTER = { Fire: "Ice", Ice: "Earth", Earth: "Fire", Light: "Dark", Dark: "Light" }; // which element beats which
 
-/* ── Quick Draft rules (simplified 3-rule strategy) ──
+/* ── Quick Draft rules (4-rule strategy) ──
    Rule 1 (Ban Protect counter): see qdBanProtectElement / qdSuggestForNextSlot.
    Rule 2 (stat balance): a hero counts as "High" in Speed/Tank/Survivability/
    Sustainability at QD_HIGH — suggestions favor whichever of those 4 lanes
@@ -128,7 +128,24 @@ const QD_ELEMENT_COUNTER = { Fire: "Ice", Ice: "Earth", Earth: "Fire", Light: "D
    Warrior/Mage/Ranger are the hard-hitting "no revive" classes and the
    team should aim for QD_OFFENSE_TARGET of them; Knight/Soul Weaver/Thief
    are favored specifically for the Protect slot instead (Ranger moved out
-   of that group earlier for being too squishy there; Thief moved in). */
+   of that group earlier for being too squishy there; Thief moved in).
+   Rule 4 (team score budget): the whole 5-hero team's scores (each hero's
+   raw, un-boosted Avg/Total-Avg — never the ranking score after Rule 1-3
+   bonuses) must add up to at most QD_TEAM_SCORE_CAP. Rather than dividing
+   the budget evenly across remaining slots, each non-final pick paces
+   itself against roughly HALF of whatever budget is still left (e.g.
+   pick 1 = 7 out of a 30 cap leaves 23; pick 2 paces toward ~11.5; if it
+   lands near there, ~11.5 remains and pick 3 paces toward ~5.75; and so
+   on). Halving instead of dividing evenly means it's always saving room
+   for the picks after it rather than assuming they'll each be average,
+   which is what actually creates the variety — a strong pick doesn't
+   force every later pick down uniformly, it just halves what's left. The
+   final (5th) pick has nothing left to save for, so its target becomes
+   the FULL remaining budget instead, rewarding landing as close to the
+   QD_TEAM_SCORE_CAP as possible without going over it. Going over the
+   overall cap outright is always penalized as a backstop. See
+   qdComputeTeamNeeds (totalScore/remainingBudget) and the pacing
+   penalty/bonus applied in qdScoreCandidate. */
 const QD_STAT_FIRST_BONUS = 30;       // bonus for being the 1st High pick covering a stat lane
 const QD_STAT_SECOND_BONUS = 12;      // smaller bonus for being the 2nd High pick in that lane
 const QD_STAT_GAP_BONUS = 8;          // ongoing bonus per lane the candidate's stat is BEHIND the team's most-stacked stat lane — keeps Rule 2 balancing even after every lane has 1+ High picks (i.e. past 4/4), instead of going to 0
@@ -140,6 +157,13 @@ const QD_OFFENSE_TARGET = 2;          // aim for at least 2 offense-class heroes
 const QD_OFFENSE_BONUS = 20;
 const QD_PROTECT_SUPPORT_BONUS = 30;  // Rule 3: support classes are prioritized for the Protect slot
 const QD_BAN_PROTECT_COUNTER_BONUS = 50; // Rule 1: bonus for countering the Ban Protect element
+const QD_TEAM_SCORE_CAP = 30;         // Rule 4: max combined score (raw 0-10 Avg/Total-Avg per hero) across all 5 picks — ~6/hero on average
+const QD_BUDGET_OVER_PENALTY = 15;    // heavy backstop penalty per point the candidate would push the team's running total over QD_TEAM_SCORE_CAP entirely
+const QD_LAST_PICK_CLOSENESS_BONUS = 20; // for the 5th/final pick, max bonus for landing the team total as close to QD_TEAM_SCORE_CAP as possible without going over
+const QD_LAST_PICK_CLOSENESS_SCALE = 3;  // how fast that bonus decays per point of leftover (unused) budget on the final pick
+const QD_PACE_CLOSENESS_BONUS = 15;   // for picks 1-4, max bonus for landing near the pacing target (see paceTarget below)
+const QD_PACE_CLOSENESS_SCALE = 2;    // how fast that bonus decays per point under the pacing target
+const QD_PACE_OVER_PENALTY = 5;       // lighter penalty (than QD_BUDGET_OVER_PENALTY) per point a non-final pick spends past its pacing target, even while still under the hard cap
 
 /* ── Image editor state ── */
 let editorImg   = null;   // loaded HTMLImageElement
@@ -755,6 +779,8 @@ function qdComputeTeamNeeds(currentPicks) {
   const traits = currentPicks.map(qdHeroTraits);
   const n = traits.length;
   const avgScore = n ? traits.reduce((s, t) => s + t.score, 0) / n : 0;
+  const totalScore = traits.reduce((s, t) => s + t.score, 0); // Rule 4: running sum toward QD_TEAM_SCORE_CAP
+  const remainingBudget = QD_TEAM_SCORE_CAP - totalScore;
 
   const statCounts = { spd: 0, tnk: 0, sur: 0, sst: 0 };
   traits.forEach(t => {
@@ -771,7 +797,7 @@ function qdComputeTeamNeeds(currentPicks) {
   });
   const offenseCount = currentPicks.reduce((sum, h) => sum + (QD_OFFENSE_CLASSES.has(h.role || "") ? 1 : 0), 0);
 
-  return { traits, n, avgScore, statCounts, classCounts, offenseCount };
+  return { traits, n, avgScore, totalScore, remainingBudget, statCounts, classCounts, offenseCount };
 }
 
 /* Scores one candidate hero for whatever slot is next empty. Higher is
@@ -852,6 +878,48 @@ function qdScoreCandidate(candidate, currentPicks, slotIndex) {
     }
   }
 
+  // ── Rule 4: team score budget (halving pace) ──
+  // The 5-hero team's total score is capped at QD_TEAM_SCORE_CAP. Instead
+  // of dividing what's left evenly across remaining slots, each non-final
+  // pick paces against roughly HALF of the currently remaining budget —
+  // e.g. pick 1 = 7 out of 30 leaves 23, so pick 2 paces toward ~11.5;
+  // land near there and pick 3 paces toward ~5.75, and so on. This always
+  // banks something for the picks after it instead of assuming they'll
+  // each be exactly average. The final pick has nothing left to save for,
+  // so its target is the FULL remaining budget — reward landing as close
+  // to it as possible without going over.
+  const projectedTotal = needs.totalScore + t.score;
+  const isLastPick = needs.n === QD_SIZE - 1;
+
+  if (projectedTotal > QD_TEAM_SCORE_CAP) {
+    // Backstop: never let a pick blow the whole team past the hard cap,
+    // regardless of pacing — this is always a real penalty, not just a
+    // pacing nudge.
+    const over = projectedTotal - QD_TEAM_SCORE_CAP;
+    score -= over * QD_BUDGET_OVER_PENALTY;
+    reasons.push(`Pushes team total to ${projectedTotal.toFixed(1)}, ${over.toFixed(1)} over the ${QD_TEAM_SCORE_CAP} budget cap`);
+  } else {
+    const paceTarget = isLastPick ? needs.remainingBudget : needs.remainingBudget / 2;
+    const diff = paceTarget - t.score; // >=0 = at/under this pick's pacing target (banks the rest); <0 = spent past it
+
+    if (diff >= 0) {
+      const bonusMax   = isLastPick ? QD_LAST_PICK_CLOSENESS_BONUS : QD_PACE_CLOSENESS_BONUS;
+      const bonusScale = isLastPick ? QD_LAST_PICK_CLOSENESS_SCALE : QD_PACE_CLOSENESS_SCALE;
+      const closeness = Math.max(0, bonusMax - diff * bonusScale);
+      if (closeness > 0) score += closeness;
+      reasons.push(isLastPick
+        ? `Finishes the team close to the ${QD_TEAM_SCORE_CAP} budget cap (total ${projectedTotal.toFixed(1)}, ${diff.toFixed(1)} left unused)`
+        : `Near this pick's ~${paceTarget.toFixed(1)} pacing target (half of the ${needs.remainingBudget.toFixed(1)} left), banking ${diff.toFixed(1)} for later picks`);
+    } else {
+      // Still under the hard cap, but this pick eats more than its "spend
+      // about half of what's left" pace allows — a smaller penalty than
+      // blowing the cap outright, since it just tightens later picks.
+      const overPace = -diff;
+      score -= overPace * QD_PACE_OVER_PENALTY;
+      reasons.push(`Uses ${overPace.toFixed(1)} more than the ~${paceTarget.toFixed(1)} pacing target, leaving less budget for later picks`);
+    }
+  }
+
   if (reasons.length === 0) reasons.push("Solid, balanced pick");
 
   return { hero: candidate, score, reasons, traits: t };
@@ -883,8 +951,26 @@ function qdClassHint(currentPicks) {
   const hints = [];
   const stacked = Object.entries(needs.classCounts).find(([role, n]) => role && n >= QD_CLASS_MAX);
   if (stacked) hints.push(`⚔️ ${stacked[1]}× ${stacked[0]} already picked — that class is capped at ${QD_CLASS_MAX}.`);
-  if (needs.offenseCount < QD_OFFENSE_TARGET) hints.push(`🗡️ ${needs.offenseCount}/${QD_OFFENSE_TARGET} hard-hitting Warrior/Thief/Mage picks so far.`);
+  if (needs.offenseCount < QD_OFFENSE_TARGET) hints.push(`🗡️ ${needs.offenseCount}/${QD_OFFENSE_TARGET} hard-hitting Warrior/Mage/Ranger picks so far.`);
   return hints.join("<br>");
+}
+
+/* Rule 4 hint — shows the team's running score total against the budget
+   cap, so it's clear why suggestions start favoring cheaper picks once
+   the earlier picks have used up most of the budget. */
+function qdBudgetHint(currentPicks) {
+  if (currentPicks.length === 0) return "";
+  const needs = qdComputeTeamNeeds(currentPicks);
+  const picksLeft = QD_SIZE - currentPicks.length;
+  if (picksLeft <= 0) return "";
+  if (needs.remainingBudget < 0) {
+    return `💰 Team total ${needs.totalScore.toFixed(1)} is already ${Math.abs(needs.remainingBudget).toFixed(1)} over the ${QD_TEAM_SCORE_CAP} budget cap — remaining picks are pushed toward lower scores.`;
+  }
+  const isLastPick = picksLeft === 1;
+  const paceTarget = isLastPick ? needs.remainingBudget : needs.remainingBudget / 2;
+  return isLastPick
+    ? `💰 Budget: ${needs.totalScore.toFixed(1)}/${QD_TEAM_SCORE_CAP} used — final pick is paced toward using the full ~${paceTarget.toFixed(1)} left, to land close to the cap.`
+    : `💰 Budget: ${needs.totalScore.toFixed(1)}/${QD_TEAM_SCORE_CAP} used, ${needs.remainingBudget.toFixed(1)} left — this pick is paced toward ~${paceTarget.toFixed(1)} (half of what's left), banking the rest for later picks.`;
 }
 
 /* Rule 1 hint — shows the Ban Protect element and its counter, so it's
@@ -1034,11 +1120,13 @@ function renderQuickDraft() {
   const statsCovered = Object.values(needs.statCounts).filter(n => n > 0).length;
   const statsClass = statsCovered >= 4 ? "good" : (filledCount ? "warn" : "");
   const offenseClass = needs.offenseCount >= QD_OFFENSE_TARGET ? "good" : (filledCount ? "warn" : "");
+  const budgetClass = needs.totalScore > QD_TEAM_SCORE_CAP ? "warn" : (filledCount ? "good" : "");
   statsEl.innerHTML = `
     <span class="qd-stat">${filledCount}/5 Picked</span>
     <span class="qd-stat">Avg ${avgTxt}</span>
     <span class="qd-stat ${statsClass}">⚖️ Stats ${statsCovered}/4</span>
-    <span class="qd-stat ${offenseClass}">🗡️ Offense ${needs.offenseCount}/${QD_OFFENSE_TARGET}</span>`;
+    <span class="qd-stat ${offenseClass}">🗡️ Offense ${needs.offenseCount}/${QD_OFFENSE_TARGET}</span>
+    <span class="qd-stat ${budgetClass}">💰 Budget ${needs.totalScore.toFixed(1)}/${QD_TEAM_SCORE_CAP}</span>`;
 
   document.getElementById("btn-quickdraft-suggest").disabled = filledCount >= QD_SIZE;
   document.getElementById("btn-quickdraft-random").disabled = filledCount >= QD_SIZE;
@@ -1064,7 +1152,7 @@ function renderQuickDraftSuggestions() {
 
   const currentPicks = quickDraft.filter(id => id !== null).map(id => heroes.find(h => h.id === id)).filter(Boolean);
   const hintEl = document.getElementById("quickdraft-element-hint");
-  const hints = [qdBanProtectHint(), qdStatHint(currentPicks), qdClassHint(currentPicks)].filter(Boolean);
+  const hints = [qdBanProtectHint(), qdStatHint(currentPicks), qdClassHint(currentPicks), qdBudgetHint(currentPicks)].filter(Boolean);
   if (hints.length) { hintEl.innerHTML = hints.join("<br>"); hintEl.style.display = "block"; }
   else { hintEl.style.display = "none"; }
 
