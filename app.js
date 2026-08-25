@@ -118,6 +118,9 @@ const QD_PASSABLE_SCORE = 5;
 const QD_SPEED_TARGET   = 3; // want 3-of-5 heroes to be high-speed/CR so a ban still leaves 2 to cycle
 const QD_SUSTAIN_SPD_TARGET = 2; // want at least 2 heroes that are BOTH high-sustain AND high-speed (fast buffers/self-sustainers) — top priority pick type
 const QD_VARIETY_CEILING = 7; // once Speed + Sustain+Speed targets are both met, remaining picks should aim under this score for variety
+const QD_MIDRANGE_CAP = 6; // closing-slot (4th/5th pick) cap: Sustain/Survivability and Speed/Tank aim for "around 6 or less" instead of maxed stats
+const QD_ROLE_STACK_SOFT_CAP = 2; // more than 2 of the same role starts to feel repetitive for a 5-hero team
+const QD_HEALER_SOFT_CAP = 1; // at most 1 dedicated Healer/Support-type pick (see qdIsHealerArchetype) by default — most comps run one healer, not several
 const QD_RGB_ELEMENTS = new Set(["Fire", "Ice", "Earth"]);
 const QD_RGB_STACK_SOFT_CAP = 2; // once 2 of one Fire/Ice/Earth element are picked, a 3rd is discouraged — a single enemy counter-element can sweep them all
 let qdAntiDebuffMode = false; // when true, favors Tankiness + mid-range "rounder" heroes over Survivability/revive specialists
@@ -714,6 +717,16 @@ function qdHeroTraits(h) {
   };
 }
 
+/* A "Healer/Support" archetype flag — role is Soul Weaver (this game's
+   dedicated support class) AND the hero leans on Sustain rather than
+   Survivability (high-Sustain, not-high-Survivability). This matches the
+   usual healer profile: keeps the team topped up (high Sustain) but isn't
+   itself a tank/revive-carry (Survivability often only 2–4). Used to avoid
+   Quick Draft stacking multiple healers once one is already picked. */
+function qdIsHealerArchetype(t, hero) {
+  return (hero.role || "") === "Soul Weaver" && t.isHighSst && !t.isHighSur;
+}
+
 /* Aggregates the heroes already placed in Quick Draft into "team needs" —
    how many high-speed heroes we already have towards the target of 3
    (Rule 3), and how many of Rules 1/3/5/7 (a picked hero is weak in a
@@ -732,6 +745,17 @@ function qdComputeTeamNeeds(currentPicks) {
     elementCounts[el] = (elementCounts[el] || 0) + 1;
   });
 
+  // Role counts — used to nudge Quick Draft away from repeating the same
+  // role too many times, and the healerCount specifically tracks how many
+  // Healer/Support-type picks (see qdIsHealerArchetype) are already locked
+  // in, since most comps want at most one dedicated healer.
+  const roleCounts = {};
+  currentPicks.forEach(h => {
+    const role = h.role || "";
+    roleCounts[role] = (roleCounts[role] || 0) + 1;
+  });
+  const healerCount = currentPicks.reduce((sum, h, i) => sum + (qdIsHealerArchetype(traits[i], h) ? 1 : 0), 0);
+
   let needSpd = 0, needTnk = 0, needSur = 0, needSst = 0;
   traits.forEach(t => {
     if (t.isLowSpd) needSpd++;                                         // Rule 1: low speed → needs a speedster
@@ -744,7 +768,7 @@ function qdComputeTeamNeeds(currentPicks) {
     if (t.isHighSst && (t.isLowSpd || t.isLowTnk)) { needSpd++; needTnk++; }              // Rule 8
   });
 
-  return { traits, n, highSpdCount, highSstSpdCount, avgScore, elementCounts, needSpd, needTnk, needSur, needSst };
+  return { traits, n, highSpdCount, highSstSpdCount, avgScore, elementCounts, roleCounts, healerCount, needSpd, needTnk, needSur, needSst };
 }
 
 /* Scores one candidate hero for whatever slot is next empty. Higher is
@@ -760,6 +784,12 @@ function qdScoreCandidate(candidate, currentPicks, slotIndex) {
   const isProtectSlot = slotIndex === QD_PROTECT_INDEX;
   const reasons = [];
   let score = 0;
+  // The two closing slots (4th = index 3, 5th = index 4) get their own shaping
+  // once core targets are met, so they stop just re-picking whichever hero has
+  // the single highest Sustain/Survivability stat. Computed here (not inside
+  // the isProtectSlot/else branch below) so it's still in scope for the gap
+  // bonuses further down.
+  let isClosingSlot = false;
 
   // Base hero quality — always matters, ghost-inclusive Total Avg / Avg.
   score += t.score * 10;
@@ -810,11 +840,15 @@ function qdScoreCandidate(candidate, currentPicks, slotIndex) {
   } else {
     // Sustain + Speed is the top-priority pick type for non-Protect slots —
     // fast buffers/self-sustainers keep the team alive AND act first.
+    // A duplicate Healer/Support pick gets a much smaller version of this
+    // bonus — the later Healer-stacking penalty (below) would otherwise be
+    // outweighed by this +48, still resulting in a 2nd healer getting picked.
     if (needs.highSstSpdCount < QD_SUSTAIN_SPD_TARGET && t.isHighSst && t.isHighSpd) {
-      score += 48;
+      const isDupHealer = qdIsHealerArchetype(t, candidate) && needs.healerCount >= QD_HEALER_SOFT_CAP;
+      score += isDupHealer ? 20 : 48;
       reasons.push(`High-Sustain + High-Speed (priority pick, team ${needs.highSstSpdCount}/${QD_SUSTAIN_SPD_TARGET})`);
-      if (candidate.role === "Soul Weaver") reasons.push("Soul Weaver buffer");
-    } else if (t.isHighSst && candidate.role === "Soul Weaver") {
+      if (candidate.role === "Soul Weaver" && !isDupHealer) reasons.push("Soul Weaver buffer");
+    } else if (t.isHighSst && candidate.role === "Soul Weaver" && needs.healerCount < QD_HEALER_SOFT_CAP) {
       score += 10;
       reasons.push("Soul Weaver buffer");
     }
@@ -825,12 +859,48 @@ function qdScoreCandidate(candidate, currentPicks, slotIndex) {
     // Survivability/revival heroes. Aim for a sub-7 score "rounder" pick
     // instead so the remaining slots add real variety.
     const coreTargetsMet = needs.highSpdCount >= QD_SPEED_TARGET && needs.highSstSpdCount >= QD_SUSTAIN_SPD_TARGET;
+    // The two closing slots (4th = index 3, 5th = index 4) get their own shaping
+    // once core targets are met, so they stop just re-picking whichever hero has
+    // the single highest Sustain/Survivability stat.
+    isClosingSlot = coreTargetsMet && (slotIndex === 3 || slotIndex === 4);
 
     if (coreTargetsMet) {
       if (t.isHighSpd) {
         score -= 35;
         reasons.push("Speed targets already met — no longer prioritizing High-Speed picks");
       }
+
+      if (slotIndex === 3) {
+        // 4th pick — mid-range Sustainability, not a maxed-out sustain stat,
+        // and a Speed/Tank pairing that stays around 6 or under so this pick
+        // isn't also an extreme-stat outlier.
+        if (t.best.sst > QD_MIDRANGE_CAP) {
+          score -= 22;
+          reasons.push(`Sustainability above ${QD_MIDRANGE_CAP} — closing picks favor mid-range sustain instead of maxed sustain`);
+        } else if (t.best.sst >= QD_LOW) {
+          score += 22;
+          reasons.push(`Mid-range Sustainability (${t.best.sst} ≤ ${QD_MIDRANGE_CAP}) — rounds out the team without over-stacking sustain`);
+        }
+        if (t.best.spd <= QD_MIDRANGE_CAP || t.best.tnk <= QD_MIDRANGE_CAP) {
+          score += 10;
+          reasons.push(`Speed or Tank at ${QD_MIDRANGE_CAP} or under — keeps this pick from stacking extremes`);
+        }
+      } else if (slotIndex === 4) {
+        // 5th pick — mid-range Survivability, same idea: not the single
+        // tankiest/reviviest hero available, and Speed/Tank kept moderate.
+        if (t.best.sur > QD_MIDRANGE_CAP) {
+          score -= 22;
+          reasons.push(`Survivability above ${QD_MIDRANGE_CAP} — closing picks favor mid-range survivability instead of maxed survivability`);
+        } else if (t.best.sur >= QD_LOW) {
+          score += 22;
+          reasons.push(`Mid-range Survivability (${t.best.sur} ≤ ${QD_MIDRANGE_CAP}) — rounds out the team without leaning on revive-stacking`);
+        }
+        if (t.best.spd <= QD_MIDRANGE_CAP || t.best.tnk <= QD_MIDRANGE_CAP) {
+          score += 10;
+          reasons.push(`Speed or Tank at ${QD_MIDRANGE_CAP} or under — keeps this pick from stacking extremes`);
+        }
+      }
+
       if (t.score >= QD_VARIETY_CEILING) {
         score -= (t.score - QD_VARIETY_CEILING + 1) * 15;
         reasons.push(`Core targets met — favoring picks under ${QD_VARIETY_CEILING} score for variety`);
@@ -854,11 +924,17 @@ function qdScoreCandidate(candidate, currentPicks, slotIndex) {
   // Rules 1/2/3/4/5/6/7/8 — reward covering whatever gaps the current picks
   // created. Weighted up for the Protect slot since it's meant to be the
   // pick that "turns the tide" on whatever the team is missing.
+  // On the closing slots (once core targets are met), the Survivability/
+  // Sustainability gap bonuses are skipped — those two stats are shaped by
+  // the mid-range logic above instead of the raw "isHigh" gap bonus, so we
+  // don't undo the mid-range steering by also rewarding maxed-out stats here.
   const gapMul = isProtectSlot ? 1.3 : 1;
   if (needs.needSpd > 0 && t.isHighSpd) { score += 18 * needs.needSpd * gapMul; reasons.push("Covers a Speed gap"); }
   if (needs.needTnk > 0 && t.isHighTnk) { score += 18 * needs.needTnk * gapMul; reasons.push("Covers a Tankiness gap"); }
-  if (needs.needSur > 0 && t.isHighSur) { score += 16 * needs.needSur * gapMul; reasons.push("Covers a Survivability gap"); }
-  if (needs.needSst > 0 && t.isHighSst) { score += 16 * needs.needSst * gapMul; reasons.push("Covers a Sustainability gap"); }
+  if (!isClosingSlot) {
+    if (needs.needSur > 0 && t.isHighSur) { score += 16 * needs.needSur * gapMul; reasons.push("Covers a Survivability gap"); }
+    if (needs.needSst > 0 && t.isHighSst) { score += 16 * needs.needSst * gapMul; reasons.push("Covers a Sustainability gap"); }
+  }
 
   // Element balance — Fire/Ice/Earth form a single-counter triangle, so
   // stacking one of them risks a full sweep from one matching enemy element.
@@ -870,6 +946,24 @@ function qdScoreCandidate(candidate, currentPicks, slotIndex) {
   } else if ((candidateEl === "Light" || candidateEl === "Dark") && !needs.elementCounts["Light"] && !needs.elementCounts["Dark"] && needs.n >= 2) {
     score += 8;
     reasons.push(`Adds ${candidateEl} coverage (fewer natural counters than Fire/Ice/Earth)`);
+  }
+
+  // Role diversity — once a role has shown up a couple times, later picks
+  // are nudged toward a different role so the team isn't front-loaded with
+  // near-duplicate kits. Healer/Support-type picks (see qdIsHealerArchetype)
+  // get a much stronger duplicate penalty, since most comps run exactly one
+  // dedicated healer regardless of how many other roles get doubled up —
+  // this is what was causing Quick Draft to keep suggesting extra healers
+  // for the 4th/5th slots after an early healer pick.
+  const candidateRole = candidate.role || "";
+  const roleCount = needs.roleCounts[candidateRole] || 0;
+  if (candidateRole && roleCount >= QD_ROLE_STACK_SOFT_CAP) {
+    score -= 14 * (roleCount - QD_ROLE_STACK_SOFT_CAP + 1);
+    reasons.push(`Team already has ${roleCount}× ${candidateRole} — favors a different role for a more balanced comp`);
+  }
+  if (qdIsHealerArchetype(t, candidate) && needs.healerCount >= QD_HEALER_SOFT_CAP) {
+    score -= 32;
+    reasons.push(`Team already has a Healer/Support-type pick (high-Sustain Soul Weaver) — avoid stacking multiple healers`);
   }
 
   // Global support scaling — a squad running below-average so far should
@@ -917,6 +1011,23 @@ function qdVarietyHint(currentPicks) {
     return `✅ Speed (${needs.highSpdCount}/${QD_SPEED_TARGET}) and Sustain+Speed (${needs.highSstSpdCount}/${QD_SUSTAIN_SPD_TARGET}) targets are met — no longer chasing High-Speed picks, now favoring under-${QD_VARIETY_CEILING} score picks for variety instead of repeating the same high-cost Survivability heroes.`;
   }
   return "";
+}
+
+/* Short advisory about role/healer stacking — shown above the suggestion
+   list so it's clear why Quick Draft is steering away from a role or a
+   2nd Healer/Support pick, not just silently reordering the list. */
+function qdRoleHint(currentPicks) {
+  if (currentPicks.length === 0) return "";
+  const needs = qdComputeTeamNeeds(currentPicks);
+  const hints = [];
+  if (needs.healerCount >= QD_HEALER_SOFT_CAP) {
+    hints.push(`💠 Healer/Support already picked — later slots favor non-healer roles instead of stacking a 2nd Soul Weaver.`);
+  }
+  const stackedRole = Object.entries(needs.roleCounts).find(([role, n]) => role && n >= QD_ROLE_STACK_SOFT_CAP);
+  if (stackedRole) {
+    hints.push(`⚔️ ${stackedRole[1]}× ${stackedRole[0]} already picked — favoring a different role next for a more balanced comp.`);
+  }
+  return hints.join("<br>");
 }
 
 /* Ranks every Roster hero not already drafted for the next empty slot.
@@ -1053,7 +1164,7 @@ function renderQuickDraftSuggestions() {
 
   const currentPicks = quickDraft.filter(id => id !== null).map(id => heroes.find(h => h.id === id)).filter(Boolean);
   const hintEl = document.getElementById("quickdraft-element-hint");
-  const hints = [qdElementHint(currentPicks), qdVarietyHint(currentPicks)].filter(Boolean);
+  const hints = [qdElementHint(currentPicks), qdVarietyHint(currentPicks), qdRoleHint(currentPicks)].filter(Boolean);
   if (hints.length) { hintEl.innerHTML = hints.join("<br>"); hintEl.style.display = "block"; }
   else { hintEl.style.display = "none"; }
 
