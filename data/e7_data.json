@@ -2260,8 +2260,25 @@
       },
       "_x": 20,
       "_y": 25
+    },
+    {
+      "id": 1787755726487,
+      "name": "Tenebria",
+      "rarity": "5r",
+      "role": "Mage",
+      "element": "Fire",
+      "vType": "SPD",
+      "vScore": 8,
+      "hType": "SUR",
+      "hScore": 5,
+      "notes": "",
+      "iconData": "https://raw.githubusercontent.com/iridesuwa18/e7-chart/main/assets/heroes/tenebria.webp",
+      "locked": true,
+      "altStats": null,
+      "_x": 25,
+      "_y": 10
     }
   ],
   "draftData": null,
-  "savedAt": "2026-08-26T14:47:38.825Z"
+  "savedAt": "2026-08-26T14:48:48.370Z"
 }
