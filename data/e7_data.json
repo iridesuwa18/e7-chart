@@ -2820,8 +2820,25 @@
       "altStats": null,
       "_x": 20,
       "_y": 25
+    },
+    {
+      "id": 1787755065666,
+      "name": "Aramintha",
+      "rarity": "5r",
+      "role": "Mage",
+      "element": "Fire",
+      "vType": "SPD",
+      "vScore": 4,
+      "hType": "SUR",
+      "hScore": 4,
+      "notes": "",
+      "iconData": "https://raw.githubusercontent.com/iridesuwa18/e7-chart/main/assets/heroes/aramintha.webp",
+      "locked": true,
+      "altStats": null,
+      "_x": 30,
+      "_y": 30
     }
   ],
   "draftData": null,
-  "savedAt": "2026-08-26T14:36:01.790Z"
+  "savedAt": "2026-08-26T14:37:48.315Z"
 }
