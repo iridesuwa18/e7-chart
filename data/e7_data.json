@@ -2321,8 +2321,25 @@
       },
       "_x": 40,
       "_y": 0
+    },
+    {
+      "id": 1787756085222,
+      "name": "ae-NINGNING",
+      "rarity": "5ml",
+      "role": "Soul Weaver",
+      "element": "Fire",
+      "vType": "SPD",
+      "vScore": 8,
+      "hType": "SUR",
+      "hScore": 2,
+      "notes": "",
+      "iconData": "https://raw.githubusercontent.com/iridesuwa18/e7-chart/main/assets/heroes/ae-ningning.webp",
+      "locked": true,
+      "altStats": null,
+      "_x": 40,
+      "_y": 10
     }
   ],
   "draftData": null,
-  "savedAt": "2026-08-26T14:52:55.500Z"
+  "savedAt": "2026-08-26T14:54:47.815Z"
 }
