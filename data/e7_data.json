@@ -2699,8 +2699,25 @@
       },
       "_x": 30,
       "_y": 15
+    },
+    {
+      "id": 1787783339727,
+      "name": "Flan",
+      "rarity": "5r",
+      "role": "Ranger",
+      "element": "Ice",
+      "vType": "SPD",
+      "vScore": 6,
+      "hType": "SUR",
+      "hScore": 2,
+      "notes": "",
+      "iconData": "https://raw.githubusercontent.com/iridesuwa18/e7-chart/main/assets/heroes/flan.webp",
+      "locked": true,
+      "altStats": null,
+      "_x": 40,
+      "_y": 20
     }
   ],
   "draftData": null,
-  "savedAt": "2026-08-26T22:27:49.931Z"
+  "savedAt": "2026-08-26T22:29:09.893Z"
 }
