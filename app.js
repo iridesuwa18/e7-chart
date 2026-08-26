@@ -118,7 +118,7 @@ const QD_PASSABLE_SCORE = 5;
 let qdBanProtectElement = null; // the element of the enemy's un-bannable "Ban Protect" pick, if set (Rule 1)
 const QD_ELEMENT_COUNTER = { Fire: "Ice", Ice: "Earth", Earth: "Fire", Light: "Dark", Dark: "Light" }; // which element beats which
 
-/* ── Quick Draft rules (4-rule strategy) ──
+/* ── Quick Draft rules (5-rule strategy) ──
    Rule 1 (Ban Protect counter): see qdBanProtectElement / qdSuggestForNextSlot.
    Rule 2 (stat balance): a hero counts as "High" in Speed/Tank/Survivability/
    Sustainability at QD_HIGH — suggestions favor whichever of those 4 lanes
@@ -131,21 +131,24 @@ const QD_ELEMENT_COUNTER = { Fire: "Ice", Ice: "Earth", Earth: "Fire", Light: "D
    of that group earlier for being too squishy there; Thief moved in).
    Rule 4 (team score budget): the whole 5-hero team's scores (each hero's
    raw, un-boosted Avg/Total-Avg — never the ranking score after Rule 1-3
-   bonuses) must add up to at most QD_TEAM_SCORE_CAP. Rather than dividing
-   the budget evenly across remaining slots, each non-final pick paces
-   itself against roughly HALF of whatever budget is still left (e.g.
-   pick 1 = 7 out of a 30 cap leaves 23; pick 2 paces toward ~11.5; if it
-   lands near there, ~11.5 remains and pick 3 paces toward ~5.75; and so
-   on). Halving instead of dividing evenly means it's always saving room
-   for the picks after it rather than assuming they'll each be average,
-   which is what actually creates the variety — a strong pick doesn't
-   force every later pick down uniformly, it just halves what's left. The
-   final (5th) pick has nothing left to save for, so its target becomes
-   the FULL remaining budget instead, rewarding landing as close to the
-   QD_TEAM_SCORE_CAP as possible without going over it. Going over the
-   overall cap outright is always penalized as a backstop. See
-   qdComputeTeamNeeds (totalScore/remainingBudget) and the pacing
-   penalty/bonus applied in qdScoreCandidate. */
+   bonuses) must add up to at most QD_TEAM_SCORE_CAP. Rather than halving
+   or dividing evenly, each pick's pacing target is 1 / (slots left,
+   INCLUDING this one) of whatever budget remains — except the opening
+   pick, which has nothing banked yet so it targets the FULL budget (no
+   pacing pressure at all). That works out to: pick 1 = full budget,
+   pick 2 = 1/4 of what's left, pick 3 = 1/3 of what's left, pick 4 = 1/2
+   of what's left, pick 5 (final) = the full remainder — rewarding
+   landing as close to the QD_TEAM_SCORE_CAP as possible without going
+   over. Going over the overall cap outright is always penalized as a
+   backstop regardless of pacing. See qdPaceTarget, qdComputeTeamNeeds
+   (totalScore/remainingBudget), and the pacing penalty/bonus applied in
+   qdScoreCandidate.
+   Rule 5 (Protect follow-up): once the Protect slot (index
+   QD_PROTECT_INDEX) is filled, two follow-up checks kick in — (a) if it's
+   a Soul Weaver, the last two slots are steered away from a 2nd one, and
+   (b) once the Ban Protect element (Rule 1) is set, the team is steered
+   toward having at least QD_KNIGHT_MIN_AFTER_BAN_PROTECT Knights if it
+   doesn't already. See qdProtectIsSoulWeaver / qdSuggestForNextSlot. */
 const QD_STAT_FIRST_BONUS = 30;       // bonus for being the 1st High pick covering a stat lane
 const QD_STAT_SECOND_BONUS = 12;      // smaller bonus for being the 2nd High pick in that lane
 const QD_STAT_GAP_BONUS = 8;          // ongoing bonus per lane the candidate's stat is BEHIND the team's most-stacked stat lane — keeps Rule 2 balancing even after every lane has 1+ High picks (i.e. past 4/4), instead of going to 0
@@ -157,13 +160,15 @@ const QD_OFFENSE_TARGET = 2;          // aim for at least 2 offense-class heroes
 const QD_OFFENSE_BONUS = 20;
 const QD_PROTECT_SUPPORT_BONUS = 30;  // Rule 3: support classes are prioritized for the Protect slot
 const QD_BAN_PROTECT_COUNTER_BONUS = 50; // Rule 1: bonus for countering the Ban Protect element
-const QD_LAST_TWO_INDICES = [3, 4];    // Rule 5: the final two slots, filled after the Protect slot
-const QD_PROTECT_SW_LAST_TWO_PENALTY = 200; // Rule 5: heavy penalty for a 2nd Soul Weaver in the last two slots once Protect is already one
+const QD_LAST_TWO_INDICES = [3, 4];    // Rule 5a: the final two slots, filled after the Protect slot
+const QD_PROTECT_SW_LAST_TWO_PENALTY = 200; // Rule 5a: heavy penalty for a 2nd Soul Weaver in the last two slots once Protect is already one
+const QD_KNIGHT_MIN_AFTER_BAN_PROTECT = 2; // Rule 5b: once Ban Protect is set, aim for at least this many Knights on the team
+const QD_KNIGHT_AFTER_BAN_PROTECT_BONUS = 40; // Rule 5b: bonus for a Knight pick while the team is still under the minimum
 const QD_TEAM_SCORE_CAP = 30;         // Rule 4: max combined score (raw 0-10 Avg/Total-Avg per hero) across all 5 picks — ~6/hero on average
 const QD_BUDGET_OVER_PENALTY = 15;    // heavy backstop penalty per point the candidate would push the team's running total over QD_TEAM_SCORE_CAP entirely
 const QD_LAST_PICK_CLOSENESS_BONUS = 20; // for the 5th/final pick, max bonus for landing the team total as close to QD_TEAM_SCORE_CAP as possible without going over
 const QD_LAST_PICK_CLOSENESS_SCALE = 3;  // how fast that bonus decays per point of leftover (unused) budget on the final pick
-const QD_PACE_CLOSENESS_BONUS = 15;   // for picks 1-4, max bonus for landing near the pacing target (see paceTarget below)
+const QD_PACE_CLOSENESS_BONUS = 15;   // for picks 1-4, max bonus for landing near the pacing target (see qdPaceTarget)
 const QD_PACE_CLOSENESS_SCALE = 2;    // how fast that bonus decays per point under the pacing target
 const QD_PACE_OVER_PENALTY = 5;       // lighter penalty (than QD_BUDGET_OVER_PENALTY) per point a non-final pick spends past its pacing target, even while still under the hard cap
 
@@ -802,6 +807,18 @@ function qdComputeTeamNeeds(currentPicks) {
   return { traits, n, avgScore, totalScore, remainingBudget, statCounts, classCounts, offenseCount };
 }
 
+/* Rule 4 pacing target — how much of the remaining budget the pick at
+   position `n` (0-based count of picks already made) should aim to use.
+   The opening pick (n=0) has nothing banked yet, so it targets the FULL
+   remaining budget (no pacing pressure). Every pick after that targets
+   1 / (slots left, including this one) of what's left: 2nd pick 1/4,
+   3rd pick 1/3, 4th pick 1/2, 5th/final pick the full remainder. */
+function qdPaceTarget(n, remainingBudget) {
+  if (n === 0) return remainingBudget;
+  const slotsLeftIncl = QD_SIZE - n;
+  return remainingBudget / slotsLeftIncl;
+}
+
 /* Scores one candidate hero for whatever slot is next empty. Higher is
    better. This is a one-slot-ahead greedy heuristic — it only reasons
    about the heroes already locked in, same as how you'd actually draft
@@ -880,7 +897,7 @@ function qdScoreCandidate(candidate, currentPicks, slotIndex) {
     }
   }
 
-  // ── Rule 5: no 2nd Soul Weaver in the last two slots ──
+  // ── Rule 5a: no 2nd Soul Weaver in the last two slots ──
   // (qdSuggestForNextSlot already excludes Soul Weaver candidates for
   // slots 3-4 once the Protect slot has one — this penalty keeps it
   // visible in the reasons and still helps ranking in the fallback case
@@ -890,16 +907,26 @@ function qdScoreCandidate(candidate, currentPicks, slotIndex) {
     reasons.push(`Protect slot is already a Soul Weaver — avoiding a 2nd one in the last two slots`);
   }
 
-  // ── Rule 4: team score budget (halving pace) ──
-  // The 5-hero team's total score is capped at QD_TEAM_SCORE_CAP. Instead
-  // of dividing what's left evenly across remaining slots, each non-final
-  // pick paces against roughly HALF of the currently remaining budget —
-  // e.g. pick 1 = 7 out of 30 leaves 23, so pick 2 paces toward ~11.5;
-  // land near there and pick 3 paces toward ~5.75, and so on. This always
-  // banks something for the picks after it instead of assuming they'll
-  // each be exactly average. The final pick has nothing left to save for,
-  // so its target is the FULL remaining budget — reward landing as close
-  // to it as possible without going over.
+  // ── Rule 5b: at least 2 Knights once Ban Protect is set ──
+  // (qdSuggestForNextSlot already restricts candidates to Knight once
+  // Ban Protect is set and the team is under the minimum — this bonus
+  // keeps it visible in the reasons and still helps ranking in the
+  // fallback case where no Knight is left in the Roster.)
+  const knightCount = needs.classCounts["Knight"] || 0;
+  if (qdBanProtectElement && knightCount < QD_KNIGHT_MIN_AFTER_BAN_PROTECT && role === "Knight") {
+    score += QD_KNIGHT_AFTER_BAN_PROTECT_BONUS;
+    reasons.push(`Ban Protect is set and the team only has ${knightCount}/${QD_KNIGHT_MIN_AFTER_BAN_PROTECT} Knights — this Knight helps close that gap`);
+  }
+
+  // ── Rule 4: team score budget (1/slots-left pace) ──
+  // The 5-hero team's total score is capped at QD_TEAM_SCORE_CAP. Each
+  // pick's target is 1 / (slots left, including this one) of whatever
+  // budget remains — see qdPaceTarget. The opening pick has nothing
+  // banked yet, so it targets the full remaining budget (no pacing
+  // pressure); pick 2 paces toward 1/4 of what's left, pick 3 toward
+  // 1/3, pick 4 toward 1/2, and the final pick toward the FULL
+  // remainder — reward landing as close to it as possible without
+  // going over.
   const projectedTotal = needs.totalScore + t.score;
   const isLastPick = needs.n === QD_SIZE - 1;
 
@@ -911,7 +938,7 @@ function qdScoreCandidate(candidate, currentPicks, slotIndex) {
     score -= over * QD_BUDGET_OVER_PENALTY;
     reasons.push(`Pushes team total to ${projectedTotal.toFixed(1)}, ${over.toFixed(1)} over the ${QD_TEAM_SCORE_CAP} budget cap`);
   } else {
-    const paceTarget = isLastPick ? needs.remainingBudget : needs.remainingBudget / 2;
+    const paceTarget = qdPaceTarget(needs.n, needs.remainingBudget);
     const diff = paceTarget - t.score; // >=0 = at/under this pick's pacing target (banks the rest); <0 = spent past it
 
     if (diff >= 0) {
@@ -921,11 +948,13 @@ function qdScoreCandidate(candidate, currentPicks, slotIndex) {
       if (closeness > 0) score += closeness;
       reasons.push(isLastPick
         ? `Finishes the team close to the ${QD_TEAM_SCORE_CAP} budget cap (total ${projectedTotal.toFixed(1)}, ${diff.toFixed(1)} left unused)`
-        : `Near this pick's ~${paceTarget.toFixed(1)} pacing target (half of the ${needs.remainingBudget.toFixed(1)} left), banking ${diff.toFixed(1)} for later picks`);
+        : needs.n === 0
+          ? `Opening pick — no pacing target yet, ${diff.toFixed(1)} banked for the rest of the team`
+          : `Near this pick's ~${paceTarget.toFixed(1)} pacing target (1/${QD_SIZE - needs.n} of the ${needs.remainingBudget.toFixed(1)} left), banking ${diff.toFixed(1)} for later picks`);
     } else {
-      // Still under the hard cap, but this pick eats more than its "spend
-      // about half of what's left" pace allows — a smaller penalty than
-      // blowing the cap outright, since it just tightens later picks.
+      // Still under the hard cap, but this pick eats more than its pacing
+      // target allows — a smaller penalty than blowing the cap outright,
+      // since it just tightens later picks.
       const overPace = -diff;
       score -= overPace * QD_PACE_OVER_PENALTY;
       reasons.push(`Uses ${overPace.toFixed(1)} more than the ~${paceTarget.toFixed(1)} pacing target, leaving less budget for later picks`);
@@ -979,10 +1008,10 @@ function qdBudgetHint(currentPicks) {
     return `💰 Team total ${needs.totalScore.toFixed(1)} is already ${Math.abs(needs.remainingBudget).toFixed(1)} over the ${QD_TEAM_SCORE_CAP} budget cap — remaining picks are pushed toward lower scores.`;
   }
   const isLastPick = picksLeft === 1;
-  const paceTarget = isLastPick ? needs.remainingBudget : needs.remainingBudget / 2;
+  const paceTarget = qdPaceTarget(currentPicks.length, needs.remainingBudget);
   return isLastPick
     ? `💰 Budget: ${needs.totalScore.toFixed(1)}/${QD_TEAM_SCORE_CAP} used — final pick is paced toward using the full ~${paceTarget.toFixed(1)} left, to land close to the cap.`
-    : `💰 Budget: ${needs.totalScore.toFixed(1)}/${QD_TEAM_SCORE_CAP} used, ${needs.remainingBudget.toFixed(1)} left — this pick is paced toward ~${paceTarget.toFixed(1)} (half of what's left), banking the rest for later picks.`;
+    : `💰 Budget: ${needs.totalScore.toFixed(1)}/${QD_TEAM_SCORE_CAP} used, ${needs.remainingBudget.toFixed(1)} left — this pick is paced toward ~${paceTarget.toFixed(1)} (1/${picksLeft} of what's left), banking the rest for later picks.`;
 }
 
 /* Rule 1 hint — shows the Ban Protect element and its counter, so it's
@@ -993,11 +1022,20 @@ function qdBanProtectHint() {
   return `🛡 Ban Protect is ${qdBanProtectElement} — remaining picks are locked to ${counterEl} where possible.`;
 }
 
-/* Rule 5 hint — shows when the Protect slot's Soul Weaver is steering
+/* Rule 5a hint — shows when the Protect slot's Soul Weaver is steering
    the last two slots away from a 2nd one. */
 function qdProtectSwHint(nextIdx) {
   if (!QD_LAST_TWO_INDICES.includes(nextIdx) || !qdProtectIsSoulWeaver()) return "";
   return `🔮 Protect slot is a Soul Weaver — the last two slots are steered away from a 2nd one.`;
+}
+
+/* Rule 5b hint — shows when Ban Protect is set and the team still needs
+   more Knights to reach the minimum. */
+function qdKnightAfterBanProtectHint(currentPicks) {
+  if (!qdBanProtectElement) return "";
+  const knightCount = currentPicks.filter(h => h.role === "Knight").length;
+  if (knightCount >= QD_KNIGHT_MIN_AFTER_BAN_PROTECT) return "";
+  return `🛡️ Ban Protect is set — team has ${knightCount}/${QD_KNIGHT_MIN_AFTER_BAN_PROTECT} Knights, remaining picks are steered toward Knight to close the gap.`;
 }
 
 /* Rule 5 helper — is the Protect slot (index QD_PROTECT_INDEX) currently
@@ -1029,13 +1067,25 @@ function qdSuggestForNextSlot() {
     if (countered.length > 0) candidates = countered;
   }
 
-  // Rule 5 — once the Protect slot is filled with a Soul Weaver, don't
+  // Rule 5a — once the Protect slot is filled with a Soul Weaver, don't
   // suggest a 2nd one for either of the last two slots (indices 3 and 4).
   // Only enforced when the Roster still has a non-Soul-Weaver hero left
   // to suggest, so this never empties the list.
   if (QD_LAST_TWO_INDICES.includes(nextIdx) && qdProtectIsSoulWeaver()) {
     const nonSW = candidates.filter(h => h.role !== "Soul Weaver");
     if (nonSW.length > 0) candidates = nonSW;
+  }
+
+  // Rule 5b — once Ban Protect is set, steer every remaining pick toward
+  // Knight until the team has at least QD_KNIGHT_MIN_AFTER_BAN_PROTECT of
+  // them. Only enforced when the Roster still has a Knight left to
+  // suggest, so this never empties the list.
+  if (qdBanProtectElement) {
+    const knightCount = currentPicks.filter(h => h.role === "Knight").length;
+    if (knightCount < QD_KNIGHT_MIN_AFTER_BAN_PROTECT) {
+      const knights = candidates.filter(h => h.role === "Knight");
+      if (knights.length > 0) candidates = knights;
+    }
   }
 
   const scored = candidates.map(c => qdScoreCandidate(c, currentPicks, nextIdx));
@@ -1190,7 +1240,7 @@ function renderQuickDraftSuggestions() {
 
   const currentPicks = quickDraft.filter(id => id !== null).map(id => heroes.find(h => h.id === id)).filter(Boolean);
   const hintEl = document.getElementById("quickdraft-element-hint");
-  const hints = [qdBanProtectHint(), qdProtectSwHint(nextIdx), qdStatHint(currentPicks), qdClassHint(currentPicks), qdBudgetHint(currentPicks)].filter(Boolean);
+  const hints = [qdBanProtectHint(), qdProtectSwHint(nextIdx), qdKnightAfterBanProtectHint(currentPicks), qdStatHint(currentPicks), qdClassHint(currentPicks), qdBudgetHint(currentPicks)].filter(Boolean);
   if (hints.length) { hintEl.innerHTML = hints.join("<br>"); hintEl.style.display = "block"; }
   else { hintEl.style.display = "none"; }
 
