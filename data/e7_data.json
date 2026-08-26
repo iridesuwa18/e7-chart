@@ -2957,8 +2957,30 @@
       },
       "_x": 15,
       "_y": 25
+    },
+    {
+      "id": 1787784673908,
+      "name": "Frida",
+      "rarity": "5ml",
+      "role": "Soul Weaver",
+      "element": "Ice",
+      "vType": "SPD",
+      "vScore": 8,
+      "hType": "SUR",
+      "hScore": 2,
+      "notes": "",
+      "iconData": "https://raw.githubusercontent.com/iridesuwa18/e7-chart/main/assets/heroes/frida.webp",
+      "locked": true,
+      "altStats": {
+        "vType": "TNK",
+        "vScore": 3,
+        "hType": "SUR",
+        "hScore": 2
+      },
+      "_x": 40,
+      "_y": 10
     }
   ],
   "draftData": null,
-  "savedAt": "2026-08-26T22:50:02.675Z"
+  "savedAt": "2026-08-26T22:51:16.833Z"
 }
