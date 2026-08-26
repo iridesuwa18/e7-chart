@@ -2752,8 +2752,42 @@
       "altStats": null,
       "_x": 40,
       "_y": 0
+    },
+    {
+      "id": 1787754738507,
+      "name": "Nahkwol",
+      "rarity": "5r",
+      "role": "Ranger",
+      "element": "Fire",
+      "vType": "SPD",
+      "vScore": 9,
+      "hType": "SUR",
+      "hScore": 2,
+      "notes": "",
+      "iconData": "https://raw.githubusercontent.com/iridesuwa18/e7-chart/main/assets/heroes/nahkwol.webp",
+      "locked": true,
+      "altStats": null,
+      "_x": 40,
+      "_y": 5
+    },
+    {
+      "id": 1787754811842,
+      "name": "Robin",
+      "rarity": "5r",
+      "role": "Ranger",
+      "element": "Fire",
+      "vType": "SPD",
+      "vScore": 7,
+      "hType": "SUR",
+      "hScore": 6,
+      "notes": "",
+      "iconData": "https://raw.githubusercontent.com/iridesuwa18/e7-chart/main/assets/heroes/robin.webp",
+      "locked": true,
+      "altStats": null,
+      "_x": 20,
+      "_y": 15
     }
   ],
   "draftData": null,
-  "savedAt": "2026-08-26T14:31:23.871Z"
+  "savedAt": "2026-08-26T14:33:37.345Z"
 }
