@@ -2550,8 +2550,25 @@
       },
       "_x": 0,
       "_y": 25
+    },
+    {
+      "id": 1787753662988,
+      "name": "Ilynav",
+      "rarity": "5r",
+      "role": "Knight",
+      "element": "Fire",
+      "vType": "SPD",
+      "vScore": 5,
+      "hType": "SUR",
+      "hScore": 5,
+      "notes": "",
+      "iconData": "https://raw.githubusercontent.com/iridesuwa18/e7-chart/main/assets/heroes/ilynav.webp",
+      "locked": true,
+      "altStats": null,
+      "_x": 25,
+      "_y": 25
     }
   ],
   "draftData": null,
-  "savedAt": "2026-08-26T14:13:00.329Z"
+  "savedAt": "2026-08-26T14:14:47.017Z"
 }
