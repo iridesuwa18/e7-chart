@@ -157,6 +157,8 @@ const QD_OFFENSE_TARGET = 2;          // aim for at least 2 offense-class heroes
 const QD_OFFENSE_BONUS = 20;
 const QD_PROTECT_SUPPORT_BONUS = 30;  // Rule 3: support classes are prioritized for the Protect slot
 const QD_BAN_PROTECT_COUNTER_BONUS = 50; // Rule 1: bonus for countering the Ban Protect element
+const QD_LAST_TWO_INDICES = [3, 4];    // Rule 5: the final two slots, filled after the Protect slot
+const QD_PROTECT_SW_LAST_TWO_PENALTY = 200; // Rule 5: heavy penalty for a 2nd Soul Weaver in the last two slots once Protect is already one
 const QD_TEAM_SCORE_CAP = 30;         // Rule 4: max combined score (raw 0-10 Avg/Total-Avg per hero) across all 5 picks — ~6/hero on average
 const QD_BUDGET_OVER_PENALTY = 15;    // heavy backstop penalty per point the candidate would push the team's running total over QD_TEAM_SCORE_CAP entirely
 const QD_LAST_PICK_CLOSENESS_BONUS = 20; // for the 5th/final pick, max bonus for landing the team total as close to QD_TEAM_SCORE_CAP as possible without going over
@@ -878,6 +880,16 @@ function qdScoreCandidate(candidate, currentPicks, slotIndex) {
     }
   }
 
+  // ── Rule 5: no 2nd Soul Weaver in the last two slots ──
+  // (qdSuggestForNextSlot already excludes Soul Weaver candidates for
+  // slots 3-4 once the Protect slot has one — this penalty keeps it
+  // visible in the reasons and still helps ranking in the fallback case
+  // where no non-Soul-Weaver hero is left.)
+  if (QD_LAST_TWO_INDICES.includes(slotIndex) && role === "Soul Weaver" && qdProtectIsSoulWeaver()) {
+    score -= QD_PROTECT_SW_LAST_TWO_PENALTY;
+    reasons.push(`Protect slot is already a Soul Weaver — avoiding a 2nd one in the last two slots`);
+  }
+
   // ── Rule 4: team score budget (halving pace) ──
   // The 5-hero team's total score is capped at QD_TEAM_SCORE_CAP. Instead
   // of dividing what's left evenly across remaining slots, each non-final
@@ -981,6 +993,23 @@ function qdBanProtectHint() {
   return `🛡 Ban Protect is ${qdBanProtectElement} — remaining picks are locked to ${counterEl} where possible.`;
 }
 
+/* Rule 5 hint — shows when the Protect slot's Soul Weaver is steering
+   the last two slots away from a 2nd one. */
+function qdProtectSwHint(nextIdx) {
+  if (!QD_LAST_TWO_INDICES.includes(nextIdx) || !qdProtectIsSoulWeaver()) return "";
+  return `🔮 Protect slot is a Soul Weaver — the last two slots are steered away from a 2nd one.`;
+}
+
+/* Rule 5 helper — is the Protect slot (index QD_PROTECT_INDEX) currently
+   filled with a Soul Weaver? Used to steer the last two slots away from
+   picking a 2nd one. */
+function qdProtectIsSoulWeaver() {
+  const protectId = quickDraft[QD_PROTECT_INDEX];
+  if (protectId === null) return false;
+  const protectHero = heroes.find(h => h.id === protectId);
+  return !!protectHero && protectHero.role === "Soul Weaver";
+}
+
 /* Ranks every Roster hero not already drafted for the next empty slot.
    Always returns a full ranked list (best first) as long as there's at
    least one hero left in the Roster to suggest. */
@@ -998,6 +1027,15 @@ function qdSuggestForNextSlot() {
     const counterEl = QD_ELEMENT_COUNTER[qdBanProtectElement];
     const countered = candidates.filter(h => h.element === counterEl);
     if (countered.length > 0) candidates = countered;
+  }
+
+  // Rule 5 — once the Protect slot is filled with a Soul Weaver, don't
+  // suggest a 2nd one for either of the last two slots (indices 3 and 4).
+  // Only enforced when the Roster still has a non-Soul-Weaver hero left
+  // to suggest, so this never empties the list.
+  if (QD_LAST_TWO_INDICES.includes(nextIdx) && qdProtectIsSoulWeaver()) {
+    const nonSW = candidates.filter(h => h.role !== "Soul Weaver");
+    if (nonSW.length > 0) candidates = nonSW;
   }
 
   const scored = candidates.map(c => qdScoreCandidate(c, currentPicks, nextIdx));
@@ -1152,7 +1190,7 @@ function renderQuickDraftSuggestions() {
 
   const currentPicks = quickDraft.filter(id => id !== null).map(id => heroes.find(h => h.id === id)).filter(Boolean);
   const hintEl = document.getElementById("quickdraft-element-hint");
-  const hints = [qdBanProtectHint(), qdStatHint(currentPicks), qdClassHint(currentPicks), qdBudgetHint(currentPicks)].filter(Boolean);
+  const hints = [qdBanProtectHint(), qdProtectSwHint(nextIdx), qdStatHint(currentPicks), qdClassHint(currentPicks), qdBudgetHint(currentPicks)].filter(Boolean);
   if (hints.length) { hintEl.innerHTML = hints.join("<br>"); hintEl.style.display = "block"; }
   else { hintEl.style.display = "none"; }
 
