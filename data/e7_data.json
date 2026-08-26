@@ -2577,8 +2577,30 @@
       },
       "_x": 30,
       "_y": 25
+    },
+    {
+      "id": 1787782628407,
+      "name": "Peira",
+      "rarity": "5r",
+      "role": "Thief",
+      "element": "Ice",
+      "vType": "TNK",
+      "vScore": 5,
+      "hType": "SUR",
+      "hScore": 3,
+      "notes": "",
+      "iconData": "https://raw.githubusercontent.com/iridesuwa18/e7-chart/main/assets/heroes/peira.webp",
+      "locked": true,
+      "altStats": {
+        "vType": "SPD",
+        "vScore": 7,
+        "hType": "SUR",
+        "hScore": 3
+      },
+      "_x": 35,
+      "_y": 75
     }
   ],
   "draftData": null,
-  "savedAt": "2026-08-26T22:14:49.821Z"
+  "savedAt": "2026-08-26T22:17:12.132Z"
 }
