@@ -2616,8 +2616,30 @@
       "altStats": null,
       "_x": 25,
       "_y": 5
+    },
+    {
+      "id": 1787782852199,
+      "name": "Sez",
+      "rarity": "5r",
+      "role": "Thief",
+      "element": "Ice",
+      "vType": "SPD",
+      "vScore": 4,
+      "hType": "SUR",
+      "hScore": 4,
+      "notes": "",
+      "iconData": "https://raw.githubusercontent.com/iridesuwa18/e7-chart/main/assets/heroes/sez.webp",
+      "locked": true,
+      "altStats": {
+        "vType": "TNK",
+        "vScore": 3,
+        "hType": "SUR",
+        "hScore": 4
+      },
+      "_x": 30,
+      "_y": 30
     }
   ],
   "draftData": null,
-  "savedAt": "2026-08-26T22:19:09.556Z"
+  "savedAt": "2026-08-26T22:20:55.386Z"
 }
