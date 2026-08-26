@@ -2828,8 +2828,25 @@
       "altStats": null,
       "_x": 25,
       "_y": 5
+    },
+    {
+      "id": 1787784093790,
+      "name": "Fairytale Tenebria",
+      "rarity": "5ml",
+      "role": "Mage",
+      "element": "Ice",
+      "vType": "SPD",
+      "vScore": 2,
+      "hType": "SUR",
+      "hScore": 5,
+      "notes": "",
+      "iconData": "https://raw.githubusercontent.com/iridesuwa18/e7-chart/main/assets/heroes/fairytale-tenebria.webp",
+      "locked": true,
+      "altStats": null,
+      "_x": 25,
+      "_y": 40
     }
   ],
   "draftData": null,
-  "savedAt": "2026-08-26T22:39:33.350Z"
+  "savedAt": "2026-08-26T22:41:36.706Z"
 }
