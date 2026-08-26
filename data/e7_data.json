@@ -2854,8 +2854,25 @@
       "altStats": null,
       "_x": 30,
       "_y": 25
+    },
+    {
+      "id": 1787755292381,
+      "name": "Kawerick",
+      "rarity": "5r",
+      "role": "Mage",
+      "element": "Fire",
+      "vType": "SPD",
+      "vScore": 5,
+      "hType": "SUR",
+      "hScore": 4,
+      "notes": "",
+      "iconData": "https://raw.githubusercontent.com/iridesuwa18/e7-chart/main/assets/heroes/kawerick.webp",
+      "locked": true,
+      "altStats": null,
+      "_x": 30,
+      "_y": 25
     }
   ],
   "draftData": null,
-  "savedAt": "2026-08-26T14:40:24.356Z"
+  "savedAt": "2026-08-26T14:41:34.988Z"
 }
