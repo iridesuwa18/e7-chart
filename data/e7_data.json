@@ -2243,8 +2243,25 @@
       },
       "_x": 80,
       "_y": 25
+    },
+    {
+      "id": 1787751852338,
+      "name": "Aki",
+      "rarity": "5r",
+      "role": "Warrior",
+      "element": "Fire",
+      "vType": "TNK",
+      "vScore": 3,
+      "hType": "SUR",
+      "hScore": 9,
+      "notes": "",
+      "iconData": "https://raw.githubusercontent.com/iridesuwa18/e7-chart/main/assets/heroes/aki.webp",
+      "locked": true,
+      "altStats": null,
+      "_x": 5,
+      "_y": 65
     }
   ],
   "draftData": null,
-  "savedAt": "2026-08-26T13:42:39.823Z"
+  "savedAt": "2026-08-26T13:44:23.076Z"
 }
