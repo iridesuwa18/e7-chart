@@ -2772,8 +2772,30 @@
       "altStats": null,
       "_x": 25,
       "_y": 20
+    },
+    {
+      "id": 1787783802188,
+      "name": "Aria",
+      "rarity": "5r",
+      "role": "Mage",
+      "element": "Ice",
+      "vType": "TNK",
+      "vScore": 4,
+      "hType": "SUR",
+      "hScore": 6,
+      "notes": "",
+      "iconData": "https://raw.githubusercontent.com/iridesuwa18/e7-chart/main/assets/heroes/aria.webp",
+      "locked": false,
+      "altStats": {
+        "vType": "SPD",
+        "vScore": 5,
+        "hType": "SUR",
+        "hScore": 6
+      },
+      "_x": 20,
+      "_y": 70
     }
   ],
   "draftData": null,
-  "savedAt": "2026-08-26T22:34:17.669Z"
+  "savedAt": "2026-08-26T22:36:44.948Z"
 }
