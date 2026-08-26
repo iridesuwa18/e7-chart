@@ -2277,8 +2277,25 @@
       "altStats": null,
       "_x": 20,
       "_y": 20
+    },
+    {
+      "id": 1787752019328,
+      "name": "Cermia",
+      "rarity": "5r",
+      "role": "Warrior",
+      "element": "Fire",
+      "vType": "SPD",
+      "vScore": 8,
+      "hType": "SUR",
+      "hScore": 3,
+      "notes": "",
+      "iconData": "https://raw.githubusercontent.com/iridesuwa18/e7-chart/main/assets/heroes/cermia.webp",
+      "locked": true,
+      "altStats": null,
+      "_x": 35,
+      "_y": 10
     }
   ],
   "draftData": null,
-  "savedAt": "2026-08-26T13:46:13.309Z"
+  "savedAt": "2026-08-26T13:47:03.879Z"
 }
