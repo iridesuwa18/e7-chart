@@ -2316,8 +2316,30 @@
       },
       "_x": 35,
       "_y": 25
+    },
+    {
+      "id": 1787752261123,
+      "name": "Guard Captain Krau",
+      "rarity": "5r",
+      "role": "Warrior",
+      "element": "Fire",
+      "vType": "SPD",
+      "vScore": 6,
+      "hType": "SST",
+      "hScore": 5,
+      "notes": "",
+      "iconData": "https://raw.githubusercontent.com/iridesuwa18/e7-chart/main/assets/heroes/guard-captain-krau.webp",
+      "locked": true,
+      "altStats": {
+        "vType": "TNK",
+        "vScore": 3,
+        "hType": "SUR",
+        "hScore": 6
+      },
+      "_x": 75,
+      "_y": 20
     }
   ],
   "draftData": null,
-  "savedAt": "2026-08-26T13:48:38.668Z"
+  "savedAt": "2026-08-26T13:51:04.094Z"
 }
