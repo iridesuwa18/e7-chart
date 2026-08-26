@@ -2511,8 +2511,47 @@
       "altStats": null,
       "_x": 35,
       "_y": 25
+    },
+    {
+      "id": 1787753425901,
+      "name": "Cecilia",
+      "rarity": "5r",
+      "role": "Knight",
+      "element": "Fire",
+      "vType": "TNK",
+      "vScore": 3,
+      "hType": "SUR",
+      "hScore": 4,
+      "notes": "",
+      "iconData": "https://raw.githubusercontent.com/iridesuwa18/e7-chart/main/assets/heroes/cecilia.webp",
+      "locked": true,
+      "altStats": null,
+      "_x": 30,
+      "_y": 65
+    },
+    {
+      "id": 1787753484471,
+      "name": "Charlotte",
+      "rarity": "5r",
+      "role": "Knight",
+      "element": "Fire",
+      "vType": "SPD",
+      "vScore": 5,
+      "hType": "SUR",
+      "hScore": 10,
+      "notes": "",
+      "iconData": "https://raw.githubusercontent.com/iridesuwa18/e7-chart/main/assets/heroes/charlotte.webp",
+      "locked": true,
+      "altStats": {
+        "vType": "TNK",
+        "vScore": 5,
+        "hType": "SST",
+        "hScore": 9
+      },
+      "_x": 0,
+      "_y": 25
     }
   ],
   "draftData": null,
-  "savedAt": "2026-08-26T14:08:08.082Z"
+  "savedAt": "2026-08-26T14:13:00.329Z"
 }
