@@ -2913,8 +2913,30 @@
       "altStats": null,
       "_x": 40,
       "_y": 5
+    },
+    {
+      "id": 1787784513594,
+      "name": "Emilia",
+      "rarity": "5ml",
+      "role": "Soul Weaver",
+      "element": "Ice",
+      "vType": "SPD",
+      "vScore": 7,
+      "hType": "SST",
+      "hScore": 6,
+      "notes": "",
+      "iconData": "https://raw.githubusercontent.com/iridesuwa18/e7-chart/main/assets/heroes/emilia.webp",
+      "locked": true,
+      "altStats": {
+        "vType": "TNK",
+        "vScore": 4,
+        "hType": "SUR",
+        "hScore": 2
+      },
+      "_x": 80,
+      "_y": 15
     }
   ],
   "draftData": null,
-  "savedAt": "2026-08-26T22:46:59.065Z"
+  "savedAt": "2026-08-26T22:48:36.112Z"
 }
