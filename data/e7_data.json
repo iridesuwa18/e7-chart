@@ -2460,8 +2460,25 @@
       },
       "_x": 10,
       "_y": 10
+    },
+    {
+      "id": 1787753087846,
+      "name": "Shalltear",
+      "rarity": "5ml",
+      "role": "Warrior",
+      "element": "Fire",
+      "vType": "TNK",
+      "vScore": 5,
+      "hType": "SUR",
+      "hScore": 7,
+      "notes": "",
+      "iconData": "https://raw.githubusercontent.com/iridesuwa18/e7-chart/main/assets/heroes/shalltear.webp",
+      "locked": true,
+      "altStats": null,
+      "_x": 15,
+      "_y": 75
     }
   ],
   "draftData": null,
-  "savedAt": "2026-08-26T14:02:51.218Z"
+  "savedAt": "2026-08-26T14:04:50.056Z"
 }
