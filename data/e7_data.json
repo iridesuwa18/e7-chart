@@ -2599,8 +2599,25 @@
       },
       "_x": 35,
       "_y": 75
+    },
+    {
+      "id": 1787782746066,
+      "name": "Ran",
+      "rarity": "5ml",
+      "role": "Thief",
+      "element": "Ice",
+      "vType": "SPD",
+      "vScore": 9,
+      "hType": "SUR",
+      "hScore": 5,
+      "notes": "",
+      "iconData": "https://raw.githubusercontent.com/iridesuwa18/e7-chart/main/assets/heroes/ran.webp",
+      "locked": true,
+      "altStats": null,
+      "_x": 25,
+      "_y": 5
     }
   ],
   "draftData": null,
-  "savedAt": "2026-08-26T22:17:12.132Z"
+  "savedAt": "2026-08-26T22:19:09.556Z"
 }
