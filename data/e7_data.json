@@ -2516,8 +2516,25 @@
       "altStats": null,
       "_x": 25,
       "_y": 10
+    },
+    {
+      "id": 1787782181015,
+      "name": "Tywin",
+      "rarity": "5r",
+      "role": "Knight",
+      "element": "Ice",
+      "vType": "TNK",
+      "vScore": 5,
+      "hType": "SUR",
+      "hScore": 4,
+      "notes": "",
+      "iconData": "https://raw.githubusercontent.com/iridesuwa18/e7-chart/main/assets/heroes/tywin.webp",
+      "locked": true,
+      "altStats": null,
+      "_x": 30,
+      "_y": 75
     }
   ],
   "draftData": null,
-  "savedAt": "2026-08-26T22:08:24.373Z"
+  "savedAt": "2026-08-26T22:10:36.283Z"
 }
