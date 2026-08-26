@@ -2416,8 +2416,25 @@
       "altStats": null,
       "_x": 25,
       "_y": 25
+    },
+    {
+      "id": 1787781478944,
+      "name": "Sigret",
+      "rarity": "5r",
+      "role": "Warrior",
+      "element": "Ice",
+      "vType": "SPD",
+      "vScore": 1,
+      "hType": "SUR",
+      "hScore": 3,
+      "notes": "",
+      "iconData": "https://raw.githubusercontent.com/iridesuwa18/e7-chart/main/assets/heroes/sigret.webp",
+      "locked": true,
+      "altStats": null,
+      "_x": 35,
+      "_y": 45
     }
   ],
   "draftData": null,
-  "savedAt": "2026-08-26T21:55:58.348Z"
+  "savedAt": "2026-08-26T21:58:01.614Z"
 }
