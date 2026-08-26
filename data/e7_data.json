@@ -2845,8 +2845,25 @@
       "altStats": null,
       "_x": 25,
       "_y": 40
+    },
+    {
+      "id": 1787784177295,
+      "name": "Fumyr",
+      "rarity": "5r",
+      "role": "Mage",
+      "element": "Ice",
+      "vType": "SPD",
+      "vScore": 8,
+      "hType": "SUR",
+      "hScore": 3,
+      "notes": "",
+      "iconData": "https://raw.githubusercontent.com/iridesuwa18/e7-chart/main/assets/heroes/fumyr.webp",
+      "locked": true,
+      "altStats": null,
+      "_x": 35,
+      "_y": 10
     }
   ],
   "draftData": null,
-  "savedAt": "2026-08-26T22:41:36.706Z"
+  "savedAt": "2026-08-26T22:42:59.731Z"
 }
