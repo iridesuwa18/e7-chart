@@ -2701,8 +2701,25 @@
       "altStats": null,
       "_x": 30,
       "_y": 20
+    },
+    {
+      "id": 1787754501552,
+      "name": "Eligos",
+      "rarity": "5r",
+      "role": "Ranger",
+      "element": "Fire",
+      "vType": "SPD",
+      "vScore": 5,
+      "hType": "SUR",
+      "hScore": 7,
+      "notes": "",
+      "iconData": "https://raw.githubusercontent.com/iridesuwa18/e7-chart/main/assets/heroes/eligos.webp",
+      "locked": true,
+      "altStats": null,
+      "_x": 15,
+      "_y": 25
     }
   ],
   "draftData": null,
-  "savedAt": "2026-08-26T14:26:52.731Z"
+  "savedAt": "2026-08-26T14:28:24.988Z"
 }
