@@ -2438,8 +2438,30 @@
       },
       "_x": 75,
       "_y": 30
+    },
+    {
+      "id": 1787752968920,
+      "name": "Ravi",
+      "rarity": "5r",
+      "role": "Warrior",
+      "element": "Fire",
+      "vType": "SPD",
+      "vScore": 8,
+      "hType": "SUR",
+      "hScore": 8,
+      "notes": "",
+      "iconData": "https://raw.githubusercontent.com/iridesuwa18/e7-chart/main/assets/heroes/ravi.webp",
+      "locked": true,
+      "altStats": {
+        "vType": "TNK",
+        "vScore": 3,
+        "hType": "SST",
+        "hScore": 9
+      },
+      "_x": 10,
+      "_y": 10
     }
   ],
   "draftData": null,
-  "savedAt": "2026-08-26T14:01:15.470Z"
+  "savedAt": "2026-08-26T14:02:51.218Z"
 }
