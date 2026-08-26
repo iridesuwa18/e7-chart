@@ -2871,8 +2871,30 @@
       "altStats": null,
       "_x": 30,
       "_y": 25
+    },
+    {
+      "id": 1787755372046,
+      "name": "Melissa",
+      "rarity": "5r",
+      "role": "Mage",
+      "element": "Fire",
+      "vType": "SPD",
+      "vScore": 7,
+      "hType": "SUR",
+      "hScore": 7,
+      "notes": "",
+      "iconData": "https://raw.githubusercontent.com/iridesuwa18/e7-chart/main/assets/heroes/melissa.webp",
+      "locked": true,
+      "altStats": {
+        "vType": "TNK",
+        "vScore": 3,
+        "hType": "SST",
+        "hScore": 5
+      },
+      "_x": 15,
+      "_y": 15
     }
   ],
   "draftData": null,
-  "savedAt": "2026-08-26T14:41:34.988Z"
+  "savedAt": "2026-08-26T14:43:30.210Z"
 }
