@@ -2277,8 +2277,30 @@
       "altStats": null,
       "_x": 25,
       "_y": 10
+    },
+    {
+      "id": 1787755861696,
+      "name": "Shuna",
+      "rarity": "5ml",
+      "role": "Soul Weaver",
+      "element": "Fire",
+      "vType": "SPD",
+      "vScore": 7,
+      "hType": "SUR",
+      "hScore": 2,
+      "notes": "",
+      "iconData": "https://raw.githubusercontent.com/iridesuwa18/e7-chart/main/assets/heroes/shuna.webp",
+      "locked": true,
+      "altStats": {
+        "vType": "TNK",
+        "vScore": 6,
+        "hType": "SST",
+        "hScore": 4
+      },
+      "_x": 40,
+      "_y": 15
     }
   ],
   "draftData": null,
-  "savedAt": "2026-08-26T14:48:48.370Z"
+  "savedAt": "2026-08-26T14:51:28.595Z"
 }
