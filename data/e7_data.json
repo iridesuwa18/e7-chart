@@ -2718,8 +2718,25 @@
       "altStats": null,
       "_x": 15,
       "_y": 25
+    },
+    {
+      "id": 1787754579849,
+      "name": "Elphelt",
+      "rarity": "5ml",
+      "role": "Ranger",
+      "element": "Fire",
+      "vType": "SPD",
+      "vScore": 7,
+      "hType": "SUR",
+      "hScore": 4,
+      "notes": "",
+      "iconData": "https://raw.githubusercontent.com/iridesuwa18/e7-chart/main/assets/heroes/elphelt.webp",
+      "locked": true,
+      "altStats": null,
+      "_x": 30,
+      "_y": 15
     }
   ],
   "draftData": null,
-  "savedAt": "2026-08-26T14:28:24.988Z"
+  "savedAt": "2026-08-26T14:29:42.617Z"
 }
