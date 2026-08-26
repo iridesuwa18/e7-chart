@@ -2611,8 +2611,25 @@
       },
       "_x": 20,
       "_y": 60
+    },
+    {
+      "id": 1787754035016,
+      "name": "Kayron",
+      "rarity": "5ml",
+      "role": "Thief",
+      "element": "Fire",
+      "vType": "TNK",
+      "vScore": 5,
+      "hType": "SST",
+      "hScore": 7,
+      "notes": "",
+      "iconData": "https://raw.githubusercontent.com/iridesuwa18/e7-chart/main/assets/heroes/kayron.webp",
+      "locked": true,
+      "altStats": null,
+      "_x": 85,
+      "_y": 75
     }
   ],
   "draftData": null,
-  "savedAt": "2026-08-26T14:18:54.251Z"
+  "savedAt": "2026-08-26T14:20:36.387Z"
 }
