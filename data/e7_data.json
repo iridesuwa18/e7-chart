@@ -2377,8 +2377,30 @@
       },
       "_x": 25,
       "_y": 20
+    },
+    {
+      "id": 1787781249575,
+      "name": "Luna",
+      "rarity": "5ml",
+      "role": "Warrior",
+      "element": "Ice",
+      "vType": "SPD",
+      "vScore": 4,
+      "hType": "SUR",
+      "hScore": 7,
+      "notes": "",
+      "iconData": "https://raw.githubusercontent.com/iridesuwa18/e7-chart/main/assets/heroes/luna.webp",
+      "locked": true,
+      "altStats": {
+        "vType": "TNK",
+        "vScore": 6,
+        "hType": "SUR",
+        "hScore": 7
+      },
+      "_x": 15,
+      "_y": 30
     }
   ],
   "draftData": null,
-  "savedAt": "2026-08-26T21:51:59.148Z"
+  "savedAt": "2026-08-26T21:54:10.999Z"
 }
