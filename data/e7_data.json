@@ -2645,8 +2645,30 @@
       "altStats": null,
       "_x": 25,
       "_y": 15
+    },
+    {
+      "id": 1787754241172,
+      "name": "Afternoon Soak Flan",
+      "rarity": "5ml",
+      "role": "Ranger",
+      "element": "Fire",
+      "vType": "SPD",
+      "vScore": 8,
+      "hType": "SUR",
+      "hScore": 7,
+      "notes": "",
+      "iconData": "https://raw.githubusercontent.com/iridesuwa18/e7-chart/main/assets/heroes/afternoon-soak-flan.webp",
+      "locked": true,
+      "altStats": {
+        "vType": "TNK",
+        "vScore": 3,
+        "hType": "SUR",
+        "hScore": 7
+      },
+      "_x": 15,
+      "_y": 10
     }
   ],
   "draftData": null,
-  "savedAt": "2026-08-26T14:22:26.257Z"
+  "savedAt": "2026-08-26T14:24:04.412Z"
 }
