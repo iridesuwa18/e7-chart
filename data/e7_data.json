@@ -2555,8 +2555,30 @@
       },
       "_x": 20,
       "_y": 20
+    },
+    {
+      "id": 1787782487979,
+      "name": "Kise",
+      "rarity": "5r",
+      "role": "Thief",
+      "element": "Ice",
+      "vType": "SPD",
+      "vScore": 5,
+      "hType": "SUR",
+      "hScore": 4,
+      "notes": "",
+      "iconData": "https://raw.githubusercontent.com/iridesuwa18/e7-chart/main/assets/heroes/kise.webp",
+      "locked": true,
+      "altStats": {
+        "vType": "TNK",
+        "vScore": 3,
+        "hType": "SUR",
+        "hScore": 4
+      },
+      "_x": 30,
+      "_y": 25
     }
   ],
   "draftData": null,
-  "savedAt": "2026-08-26T22:12:56.530Z"
+  "savedAt": "2026-08-26T22:14:49.821Z"
 }
