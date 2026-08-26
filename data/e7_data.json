@@ -2735,8 +2735,25 @@
       "altStats": null,
       "_x": 30,
       "_y": 15
+    },
+    {
+      "id": 1787754632713,
+      "name": "Lidica",
+      "rarity": "5r",
+      "role": "Ranger",
+      "element": "Fire",
+      "vType": "SPD",
+      "vScore": 10,
+      "hType": "SUR",
+      "hScore": 2,
+      "notes": "",
+      "iconData": "https://raw.githubusercontent.com/iridesuwa18/e7-chart/main/assets/heroes/lidica.webp",
+      "locked": true,
+      "altStats": null,
+      "_x": 40,
+      "_y": 0
     }
   ],
   "draftData": null,
-  "savedAt": "2026-08-26T14:29:42.617Z"
+  "savedAt": "2026-08-26T14:31:23.871Z"
 }
