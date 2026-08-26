@@ -2794,8 +2794,25 @@
       },
       "_x": 20,
       "_y": 70
+    },
+    {
+      "id": 1787783897592,
+      "name": "Dizzy",
+      "rarity": "5ml",
+      "role": "Mage",
+      "element": "Ice",
+      "vType": "SPD",
+      "vScore": 8,
+      "hType": "SUR",
+      "hScore": 5,
+      "notes": "",
+      "iconData": "https://raw.githubusercontent.com/iridesuwa18/e7-chart/main/assets/heroes/dizzy.webp",
+      "locked": true,
+      "altStats": null,
+      "_x": 25,
+      "_y": 10
     }
   ],
   "draftData": null,
-  "savedAt": "2026-08-26T22:36:44.948Z"
+  "savedAt": "2026-08-26T22:38:19.713Z"
 }
