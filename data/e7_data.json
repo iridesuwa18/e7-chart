@@ -2533,8 +2533,30 @@
       "altStats": null,
       "_x": 30,
       "_y": 75
+    },
+    {
+      "id": 1787782356925,
+      "name": "ae-KARINA",
+      "rarity": "5ml",
+      "role": "Knight",
+      "element": "Ice",
+      "vType": "SPD",
+      "vScore": 6,
+      "hType": "SUR",
+      "hScore": 6,
+      "notes": "",
+      "iconData": "https://raw.githubusercontent.com/iridesuwa18/e7-chart/main/assets/heroes/ae-karina.webp",
+      "locked": true,
+      "altStats": {
+        "vType": "TNK",
+        "vScore": 6,
+        "hType": "SUR",
+        "hScore": 6
+      },
+      "_x": 20,
+      "_y": 20
     }
   ],
   "draftData": null,
-  "savedAt": "2026-08-26T22:10:36.283Z"
+  "savedAt": "2026-08-26T22:12:56.530Z"
 }
