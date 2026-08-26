@@ -2260,8 +2260,25 @@
       "altStats": null,
       "_x": 5,
       "_y": 65
+    },
+    {
+      "id": 1787751886655,
+      "name": "Benimaru",
+      "rarity": "5ml",
+      "role": "Warrior",
+      "element": "Fire",
+      "vType": "SPD",
+      "vScore": 6,
+      "hType": "SUR",
+      "hScore": 6,
+      "notes": "",
+      "iconData": "https://raw.githubusercontent.com/iridesuwa18/e7-chart/main/assets/heroes/benimaru.webp",
+      "locked": true,
+      "altStats": null,
+      "_x": 20,
+      "_y": 20
     }
   ],
   "draftData": null,
-  "savedAt": "2026-08-26T13:44:23.076Z"
+  "savedAt": "2026-08-26T13:46:13.309Z"
 }
