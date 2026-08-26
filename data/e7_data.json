@@ -2360,8 +2360,25 @@
       },
       "_x": 25,
       "_y": 15
+    },
+    {
+      "id": 1787752519542,
+      "name": "Hwayoung",
+      "rarity": "5r",
+      "role": "Warrior",
+      "element": "Fire",
+      "vType": "TNK",
+      "vScore": 5,
+      "hType": "SUR",
+      "hScore": 7,
+      "notes": "",
+      "iconData": "https://raw.githubusercontent.com/iridesuwa18/e7-chart/main/assets/heroes/hwayoung.webp",
+      "locked": true,
+      "altStats": null,
+      "_x": 15,
+      "_y": 75
     }
   ],
   "draftData": null,
-  "savedAt": "2026-08-26T13:53:17.363Z"
+  "savedAt": "2026-08-26T13:55:22.860Z"
 }
