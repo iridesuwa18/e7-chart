@@ -2433,8 +2433,30 @@
       "altStats": null,
       "_x": 35,
       "_y": 45
+    },
+    {
+      "id": 1787781638331,
+      "name": "Taeyou",
+      "rarity": "5r",
+      "role": "Warrior",
+      "element": "Ice",
+      "vType": "SPD",
+      "vScore": 6,
+      "hType": "SUR",
+      "hScore": 4,
+      "notes": "",
+      "iconData": "https://raw.githubusercontent.com/iridesuwa18/e7-chart/main/assets/heroes/taeyou.webp",
+      "locked": true,
+      "altStats": {
+        "vType": "TNK",
+        "vScore": 3,
+        "hType": "SUR",
+        "hScore": 4
+      },
+      "_x": 30,
+      "_y": 20
     }
   ],
   "draftData": null,
-  "savedAt": "2026-08-26T21:58:01.614Z"
+  "savedAt": "2026-08-26T22:00:41.698Z"
 }
