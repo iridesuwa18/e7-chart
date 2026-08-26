@@ -2837,8 +2837,25 @@
       "altStats": null,
       "_x": 30,
       "_y": 30
+    },
+    {
+      "id": 1787755188560,
+      "name": "Baal and Sezan",
+      "rarity": "5r",
+      "role": "Mage",
+      "element": "Fire",
+      "vType": "SPD",
+      "vScore": 5,
+      "hType": "SUR",
+      "hScore": 4,
+      "notes": "",
+      "iconData": "https://raw.githubusercontent.com/iridesuwa18/e7-chart/main/assets/heroes/baal-and-sezan.webp",
+      "locked": true,
+      "altStats": null,
+      "_x": 30,
+      "_y": 25
     }
   ],
   "draftData": null,
-  "savedAt": "2026-08-26T14:37:48.315Z"
+  "savedAt": "2026-08-26T14:40:24.356Z"
 }
