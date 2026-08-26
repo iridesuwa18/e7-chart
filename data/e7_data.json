@@ -2399,8 +2399,25 @@
       },
       "_x": 15,
       "_y": 30
+    },
+    {
+      "id": 1787781348871,
+      "name": "Rem",
+      "rarity": "5ml",
+      "role": "Warrior",
+      "element": "Ice",
+      "vType": "SPD",
+      "vScore": 5,
+      "hType": "SUR",
+      "hScore": 5,
+      "notes": "",
+      "iconData": "https://raw.githubusercontent.com/iridesuwa18/e7-chart/main/assets/heroes/rem.webp",
+      "locked": true,
+      "altStats": null,
+      "_x": 25,
+      "_y": 25
     }
   ],
   "draftData": null,
-  "savedAt": "2026-08-26T21:54:10.999Z"
+  "savedAt": "2026-08-26T21:55:58.348Z"
 }
