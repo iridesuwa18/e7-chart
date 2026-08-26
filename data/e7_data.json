@@ -2238,8 +2238,30 @@
       "altStats": null,
       "_x": 25,
       "_y": 65
+    },
+    {
+      "id": 1787755655365,
+      "name": "Roy Mustang",
+      "rarity": "5ml",
+      "role": "Mage",
+      "element": "Fire",
+      "vType": "SPD",
+      "vScore": 5,
+      "hType": "SUR",
+      "hScore": 6,
+      "notes": "",
+      "iconData": "https://raw.githubusercontent.com/iridesuwa18/e7-chart/main/assets/heroes/roy-mustang.webp",
+      "locked": true,
+      "altStats": {
+        "vType": "TNK",
+        "vScore": 3,
+        "hType": "SUR",
+        "hScore": 6
+      },
+      "_x": 20,
+      "_y": 25
     }
   ],
   "draftData": null,
-  "savedAt": "2026-08-26T14:45:57.873Z"
+  "savedAt": "2026-08-26T14:47:38.825Z"
 }
