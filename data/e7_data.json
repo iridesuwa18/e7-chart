@@ -2628,8 +2628,25 @@
       "altStats": null,
       "_x": 85,
       "_y": 75
+    },
+    {
+      "id": 1787754144082,
+      "name": "ae-WINTER",
+      "rarity": "5ml",
+      "role": "Thief",
+      "element": "Fire",
+      "vType": "SPD",
+      "vScore": 7,
+      "hType": "SUR",
+      "hScore": 5,
+      "notes": "",
+      "iconData": "https://raw.githubusercontent.com/iridesuwa18/e7-chart/main/assets/heroes/ae-winter.webp",
+      "locked": true,
+      "altStats": null,
+      "_x": 25,
+      "_y": 15
     }
   ],
   "draftData": null,
-  "savedAt": "2026-08-26T14:20:36.387Z"
+  "savedAt": "2026-08-26T14:22:26.257Z"
 }
