@@ -2935,8 +2935,30 @@
       },
       "_x": 80,
       "_y": 15
+    },
+    {
+      "id": 1787784599403,
+      "name": "Fenne",
+      "rarity": "5r",
+      "role": "Soul Weaver",
+      "element": "Ice",
+      "vType": "SPD",
+      "vScore": 5,
+      "hType": "SUR",
+      "hScore": 7,
+      "notes": "",
+      "iconData": "https://raw.githubusercontent.com/iridesuwa18/e7-chart/main/assets/heroes/fenne.webp",
+      "locked": true,
+      "altStats": {
+        "vType": "TNK",
+        "vScore": 5,
+        "hType": "SST",
+        "hScore": 5
+      },
+      "_x": 15,
+      "_y": 25
     }
   ],
   "draftData": null,
-  "savedAt": "2026-08-26T22:48:36.112Z"
+  "savedAt": "2026-08-26T22:50:02.675Z"
 }
