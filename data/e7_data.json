@@ -2338,8 +2338,30 @@
       },
       "_x": 75,
       "_y": 20
+    },
+    {
+      "id": 1787752393999,
+      "name": "Holiday Yufine",
+      "rarity": "5ml",
+      "role": "Warrior",
+      "element": "Fire",
+      "vType": "SPD",
+      "vScore": 7,
+      "hType": "SUR",
+      "hScore": 5,
+      "notes": "",
+      "iconData": "https://raw.githubusercontent.com/iridesuwa18/e7-chart/main/assets/heroes/holiday-yufine.webp",
+      "locked": true,
+      "altStats": {
+        "vType": "TNK",
+        "vScore": 3,
+        "hType": "SUR",
+        "hScore": 5
+      },
+      "_x": 25,
+      "_y": 15
     }
   ],
   "draftData": null,
-  "savedAt": "2026-08-26T13:51:04.094Z"
+  "savedAt": "2026-08-26T13:53:17.363Z"
 }
