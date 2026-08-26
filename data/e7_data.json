@@ -2338,8 +2338,25 @@
       "altStats": null,
       "_x": 40,
       "_y": 10
+    },
+    {
+      "id": 1787780966080,
+      "name": "Chloe",
+      "rarity": "5r",
+      "role": "Warrior",
+      "element": "Ice",
+      "vType": "SPD",
+      "vScore": 5,
+      "hType": "SUR",
+      "hScore": 3,
+      "notes": "",
+      "iconData": "https://raw.githubusercontent.com/iridesuwa18/e7-chart/main/assets/heroes/chloe.webp",
+      "locked": true,
+      "altStats": null,
+      "_x": 35,
+      "_y": 25
     }
   ],
   "draftData": null,
-  "savedAt": "2026-08-26T14:54:47.815Z"
+  "savedAt": "2026-08-26T21:49:30.287Z"
 }
