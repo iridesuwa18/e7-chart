@@ -2667,8 +2667,25 @@
       },
       "_x": 15,
       "_y": 10
+    },
+    {
+      "id": 1787754316257,
+      "name": "Beehoo",
+      "rarity": "5r",
+      "role": "Ranger",
+      "element": "Fire",
+      "vType": "SPD",
+      "vScore": 5,
+      "hType": "SUR",
+      "hScore": 5,
+      "notes": "",
+      "iconData": "https://raw.githubusercontent.com/iridesuwa18/e7-chart/main/assets/heroes/beehoo.webp",
+      "locked": true,
+      "altStats": null,
+      "_x": 25,
+      "_y": 25
     }
   ],
   "draftData": null,
-  "savedAt": "2026-08-26T14:24:04.412Z"
+  "savedAt": "2026-08-26T14:25:17.983Z"
 }
