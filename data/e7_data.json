@@ -2416,8 +2416,30 @@
       },
       "_x": 75,
       "_y": 30
+    },
+    {
+      "id": 1787752867348,
+      "name": "Ken",
+      "rarity": "5r",
+      "role": "Warrior",
+      "element": "Fire",
+      "vType": "SPD",
+      "vScore": 4,
+      "hType": "SST",
+      "hScore": 5,
+      "notes": "",
+      "iconData": "https://raw.githubusercontent.com/iridesuwa18/e7-chart/main/assets/heroes/ken.webp",
+      "locked": true,
+      "altStats": {
+        "vType": "TNK",
+        "vScore": 3,
+        "hType": "SUR",
+        "hScore": 4
+      },
+      "_x": 75,
+      "_y": 30
     }
   ],
   "draftData": null,
-  "savedAt": "2026-08-26T13:58:43.670Z"
+  "savedAt": "2026-08-26T14:01:15.470Z"
 }
