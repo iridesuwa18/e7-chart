@@ -2803,8 +2803,25 @@
       "altStats": null,
       "_x": 40,
       "_y": 15
+    },
+    {
+      "id": 1787754958883,
+      "name": "Summertime Iseria",
+      "rarity": "5ml",
+      "role": "Ranger",
+      "element": "Fire",
+      "vType": "SPD",
+      "vScore": 5,
+      "hType": "SUR",
+      "hScore": 6,
+      "notes": "",
+      "iconData": "https://raw.githubusercontent.com/iridesuwa18/e7-chart/main/assets/heroes/summertime-iseria.webp",
+      "locked": true,
+      "altStats": null,
+      "_x": 20,
+      "_y": 25
     }
   ],
   "draftData": null,
-  "savedAt": "2026-08-26T14:34:44.707Z"
+  "savedAt": "2026-08-26T14:36:01.790Z"
 }
