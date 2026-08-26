@@ -2733,8 +2733,30 @@
       "altStats": null,
       "_x": 40,
       "_y": 0
+    },
+    {
+      "id": 1787783561824,
+      "name": "Riza Hawkeye",
+      "rarity": "5ml",
+      "role": "Ranger",
+      "element": "Ice",
+      "vType": "SPD",
+      "vScore": 5,
+      "hType": "SUR",
+      "hScore": 3,
+      "notes": "",
+      "iconData": "https://raw.githubusercontent.com/iridesuwa18/e7-chart/main/assets/heroes/riza-hawkeye.webp",
+      "locked": true,
+      "altStats": {
+        "vType": "TNK",
+        "vScore": 3,
+        "hType": "SUR",
+        "hScore": 3
+      },
+      "_x": 35,
+      "_y": 25
     }
   ],
   "draftData": null,
-  "savedAt": "2026-08-26T22:30:13.658Z"
+  "savedAt": "2026-08-26T22:32:45.479Z"
 }
