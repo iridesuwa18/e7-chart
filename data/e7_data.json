@@ -3057,8 +3057,47 @@
       "altStats": null,
       "_x": 25,
       "_y": 15
+    },
+    {
+      "id": 1787869715761,
+      "name": "Yufine",
+      "rarity": "5r",
+      "role": "Warrior",
+      "element": "Earth",
+      "vType": "SPD",
+      "vScore": 6,
+      "hType": "SUR",
+      "hScore": 7,
+      "notes": "",
+      "iconData": "https://raw.githubusercontent.com/iridesuwa18/e7-chart/main/assets/heroes/yufine.webp",
+      "locked": true,
+      "altStats": null,
+      "_x": 15,
+      "_y": 20
+    },
+    {
+      "id": 1787869816863,
+      "name": "Zahhak",
+      "rarity": "5r",
+      "role": "Warrior",
+      "element": "Earth",
+      "vType": "SPD",
+      "vScore": 7,
+      "hType": "SUR",
+      "hScore": 7,
+      "notes": "",
+      "iconData": "https://raw.githubusercontent.com/iridesuwa18/e7-chart/main/assets/heroes/zahhak.webp",
+      "locked": true,
+      "altStats": {
+        "vType": "TNK",
+        "vScore": 3,
+        "hType": "SUR",
+        "hScore": 7
+      },
+      "_x": 15,
+      "_y": 15
     }
   ],
   "draftData": null,
-  "savedAt": "2026-08-27T22:27:09.995Z"
+  "savedAt": "2026-08-27T22:30:19.890Z"
 }
