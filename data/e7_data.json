@@ -3096,8 +3096,30 @@
       },
       "_x": 15,
       "_y": 15
+    },
+    {
+      "id": 1787869970026,
+      "name": "Albedo",
+      "rarity": "5r",
+      "role": "Knight",
+      "element": "Earth",
+      "vType": "SPD",
+      "vScore": 7,
+      "hType": "SUR",
+      "hScore": 4,
+      "notes": "",
+      "iconData": "https://raw.githubusercontent.com/iridesuwa18/e7-chart/main/assets/heroes/albedo.webp",
+      "locked": true,
+      "altStats": {
+        "vType": "TNK",
+        "vScore": 3,
+        "hType": "SUR",
+        "hScore": 4
+      },
+      "_x": 30,
+      "_y": 15
     }
   ],
   "draftData": null,
-  "savedAt": "2026-08-27T22:30:19.890Z"
+  "savedAt": "2026-08-27T22:32:53.287Z"
 }
