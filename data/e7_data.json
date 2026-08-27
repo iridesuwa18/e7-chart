@@ -3162,8 +3162,25 @@
       },
       "_x": 20,
       "_y": 10
+    },
+    {
+      "id": 1787870335303,
+      "name": "Senya",
+      "rarity": "5r",
+      "role": "Knight",
+      "element": "Earth",
+      "vType": "TNK",
+      "vScore": 5,
+      "hType": "SUR",
+      "hScore": 8,
+      "notes": "",
+      "iconData": "https://raw.githubusercontent.com/iridesuwa18/e7-chart/main/assets/heroes/senya.webp",
+      "locked": true,
+      "altStats": null,
+      "_x": 10,
+      "_y": 75
     }
   ],
   "draftData": null,
-  "savedAt": "2026-08-27T22:37:01.788Z"
+  "savedAt": "2026-08-27T22:39:04.379Z"
 }
