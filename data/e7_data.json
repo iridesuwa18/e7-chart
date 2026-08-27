@@ -3140,8 +3140,30 @@
       },
       "_x": 15,
       "_y": 20
+    },
+    {
+      "id": 1787870214209,
+      "name": "Mort",
+      "rarity": "5r",
+      "role": "Knight",
+      "element": "Earth",
+      "vType": "SPD",
+      "vScore": 8,
+      "hType": "SUR",
+      "hScore": 6,
+      "notes": "",
+      "iconData": "https://raw.githubusercontent.com/iridesuwa18/e7-chart/main/assets/heroes/mort.webp",
+      "locked": true,
+      "altStats": {
+        "vType": "TNK",
+        "vScore": 4,
+        "hType": "SST",
+        "hScore": 5
+      },
+      "_x": 20,
+      "_y": 10
     }
   ],
   "draftData": null,
-  "savedAt": "2026-08-27T22:34:35.540Z"
+  "savedAt": "2026-08-27T22:37:01.788Z"
 }
