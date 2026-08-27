@@ -3040,8 +3040,25 @@
       "altStats": null,
       "_x": 15,
       "_y": 15
+    },
+    {
+      "id": 1787869628038,
+      "name": "Mui",
+      "rarity": "5ml",
+      "role": "Warrior",
+      "element": "Earth",
+      "vType": "SPD",
+      "vScore": 7,
+      "hType": "SUR",
+      "hScore": 5,
+      "notes": "",
+      "iconData": "https://raw.githubusercontent.com/iridesuwa18/e7-chart/main/assets/heroes/mui.webp",
+      "locked": true,
+      "altStats": null,
+      "_x": 25,
+      "_y": 15
     }
   ],
   "draftData": null,
-  "savedAt": "2026-08-27T22:25:05.434Z"
+  "savedAt": "2026-08-27T22:27:09.995Z"
 }
