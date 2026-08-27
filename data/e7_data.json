@@ -3001,8 +3001,47 @@
       },
       "_x": 30,
       "_y": 20
+    },
+    {
+      "id": 1787869370879,
+      "name": "Arunka",
+      "rarity": "5r",
+      "role": "Warrior",
+      "element": "Earth",
+      "vType": "SPD",
+      "vScore": 5,
+      "hType": "SUR",
+      "hScore": 4,
+      "notes": "",
+      "iconData": "https://raw.githubusercontent.com/iridesuwa18/e7-chart/main/assets/heroes/arunka.webp",
+      "locked": true,
+      "altStats": {
+        "vType": "TNK",
+        "vScore": 2,
+        "hType": "SST",
+        "hScore": 4
+      },
+      "_x": 30,
+      "_y": 25
+    },
+    {
+      "id": 1787869503206,
+      "name": "Lilibet",
+      "rarity": "5r",
+      "role": "Warrior",
+      "element": "Earth",
+      "vType": "SPD",
+      "vScore": 7,
+      "hType": "SUR",
+      "hScore": 7,
+      "notes": "",
+      "iconData": "https://raw.githubusercontent.com/iridesuwa18/e7-chart/main/assets/heroes/lilibet.webp",
+      "locked": true,
+      "altStats": null,
+      "_x": 15,
+      "_y": 15
     }
   ],
   "draftData": null,
-  "savedAt": "2026-08-27T22:19:52.921Z"
+  "savedAt": "2026-08-27T22:25:05.434Z"
 }
