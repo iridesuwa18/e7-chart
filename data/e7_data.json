@@ -2979,8 +2979,30 @@
       },
       "_x": 40,
       "_y": 10
+    },
+    {
+      "id": 1787869191346,
+      "name": "Alencia",
+      "rarity": "5r",
+      "role": "Warrior",
+      "element": "Earth",
+      "vType": "SPD",
+      "vScore": 6,
+      "hType": "SUR",
+      "hScore": 4,
+      "notes": "",
+      "iconData": "https://raw.githubusercontent.com/iridesuwa18/e7-chart/main/assets/heroes/alencia.webp",
+      "locked": true,
+      "altStats": {
+        "vType": "TNK",
+        "vScore": 3,
+        "hType": "SST",
+        "hScore": 4
+      },
+      "_x": 30,
+      "_y": 20
     }
   ],
   "draftData": null,
-  "savedAt": "2026-08-26T22:51:57.290Z"
+  "savedAt": "2026-08-27T22:19:52.921Z"
 }
