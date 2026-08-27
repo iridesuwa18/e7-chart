@@ -1342,6 +1342,46 @@ body.dot-mode .origin-dot:hover {
   border-radius: 3px;
 }
 
+/* ── Quick Draft logic info modal: rules table ── */
+.qd-rules-table-wrap {
+  max-height: 340px;
+  overflow-y: auto;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+}
+.qd-rules-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 11px;
+  line-height: 1.5;
+}
+.qd-rules-table thead th {
+  position: sticky;
+  top: 0;
+  background: var(--bg3);
+  color: var(--gold2);
+  font-family: 'Cinzel', serif;
+  font-size: 10.5px;
+  letter-spacing: .04em;
+  text-align: left;
+  padding: 8px 10px;
+  border-bottom: 1px solid var(--gold-dim);
+  z-index: 1;
+}
+.qd-rules-table td {
+  padding: 8px 10px;
+  color: var(--text-dim);
+  border-bottom: 1px solid rgba(255,255,255,.06);
+  vertical-align: top;
+}
+.qd-rules-table td:first-child {
+  color: var(--gold2);
+  white-space: nowrap;
+  font-weight: 600;
+}
+.qd-rules-table tbody tr:last-child td { border-bottom: none; }
+.qd-rules-table tbody tr:hover td { background: rgba(201,162,39,.06); }
+
 .compare-target {
   text-align: center;
   margin-bottom: 22px;

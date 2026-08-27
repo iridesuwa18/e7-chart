@@ -776,63 +776,82 @@
         <button class="det-close-btn" id="qd-logic-close">×</button>
       </div>
       <div class="compare-body" style="padding-top:10px">
-        <p style="font-size:11.5px;color:var(--text-dim);line-height:1.6;margin-bottom:14px">
-          One candidate hero at a time, for whichever slot is next empty. It's a
-          <strong style="color:var(--gold2)">one-slot-ahead greedy heuristic</strong> —
-          not a full 5-hero optimizer — so it only ever reasons about the heroes
-          already locked in, same as drafting in real time. Three simple rules
-          drive every score; whichever remaining hero ends up highest is ranked
-          #1 (and is what Autofill/👑 picks).
+        <p style="font-size:11.5px;color:var(--text-dim);line-height:1.6;margin-bottom:12px">
+          One candidate hero at a time, for whichever slot is next empty —
+          a <strong style="color:var(--gold2)">one-slot-ahead greedy heuristic</strong>,
+          not a full 5-hero optimizer. Whichever remaining hero ends up
+          highest is ranked #1 (what Autofill/👑 picks). Slots: 1-2-3-4-5,
+          where slot 3 is the un-bannable <strong style="color:var(--gold2)">Protect</strong> slot.
         </p>
-
-        <div class="qd-logic-section">
-          <div class="qd-logic-heading">1 · Base hero quality</div>
-          <p>Score starts at <code>hero score × 10</code>. Below the passable
-          threshold (5.0), the shortfall is punished at ×12 — so a weak hero is
-          unlikely to ever outrank a strong one regardless of the rules below.</p>
+        <div class="qd-rules-table-wrap">
+          <table class="qd-rules-table">
+            <thead>
+              <tr><th>Rule</th><th>Trigger</th><th>Points</th></tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>Base quality</td>
+                <td>Every pick</td>
+                <td>Score × 10; below 5.0 passable score, −12 per point short</td>
+              </tr>
+              <tr>
+                <td>1 · Ban Protect counter</td>
+                <td>Enemy Ban Protect element is set</td>
+                <td>Pool locked to the countering element (Fire→Ice→Earth→Fire, Light↔Dark); +50 for matching it</td>
+              </tr>
+              <tr>
+                <td>2 · Stat balance</td>
+                <td>Every pick</td>
+                <td>+30 for 1st High pick in an uncovered lane (Speed/Tank/Survivability/Sustainability), +12 for 2nd; +8 per lane still behind the team's top lane</td>
+              </tr>
+              <tr>
+                <td>3 · Offense target</td>
+                <td>Warrior/Mage/Ranger, team has &lt;2</td>
+                <td>+20</td>
+              </tr>
+              <tr>
+                <td>3 · Protect-slot support</td>
+                <td>Slot 3 (Protect), Knight/Soul Weaver/Thief</td>
+                <td>+30</td>
+              </tr>
+              <tr>
+                <td>3 · Class cap</td>
+                <td>Class already has 2 on team</td>
+                <td>−100 for a 3rd</td>
+              </tr>
+              <tr>
+                <td>4 · Budget: opening pick</td>
+                <td>Slot 1</td>
+                <td>No pacing target — full cap available, nothing banked yet</td>
+              </tr>
+              <tr>
+                <td>4 · Budget: pacing</td>
+                <td>Slots 2-4</td>
+                <td>Target = 1/(slots left, incl. this one) of budget left — 1/4, 1/3, 1/2; near it +15 (−2/pt over target decay), past it −5/pt</td>
+              </tr>
+              <tr>
+                <td>4 · Budget: final pick</td>
+                <td>Slot 5</td>
+                <td>Target = full remaining budget; near cap +20 (−3/pt decay); over the 30 cap outright −15/pt (hard backstop, any slot)</td>
+              </tr>
+              <tr>
+                <td>5a · No 2nd Soul Weaver</td>
+                <td>Slots 4-5, Protect slot is Soul Weaver</td>
+                <td>Pool excludes Soul Weaver; −200 if picked anyway</td>
+              </tr>
+              <tr>
+                <td>5b · Knight minimum</td>
+                <td>Slots 4-5</td>
+                <td>0 Knights yet → both slots locked to Knight; 1 Knight → +40 soft nudge at slot 4, locked at slot 5; 2+ Knights → rule off</td>
+              </tr>
+            </tbody>
+          </table>
         </div>
-
-        <div class="qd-logic-section">
-          <div class="qd-logic-heading">2 · Rule 1 — counter the Ban Protect element only</div>
-          <p>The only enemy-side signal Quick Draft tracks is which element the
-          opponent's un-bannable "Ban Protect" pick is. Once set, the candidate
-          pool for every remaining slot is <strong style="color:var(--gold2)">locked</strong>
-          to whichever element counters it (Fire→Ice→Earth→Fire, Light↔Dark) —
-          falling back to the full Roster only if no counter-element hero is
-          left. On top of the lock, a matching candidate also gets a +50 bonus
-          so it's clear in the reasons why it's ranked where it is.</p>
-        </div>
-
-        <div class="qd-logic-section">
-          <div class="qd-logic-heading">3 · Rule 2 — balance the 4 stat lanes</div>
-          <p>Every hero is read as High or not in 4 lanes — Speed, Tankiness,
-          Survivability, Sustainability (ghost stats included, whichever build
-          is best). A candidate gets +30 for being the team's <em>first</em>
-          High pick in a lane that's currently uncovered, or +12 if it'd be the
-          <em>second</em> High pick in a lane the team already has one of. A
-          hero that's High in two still-needed lanes at once (e.g. both High
-          Speed and High Tankiness) stacks both bonuses — that's how "the hero
-          that covers the most gaps" naturally floats to the top, no dice roll
-          needed.</p>
-        </div>
-
-        <div class="qd-logic-section">
-          <div class="qd-logic-heading">4 · Rule 3 — class caps</div>
-          <p>At most 2 of any one class per team (Warrior/Knight/Thief/Ranger/
-          Mage/Soul Weaver) — a 3rd copy of a class already at 2 takes a heavy
-          −100. Warrior/Thief/Mage are the hard-hitting classes that usually
-          don't carry revives, so each gets +20 while the team has fewer than 2
-          of them. Knight/Soul Weaver/Ranger are the more support-leaning
-          classes, so they get a +30 bonus specifically in the Protect slot
-          (slot 3) — since that pick can't be banned away, it's the safest spot
-          for a support-type hero.</p>
-        </div>
-
-        <p style="font-size:11px;color:var(--text-dim);line-height:1.6;margin-top:16px;padding-top:12px;border-top:1px solid var(--border)">
-          All of this lives in <code>qdScoreCandidate()</code> (plus the
-          Rule 1 filter in <code>qdSuggestForNextSlot()</code>) in
-          <code>app.js</code> — the point values (+50, +30, −100, etc.) are the
-          easiest things to tune first if a suggestion feels off.
+        <p style="font-size:11px;color:var(--text-dim);line-height:1.6;margin-top:14px;padding-top:12px;border-top:1px solid var(--border)">
+          All of this lives in <code>qdScoreCandidate()</code> and
+          <code>qdSuggestForNextSlot()</code> in <code>app.js</code> — the
+          point values above are the easiest things to tune first if a
+          suggestion feels off.
         </p>
       </div>
     </div>

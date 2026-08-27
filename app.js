@@ -143,12 +143,17 @@ const QD_ELEMENT_COUNTER = { Fire: "Ice", Ice: "Earth", Earth: "Fire", Light: "D
    backstop regardless of pacing. See qdPaceTarget, qdComputeTeamNeeds
    (totalScore/remainingBudget), and the pacing penalty/bonus applied in
    qdScoreCandidate.
-   Rule 5 (Protect follow-up): once the Protect slot (index
-   QD_PROTECT_INDEX) is filled, two follow-up checks kick in — (a) if it's
-   a Soul Weaver, the last two slots are steered away from a 2nd one, and
-   (b) once the Ban Protect element (Rule 1) is set, the team is steered
-   toward having at least QD_KNIGHT_MIN_AFTER_BAN_PROTECT Knights if it
-   doesn't already. See qdProtectIsSoulWeaver / qdSuggestForNextSlot. */
+   Rule 5 (last-two-slot follow-up): the last two slots (indices 3 and 4,
+   filled after the Protect slot) have two independent checks — (a) if
+   the Protect slot is a Soul Weaver, they're steered away from a 2nd
+   one, and (b) the team is steered toward ending with at least
+   QD_KNIGHT_MIN Knights: if 0 Knights are drafted yet, BOTH of the last
+   two slots are hard-required to be Knight; if exactly 1 Knight is
+   drafted, only ONE of the last two needs to be — a soft scoring nudge
+   at slot 4 (so whichever slot fits the leftover budget better ends up
+   the Knight) that becomes a hard requirement at slot 5 if it's still
+   short by then; with 2+ Knights already, the rule is void. See
+   qdProtectIsSoulWeaver / qdKnightsNeededInfo / qdSuggestForNextSlot. */
 const QD_STAT_FIRST_BONUS = 30;       // bonus for being the 1st High pick covering a stat lane
 const QD_STAT_SECOND_BONUS = 12;      // smaller bonus for being the 2nd High pick in that lane
 const QD_STAT_GAP_BONUS = 8;          // ongoing bonus per lane the candidate's stat is BEHIND the team's most-stacked stat lane — keeps Rule 2 balancing even after every lane has 1+ High picks (i.e. past 4/4), instead of going to 0
@@ -162,8 +167,8 @@ const QD_PROTECT_SUPPORT_BONUS = 30;  // Rule 3: support classes are prioritized
 const QD_BAN_PROTECT_COUNTER_BONUS = 50; // Rule 1: bonus for countering the Ban Protect element
 const QD_LAST_TWO_INDICES = [3, 4];    // Rule 5a: the final two slots, filled after the Protect slot
 const QD_PROTECT_SW_LAST_TWO_PENALTY = 200; // Rule 5a: heavy penalty for a 2nd Soul Weaver in the last two slots once Protect is already one
-const QD_KNIGHT_MIN_AFTER_BAN_PROTECT = 2; // Rule 5b: once Ban Protect is set, aim for at least this many Knights on the team
-const QD_KNIGHT_AFTER_BAN_PROTECT_BONUS = 40; // Rule 5b: bonus for a Knight pick while the team is still under the minimum
+const QD_KNIGHT_MIN = 2;              // Rule 5b: aim for at least this many Knights across the last two slots
+const QD_KNIGHT_BONUS = 40;           // Rule 5b: bonus for a Knight pick while the team is still under the minimum
 const QD_TEAM_SCORE_CAP = 30;         // Rule 4: max combined score (raw 0-10 Avg/Total-Avg per hero) across all 5 picks — ~6/hero on average
 const QD_BUDGET_OVER_PENALTY = 15;    // heavy backstop penalty per point the candidate would push the team's running total over QD_TEAM_SCORE_CAP entirely
 const QD_LAST_PICK_CLOSENESS_BONUS = 20; // for the 5th/final pick, max bonus for landing the team total as close to QD_TEAM_SCORE_CAP as possible without going over
@@ -907,15 +912,20 @@ function qdScoreCandidate(candidate, currentPicks, slotIndex) {
     reasons.push(`Protect slot is already a Soul Weaver — avoiding a 2nd one in the last two slots`);
   }
 
-  // ── Rule 5b: at least 2 Knights once Ban Protect is set ──
-  // (qdSuggestForNextSlot already restricts candidates to Knight once
-  // Ban Protect is set and the team is under the minimum — this bonus
-  // keeps it visible in the reasons and still helps ranking in the
-  // fallback case where no Knight is left in the Roster.)
-  const knightCount = needs.classCounts["Knight"] || 0;
-  if (qdBanProtectElement && knightCount < QD_KNIGHT_MIN_AFTER_BAN_PROTECT && role === "Knight") {
-    score += QD_KNIGHT_AFTER_BAN_PROTECT_BONUS;
-    reasons.push(`Ban Protect is set and the team only has ${knightCount}/${QD_KNIGHT_MIN_AFTER_BAN_PROTECT} Knights — this Knight helps close that gap`);
+  // ── Rule 5b: work toward at least QD_KNIGHT_MIN Knights (last two slots) ──
+  // When forced (see qdKnightsNeededInfo), qdSuggestForNextSlot has
+  // already restricted candidates to Knight, so this bonus mainly keeps
+  // the reason visible and helps ranking in the fallback case where no
+  // Knight is left in the Roster. When not forced (1 Knight already,
+  // slot 4 only), this is the only mechanism — it's a soft nudge rather
+  // than a hard restriction, letting whichever of slot 4/5 fits the
+  // leftover budget better end up the Knight.
+  const knightInfo = qdKnightsNeededInfo(currentPicks, slotIndex);
+  if (knightInfo && role === "Knight") {
+    score += QD_KNIGHT_BONUS;
+    reasons.push(knightInfo.forced
+      ? `Team has ${knightInfo.knightCount}/${QD_KNIGHT_MIN} Knights with ${knightInfo.slotsLeftIncl} slot(s) left — this Knight is needed to reach the minimum`
+      : `Team has ${knightInfo.knightCount}/${QD_KNIGHT_MIN} Knights — this Knight would lock in the minimum early`);
   }
 
   // ── Rule 4: team score budget (1/slots-left pace) ──
@@ -1029,13 +1039,14 @@ function qdProtectSwHint(nextIdx) {
   return `🔮 Protect slot is a Soul Weaver — the last two slots are steered away from a 2nd one.`;
 }
 
-/* Rule 5b hint — shows when Ban Protect is set and the team still needs
-   more Knights to reach the minimum. */
-function qdKnightAfterBanProtectHint(currentPicks) {
-  if (!qdBanProtectElement) return "";
-  const knightCount = currentPicks.filter(h => h.role === "Knight").length;
-  if (knightCount >= QD_KNIGHT_MIN_AFTER_BAN_PROTECT) return "";
-  return `🛡️ Ban Protect is set — team has ${knightCount}/${QD_KNIGHT_MIN_AFTER_BAN_PROTECT} Knights, remaining picks are steered toward Knight to close the gap.`;
+/* Rule 5b hint — shows when the last two slots still need a Knight to
+   reach the minimum. */
+function qdKnightMinHint(currentPicks, nextIdx) {
+  const info = qdKnightsNeededInfo(currentPicks, nextIdx);
+  if (!info) return "";
+  return info.forced
+    ? `🛡️ Team has ${info.knightCount}/${QD_KNIGHT_MIN} Knights with ${info.slotsLeftIncl} slot(s) left — this pick is locked to Knight to reach the minimum.`
+    : `🛡️ Team has ${info.knightCount}/${QD_KNIGHT_MIN} Knights — Knight is favored here to help lock in the minimum before the last slot.`;
 }
 
 /* Rule 5 helper — is the Protect slot (index QD_PROTECT_INDEX) currently
@@ -1048,6 +1059,25 @@ function qdProtectIsSoulWeaver() {
   return !!protectHero && protectHero.role === "Soul Weaver";
 }
 
+/* Rule 5b helper — works out whether/how strongly this pick (at
+   `nextIdx`, one of the last two slots only) needs to be a Knight so the
+   team ends up with QD_KNIGHT_MIN. Returns null outside the last two
+   slots or once the minimum is already met (rule void). Otherwise
+   returns { needed, knightCount, slotsLeftIncl, forced } where `forced`
+   is true when every remaining last-two slot has to be a Knight to hit
+   the minimum (0 Knights yet → forced at slot 4 covering both; 1 Knight
+   yet → not forced at slot 4, but forced at slot 5 since it's the last
+   chance). */
+function qdKnightsNeededInfo(currentPicks, nextIdx) {
+  if (!QD_LAST_TWO_INDICES.includes(nextIdx)) return null;
+  const knightCount = currentPicks.filter(h => h.role === "Knight").length;
+  const needed = QD_KNIGHT_MIN - knightCount;
+  if (needed <= 0) return null;
+  const slotsLeftIncl = nextIdx === 3 ? 2 : 1; // last two slots remaining, including this one
+  const forced = needed >= slotsLeftIncl;
+  return { needed, knightCount, slotsLeftIncl, forced };
+}
+
 /* Ranks every Roster hero not already drafted for the next empty slot.
    Always returns a full ranked list (best first) as long as there's at
    least one hero left in the Roster to suggest. */
@@ -1057,10 +1087,30 @@ function qdSuggestForNextSlot() {
   const nextIdx = quickDraft.indexOf(null);
   let candidates = heroes.filter(h => !currentIds.includes(h.id));
 
+  // Rule 5b — steer the last two slots toward ending with at least
+  // QD_KNIGHT_MIN Knights, independent of Ban Protect. Only actually
+  // hard-restricts the pool when `forced` (every remaining last-two slot
+  // is needed to hit the minimum) — otherwise it's left as a soft
+  // scoring nudge in qdScoreCandidate so slot 4 can go either way and
+  // slot 5 picks up the slack if still short. This runs BEFORE Rule 1's
+  // element narrowing (below) on purpose: if it ran after, a Roster with
+  // no Knight of the exact counter element would silently fail to find
+  // one and this requirement would never actually apply. Only enforced
+  // when the Roster still has a Knight left to suggest, so this never
+  // empties the list.
+  const knightInfo = qdKnightsNeededInfo(currentPicks, nextIdx);
+  if (knightInfo && knightInfo.forced) {
+    const knights = candidates.filter(h => h.role === "Knight");
+    if (knights.length > 0) candidates = knights;
+  }
+
   // Rule 1 — once the opponent's un-bannable Ban Protect element is set,
-  // every remaining pick should be the element that counters it. Only
-  // enforced when the Roster actually still has a counter-element hero
-  // left to suggest, so this never empties the list.
+  // every remaining pick should be the element that counters it. Applied
+  // on top of the Rule 5b Knight narrowing above, so it only additionally
+  // prefers the counter element among Knights when one exists — it never
+  // overrides the Knight requirement itself. Only enforced when the pool
+  // actually still has a counter-element hero left, so this never empties
+  // the list.
   if (qdBanProtectElement) {
     const counterEl = QD_ELEMENT_COUNTER[qdBanProtectElement];
     const countered = candidates.filter(h => h.element === counterEl);
@@ -1074,18 +1124,6 @@ function qdSuggestForNextSlot() {
   if (QD_LAST_TWO_INDICES.includes(nextIdx) && qdProtectIsSoulWeaver()) {
     const nonSW = candidates.filter(h => h.role !== "Soul Weaver");
     if (nonSW.length > 0) candidates = nonSW;
-  }
-
-  // Rule 5b — once Ban Protect is set, steer every remaining pick toward
-  // Knight until the team has at least QD_KNIGHT_MIN_AFTER_BAN_PROTECT of
-  // them. Only enforced when the Roster still has a Knight left to
-  // suggest, so this never empties the list.
-  if (qdBanProtectElement) {
-    const knightCount = currentPicks.filter(h => h.role === "Knight").length;
-    if (knightCount < QD_KNIGHT_MIN_AFTER_BAN_PROTECT) {
-      const knights = candidates.filter(h => h.role === "Knight");
-      if (knights.length > 0) candidates = knights;
-    }
   }
 
   const scored = candidates.map(c => qdScoreCandidate(c, currentPicks, nextIdx));
@@ -1240,7 +1278,7 @@ function renderQuickDraftSuggestions() {
 
   const currentPicks = quickDraft.filter(id => id !== null).map(id => heroes.find(h => h.id === id)).filter(Boolean);
   const hintEl = document.getElementById("quickdraft-element-hint");
-  const hints = [qdBanProtectHint(), qdProtectSwHint(nextIdx), qdKnightAfterBanProtectHint(currentPicks), qdStatHint(currentPicks), qdClassHint(currentPicks), qdBudgetHint(currentPicks)].filter(Boolean);
+  const hints = [qdBanProtectHint(), qdProtectSwHint(nextIdx), qdKnightMinHint(currentPicks, nextIdx), qdStatHint(currentPicks), qdClassHint(currentPicks), qdBudgetHint(currentPicks)].filter(Boolean);
   if (hints.length) { hintEl.innerHTML = hints.join("<br>"); hintEl.style.display = "block"; }
   else { hintEl.style.display = "none"; }
 
