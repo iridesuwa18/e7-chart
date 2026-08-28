@@ -4181,8 +4181,30 @@
       "altStats": null,
       "_x": 25,
       "_y": 10
+    },
+    {
+      "id": 1787905131779,
+      "name": "Armin",
+      "rarity": "4",
+      "role": "Knight",
+      "element": "Earth",
+      "vType": "TNK",
+      "vScore": 6,
+      "hType": "SUR",
+      "hScore": 2,
+      "notes": "",
+      "iconData": "https://raw.githubusercontent.com/iridesuwa18/e7-chart/main/assets/heroes/armin.webp",
+      "locked": true,
+      "altStats": {
+        "vType": "SPD",
+        "vScore": 3,
+        "hType": "SUR",
+        "hScore": 2
+      },
+      "_x": 40,
+      "_y": 80
     }
   ],
   "draftData": null,
-  "savedAt": "2026-08-28T08:16:48.262Z"
+  "savedAt": "2026-08-28T08:18:59.092Z"
 }
