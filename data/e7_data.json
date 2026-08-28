@@ -3952,8 +3952,25 @@
       },
       "_x": 90,
       "_y": 70
+    },
+    {
+      "id": 1787903615509,
+      "name": "Clarissa",
+      "rarity": "4",
+      "role": "Warrior",
+      "element": "Ice",
+      "vType": "SPD",
+      "vScore": 4,
+      "hType": "SUR",
+      "hScore": 6,
+      "notes": "",
+      "iconData": "https://raw.githubusercontent.com/iridesuwa18/e7-chart/main/assets/heroes/clarissa.webp",
+      "locked": true,
+      "altStats": null,
+      "_x": 20,
+      "_y": 30
     }
   ],
   "draftData": null,
-  "savedAt": "2026-08-28T07:52:19.925Z"
+  "savedAt": "2026-08-28T07:53:40.327Z"
 }
