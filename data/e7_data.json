@@ -3596,8 +3596,25 @@
       "altStats": null,
       "_x": 25,
       "_y": 30
+    },
+    {
+      "id": 1787900739429,
+      "name": "ae-GISELLE",
+      "rarity": "5ml",
+      "role": "Mage",
+      "element": "Earth",
+      "vType": "SPD",
+      "vScore": 8,
+      "hType": "SUR",
+      "hScore": 4,
+      "notes": "",
+      "iconData": "https://raw.githubusercontent.com/iridesuwa18/e7-chart/main/assets/heroes/ae-giselle.webp",
+      "locked": true,
+      "altStats": null,
+      "_x": 30,
+      "_y": 10
     }
   ],
   "draftData": null,
-  "savedAt": "2026-08-28T07:03:46.841Z"
+  "savedAt": "2026-08-28T07:05:48.121Z"
 }
