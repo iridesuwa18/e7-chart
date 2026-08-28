@@ -4203,8 +4203,59 @@
       },
       "_x": 40,
       "_y": 80
+    },
+    {
+      "id": 1787905187580,
+      "name": "Cidd",
+      "rarity": "4",
+      "role": "Thief",
+      "element": "Earth",
+      "vType": "SPD",
+      "vScore": 9,
+      "hType": "SUR",
+      "hScore": 7,
+      "notes": "",
+      "iconData": "https://raw.githubusercontent.com/iridesuwa18/e7-chart/main/assets/heroes/cidd.webp",
+      "locked": true,
+      "altStats": null,
+      "_x": 15,
+      "_y": 5
+    },
+    {
+      "id": 1787905235594,
+      "name": "Leo",
+      "rarity": "4",
+      "role": "Ranger",
+      "element": "Earth",
+      "vType": "SPD",
+      "vScore": 7,
+      "hType": "SUR",
+      "hScore": 3,
+      "notes": "",
+      "iconData": "https://raw.githubusercontent.com/iridesuwa18/e7-chart/main/assets/heroes/leo.webp",
+      "locked": true,
+      "altStats": null,
+      "_x": 35,
+      "_y": 15
+    },
+    {
+      "id": 1787905283348,
+      "name": "Silk",
+      "rarity": "4",
+      "role": "Ranger",
+      "element": "Earth",
+      "vType": "SPD",
+      "vScore": 8,
+      "hType": "SUR",
+      "hScore": 4,
+      "notes": "",
+      "iconData": "https://raw.githubusercontent.com/iridesuwa18/e7-chart/main/assets/heroes/silk.webp",
+      "locked": true,
+      "altStats": null,
+      "_x": 30,
+      "_y": 10
     }
   ],
   "draftData": null,
-  "savedAt": "2026-08-28T08:18:59.092Z"
+  "savedAt": "2026-08-28T08:21:29.499Z"
 }
