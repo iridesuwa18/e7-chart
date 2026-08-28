@@ -4030,8 +4030,25 @@
       "altStats": null,
       "_x": 25,
       "_y": 10
+    },
+    {
+      "id": 1787909224910,
+      "name": "Westwind Executioner Schuri",
+      "rarity": "4",
+      "role": "Ranger",
+      "element": "Dark",
+      "vType": "SPD",
+      "vScore": 7,
+      "hType": "SUR",
+      "hScore": 6,
+      "notes": "",
+      "iconData": "https://raw.githubusercontent.com/iridesuwa18/e7-chart/main/assets/heroes/westwind-executioner-schuri.webp",
+      "locked": true,
+      "altStats": null,
+      "_x": 20,
+      "_y": 15
     }
   ],
   "draftData": null,
-  "savedAt": "2026-08-28T09:25:50.102Z"
+  "savedAt": "2026-08-28T09:27:08.322Z"
 }
