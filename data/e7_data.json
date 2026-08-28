@@ -3991,8 +3991,30 @@
       },
       "_x": 35,
       "_y": 85
+    },
+    {
+      "id": 1787903862874,
+      "name": "Rose",
+      "rarity": "4",
+      "role": "Knight",
+      "element": "Ice",
+      "vType": "SPD",
+      "vScore": 8,
+      "hType": "SUR",
+      "hScore": 2,
+      "notes": ".",
+      "iconData": "https://raw.githubusercontent.com/iridesuwa18/e7-chart/main/assets/heroes/rose.webp",
+      "locked": true,
+      "altStats": {
+        "vType": "TNK",
+        "vScore": 6,
+        "hType": "SUR",
+        "hScore": 2
+      },
+      "_x": 40,
+      "_y": 10
     }
   ],
   "draftData": null,
-  "savedAt": "2026-08-28T07:55:13.338Z"
+  "savedAt": "2026-08-28T07:57:49.984Z"
 }
