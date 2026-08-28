@@ -4047,8 +4047,47 @@
       "altStats": null,
       "_x": 25,
       "_y": 5
+    },
+    {
+      "id": 1787904159665,
+      "name": "Furious",
+      "rarity": "4",
+      "role": "Ranger",
+      "element": "Ice",
+      "vType": "SPD",
+      "vScore": 8,
+      "hType": "SUR",
+      "hScore": 3,
+      "notes": "",
+      "iconData": "https://raw.githubusercontent.com/iridesuwa18/e7-chart/main/assets/heroes/furious.webp",
+      "locked": true,
+      "altStats": null,
+      "_x": 35,
+      "_y": 10
+    },
+    {
+      "id": 1787904229837,
+      "name": "Dominiel",
+      "rarity": "4",
+      "role": "Mage",
+      "element": "Ice",
+      "vType": "SPD",
+      "vScore": 7,
+      "hType": "SUR",
+      "hScore": 3,
+      "notes": "",
+      "iconData": "https://raw.githubusercontent.com/iridesuwa18/e7-chart/main/assets/heroes/dominiel.webp",
+      "locked": true,
+      "altStats": {
+        "vType": "TNK",
+        "vScore": 3,
+        "hType": "SUR",
+        "hScore": 3
+      },
+      "_x": 35,
+      "_y": 15
     }
   ],
   "draftData": null,
-  "savedAt": "2026-08-28T08:01:10.087Z"
+  "savedAt": "2026-08-28T08:03:59.667Z"
 }
