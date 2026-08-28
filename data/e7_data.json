@@ -3745,8 +3745,47 @@
       },
       "_x": 40,
       "_y": 5
+    },
+    {
+      "id": 1787902193433,
+      "name": "Khawazu",
+      "rarity": "4",
+      "role": "Warrior",
+      "element": "Fire",
+      "vType": "SPD",
+      "vScore": 5,
+      "hType": "SUR",
+      "hScore": 4,
+      "notes": "",
+      "iconData": "https://raw.githubusercontent.com/iridesuwa18/e7-chart/main/assets/heroes/khawazu.webp",
+      "locked": true,
+      "altStats": null,
+      "_x": 30,
+      "_y": 25
+    },
+    {
+      "id": 1787902297742,
+      "name": "Maya",
+      "rarity": "4",
+      "role": "Knight",
+      "element": "Fire",
+      "vType": "SPD",
+      "vScore": 7,
+      "hType": "SUR",
+      "hScore": 2,
+      "notes": "",
+      "iconData": "https://raw.githubusercontent.com/iridesuwa18/e7-chart/main/assets/heroes/maya.webp",
+      "locked": true,
+      "altStats": {
+        "vType": "TNK",
+        "vScore": 2,
+        "hType": "SUR",
+        "hScore": 2
+      },
+      "_x": 40,
+      "_y": 15
     }
   ],
   "draftData": null,
-  "savedAt": "2026-08-28T07:28:33.779Z"
+  "savedAt": "2026-08-28T07:31:44.065Z"
 }
