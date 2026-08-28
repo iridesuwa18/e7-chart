@@ -4142,8 +4142,30 @@
       },
       "_x": 95,
       "_y": 65
+    },
+    {
+      "id": 1787904850011,
+      "name": "Cartuja",
+      "rarity": "4",
+      "role": "Warrior",
+      "element": "Earth",
+      "vType": "SPD",
+      "vScore": 7,
+      "hType": "SST",
+      "hScore": 9,
+      "notes": "",
+      "iconData": "https://raw.githubusercontent.com/iridesuwa18/e7-chart/main/assets/heroes/cartuja.webp",
+      "locked": true,
+      "altStats": {
+        "vType": "TNK",
+        "vScore": 5,
+        "hType": "SUR",
+        "hScore": 5
+      },
+      "_x": 95,
+      "_y": 15
     }
   ],
   "draftData": null,
-  "savedAt": "2026-08-28T08:10:49.173Z"
+  "savedAt": "2026-08-28T08:14:17.876Z"
 }
