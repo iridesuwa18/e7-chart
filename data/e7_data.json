@@ -4120,8 +4120,30 @@
       "altStats": null,
       "_x": 30,
       "_y": 15
+    },
+    {
+      "id": 1787904644621,
+      "name": "Angelica",
+      "rarity": "4",
+      "role": "Soul Weaver",
+      "element": "Ice",
+      "vType": "TNK",
+      "vScore": 3,
+      "hType": "SST",
+      "hScore": 9,
+      "notes": "",
+      "iconData": "https://raw.githubusercontent.com/iridesuwa18/e7-chart/main/assets/heroes/angelica.webp",
+      "locked": true,
+      "altStats": {
+        "vType": "SPD",
+        "vScore": 2,
+        "hType": "SUR",
+        "hScore": 2
+      },
+      "_x": 95,
+      "_y": 65
     }
   ],
   "draftData": null,
-  "savedAt": "2026-08-28T08:08:33.061Z"
+  "savedAt": "2026-08-28T08:10:49.173Z"
 }
