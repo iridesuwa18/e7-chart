@@ -3801,8 +3801,42 @@
       "altStats": null,
       "_x": 35,
       "_y": 40
+    },
+    {
+      "id": 1787902538870,
+      "name": "Khawana",
+      "rarity": "4",
+      "role": "Thief",
+      "element": "Fire",
+      "vType": "SPD",
+      "vScore": 4,
+      "hType": "SUR",
+      "hScore": 4,
+      "notes": "",
+      "iconData": "https://raw.githubusercontent.com/iridesuwa18/e7-chart/main/assets/heroes/khawana.webp",
+      "locked": true,
+      "altStats": null,
+      "_x": 30,
+      "_y": 30
+    },
+    {
+      "id": 1787902709592,
+      "name": "Surin",
+      "rarity": "4",
+      "role": "Thief",
+      "element": "Fire",
+      "vType": "SPD",
+      "vScore": 6,
+      "hType": "SUR",
+      "hScore": 4,
+      "notes": "",
+      "iconData": "https://raw.githubusercontent.com/iridesuwa18/e7-chart/main/assets/heroes/surin.webp",
+      "locked": true,
+      "altStats": null,
+      "_x": 30,
+      "_y": 20
     }
   ],
   "draftData": null,
-  "savedAt": "2026-08-28T07:33:54.427Z"
+  "savedAt": "2026-08-28T07:38:48.173Z"
 }
