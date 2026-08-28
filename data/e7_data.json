@@ -3952,8 +3952,25 @@
       "altStats": null,
       "_x": 20,
       "_y": 15
+    },
+    {
+      "id": 1787908842494,
+      "name": "Crescent Moon Rin",
+      "rarity": "4",
+      "role": "Thief",
+      "element": "Dark",
+      "vType": "SPD",
+      "vScore": 7,
+      "hType": "SUR",
+      "hScore": 2,
+      "notes": "",
+      "iconData": "https://raw.githubusercontent.com/iridesuwa18/e7-chart/main/assets/heroes/crescent-moon-rin.webp",
+      "locked": true,
+      "altStats": null,
+      "_x": 40,
+      "_y": 15
     }
   ],
   "draftData": null,
-  "savedAt": "2026-08-28T09:19:28.991Z"
+  "savedAt": "2026-08-28T09:20:49.025Z"
 }
