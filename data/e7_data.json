@@ -3801,8 +3801,69 @@
       "altStats": null,
       "_x": 30,
       "_y": 20
+    },
+    {
+      "id": 1787907941456,
+      "name": "Bad Cat Armin",
+      "rarity": "4",
+      "role": "Warrior",
+      "element": "Dark",
+      "vType": "TNK",
+      "vScore": 3,
+      "hType": "SUR",
+      "hScore": 4,
+      "notes": "",
+      "iconData": "https://raw.githubusercontent.com/iridesuwa18/e7-chart/main/assets/heroes/bad-cat-armin.webp",
+      "locked": true,
+      "altStats": null,
+      "_x": 30,
+      "_y": 65
+    },
+    {
+      "id": 1787908026422,
+      "name": "Great Chief Khawana",
+      "rarity": "4",
+      "role": "Warrior",
+      "element": "Dark",
+      "vType": "SPD",
+      "vScore": 5,
+      "hType": "SUR",
+      "hScore": 5,
+      "notes": "",
+      "iconData": "https://raw.githubusercontent.com/iridesuwa18/e7-chart/main/assets/heroes/great-chief-khawana.webp",
+      "locked": true,
+      "altStats": {
+        "vType": "TNK",
+        "vScore": 3,
+        "hType": "SUR",
+        "hScore": 5
+      },
+      "_x": 25,
+      "_y": 25
+    },
+    {
+      "id": 1787908170174,
+      "name": "Inferno Khawazu",
+      "rarity": "4",
+      "role": "Warrior",
+      "element": "Dark",
+      "vType": "TNK",
+      "vScore": 6,
+      "hType": "SUR",
+      "hScore": 7,
+      "notes": "",
+      "iconData": "https://raw.githubusercontent.com/iridesuwa18/e7-chart/main/assets/heroes/inferno-khawazu.webp",
+      "locked": true,
+      "altStats": {
+        "vType": "SPD",
+        "vScore": 6,
+        "hType": "SST",
+        "hScore": 5
+      },
+      "_x": 15,
+      "_y": 80
     }
   ],
   "draftData": null,
-  "savedAt": "2026-08-28T09:04:30.236Z"
+  "savedAt": "2026-08-28T09:09:37.345Z"
 }
