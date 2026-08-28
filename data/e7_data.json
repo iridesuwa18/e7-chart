@@ -3540,8 +3540,30 @@
       "altStats": null,
       "_x": 35,
       "_y": 20
+    },
+    {
+      "id": 1787900402616,
+      "name": "Ludwig",
+      "rarity": "5r",
+      "role": "Mage",
+      "element": "Earth",
+      "vType": "SPD",
+      "vScore": 5,
+      "hType": "SUR",
+      "hScore": 5,
+      "notes": "",
+      "iconData": "https://raw.githubusercontent.com/iridesuwa18/e7-chart/main/assets/heroes/ludwig.webp",
+      "locked": true,
+      "altStats": {
+        "vType": "TNK",
+        "vScore": 3,
+        "hType": "SUR",
+        "hScore": 5
+      },
+      "_x": 25,
+      "_y": 25
     }
   ],
   "draftData": null,
-  "savedAt": "2026-08-28T06:57:38.084Z"
+  "savedAt": "2026-08-28T07:00:07.237Z"
 }
