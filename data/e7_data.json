@@ -3679,8 +3679,25 @@
       },
       "_x": 35,
       "_y": 20
+    },
+    {
+      "id": 1787906954824,
+      "name": "Wandering Prince Cidd",
+      "rarity": "4",
+      "role": "Mage",
+      "element": "Light",
+      "vType": "SPD",
+      "vScore": 7,
+      "hType": "SUR",
+      "hScore": 4,
+      "notes": "",
+      "iconData": "https://raw.githubusercontent.com/iridesuwa18/e7-chart/main/assets/heroes/wandering-prince-cidd.webp",
+      "locked": true,
+      "altStats": null,
+      "_x": 30,
+      "_y": 15
     }
   ],
   "draftData": null,
-  "savedAt": "2026-08-28T08:47:29.247Z"
+  "savedAt": "2026-08-28T08:49:18.829Z"
 }
