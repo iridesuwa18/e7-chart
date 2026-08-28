@@ -3718,8 +3718,30 @@
       },
       "_x": 20,
       "_y": 75
+    },
+    {
+      "id": 1787907140233,
+      "name": "Infinite Horizon Achates",
+      "rarity": "4",
+      "role": "Soul Weaver",
+      "element": "Light",
+      "vType": "SPD",
+      "vScore": 9,
+      "hType": "SUR",
+      "hScore": 2,
+      "notes": "",
+      "iconData": "https://raw.githubusercontent.com/iridesuwa18/e7-chart/main/assets/heroes/infinite-horizon-achates.webp",
+      "locked": true,
+      "altStats": {
+        "vType": "TNK",
+        "vScore": 4,
+        "hType": "SST",
+        "hScore": 5
+      },
+      "_x": 40,
+      "_y": 5
     }
   ],
   "draftData": null,
-  "savedAt": "2026-08-28T08:50:59.301Z"
+  "savedAt": "2026-08-28T08:52:46.200Z"
 }
