@@ -3506,8 +3506,25 @@
       "altStats": null,
       "_x": 30,
       "_y": 15
+    },
+    {
+      "id": 1787900111515,
+      "name": "Pavel",
+      "rarity": "5r",
+      "role": "Ranger",
+      "element": "Earth",
+      "vType": "SPD",
+      "vScore": 7,
+      "hType": "SUR",
+      "hScore": 3,
+      "notes": "",
+      "iconData": "https://raw.githubusercontent.com/iridesuwa18/e7-chart/main/assets/heroes/pavel.webp",
+      "locked": true,
+      "altStats": null,
+      "_x": 35,
+      "_y": 15
     }
   ],
   "draftData": null,
-  "savedAt": "2026-08-28T06:52:25.112Z"
+  "savedAt": "2026-08-28T06:55:15.667Z"
 }
