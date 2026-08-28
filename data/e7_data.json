@@ -3784,8 +3784,25 @@
       },
       "_x": 95,
       "_y": 25
+    },
+    {
+      "id": 1787907862013,
+      "name": "Assassin Cartuja",
+      "rarity": "4",
+      "role": "Knight",
+      "element": "Dark",
+      "vType": "SPD",
+      "vScore": 6,
+      "hType": "SUR",
+      "hScore": 4,
+      "notes": "",
+      "iconData": "https://raw.githubusercontent.com/iridesuwa18/e7-chart/main/assets/heroes/assassin-cartuja.webp",
+      "locked": true,
+      "altStats": null,
+      "_x": 30,
+      "_y": 20
     }
   ],
   "draftData": null,
-  "savedAt": "2026-08-28T09:02:55.211Z"
+  "savedAt": "2026-08-28T09:04:30.236Z"
 }
