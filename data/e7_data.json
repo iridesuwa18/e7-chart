@@ -3613,8 +3613,30 @@
       "altStats": null,
       "_x": 30,
       "_y": 10
+    },
+    {
+      "id": 1787900920551,
+      "name": "Ray",
+      "rarity": "5r",
+      "role": "Soul Weaver",
+      "element": "Earth",
+      "vType": "TNK",
+      "vScore": 4,
+      "hType": "SST",
+      "hScore": 8,
+      "notes": "",
+      "iconData": "https://raw.githubusercontent.com/iridesuwa18/e7-chart/main/assets/heroes/ray.webp",
+      "locked": true,
+      "altStats": {
+        "vType": "SPD",
+        "vScore": 1,
+        "hType": "SUR",
+        "hScore": 2
+      },
+      "_x": 90,
+      "_y": 70
     }
   ],
   "draftData": null,
-  "savedAt": "2026-08-28T07:05:48.121Z"
+  "savedAt": "2026-08-28T07:08:49.398Z"
 }
