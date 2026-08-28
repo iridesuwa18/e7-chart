@@ -3784,8 +3784,25 @@
       },
       "_x": 40,
       "_y": 15
+    },
+    {
+      "id": 1787902401904,
+      "name": "Victorika",
+      "rarity": "4",
+      "role": "Knight",
+      "element": "Fire",
+      "vType": "SPD",
+      "vScore": 2,
+      "hType": "SUR",
+      "hScore": 3,
+      "notes": "",
+      "iconData": "https://raw.githubusercontent.com/iridesuwa18/e7-chart/main/assets/heroes/victorika.webp",
+      "locked": true,
+      "altStats": null,
+      "_x": 35,
+      "_y": 40
     }
   ],
   "draftData": null,
-  "savedAt": "2026-08-28T07:31:44.065Z"
+  "savedAt": "2026-08-28T07:33:54.427Z"
 }
