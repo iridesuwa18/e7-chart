@@ -4086,8 +4086,42 @@
       },
       "_x": 35,
       "_y": 15
+    },
+    {
+      "id": 1787904314868,
+      "name": "Romann",
+      "rarity": "4",
+      "role": "Mage",
+      "element": "Ice",
+      "vType": "SPD",
+      "vScore": 10,
+      "hType": "SUR",
+      "hScore": 4,
+      "notes": "",
+      "iconData": "https://raw.githubusercontent.com/iridesuwa18/e7-chart/main/assets/heroes/romann.webp",
+      "locked": true,
+      "altStats": null,
+      "_x": 30,
+      "_y": 0
+    },
+    {
+      "id": 1787904473028,
+      "name": "Zerato",
+      "rarity": "4",
+      "role": "Mage",
+      "element": "Ice",
+      "vType": "SPD",
+      "vScore": 7,
+      "hType": "SUR",
+      "hScore": 4,
+      "notes": "",
+      "iconData": "https://raw.githubusercontent.com/iridesuwa18/e7-chart/main/assets/heroes/zerato.webp",
+      "locked": true,
+      "altStats": null,
+      "_x": 30,
+      "_y": 15
     }
   ],
   "draftData": null,
-  "savedAt": "2026-08-28T08:03:59.667Z"
+  "savedAt": "2026-08-28T08:08:33.061Z"
 }
