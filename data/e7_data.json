@@ -4132,8 +4132,30 @@
       "altStats": null,
       "_x": 25,
       "_y": 25
+    },
+    {
+      "id": 1787909909990,
+      "name": "Shooting Star Achates",
+      "rarity": "4",
+      "role": "Soul Weaver",
+      "element": "Dark",
+      "vType": "SPD",
+      "vScore": 2,
+      "hType": "SST",
+      "hScore": 10,
+      "notes": "",
+      "iconData": "https://raw.githubusercontent.com/iridesuwa18/e7-chart/main/assets/heroes/shooting-star-achates.webp",
+      "locked": true,
+      "altStats": {
+        "vType": "TNK",
+        "vScore": 3,
+        "hType": "SUR",
+        "hScore": 2
+      },
+      "_x": 100,
+      "_y": 40
     }
   ],
   "draftData": null,
-  "savedAt": "2026-08-28T09:36:40.743Z"
+  "savedAt": "2026-08-28T09:38:39.100Z"
 }
