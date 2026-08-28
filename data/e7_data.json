@@ -3562,8 +3562,25 @@
       },
       "_x": 25,
       "_y": 25
+    },
+    {
+      "id": 1787900523527,
+      "name": "Ram",
+      "rarity": "5ml",
+      "role": "Mage",
+      "element": "Earth",
+      "vType": "SPD",
+      "vScore": 2,
+      "hType": "SUR",
+      "hScore": 4,
+      "notes": "",
+      "iconData": "https://raw.githubusercontent.com/iridesuwa18/e7-chart/main/assets/heroes/ram.webp",
+      "locked": true,
+      "altStats": null,
+      "_x": 30,
+      "_y": 40
     }
   ],
   "draftData": null,
-  "savedAt": "2026-08-28T07:00:07.237Z"
+  "savedAt": "2026-08-28T07:02:10.278Z"
 }
