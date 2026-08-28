@@ -3355,8 +3355,30 @@
       "altStats": null,
       "_x": 30,
       "_y": 15
+    },
+    {
+      "id": 1787898942394,
+      "name": "Ervalen",
+      "rarity": "5r",
+      "role": "Thief",
+      "element": "Earth",
+      "vType": "SPD",
+      "vScore": 5,
+      "hType": "SUR",
+      "hScore": 7,
+      "notes": "",
+      "iconData": "https://raw.githubusercontent.com/iridesuwa18/e7-chart/main/assets/heroes/ervalen.webp",
+      "locked": true,
+      "altStats": {
+        "vType": "TNK",
+        "vScore": 2,
+        "hType": "SUR",
+        "hScore": 7
+      },
+      "_x": 15,
+      "_y": 25
     }
   ],
   "draftData": null,
-  "savedAt": "2026-08-28T06:32:41.643Z"
+  "savedAt": "2026-08-28T06:35:46.664Z"
 }
