@@ -3679,8 +3679,30 @@
       },
       "_x": 35,
       "_y": 20
+    },
+    {
+      "id": 1787901644184,
+      "name": "Lisette",
+      "rarity": "5ml",
+      "role": "Soul Weaver",
+      "element": "Light",
+      "vType": "TNK",
+      "vScore": 10,
+      "hType": "SST",
+      "hScore": 10,
+      "notes": "",
+      "iconData": "https://raw.githubusercontent.com/iridesuwa18/e7-chart/main/assets/heroes/lisette.webp",
+      "locked": true,
+      "altStats": {
+        "vType": "SPD",
+        "vScore": 5,
+        "hType": "SUR",
+        "hScore": 7
+      },
+      "_x": 100,
+      "_y": 100
     }
   ],
   "draftData": null,
-  "savedAt": "2026-08-28T07:15:28.751Z"
+  "savedAt": "2026-08-28T07:21:18.775Z"
 }
