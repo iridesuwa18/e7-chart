@@ -3438,8 +3438,25 @@
       },
       "_x": 15,
       "_y": 10
+    },
+    {
+      "id": 1787899571123,
+      "name": "Bellona",
+      "rarity": "5r",
+      "role": "Ranger",
+      "element": "Earth",
+      "vType": "SPD",
+      "vScore": 7,
+      "hType": "SUR",
+      "hScore": 5,
+      "notes": "",
+      "iconData": "https://raw.githubusercontent.com/iridesuwa18/e7-chart/main/assets/heroes/bellona.webp",
+      "locked": true,
+      "altStats": null,
+      "_x": 25,
+      "_y": 15
     }
   ],
   "draftData": null,
-  "savedAt": "2026-08-28T06:43:05.372Z"
+  "savedAt": "2026-08-28T06:46:18.694Z"
 }
