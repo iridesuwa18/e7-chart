@@ -4254,8 +4254,30 @@
       "altStats": null,
       "_x": 30,
       "_y": 10
+    },
+    {
+      "id": 1787905379103,
+      "name": "Lots",
+      "rarity": "4",
+      "role": "Soul Weaver",
+      "element": "Earth",
+      "vType": "SPD",
+      "vScore": 9,
+      "hType": "SST",
+      "hScore": 5,
+      "notes": "",
+      "iconData": "https://raw.githubusercontent.com/iridesuwa18/e7-chart/main/assets/heroes/lots.webp",
+      "locked": true,
+      "altStats": {
+        "vType": "TNK",
+        "vScore": 2,
+        "hType": "SUR",
+        "hScore": 2
+      },
+      "_x": 75,
+      "_y": 5
     }
   ],
   "draftData": null,
-  "savedAt": "2026-08-28T08:21:29.499Z"
+  "savedAt": "2026-08-28T08:23:06.237Z"
 }
