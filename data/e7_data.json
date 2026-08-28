@@ -3701,8 +3701,30 @@
       },
       "_x": 100,
       "_y": 100
+    },
+    {
+      "id": 1787902026479,
+      "name": "Corvus",
+      "rarity": "4",
+      "role": "Warrior",
+      "element": "Fire",
+      "vType": "SPD",
+      "vScore": 8,
+      "hType": "SST",
+      "hScore": 4,
+      "notes": "",
+      "iconData": "https://raw.githubusercontent.com/iridesuwa18/e7-chart/main/assets/heroes/corvus.webp",
+      "locked": true,
+      "altStats": {
+        "vType": "TNK",
+        "vScore": 4,
+        "hType": "SUR",
+        "hScore": 4
+      },
+      "_x": 70,
+      "_y": 10
     }
   ],
   "draftData": null,
-  "savedAt": "2026-08-28T07:23:35.752Z"
+  "savedAt": "2026-08-28T07:27:15.177Z"
 }
