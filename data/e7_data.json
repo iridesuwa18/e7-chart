@@ -3377,8 +3377,30 @@
       },
       "_x": 15,
       "_y": 25
+    },
+    {
+      "id": 1787899105595,
+      "name": "Midnight Gaia Lilias",
+      "rarity": "5ml",
+      "role": "Thief",
+      "element": "Earth",
+      "vType": "SPD",
+      "vScore": 8,
+      "hType": "SST",
+      "hScore": 6,
+      "notes": "",
+      "iconData": "https://raw.githubusercontent.com/iridesuwa18/e7-chart/main/assets/heroes/midnight-gaia-lilias.webp",
+      "locked": true,
+      "altStats": {
+        "vType": "TNK",
+        "vScore": 5,
+        "hType": "SUR",
+        "hScore": 7
+      },
+      "_x": 80,
+      "_y": 10
     }
   ],
   "draftData": null,
-  "savedAt": "2026-08-28T06:35:46.664Z"
+  "savedAt": "2026-08-28T06:38:29.589Z"
 }
