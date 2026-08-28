@@ -3723,8 +3723,30 @@
       },
       "_x": 70,
       "_y": 10
+    },
+    {
+      "id": 1787902106573,
+      "name": "Dingo",
+      "rarity": "4",
+      "role": "Warrior",
+      "element": "Fire",
+      "vType": "SPD",
+      "vScore": 9,
+      "hType": "SUR",
+      "hScore": 2,
+      "notes": "",
+      "iconData": "https://raw.githubusercontent.com/iridesuwa18/e7-chart/main/assets/heroes/dingo.webp",
+      "locked": true,
+      "altStats": {
+        "vType": "SPD",
+        "vScore": 9,
+        "hType": "SST",
+        "hScore": 2
+      },
+      "_x": 40,
+      "_y": 5
     }
   ],
   "draftData": null,
-  "savedAt": "2026-08-28T07:27:15.177Z"
+  "savedAt": "2026-08-28T07:28:33.779Z"
 }
