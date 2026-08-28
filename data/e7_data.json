@@ -3852,8 +3852,25 @@
       "altStats": null,
       "_x": 40,
       "_y": 10
+    },
+    {
+      "id": 1787902925901,
+      "name": "Veronica",
+      "rarity": "4",
+      "role": "Ranger",
+      "element": "Fire",
+      "vType": "SPD",
+      "vScore": 7,
+      "hType": "SUR",
+      "hScore": 3,
+      "notes": "",
+      "iconData": "https://raw.githubusercontent.com/iridesuwa18/e7-chart/main/assets/heroes/veronica.webp",
+      "locked": true,
+      "altStats": null,
+      "_x": 35,
+      "_y": 15
     }
   ],
   "draftData": null,
-  "savedAt": "2026-08-28T07:40:47.467Z"
+  "savedAt": "2026-08-28T07:42:27.208Z"
 }
