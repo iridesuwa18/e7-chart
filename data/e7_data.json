@@ -4164,8 +4164,25 @@
       },
       "_x": 95,
       "_y": 15
+    },
+    {
+      "id": 1787904999343,
+      "name": "Purrgis",
+      "rarity": "4",
+      "role": "Warrior",
+      "element": "Earth",
+      "vType": "SPD",
+      "vScore": 8,
+      "hType": "SUR",
+      "hScore": 5,
+      "notes": "",
+      "iconData": "https://raw.githubusercontent.com/iridesuwa18/e7-chart/main/assets/heroes/purrgis.webp",
+      "locked": true,
+      "altStats": null,
+      "_x": 25,
+      "_y": 10
     }
   ],
   "draftData": null,
-  "savedAt": "2026-08-28T08:14:17.876Z"
+  "savedAt": "2026-08-28T08:16:48.262Z"
 }
