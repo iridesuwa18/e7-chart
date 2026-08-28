@@ -4237,8 +4237,30 @@
       "altStats": null,
       "_x": 35,
       "_y": 30
+    },
+    {
+      "id": 1787960440121,
+      "name": "Maya",
+      "rarity": "4",
+      "role": "Knight",
+      "element": "Fire",
+      "vType": "SPD",
+      "vScore": 7,
+      "hType": "SUR",
+      "hScore": 2,
+      "notes": "",
+      "iconData": "https://raw.githubusercontent.com/iridesuwa18/e7-chart/main/assets/heroes/maya.webp",
+      "locked": true,
+      "altStats": {
+        "vType": "TNK",
+        "vScore": 3,
+        "hType": "SUR",
+        "hScore": 2
+      },
+      "_x": 40,
+      "_y": 15
     }
   ],
   "draftData": null,
-  "savedAt": "2026-08-28T23:39:21.850Z"
+  "savedAt": "2026-08-28T23:40:49.696Z"
 }
