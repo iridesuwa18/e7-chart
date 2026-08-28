@@ -4376,8 +4376,30 @@
       "altStats": null,
       "_x": 30,
       "_y": 75
+    },
+    {
+      "id": 1787906147336,
+      "name": "Last Piece Karin",
+      "rarity": "4",
+      "role": "Thief",
+      "element": "Light",
+      "vType": "SPD",
+      "vScore": 8,
+      "hType": "SUR",
+      "hScore": 7,
+      "notes": "",
+      "iconData": "https://raw.githubusercontent.com/iridesuwa18/e7-chart/main/assets/heroes/last-piece-karin.webp",
+      "locked": true,
+      "altStats": {
+        "vType": "TNK",
+        "vScore": 2,
+        "hType": "SUR",
+        "hScore": 7
+      },
+      "_x": 15,
+      "_y": 10
     }
   ],
   "draftData": null,
-  "savedAt": "2026-08-28T08:34:01.181Z"
+  "savedAt": "2026-08-28T08:36:11.567Z"
 }
