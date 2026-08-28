@@ -4359,8 +4359,25 @@
       },
       "_x": 70,
       "_y": 90
+    },
+    {
+      "id": 1787906034862,
+      "name": "Fighter Maya",
+      "rarity": "4",
+      "role": "Knight",
+      "element": "Light",
+      "vType": "TNK",
+      "vScore": 5,
+      "hType": "SUR",
+      "hScore": 4,
+      "notes": "",
+      "iconData": "https://raw.githubusercontent.com/iridesuwa18/e7-chart/main/assets/heroes/fighter-maya.webp",
+      "locked": true,
+      "altStats": null,
+      "_x": 30,
+      "_y": 75
     }
   ],
   "draftData": null,
-  "savedAt": "2026-08-28T08:31:55.857Z"
+  "savedAt": "2026-08-28T08:34:01.181Z"
 }
