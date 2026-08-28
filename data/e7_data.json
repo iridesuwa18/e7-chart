@@ -4327,8 +4327,47 @@
       "altStats": null,
       "_x": 40,
       "_y": 5
+    },
+    {
+      "id": 1787960721514,
+      "name": "Veronica",
+      "rarity": "4",
+      "role": "Ranger",
+      "element": "Fire",
+      "vType": "SPD",
+      "vScore": 7,
+      "hType": "SUR",
+      "hScore": 2,
+      "notes": "",
+      "iconData": "https://raw.githubusercontent.com/iridesuwa18/e7-chart/main/assets/heroes/veronica.webp",
+      "locked": true,
+      "altStats": null,
+      "_x": 40,
+      "_y": 15
+    },
+    {
+      "id": 1787960799972,
+      "name": "Mercedes",
+      "rarity": "4",
+      "role": "Mage",
+      "element": "Fire",
+      "vType": "SPD",
+      "vScore": 4,
+      "hType": "SUR",
+      "hScore": 5,
+      "notes": "",
+      "iconData": "https://raw.githubusercontent.com/iridesuwa18/e7-chart/main/assets/heroes/mercedes.webp",
+      "locked": true,
+      "altStats": {
+        "vType": "TNK",
+        "vScore": 3,
+        "hType": "SUR",
+        "hScore": 5
+      },
+      "_x": 25,
+      "_y": 30
     }
   ],
   "draftData": null,
-  "savedAt": "2026-08-28T23:44:35.445Z"
+  "savedAt": "2026-08-28T23:46:47.153Z"
 }
