@@ -3696,8 +3696,30 @@
       "altStats": null,
       "_x": 30,
       "_y": 15
+    },
+    {
+      "id": 1787907051735,
+      "name": "Blaze Dingo",
+      "rarity": "4",
+      "role": "Soul Weaver",
+      "element": "Light",
+      "vType": "TNK",
+      "vScore": 5,
+      "hType": "SUR",
+      "hScore": 6,
+      "notes": "",
+      "iconData": "https://raw.githubusercontent.com/iridesuwa18/e7-chart/main/assets/heroes/blaze-dingo.webp",
+      "locked": true,
+      "altStats": {
+        "vType": "SPD",
+        "vScore": 2,
+        "hType": "SST",
+        "hScore": 7
+      },
+      "_x": 20,
+      "_y": 75
     }
   ],
   "draftData": null,
-  "savedAt": "2026-08-28T08:49:18.829Z"
+  "savedAt": "2026-08-28T08:50:59.301Z"
 }
