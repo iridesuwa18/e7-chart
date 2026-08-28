@@ -4437,8 +4437,59 @@
       "altStats": null,
       "_x": 40,
       "_y": 0
+    },
+    {
+      "id": 1787906511501,
+      "name": "Watcher Schuri",
+      "rarity": "4",
+      "role": "Ranger",
+      "element": "Light",
+      "vType": "SPD",
+      "vScore": 2,
+      "hType": "SUR",
+      "hScore": 7,
+      "notes": "",
+      "iconData": "https://raw.githubusercontent.com/iridesuwa18/e7-chart/main/assets/heroes/watcher-schuru.webp",
+      "locked": true,
+      "altStats": null,
+      "_x": 15,
+      "_y": 40
+    },
+    {
+      "id": 1787906632093,
+      "name": "Angel of Light Angelica",
+      "rarity": "4",
+      "role": "Mage",
+      "element": "Light",
+      "vType": "SPD",
+      "vScore": 8,
+      "hType": "SUR",
+      "hScore": 2,
+      "notes": "",
+      "iconData": "https://raw.githubusercontent.com/iridesuwa18/e7-chart/main/assets/heroes/angel-of-light-angelica.webp",
+      "locked": true,
+      "altStats": null,
+      "_x": 40,
+      "_y": 10
+    },
+    {
+      "id": 1787906743834,
+      "name": "Benevolent Romann",
+      "rarity": "4",
+      "role": "Mage",
+      "element": "Light",
+      "vType": "SPD",
+      "vScore": 10,
+      "hType": "SUR",
+      "hScore": 4,
+      "notes": "",
+      "iconData": "https://raw.githubusercontent.com/iridesuwa18/e7-chart/main/assets/heroes/benevolent-romann.webp",
+      "locked": true,
+      "altStats": null,
+      "_x": 30,
+      "_y": 0
     }
   ],
   "draftData": null,
-  "savedAt": "2026-08-28T08:39:31.411Z"
+  "savedAt": "2026-08-28T08:45:48.597Z"
 }
