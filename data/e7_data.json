@@ -4093,7 +4093,7 @@
       "hType": "SUR",
       "hScore": 5,
       "notes": "",
-      "iconData": null,
+      "iconData": "https://raw.githubusercontent.com/iridesuwa18/e7-chart/main/assets/heroes/challenger-dominiel.webp",
       "locked": true,
       "altStats": null,
       "_x": 25,
@@ -4179,5 +4179,5 @@
     }
   ],
   "draftData": null,
-  "savedAt": "2026-08-28T09:40:28.775Z"
+  "savedAt": "2026-08-28T23:27:18.225Z"
 }
