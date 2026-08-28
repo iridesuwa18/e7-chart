@@ -3489,8 +3489,25 @@
       "altStats": null,
       "_x": 15,
       "_y": 15
+    },
+    {
+      "id": 1787899940540,
+      "name": "Iseria",
+      "rarity": "5r",
+      "role": "Ranger",
+      "element": "Earth",
+      "vType": "SPD",
+      "vScore": 7,
+      "hType": "SUR",
+      "hScore": 4,
+      "notes": "",
+      "iconData": "https://raw.githubusercontent.com/iridesuwa18/e7-chart/main/assets/heroes/iseria.webp",
+      "locked": true,
+      "altStats": null,
+      "_x": 30,
+      "_y": 15
     }
   ],
   "draftData": null,
-  "savedAt": "2026-08-28T06:50:43.809Z"
+  "savedAt": "2026-08-28T06:52:25.112Z"
 }
