@@ -4081,8 +4081,25 @@
       "altStats": null,
       "_x": 20,
       "_y": 20
+    },
+    {
+      "id": 1787909389583,
+      "name": "Challenger Dominiel",
+      "rarity": "4",
+      "role": "Mage",
+      "element": "Dark",
+      "vType": "SPD",
+      "vScore": 9,
+      "hType": "SUR",
+      "hScore": 5,
+      "notes": "",
+      "iconData": null,
+      "locked": true,
+      "altStats": null,
+      "_x": 25,
+      "_y": 5
     }
   ],
   "draftData": null,
-  "savedAt": "2026-08-28T09:29:00.742Z"
+  "savedAt": "2026-08-28T09:29:55.539Z"
 }
