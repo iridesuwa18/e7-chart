@@ -4366,8 +4366,30 @@
       },
       "_x": 25,
       "_y": 30
+    },
+    {
+      "id": 1787960866128,
+      "name": "Serila",
+      "rarity": "4",
+      "role": "Mage",
+      "element": "Fire",
+      "vType": "SPD",
+      "vScore": 2,
+      "hType": "SST",
+      "hScore": 8,
+      "notes": "",
+      "iconData": "https://raw.githubusercontent.com/iridesuwa18/e7-chart/main/assets/heroes/serila.webp",
+      "locked": true,
+      "altStats": {
+        "vType": "SPD",
+        "vScore": 2,
+        "hType": "SUR",
+        "hScore": 6
+      },
+      "_x": 90,
+      "_y": 40
     }
   ],
   "draftData": null,
-  "savedAt": "2026-08-28T23:46:47.153Z"
+  "savedAt": "2026-08-28T23:48:14.015Z"
 }
