@@ -3930,8 +3930,30 @@
       },
       "_x": 95,
       "_y": 75
+    },
+    {
+      "id": 1787903534419,
+      "name": "Kizuna Ai",
+      "rarity": "5ml",
+      "role": "Soul Weaver",
+      "element": "Fire",
+      "vType": "TNK",
+      "vScore": 4,
+      "hType": "SST",
+      "hScore": 8,
+      "notes": "",
+      "iconData": "https://raw.githubusercontent.com/iridesuwa18/e7-chart/main/assets/heroes/kizuna-ai.webp",
+      "locked": true,
+      "altStats": {
+        "vType": "SPD",
+        "vScore": 5,
+        "hType": "SUR",
+        "hScore": 2
+      },
+      "_x": 90,
+      "_y": 70
     }
   ],
   "draftData": null,
-  "savedAt": "2026-08-28T07:49:47.389Z"
+  "savedAt": "2026-08-28T07:52:19.925Z"
 }
