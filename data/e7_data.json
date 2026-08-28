@@ -4388,8 +4388,30 @@
       },
       "_x": 90,
       "_y": 40
+    },
+    {
+      "id": 1787960952313,
+      "name": "Achates",
+      "rarity": "4",
+      "role": "Soul Weaver",
+      "element": "Fire",
+      "vType": "SPD",
+      "vScore": 2,
+      "hType": "SST",
+      "hScore": 9,
+      "notes": "",
+      "iconData": "https://raw.githubusercontent.com/iridesuwa18/e7-chart/main/assets/heroes/achates.webp",
+      "locked": true,
+      "altStats": {
+        "vType": "TNK",
+        "vScore": 4,
+        "hType": "SUR",
+        "hScore": 2
+      },
+      "_x": 95,
+      "_y": 40
     }
   ],
   "draftData": null,
-  "savedAt": "2026-08-28T23:48:14.015Z"
+  "savedAt": "2026-08-28T23:49:15.141Z"
 }
