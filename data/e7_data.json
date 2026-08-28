@@ -4154,8 +4154,30 @@
       },
       "_x": 100,
       "_y": 40
+    },
+    {
+      "id": 1787910015101,
+      "name": "Sinful Angelica",
+      "rarity": "4",
+      "role": "Soul Weaver",
+      "element": "Dark",
+      "vType": "SPD",
+      "vScore": 4,
+      "hType": "SST",
+      "hScore": 3,
+      "notes": "",
+      "iconData": "https://raw.githubusercontent.com/iridesuwa18/e7-chart/main/assets/heroes/sinful-angelica.webp",
+      "locked": true,
+      "altStats": {
+        "vType": "TNK",
+        "vScore": 4,
+        "hType": "SUR",
+        "hScore": 2
+      },
+      "_x": 65,
+      "_y": 30
     }
   ],
   "draftData": null,
-  "savedAt": "2026-08-28T09:38:39.100Z"
+  "savedAt": "2026-08-28T09:40:21.269Z"
 }
