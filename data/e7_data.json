@@ -3472,8 +3472,25 @@
       "altStats": null,
       "_x": 35,
       "_y": 10
+    },
+    {
+      "id": 1787899837592,
+      "name": "Fenris",
+      "rarity": "5r",
+      "role": "Ranger",
+      "element": "Earth",
+      "vType": "SPD",
+      "vScore": 7,
+      "hType": "SUR",
+      "hScore": 7,
+      "notes": "",
+      "iconData": "https://raw.githubusercontent.com/iridesuwa18/e7-chart/main/assets/heroes/fenris.webp",
+      "locked": true,
+      "altStats": null,
+      "_x": 15,
+      "_y": 15
     }
   ],
   "draftData": null,
-  "savedAt": "2026-08-28T06:48:34.315Z"
+  "savedAt": "2026-08-28T06:50:43.809Z"
 }
