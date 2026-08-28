@@ -3969,8 +3969,52 @@
       "altStats": null,
       "_x": 40,
       "_y": 15
+    },
+    {
+      "id": 1787908993300,
+      "name": "New Kid Adin",
+      "rarity": "4",
+      "role": "Thief",
+      "element": "Dark",
+      "vType": "TNK",
+      "vScore": 6,
+      "hType": "SUR",
+      "hScore": 9,
+      "notes": "",
+      "iconData": "https://raw.githubusercontent.com/iridesuwa18/e7-chart/main/assets/heroes/new-kid-adin.webp",
+      "locked": true,
+      "altStats": {
+        "vType": "SPD",
+        "vScore": 6,
+        "hType": "SST",
+        "hScore": 6
+      },
+      "_x": 5,
+      "_y": 80
+    },
+    {
+      "id": 1787909076588,
+      "name": "Peacemaker Furious",
+      "rarity": "5ml",
+      "role": "",
+      "element": "",
+      "vType": "SPD",
+      "vScore": 7,
+      "hType": "SUR",
+      "hScore": 6,
+      "notes": "",
+      "iconData": "https://raw.githubusercontent.com/iridesuwa18/e7-chart/main/assets/heroes/peacemaker-furious.webp",
+      "locked": true,
+      "altStats": {
+        "vType": "TNK",
+        "vScore": 4,
+        "hType": "SUR",
+        "hScore": 6
+      },
+      "_x": 20,
+      "_y": 15
     }
   ],
   "draftData": null,
-  "savedAt": "2026-08-28T09:20:49.025Z"
+  "savedAt": "2026-08-28T09:24:47.005Z"
 }
