@@ -3879,8 +3879,25 @@
       "altStats": null,
       "_x": 40,
       "_y": 20
+    },
+    {
+      "id": 1787908382984,
+      "name": "Shadow Rose",
+      "rarity": "4",
+      "role": "Knight",
+      "element": "Dark",
+      "vType": "SPD",
+      "vScore": 7,
+      "hType": "SUR",
+      "hScore": 3,
+      "notes": "",
+      "iconData": "https://raw.githubusercontent.com/iridesuwa18/e7-chart/main/assets/heroes/shadow-rose.webp",
+      "locked": true,
+      "altStats": null,
+      "_x": 35,
+      "_y": 15
     }
   ],
   "draftData": null,
-  "savedAt": "2026-08-28T09:12:06.018Z"
+  "savedAt": "2026-08-28T09:13:45.837Z"
 }
