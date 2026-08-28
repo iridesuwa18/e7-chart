@@ -3635,8 +3635,30 @@
       },
       "_x": 90,
       "_y": 70
+    },
+    {
+      "id": 1787901124465,
+      "name": "Schniel",
+      "rarity": "5r",
+      "role": "Soul Weaver",
+      "element": "Earth",
+      "vType": "TNK",
+      "vScore": 6,
+      "hType": "SUR",
+      "hScore": 7,
+      "notes": "",
+      "iconData": "https://raw.githubusercontent.com/iridesuwa18/e7-chart/main/assets/heroes/unnamed-hero.webp",
+      "locked": true,
+      "altStats": {
+        "vType": "SPD",
+        "vScore": 3,
+        "hType": "SUR",
+        "hScore": 7
+      },
+      "_x": 15,
+      "_y": 80
     }
   ],
   "draftData": null,
-  "savedAt": "2026-08-28T07:08:49.398Z"
+  "savedAt": "2026-08-28T07:13:00.097Z"
 }
