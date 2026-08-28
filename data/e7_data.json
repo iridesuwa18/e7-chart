@@ -3523,8 +3523,25 @@
       "altStats": null,
       "_x": 35,
       "_y": 15
+    },
+    {
+      "id": 1787900221759,
+      "name": "Basar",
+      "rarity": "5r",
+      "role": "Mage",
+      "element": "Earth",
+      "vType": "SPD",
+      "vScore": 6,
+      "hType": "SUR",
+      "hScore": 3,
+      "notes": "",
+      "iconData": "https://raw.githubusercontent.com/iridesuwa18/e7-chart/main/assets/heroes/basar.webp",
+      "locked": true,
+      "altStats": null,
+      "_x": 35,
+      "_y": 20
     }
   ],
   "draftData": null,
-  "savedAt": "2026-08-28T06:55:15.667Z"
+  "savedAt": "2026-08-28T06:57:38.084Z"
 }
