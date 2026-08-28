@@ -4115,8 +4115,25 @@
       "altStats": null,
       "_x": 25,
       "_y": 60
+    },
+    {
+      "id": 1787909792862,
+      "name": "Sealed Eye Surin",
+      "rarity": "4",
+      "role": "Mage",
+      "element": "Dark",
+      "vType": "SPD",
+      "vScore": 5,
+      "hType": "SUR",
+      "hScore": 5,
+      "notes": "",
+      "iconData": "https://raw.githubusercontent.com/iridesuwa18/e7-chart/main/assets/heroes/sealed-eye-surin.webp",
+      "locked": true,
+      "altStats": null,
+      "_x": 25,
+      "_y": 25
     }
   ],
   "draftData": null,
-  "savedAt": "2026-08-28T09:34:51.507Z"
+  "savedAt": "2026-08-28T09:36:40.743Z"
 }
