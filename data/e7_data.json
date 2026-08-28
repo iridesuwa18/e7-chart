@@ -4047,8 +4047,42 @@
       "altStats": null,
       "_x": 20,
       "_y": 15
+    },
+    {
+      "id": 1787909269531,
+      "name": "Auxiliary Lots",
+      "rarity": "4",
+      "role": "Mage",
+      "element": "Dark",
+      "vType": "SPD",
+      "vScore": 9,
+      "hType": "SUR",
+      "hScore": 2,
+      "notes": "",
+      "iconData": "https://raw.githubusercontent.com/iridesuwa18/e7-chart/main/assets/heroes/auxiliary-lots.webp",
+      "locked": true,
+      "altStats": null,
+      "_x": 40,
+      "_y": 5
+    },
+    {
+      "id": 1787909335993,
+      "name": "Celestial Mercedes",
+      "rarity": "4",
+      "role": "Mage",
+      "element": "Dark",
+      "vType": "SPD",
+      "vScore": 6,
+      "hType": "SUR",
+      "hScore": 6,
+      "notes": "",
+      "iconData": "https://raw.githubusercontent.com/iridesuwa18/e7-chart/main/assets/heroes/celestial-mercedes.webp",
+      "locked": true,
+      "altStats": null,
+      "_x": 20,
+      "_y": 20
     }
   ],
   "draftData": null,
-  "savedAt": "2026-08-28T09:27:08.322Z"
+  "savedAt": "2026-08-28T09:29:00.742Z"
 }
