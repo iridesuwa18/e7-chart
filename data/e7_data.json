@@ -4198,8 +4198,47 @@
       },
       "_x": 40,
       "_y": 15
+    },
+    {
+      "id": 1787960283924,
+      "name": "Dingo",
+      "rarity": "4",
+      "role": "Warrior",
+      "element": "Fire",
+      "vType": "SPD",
+      "vScore": 9,
+      "hType": "SUR",
+      "hScore": 4,
+      "notes": "",
+      "iconData": "https://raw.githubusercontent.com/iridesuwa18/e7-chart/main/assets/heroes/dingo.webp",
+      "locked": true,
+      "altStats": {
+        "vType": "SPD",
+        "vScore": 9,
+        "hType": "SST",
+        "hScore": 3
+      },
+      "_x": 30,
+      "_y": 5
+    },
+    {
+      "id": 1787960348288,
+      "name": "Khawazu",
+      "rarity": "4",
+      "role": "Warrior",
+      "element": "Fire",
+      "vType": "SPD",
+      "vScore": 4,
+      "hType": "SUR",
+      "hScore": 3,
+      "notes": "",
+      "iconData": "https://raw.githubusercontent.com/iridesuwa18/e7-chart/main/assets/heroes/khawazu.webp",
+      "locked": true,
+      "altStats": null,
+      "_x": 35,
+      "_y": 30
     }
   ],
   "draftData": null,
-  "savedAt": "2026-08-28T23:33:20.290Z"
+  "savedAt": "2026-08-28T23:39:21.850Z"
 }
