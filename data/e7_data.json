@@ -5397,8 +5397,30 @@
       },
       "_x": 65,
       "_y": 70
+    },
+    {
+      "id": 1787966597088,
+      "name": "Taranor Royal Guard",
+      "rarity": "3",
+      "role": "Knight",
+      "element": "Ice",
+      "vType": "TNK",
+      "vScore": 3,
+      "hType": "SST",
+      "hScore": 5,
+      "notes": "",
+      "iconData": "https://raw.githubusercontent.com/iridesuwa18/e7-chart/main/assets/heroes/taranor-royal-guard.webp",
+      "locked": true,
+      "altStats": {
+        "vType": "SPD",
+        "vScore": 2,
+        "hType": "SUR",
+        "hScore": 2
+      },
+      "_x": 75,
+      "_y": 65
     }
   ],
   "draftData": null,
-  "savedAt": "2026-08-29T01:21:49.059Z"
+  "savedAt": "2026-08-29T01:23:19.377Z"
 }
