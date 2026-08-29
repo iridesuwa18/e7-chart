@@ -4778,8 +4778,74 @@
       },
       "_x": 85,
       "_y": 30
+    },
+    {
+      "id": 1787963542895,
+      "name": "Free Spirit Tieria",
+      "rarity": "4",
+      "role": "Warrior",
+      "element": "Light",
+      "vType": "SPD",
+      "vScore": 1,
+      "hType": "SST",
+      "hScore": 5,
+      "notes": "",
+      "iconData": "https://raw.githubusercontent.com/iridesuwa18/e7-chart/main/assets/heroes/free-spirit-tieria.webp",
+      "locked": true,
+      "altStats": {
+        "vType": "TNK",
+        "vScore": 2,
+        "hType": "SUR",
+        "hScore": 6
+      },
+      "_x": 75,
+      "_y": 45
+    },
+    {
+      "id": 1787963643046,
+      "name": "General Purrgis",
+      "rarity": "4",
+      "role": "Warrior",
+      "element": "Light",
+      "vType": "SPD",
+      "vScore": 9,
+      "hType": "SST",
+      "hScore": 3,
+      "notes": "",
+      "iconData": "https://raw.githubusercontent.com/iridesuwa18/e7-chart/main/assets/heroes/general-purrgis.webp",
+      "locked": true,
+      "altStats": {
+        "vType": "TNK",
+        "vScore": 3,
+        "hType": "SUR",
+        "hScore": 4
+      },
+      "_x": 65,
+      "_y": 5
+    },
+    {
+      "id": 1787963725615,
+      "name": "Crimson Armin",
+      "rarity": "4",
+      "role": "Knight",
+      "element": "Light",
+      "vType": "TNK",
+      "vScore": 5,
+      "hType": "SST",
+      "hScore": 4,
+      "notes": "",
+      "iconData": "https://raw.githubusercontent.com/iridesuwa18/e7-chart/main/assets/heroes/crimson-armin.webp",
+      "locked": true,
+      "altStats": {
+        "vType": "SPD",
+        "vScore": 2,
+        "hType": "SUR",
+        "hScore": 2
+      },
+      "_x": 70,
+      "_y": 75
     }
   ],
   "draftData": null,
-  "savedAt": "2026-08-29T00:30:18.002Z"
+  "savedAt": "2026-08-29T00:35:44.215Z"
 }
