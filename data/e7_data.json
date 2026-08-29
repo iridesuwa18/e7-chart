@@ -4683,8 +4683,25 @@
       },
       "_x": 35,
       "_y": 85
+    },
+    {
+      "id": 1787963130872,
+      "name": "Cidd",
+      "rarity": "4",
+      "role": "Thief",
+      "element": "Earth",
+      "vType": "SPD",
+      "vScore": 8,
+      "hType": "SUR",
+      "hScore": 7,
+      "notes": "",
+      "iconData": "https://raw.githubusercontent.com/iridesuwa18/e7-chart/main/assets/heroes/cidd.webp",
+      "locked": true,
+      "altStats": null,
+      "_x": 15,
+      "_y": 10
     }
   ],
   "draftData": null,
-  "savedAt": "2026-08-29T00:24:48.209Z"
+  "savedAt": "2026-08-29T00:25:33.171Z"
 }
