@@ -4883,8 +4883,30 @@
       },
       "_x": 15,
       "_y": 65
+    },
+    {
+      "id": 1787964013003,
+      "name": "Tempest Surin",
+      "rarity": "4",
+      "role": "Thief",
+      "element": "Light",
+      "vType": "SPD",
+      "vScore": 9,
+      "hType": "SUR",
+      "hScore": 5,
+      "notes": "",
+      "iconData": "https://raw.githubusercontent.com/iridesuwa18/e7-chart/main/assets/heroes/tempest-surin.webp",
+      "locked": true,
+      "altStats": {
+        "vType": "TNK",
+        "vScore": 5,
+        "hType": "SST",
+        "hScore": 5
+      },
+      "_x": 25,
+      "_y": 5
     }
   ],
   "draftData": null,
-  "savedAt": "2026-08-29T00:39:01.973Z"
+  "savedAt": "2026-08-29T00:40:15.156Z"
 }
