@@ -4449,8 +4449,30 @@
       "altStats": null,
       "_x": 20,
       "_y": 30
+    },
+    {
+      "id": 1787961837447,
+      "name": "Crozet",
+      "rarity": "4",
+      "role": "Knight",
+      "element": "Ice",
+      "vType": "TNK",
+      "vScore": 6,
+      "hType": "SST",
+      "hScore": 3,
+      "notes": "",
+      "iconData": "https://raw.githubusercontent.com/iridesuwa18/e7-chart/main/assets/heroes/crozet.webp",
+      "locked": true,
+      "altStats": {
+        "vType": "SPD",
+        "vScore": 6,
+        "hType": "SUR",
+        "hScore": 3
+      },
+      "_x": 65,
+      "_y": 80
     }
   ],
   "draftData": null,
-  "savedAt": "2026-08-29T00:01:29.251Z"
+  "savedAt": "2026-08-29T00:04:00.832Z"
 }
