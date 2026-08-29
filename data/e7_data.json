@@ -5531,8 +5531,25 @@
       },
       "_x": 35,
       "_y": 40
+    },
+    {
+      "id": 1787967157652,
+      "name": "Shepherd Jena",
+      "rarity": "3",
+      "role": "Mage",
+      "element": "Ice",
+      "vType": "SPD",
+      "vScore": 7,
+      "hType": "SUR",
+      "hScore": 4,
+      "notes": "",
+      "iconData": "https://raw.githubusercontent.com/iridesuwa18/e7-chart/main/assets/heroes/shepherd-jena.webp",
+      "locked": true,
+      "altStats": null,
+      "_x": 30,
+      "_y": 15
     }
   ],
   "draftData": null,
-  "savedAt": "2026-08-29T01:31:35.744Z"
+  "savedAt": "2026-08-29T01:32:46.463Z"
 }
