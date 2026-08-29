@@ -5823,8 +5823,30 @@
       },
       "_x": 35,
       "_y": 15
+    },
+    {
+      "id": 1787968505967,
+      "name": "Bernard",
+      "rarity": "3",
+      "role": "Soul Weaver",
+      "element": "Earth",
+      "vType": "TNK",
+      "vScore": 5,
+      "hType": "SUR",
+      "hScore": 7,
+      "notes": "",
+      "iconData": "https://raw.githubusercontent.com/iridesuwa18/e7-chart/main/assets/heroes/bernard.webp",
+      "locked": true,
+      "altStats": {
+        "vType": "SPD",
+        "vScore": 2,
+        "hType": "SUR",
+        "hScore": 2
+      },
+      "_x": 15,
+      "_y": 75
     }
   ],
   "draftData": null,
-  "savedAt": "2026-08-29T01:53:52.422Z"
+  "savedAt": "2026-08-29T01:55:07.560Z"
 }
