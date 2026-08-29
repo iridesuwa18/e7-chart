@@ -4583,8 +4583,47 @@
       "altStats": null,
       "_x": 30,
       "_y": 5
+    },
+    {
+      "id": 1787962726131,
+      "name": "Zerato",
+      "rarity": "4",
+      "role": "Mage",
+      "element": "Ice",
+      "vType": "SPD",
+      "vScore": 7,
+      "hType": "SUR",
+      "hScore": 4,
+      "notes": "",
+      "iconData": "https://raw.githubusercontent.com/iridesuwa18/e7-chart/main/assets/heroes/zerato.webp",
+      "locked": true,
+      "altStats": null,
+      "_x": 30,
+      "_y": 15
+    },
+    {
+      "id": 1787962839167,
+      "name": "Angelica",
+      "rarity": "4",
+      "role": "Soul Weaver",
+      "element": "Ice",
+      "vType": "TNK",
+      "vScore": 4,
+      "hType": "SST",
+      "hScore": 8,
+      "notes": "",
+      "iconData": "https://raw.githubusercontent.com/iridesuwa18/e7-chart/main/assets/heroes/angelica.webp",
+      "locked": true,
+      "altStats": {
+        "vType": "SPD",
+        "vScore": 2,
+        "hType": "SUR",
+        "hScore": 2
+      },
+      "_x": 90,
+      "_y": 70
     }
   ],
   "draftData": null,
-  "savedAt": "2026-08-29T00:17:40.942Z"
+  "savedAt": "2026-08-29T00:20:46.916Z"
 }
