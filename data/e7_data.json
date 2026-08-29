@@ -4510,8 +4510,25 @@
       "altStats": null,
       "_x": 35,
       "_y": 25
+    },
+    {
+      "id": 1787962494863,
+      "name": "Karin",
+      "rarity": "4",
+      "role": "Thief",
+      "element": "Ice",
+      "vType": "SPD",
+      "vScore": 9,
+      "hType": "SUR",
+      "hScore": 7,
+      "notes": "",
+      "iconData": "https://raw.githubusercontent.com/iridesuwa18/e7-chart/main/assets/heroes/karin.webp",
+      "locked": true,
+      "altStats": null,
+      "_x": 15,
+      "_y": 5
     }
   ],
   "draftData": null,
-  "savedAt": "2026-08-29T00:14:16.678Z"
+  "savedAt": "2026-08-29T00:14:59.306Z"
 }
