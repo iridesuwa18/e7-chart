@@ -5570,8 +5570,30 @@
       },
       "_x": 75,
       "_y": 25
+    },
+    {
+      "id": 1787967350854,
+      "name": "Angelic Montmorancy",
+      "rarity": "3",
+      "role": "Soul Weaver",
+      "element": "Ice",
+      "vType": "SPD",
+      "vScore": 8,
+      "hType": "SST",
+      "hScore": 5,
+      "notes": "",
+      "iconData": "https://raw.githubusercontent.com/iridesuwa18/e7-chart/main/assets/heroes/angelic-montmorancy.webp",
+      "locked": true,
+      "altStats": {
+        "vType": "TNK",
+        "vScore": 3,
+        "hType": "SUR",
+        "hScore": 2
+      },
+      "_x": 75,
+      "_y": 10
     }
   ],
   "draftData": null,
-  "savedAt": "2026-08-29T01:34:51.441Z"
+  "savedAt": "2026-08-29T01:36:12.850Z"
 }
