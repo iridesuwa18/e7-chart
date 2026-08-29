@@ -5592,8 +5592,25 @@
       },
       "_x": 75,
       "_y": 10
+    },
+    {
+      "id": 1787967405873,
+      "name": "Ains",
+      "rarity": "3",
+      "role": "Warrior",
+      "element": "Earth",
+      "vType": "SPD",
+      "vScore": 2,
+      "hType": "SUR",
+      "hScore": 4,
+      "notes": "",
+      "iconData": "https://raw.githubusercontent.com/iridesuwa18/e7-chart/main/assets/heroes/ains.webp",
+      "locked": true,
+      "altStats": null,
+      "_x": 30,
+      "_y": 40
     }
   ],
   "draftData": null,
-  "savedAt": "2026-08-29T01:36:12.850Z"
+  "savedAt": "2026-08-29T01:37:30.023Z"
 }
