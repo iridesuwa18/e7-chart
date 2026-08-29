@@ -5341,8 +5341,25 @@
       },
       "_x": 30,
       "_y": 65
+    },
+    {
+      "id": 1787966315746,
+      "name": "Taranor Guard",
+      "rarity": "3",
+      "role": "Warrior",
+      "element": "Ice",
+      "vType": "SPD",
+      "vScore": 7,
+      "hType": "SUR",
+      "hScore": 3,
+      "notes": "",
+      "iconData": "https://raw.githubusercontent.com/iridesuwa18/e7-chart/main/assets/heroes/taranor-guard.webp",
+      "locked": true,
+      "altStats": null,
+      "_x": 35,
+      "_y": 15
     }
   ],
   "draftData": null,
-  "savedAt": "2026-08-29T01:17:16.902Z"
+  "savedAt": "2026-08-29T01:18:37.499Z"
 }
