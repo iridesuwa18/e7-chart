@@ -5241,8 +5241,30 @@
       },
       "_x": 20,
       "_y": 30
+    },
+    {
+      "id": 1787965852915,
+      "name": "Zealot Carmainerose",
+      "rarity": "3",
+      "role": "Mage",
+      "element": "Fire",
+      "vType": "SPD",
+      "vScore": 7,
+      "hType": "SST",
+      "hScore": 6,
+      "notes": "",
+      "iconData": "https://raw.githubusercontent.com/iridesuwa18/e7-chart/main/assets/heroes/zealot-carmainerose.webp",
+      "locked": true,
+      "altStats": {
+        "vType": "TNK",
+        "vScore": 4,
+        "hType": "SUR",
+        "hScore": 5
+      },
+      "_x": 80,
+      "_y": 15
     }
   ],
   "draftData": null,
-  "savedAt": "2026-08-29T01:09:09.918Z"
+  "savedAt": "2026-08-29T01:10:55.840Z"
 }
