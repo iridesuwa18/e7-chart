@@ -5073,8 +5073,25 @@
       },
       "_x": 35,
       "_y": 60
+    },
+    {
+      "id": 1787965017353,
+      "name": "Tieria",
+      "rarity": "3",
+      "role": "Warrior",
+      "element": "Fire",
+      "vType": "SPD",
+      "vScore": 7,
+      "hType": "SUR",
+      "hScore": 2,
+      "notes": "",
+      "iconData": "https://raw.githubusercontent.com/iridesuwa18/e7-chart/main/assets/heroes/tieria.webp",
+      "locked": true,
+      "altStats": null,
+      "_x": 40,
+      "_y": 15
     }
   ],
   "draftData": null,
-  "savedAt": "2026-08-29T00:56:12.466Z"
+  "savedAt": "2026-08-29T00:57:03.749Z"
 }
