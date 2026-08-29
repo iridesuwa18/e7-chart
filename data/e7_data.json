@@ -4844,8 +4844,47 @@
       },
       "_x": 70,
       "_y": 75
+    },
+    {
+      "id": 1787963862855,
+      "name": "Fighter Maya",
+      "rarity": "4",
+      "role": "Knight",
+      "element": "Light",
+      "vType": "TNK",
+      "vScore": 3,
+      "hType": "SUR",
+      "hScore": 6,
+      "notes": "",
+      "iconData": "https://raw.githubusercontent.com/iridesuwa18/e7-chart/main/assets/heroes/fighter-maya.webp",
+      "locked": true,
+      "altStats": null,
+      "_x": 20,
+      "_y": 65
+    },
+    {
+      "id": 1787963939518,
+      "name": "Last Piece Karin",
+      "rarity": "4",
+      "role": "Thief",
+      "element": "Light",
+      "vType": "TNK",
+      "vScore": 3,
+      "hType": "SUR",
+      "hScore": 7,
+      "notes": "",
+      "iconData": "https://raw.githubusercontent.com/iridesuwa18/e7-chart/main/assets/heroes/last-piece-karin.webp",
+      "locked": true,
+      "altStats": {
+        "vType": "SPD",
+        "vScore": 7,
+        "hType": "SUR",
+        "hScore": 7
+      },
+      "_x": 15,
+      "_y": 65
     }
   ],
   "draftData": null,
-  "savedAt": "2026-08-29T00:35:44.215Z"
+  "savedAt": "2026-08-29T00:39:01.973Z"
 }
