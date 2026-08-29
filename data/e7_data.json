@@ -5319,8 +5319,30 @@
       "altStats": null,
       "_x": 20,
       "_y": 15
+    },
+    {
+      "id": 1787966234475,
+      "name": "Talaz",
+      "rarity": "3",
+      "role": "Warrior",
+      "element": "Ice",
+      "vType": "TNK",
+      "vScore": 3,
+      "hType": "SUR",
+      "hScore": 4,
+      "notes": "",
+      "iconData": "https://raw.githubusercontent.com/iridesuwa18/e7-chart/main/assets/heroes/talaz.webp",
+      "locked": true,
+      "altStats": {
+        "vType": "SPD",
+        "vScore": 5,
+        "hType": "SUR",
+        "hScore": 4
+      },
+      "_x": 30,
+      "_y": 65
     }
   ],
   "draftData": null,
-  "savedAt": "2026-08-29T01:16:14.432Z"
+  "savedAt": "2026-08-29T01:17:16.902Z"
 }
