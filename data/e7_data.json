@@ -4622,8 +4622,69 @@
       },
       "_x": 90,
       "_y": 70
+    },
+    {
+      "id": 1787962922684,
+      "name": "Cartuja",
+      "rarity": "4",
+      "role": "Warrior",
+      "element": "Earth",
+      "vType": "SPD",
+      "vScore": 6,
+      "hType": "SST",
+      "hScore": 8,
+      "notes": "",
+      "iconData": "https://raw.githubusercontent.com/iridesuwa18/e7-chart/main/assets/heroes/cartuja.webp",
+      "locked": true,
+      "altStats": {
+        "vType": "TNK",
+        "vScore": 3,
+        "hType": "SUR",
+        "hScore": 6
+      },
+      "_x": 90,
+      "_y": 20
+    },
+    {
+      "id": 1787962976208,
+      "name": "Purrgis",
+      "rarity": "4",
+      "role": "Warrior",
+      "element": "Earth",
+      "vType": "SPD",
+      "vScore": 7,
+      "hType": "SUR",
+      "hScore": 6,
+      "notes": "",
+      "iconData": "https://raw.githubusercontent.com/iridesuwa18/e7-chart/main/assets/heroes/purrgis.webp",
+      "locked": true,
+      "altStats": null,
+      "_x": 20,
+      "_y": 15
+    },
+    {
+      "id": 1787963085951,
+      "name": "Armin",
+      "rarity": "4",
+      "role": "Knight",
+      "element": "Earth",
+      "vType": "TNK",
+      "vScore": 7,
+      "hType": "SUR",
+      "hScore": 3,
+      "notes": "",
+      "iconData": "https://raw.githubusercontent.com/iridesuwa18/e7-chart/main/assets/heroes/armin.webp",
+      "locked": true,
+      "altStats": {
+        "vType": "SPD",
+        "vScore": 4,
+        "hType": "SUR",
+        "hScore": 3
+      },
+      "_x": 35,
+      "_y": 85
     }
   ],
   "draftData": null,
-  "savedAt": "2026-08-29T00:20:46.916Z"
+  "savedAt": "2026-08-29T00:24:48.209Z"
 }
