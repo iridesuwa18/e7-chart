@@ -5950,8 +5950,25 @@
       "altStats": null,
       "_x": 25,
       "_y": 65
+    },
+    {
+      "id": 1787969094645,
+      "name": "Eaton",
+      "rarity": "3",
+      "role": "Knight",
+      "element": "Light",
+      "vType": "TNK",
+      "vScore": 5,
+      "hType": "SUR",
+      "hScore": 3,
+      "notes": "",
+      "iconData": "https://raw.githubusercontent.com/iridesuwa18/e7-chart/main/assets/heroes/eaton.webp",
+      "locked": true,
+      "altStats": null,
+      "_x": 35,
+      "_y": 75
     }
   ],
   "draftData": null,
-  "savedAt": "2026-08-29T02:01:59.679Z"
+  "savedAt": "2026-08-29T02:05:17.107Z"
 }
