@@ -4756,8 +4756,30 @@
       },
       "_x": 75,
       "_y": 10
+    },
+    {
+      "id": 1787963416098,
+      "name": "Rin",
+      "rarity": "4",
+      "role": "Soul Weaver",
+      "element": "Earth",
+      "vType": "SPD",
+      "vScore": 4,
+      "hType": "SST",
+      "hScore": 7,
+      "notes": "",
+      "iconData": "https://raw.githubusercontent.com/iridesuwa18/e7-chart/main/assets/heroes/rin.webp",
+      "locked": true,
+      "altStats": {
+        "vType": "TNK",
+        "vScore": 4,
+        "hType": "SUR",
+        "hScore": 3
+      },
+      "_x": 85,
+      "_y": 30
     }
   ],
   "draftData": null,
-  "savedAt": "2026-08-29T00:28:37.404Z"
+  "savedAt": "2026-08-29T00:30:18.002Z"
 }
