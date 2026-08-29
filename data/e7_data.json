@@ -3337,7 +3337,8 @@
       "locked": true,
       "altStats": null,
       "_x": 15,
-      "_y": 10
+      "_y": 10,
+      "hidden": true
     },
     {
       "id": 1787898754720,
@@ -3354,7 +3355,8 @@
       "locked": true,
       "altStats": null,
       "_x": 30,
-      "_y": 15
+      "_y": 15,
+      "hidden": true
     },
     {
       "id": 1787898942394,
@@ -3376,7 +3378,8 @@
         "hScore": 7
       },
       "_x": 15,
-      "_y": 25
+      "_y": 25,
+      "hidden": true
     },
     {
       "id": 1787899105595,
@@ -3398,7 +3401,8 @@
         "hScore": 7
       },
       "_x": 80,
-      "_y": 10
+      "_y": 10,
+      "hidden": true
     },
     {
       "id": 1787899234554,
@@ -3415,7 +3419,8 @@
       "locked": true,
       "altStats": null,
       "_x": 20,
-      "_y": 30
+      "_y": 30,
+      "hidden": true
     },
     {
       "id": 1787899377807,
@@ -3437,7 +3442,8 @@
         "hScore": 6
       },
       "_x": 15,
-      "_y": 10
+      "_y": 10,
+      "hidden": true
     },
     {
       "id": 1787899571123,
@@ -3454,7 +3460,8 @@
       "locked": true,
       "altStats": null,
       "_x": 25,
-      "_y": 15
+      "_y": 15,
+      "hidden": true
     },
     {
       "id": 1787899701491,
@@ -3471,7 +3478,8 @@
       "locked": true,
       "altStats": null,
       "_x": 35,
-      "_y": 10
+      "_y": 10,
+      "hidden": true
     },
     {
       "id": 1787899837592,
@@ -3488,7 +3496,8 @@
       "locked": true,
       "altStats": null,
       "_x": 15,
-      "_y": 15
+      "_y": 15,
+      "hidden": true
     },
     {
       "id": 1787899940540,
@@ -3505,7 +3514,8 @@
       "locked": true,
       "altStats": null,
       "_x": 30,
-      "_y": 15
+      "_y": 15,
+      "hidden": true
     },
     {
       "id": 1787900111515,
@@ -3522,7 +3532,8 @@
       "locked": true,
       "altStats": null,
       "_x": 35,
-      "_y": 15
+      "_y": 15,
+      "hidden": true
     },
     {
       "id": 1787900221759,
@@ -3539,7 +3550,8 @@
       "locked": true,
       "altStats": null,
       "_x": 35,
-      "_y": 20
+      "_y": 20,
+      "hidden": true
     },
     {
       "id": 1787900402616,
@@ -3561,7 +3573,8 @@
         "hScore": 5
       },
       "_x": 25,
-      "_y": 25
+      "_y": 25,
+      "hidden": true
     },
     {
       "id": 1787900523527,
@@ -3578,7 +3591,8 @@
       "locked": true,
       "altStats": null,
       "_x": 30,
-      "_y": 40
+      "_y": 40,
+      "hidden": true
     },
     {
       "id": 1787900621748,
@@ -3595,7 +3609,8 @@
       "locked": true,
       "altStats": null,
       "_x": 25,
-      "_y": 30
+      "_y": 30,
+      "hidden": true
     },
     {
       "id": 1787900739429,
@@ -3612,7 +3627,8 @@
       "locked": true,
       "altStats": null,
       "_x": 30,
-      "_y": 10
+      "_y": 10,
+      "hidden": true
     },
     {
       "id": 1787900920551,
@@ -3634,7 +3650,8 @@
         "hScore": 2
       },
       "_x": 90,
-      "_y": 70
+      "_y": 70,
+      "hidden": true
     },
     {
       "id": 1787901124465,
@@ -3656,7 +3673,8 @@
         "hScore": 7
       },
       "_x": 15,
-      "_y": 80
+      "_y": 80,
+      "hidden": true
     },
     {
       "id": 1787901321031,
@@ -3678,7 +3696,8 @@
         "hScore": 3
       },
       "_x": 35,
-      "_y": 20
+      "_y": 20,
+      "hidden": true
     },
     {
       "id": 1787906954824,
@@ -3695,7 +3714,8 @@
       "locked": true,
       "altStats": null,
       "_x": 30,
-      "_y": 15
+      "_y": 15,
+      "hidden": true
     },
     {
       "id": 1787907051735,
@@ -3717,7 +3737,8 @@
         "hScore": 7
       },
       "_x": 20,
-      "_y": 75
+      "_y": 75,
+      "hidden": true
     },
     {
       "id": 1787907140233,
@@ -3739,7 +3760,8 @@
         "hScore": 5
       },
       "_x": 40,
-      "_y": 5
+      "_y": 5,
+      "hidden": true
     },
     {
       "id": 1787907294375,
@@ -3761,7 +3783,8 @@
         "hScore": 2
       },
       "_x": 70,
-      "_y": 15
+      "_y": 15,
+      "hidden": true
     },
     {
       "id": 1787907425418,
@@ -3783,7 +3806,8 @@
         "hScore": 2
       },
       "_x": 95,
-      "_y": 25
+      "_y": 25,
+      "hidden": true
     },
     {
       "id": 1787907862013,
@@ -3800,7 +3824,8 @@
       "locked": true,
       "altStats": null,
       "_x": 30,
-      "_y": 20
+      "_y": 20,
+      "hidden": true
     },
     {
       "id": 1787907941456,
@@ -3817,7 +3842,8 @@
       "locked": true,
       "altStats": null,
       "_x": 30,
-      "_y": 65
+      "_y": 65,
+      "hidden": true
     },
     {
       "id": 1787908026422,
@@ -3839,7 +3865,8 @@
         "hScore": 5
       },
       "_x": 25,
-      "_y": 25
+      "_y": 25,
+      "hidden": true
     },
     {
       "id": 1787908170174,
@@ -3861,7 +3888,8 @@
         "hScore": 5
       },
       "_x": 15,
-      "_y": 80
+      "_y": 80,
+      "hidden": true
     },
     {
       "id": 1787908316992,
@@ -3878,7 +3906,8 @@
       "locked": true,
       "altStats": null,
       "_x": 40,
-      "_y": 20
+      "_y": 20,
+      "hidden": true
     },
     {
       "id": 1787908382984,
@@ -3895,7 +3924,8 @@
       "locked": true,
       "altStats": null,
       "_x": 35,
-      "_y": 15
+      "_y": 15,
+      "hidden": true
     },
     {
       "id": 1787908525063,
@@ -3917,7 +3947,8 @@
         "hScore": 4
       },
       "_x": 25,
-      "_y": 95
+      "_y": 95,
+      "hidden": true
     },
     {
       "id": 1787908653051,
@@ -3934,7 +3965,8 @@
       "locked": true,
       "altStats": null,
       "_x": 15,
-      "_y": 10
+      "_y": 10,
+      "hidden": true
     },
     {
       "id": 1787908764013,
@@ -3951,7 +3983,8 @@
       "locked": true,
       "altStats": null,
       "_x": 20,
-      "_y": 15
+      "_y": 15,
+      "hidden": true
     },
     {
       "id": 1787908842494,
@@ -3968,7 +4001,8 @@
       "locked": true,
       "altStats": null,
       "_x": 40,
-      "_y": 15
+      "_y": 15,
+      "hidden": true
     },
     {
       "id": 1787908993300,
@@ -3990,7 +4024,8 @@
         "hScore": 6
       },
       "_x": 5,
-      "_y": 80
+      "_y": 80,
+      "hidden": true
     },
     {
       "id": 1787909076588,
@@ -4012,7 +4047,8 @@
         "hScore": 6
       },
       "_x": 20,
-      "_y": 15
+      "_y": 15,
+      "hidden": true
     },
     {
       "id": 1787909145371,
@@ -4029,7 +4065,8 @@
       "locked": true,
       "altStats": null,
       "_x": 25,
-      "_y": 10
+      "_y": 10,
+      "hidden": true
     },
     {
       "id": 1787909224910,
@@ -4046,7 +4083,8 @@
       "locked": true,
       "altStats": null,
       "_x": 20,
-      "_y": 15
+      "_y": 15,
+      "hidden": true
     },
     {
       "id": 1787909269531,
@@ -4063,7 +4101,8 @@
       "locked": true,
       "altStats": null,
       "_x": 40,
-      "_y": 5
+      "_y": 5,
+      "hidden": true
     },
     {
       "id": 1787909335993,
@@ -4080,7 +4119,8 @@
       "locked": true,
       "altStats": null,
       "_x": 20,
-      "_y": 20
+      "_y": 20,
+      "hidden": true
     },
     {
       "id": 1787909389583,
@@ -4097,7 +4137,8 @@
       "locked": true,
       "altStats": null,
       "_x": 25,
-      "_y": 5
+      "_y": 5,
+      "hidden": true
     },
     {
       "id": 1787909668118,
@@ -4114,7 +4155,8 @@
       "locked": true,
       "altStats": null,
       "_x": 25,
-      "_y": 60
+      "_y": 60,
+      "hidden": true
     },
     {
       "id": 1787909792862,
@@ -4131,7 +4173,8 @@
       "locked": true,
       "altStats": null,
       "_x": 25,
-      "_y": 25
+      "_y": 25,
+      "hidden": true
     },
     {
       "id": 1787909909990,
@@ -4153,7 +4196,8 @@
         "hScore": 2
       },
       "_x": 100,
-      "_y": 40
+      "_y": 40,
+      "hidden": true
     },
     {
       "id": 1787910015101,
@@ -4175,7 +4219,8 @@
         "hScore": 2
       },
       "_x": 65,
-      "_y": 30
+      "_y": 30,
+      "hidden": true
     },
     {
       "id": 1787959993617,
@@ -4197,7 +4242,8 @@
         "hScore": 5
       },
       "_x": 40,
-      "_y": 15
+      "_y": 15,
+      "hidden": true
     },
     {
       "id": 1787960283924,
@@ -4219,7 +4265,8 @@
         "hScore": 3
       },
       "_x": 30,
-      "_y": 5
+      "_y": 5,
+      "hidden": true
     },
     {
       "id": 1787960348288,
@@ -4236,7 +4283,8 @@
       "locked": true,
       "altStats": null,
       "_x": 35,
-      "_y": 30
+      "_y": 30,
+      "hidden": true
     },
     {
       "id": 1787960440121,
@@ -4258,7 +4306,8 @@
         "hScore": 2
       },
       "_x": 40,
-      "_y": 15
+      "_y": 15,
+      "hidden": true
     },
     {
       "id": 1787960515939,
@@ -4275,7 +4324,8 @@
       "locked": true,
       "altStats": null,
       "_x": 35,
-      "_y": 40
+      "_y": 40,
+      "hidden": true
     },
     {
       "id": 1787960580214,
@@ -4292,7 +4342,8 @@
       "locked": true,
       "altStats": null,
       "_x": 30,
-      "_y": 15
+      "_y": 15,
+      "hidden": true
     },
     {
       "id": 1787960624941,
@@ -4309,7 +4360,8 @@
       "locked": true,
       "altStats": null,
       "_x": 25,
-      "_y": 15
+      "_y": 15,
+      "hidden": true
     },
     {
       "id": 1787960670430,
@@ -4326,7 +4378,8 @@
       "locked": true,
       "altStats": null,
       "_x": 40,
-      "_y": 5
+      "_y": 5,
+      "hidden": true
     },
     {
       "id": 1787960721514,
@@ -4343,7 +4396,8 @@
       "locked": true,
       "altStats": null,
       "_x": 40,
-      "_y": 15
+      "_y": 15,
+      "hidden": true
     },
     {
       "id": 1787960799972,
@@ -4365,7 +4419,8 @@
         "hScore": 5
       },
       "_x": 25,
-      "_y": 30
+      "_y": 30,
+      "hidden": true
     },
     {
       "id": 1787960866128,
@@ -4387,7 +4442,8 @@
         "hScore": 6
       },
       "_x": 90,
-      "_y": 40
+      "_y": 40,
+      "hidden": true
     },
     {
       "id": 1787960952313,
@@ -4409,7 +4465,8 @@
         "hScore": 2
       },
       "_x": 95,
-      "_y": 40
+      "_y": 40,
+      "hidden": true
     },
     {
       "id": 1787961639767,
@@ -4431,7 +4488,8 @@
         "hScore": 2
       },
       "_x": 85,
-      "_y": 70
+      "_y": 70,
+      "hidden": true
     },
     {
       "id": 1787961686973,
@@ -4448,7 +4506,8 @@
       "locked": true,
       "altStats": null,
       "_x": 20,
-      "_y": 30
+      "_y": 30,
+      "hidden": true
     },
     {
       "id": 1787961837447,
@@ -4470,7 +4529,8 @@
         "hScore": 3
       },
       "_x": 65,
-      "_y": 80
+      "_y": 80,
+      "hidden": true
     },
     {
       "id": 1787961945817,
@@ -4492,7 +4552,8 @@
         "hScore": 2
       },
       "_x": 40,
-      "_y": 10
+      "_y": 10,
+      "hidden": true
     },
     {
       "id": 1787962438781,
@@ -4509,7 +4570,8 @@
       "locked": true,
       "altStats": null,
       "_x": 35,
-      "_y": 25
+      "_y": 25,
+      "hidden": true
     },
     {
       "id": 1787962494863,
@@ -4526,7 +4588,8 @@
       "locked": true,
       "altStats": null,
       "_x": 15,
-      "_y": 5
+      "_y": 5,
+      "hidden": true
     },
     {
       "id": 1787962543684,
@@ -4543,7 +4606,8 @@
       "locked": true,
       "altStats": null,
       "_x": 40,
-      "_y": 10
+      "_y": 10,
+      "hidden": true
     },
     {
       "id": 1787962612752,
@@ -4565,7 +4629,8 @@
         "hScore": 4
       },
       "_x": 30,
-      "_y": 75
+      "_y": 75,
+      "hidden": true
     },
     {
       "id": 1787962659353,
@@ -4582,7 +4647,8 @@
       "locked": true,
       "altStats": null,
       "_x": 30,
-      "_y": 5
+      "_y": 5,
+      "hidden": true
     },
     {
       "id": 1787962726131,
@@ -4599,7 +4665,8 @@
       "locked": true,
       "altStats": null,
       "_x": 30,
-      "_y": 15
+      "_y": 15,
+      "hidden": true
     },
     {
       "id": 1787962839167,
@@ -4621,7 +4688,8 @@
         "hScore": 2
       },
       "_x": 90,
-      "_y": 70
+      "_y": 70,
+      "hidden": true
     },
     {
       "id": 1787962922684,
@@ -4643,7 +4711,8 @@
         "hScore": 6
       },
       "_x": 90,
-      "_y": 20
+      "_y": 20,
+      "hidden": true
     },
     {
       "id": 1787962976208,
@@ -4660,7 +4729,8 @@
       "locked": true,
       "altStats": null,
       "_x": 20,
-      "_y": 15
+      "_y": 15,
+      "hidden": true
     },
     {
       "id": 1787963085951,
@@ -4682,7 +4752,8 @@
         "hScore": 3
       },
       "_x": 35,
-      "_y": 85
+      "_y": 85,
+      "hidden": true
     },
     {
       "id": 1787963130872,
@@ -4699,7 +4770,8 @@
       "locked": true,
       "altStats": null,
       "_x": 15,
-      "_y": 10
+      "_y": 10,
+      "hidden": true
     },
     {
       "id": 1787963187758,
@@ -4716,7 +4788,8 @@
       "locked": true,
       "altStats": null,
       "_x": 35,
-      "_y": 10
+      "_y": 10,
+      "hidden": true
     },
     {
       "id": 1787963229190,
@@ -4733,7 +4806,8 @@
       "locked": true,
       "altStats": null,
       "_x": 25,
-      "_y": 15
+      "_y": 15,
+      "hidden": true
     },
     {
       "id": 1787963312026,
@@ -4755,7 +4829,8 @@
         "hScore": 2
       },
       "_x": 75,
-      "_y": 10
+      "_y": 10,
+      "hidden": true
     },
     {
       "id": 1787963416098,
@@ -4777,7 +4852,8 @@
         "hScore": 3
       },
       "_x": 85,
-      "_y": 30
+      "_y": 30,
+      "hidden": true
     },
     {
       "id": 1787963542895,
@@ -4799,7 +4875,8 @@
         "hScore": 6
       },
       "_x": 75,
-      "_y": 45
+      "_y": 45,
+      "hidden": true
     },
     {
       "id": 1787963643046,
@@ -4821,7 +4898,8 @@
         "hScore": 4
       },
       "_x": 65,
-      "_y": 5
+      "_y": 5,
+      "hidden": true
     },
     {
       "id": 1787963725615,
@@ -4843,7 +4921,8 @@
         "hScore": 2
       },
       "_x": 70,
-      "_y": 75
+      "_y": 75,
+      "hidden": true
     },
     {
       "id": 1787963862855,
@@ -4860,7 +4939,8 @@
       "locked": true,
       "altStats": null,
       "_x": 20,
-      "_y": 65
+      "_y": 65,
+      "hidden": true
     },
     {
       "id": 1787963939518,
@@ -4882,7 +4962,8 @@
         "hScore": 7
       },
       "_x": 15,
-      "_y": 65
+      "_y": 65,
+      "hidden": true
     },
     {
       "id": 1787964013003,
@@ -4904,7 +4985,8 @@
         "hScore": 5
       },
       "_x": 25,
-      "_y": 5
+      "_y": 5,
+      "hidden": true
     },
     {
       "id": 1787964066049,
@@ -4921,7 +5003,8 @@
       "locked": true,
       "altStats": null,
       "_x": 30,
-      "_y": 5
+      "_y": 5,
+      "hidden": true
     },
     {
       "id": 1787964122777,
@@ -4938,7 +5021,8 @@
       "locked": true,
       "altStats": null,
       "_x": 15,
-      "_y": 30
+      "_y": 30,
+      "hidden": true
     },
     {
       "id": 1787964233416,
@@ -4960,7 +5044,8 @@
         "hScore": 2
       },
       "_x": 40,
-      "_y": 0
+      "_y": 0,
+      "hidden": true
     },
     {
       "id": 1787964312318,
@@ -4977,7 +5062,8 @@
       "locked": true,
       "altStats": null,
       "_x": 35,
-      "_y": 5
+      "_y": 5,
+      "hidden": true
     },
     {
       "id": 1787964370566,
@@ -4999,7 +5085,8 @@
         "hScore": 5
       },
       "_x": 25,
-      "_y": 65
+      "_y": 65,
+      "hidden": true
     },
     {
       "id": 1787964705934,
@@ -5016,7 +5103,8 @@
       "locked": true,
       "altStats": null,
       "_x": 30,
-      "_y": 40
+      "_y": 40,
+      "hidden": true
     },
     {
       "id": 1787964775861,
@@ -5033,7 +5121,8 @@
       "locked": true,
       "altStats": null,
       "_x": 30,
-      "_y": 25
+      "_y": 25,
+      "hidden": true
     },
     {
       "id": 1787964858977,
@@ -5050,7 +5139,8 @@
       "locked": true,
       "altStats": null,
       "_x": 35,
-      "_y": 35
+      "_y": 35,
+      "hidden": true
     },
     {
       "id": 1787964958954,
@@ -5072,7 +5162,8 @@
         "hScore": 3
       },
       "_x": 35,
-      "_y": 60
+      "_y": 60,
+      "hidden": true
     },
     {
       "id": 1787965017353,
@@ -5089,7 +5180,8 @@
       "locked": true,
       "altStats": null,
       "_x": 40,
-      "_y": 15
+      "_y": 15,
+      "hidden": true
     },
     {
       "id": 1787965108194,
@@ -5111,7 +5203,8 @@
         "hScore": 3
       },
       "_x": 70,
-      "_y": 75
+      "_y": 75,
+      "hidden": true
     },
     {
       "id": 1787965200695,
@@ -5133,7 +5226,8 @@
         "hScore": 4
       },
       "_x": 75,
-      "_y": 25
+      "_y": 25,
+      "hidden": true
     },
     {
       "id": 1787965266650,
@@ -5150,7 +5244,8 @@
       "locked": true,
       "altStats": null,
       "_x": 65,
-      "_y": 75
+      "_y": 75,
+      "hidden": true
     },
     {
       "id": 1787965308767,
@@ -5167,7 +5262,8 @@
       "locked": true,
       "altStats": null,
       "_x": 30,
-      "_y": 30
+      "_y": 30,
+      "hidden": true
     },
     {
       "id": 1787965371657,
@@ -5184,7 +5280,8 @@
       "locked": true,
       "altStats": null,
       "_x": 40,
-      "_y": 10
+      "_y": 10,
+      "hidden": true
     },
     {
       "id": 1787965466428,
@@ -5201,7 +5298,8 @@
       "locked": true,
       "altStats": null,
       "_x": 40,
-      "_y": 25
+      "_y": 25,
+      "hidden": true
     },
     {
       "id": 1787965511350,
@@ -5218,7 +5316,8 @@
       "locked": true,
       "altStats": null,
       "_x": 65,
-      "_y": 25
+      "_y": 25,
+      "hidden": true
     },
     {
       "id": 1787965747973,
@@ -5240,7 +5339,8 @@
         "hScore": 4
       },
       "_x": 20,
-      "_y": 30
+      "_y": 30,
+      "hidden": true
     },
     {
       "id": 1787965852915,
@@ -5262,7 +5362,8 @@
         "hScore": 5
       },
       "_x": 80,
-      "_y": 15
+      "_y": 15,
+      "hidden": true
     },
     {
       "id": 1787965981357,
@@ -5284,7 +5385,8 @@
         "hScore": 2
       },
       "_x": 95,
-      "_y": 30
+      "_y": 30,
+      "hidden": true
     },
     {
       "id": 1787966066696,
@@ -5301,7 +5403,8 @@
       "locked": true,
       "altStats": null,
       "_x": 30,
-      "_y": 40
+      "_y": 40,
+      "hidden": true
     },
     {
       "id": 1787966171066,
@@ -5318,7 +5421,8 @@
       "locked": true,
       "altStats": null,
       "_x": 20,
-      "_y": 15
+      "_y": 15,
+      "hidden": true
     },
     {
       "id": 1787966234475,
@@ -5340,7 +5444,8 @@
         "hScore": 4
       },
       "_x": 30,
-      "_y": 65
+      "_y": 65,
+      "hidden": true
     },
     {
       "id": 1787966315746,
@@ -5357,7 +5462,8 @@
       "locked": true,
       "altStats": null,
       "_x": 35,
-      "_y": 15
+      "_y": 15,
+      "hidden": true
     },
     {
       "id": 1787966392426,
@@ -5374,7 +5480,8 @@
       "locked": true,
       "altStats": null,
       "_x": 35,
-      "_y": 65
+      "_y": 65,
+      "hidden": true
     },
     {
       "id": 1787966505497,
@@ -5396,7 +5503,8 @@
         "hScore": 3
       },
       "_x": 65,
-      "_y": 70
+      "_y": 70,
+      "hidden": true
     },
     {
       "id": 1787966597088,
@@ -5418,7 +5526,8 @@
         "hScore": 2
       },
       "_x": 75,
-      "_y": 65
+      "_y": 65,
+      "hidden": true
     },
     {
       "id": 1787966665483,
@@ -5435,7 +5544,8 @@
       "locked": true,
       "altStats": null,
       "_x": 35,
-      "_y": 30
+      "_y": 30,
+      "hidden": true
     },
     {
       "id": 1787966765429,
@@ -5457,7 +5567,8 @@
         "hScore": 4
       },
       "_x": 30,
-      "_y": 20
+      "_y": 20,
+      "hidden": true
     },
     {
       "id": 1787966814148,
@@ -5474,7 +5585,8 @@
       "locked": true,
       "altStats": null,
       "_x": 25,
-      "_y": 15
+      "_y": 15,
+      "hidden": true
     },
     {
       "id": 1787966896121,
@@ -5491,7 +5603,8 @@
       "locked": true,
       "altStats": null,
       "_x": 35,
-      "_y": 15
+      "_y": 15,
+      "hidden": true
     },
     {
       "id": 1787967016677,
@@ -5508,7 +5621,8 @@
       "locked": true,
       "altStats": null,
       "_x": 35,
-      "_y": 15
+      "_y": 15,
+      "hidden": true
     },
     {
       "id": 1787967092257,
@@ -5530,7 +5644,8 @@
         "hScore": 5
       },
       "_x": 35,
-      "_y": 40
+      "_y": 40,
+      "hidden": true
     },
     {
       "id": 1787967157652,
@@ -5547,7 +5662,8 @@
       "locked": true,
       "altStats": null,
       "_x": 30,
-      "_y": 15
+      "_y": 15,
+      "hidden": true
     },
     {
       "id": 1787967249846,
@@ -5569,7 +5685,8 @@
         "hScore": 2
       },
       "_x": 75,
-      "_y": 25
+      "_y": 25,
+      "hidden": true
     },
     {
       "id": 1787967350854,
@@ -5591,7 +5708,8 @@
         "hScore": 2
       },
       "_x": 75,
-      "_y": 10
+      "_y": 10,
+      "hidden": true
     },
     {
       "id": 1787967405873,
@@ -5608,7 +5726,8 @@
       "locked": true,
       "altStats": null,
       "_x": 30,
-      "_y": 40
+      "_y": 40,
+      "hidden": true
     },
     {
       "id": 1787967530812,
@@ -5625,7 +5744,8 @@
       "locked": true,
       "altStats": null,
       "_x": 30,
-      "_y": 20
+      "_y": 20,
+      "hidden": true
     },
     {
       "id": 1787967588565,
@@ -5642,7 +5762,8 @@
       "locked": true,
       "altStats": null,
       "_x": 25,
-      "_y": 10
+      "_y": 10,
+      "hidden": true
     },
     {
       "id": 1787967696574,
@@ -5664,7 +5785,8 @@
         "hScore": 3
       },
       "_x": 70,
-      "_y": 15
+      "_y": 15,
+      "hidden": true
     },
     {
       "id": 1787967787144,
@@ -5681,7 +5803,8 @@
       "locked": true,
       "altStats": null,
       "_x": 20,
-      "_y": 30
+      "_y": 30,
+      "hidden": true
     },
     {
       "id": 1787967865012,
@@ -5698,7 +5821,8 @@
       "locked": true,
       "altStats": null,
       "_x": 40,
-      "_y": 40
+      "_y": 40,
+      "hidden": true
     },
     {
       "id": 1787967908585,
@@ -5715,7 +5839,8 @@
       "locked": true,
       "altStats": null,
       "_x": 15,
-      "_y": 10
+      "_y": 10,
+      "hidden": true
     },
     {
       "id": 1787967979350,
@@ -5732,7 +5857,8 @@
       "locked": true,
       "altStats": null,
       "_x": 30,
-      "_y": 15
+      "_y": 15,
+      "hidden": true
     },
     {
       "id": 1787968088087,
@@ -5749,7 +5875,8 @@
       "locked": true,
       "altStats": null,
       "_x": 35,
-      "_y": 15
+      "_y": 15,
+      "hidden": true
     },
     {
       "id": 1787968165206,
@@ -5766,7 +5893,8 @@
       "locked": true,
       "altStats": null,
       "_x": 40,
-      "_y": 15
+      "_y": 15,
+      "hidden": true
     },
     {
       "id": 1787968263984,
@@ -5783,7 +5911,8 @@
       "locked": true,
       "altStats": null,
       "_x": 30,
-      "_y": 15
+      "_y": 15,
+      "hidden": true
     },
     {
       "id": 1787968301841,
@@ -5800,7 +5929,8 @@
       "locked": true,
       "altStats": null,
       "_x": 35,
-      "_y": 10
+      "_y": 10,
+      "hidden": true
     },
     {
       "id": 1787968430445,
@@ -5822,7 +5952,8 @@
         "hScore": 3
       },
       "_x": 35,
-      "_y": 15
+      "_y": 15,
+      "hidden": true
     },
     {
       "id": 1787968505967,
@@ -5844,7 +5975,8 @@
         "hScore": 2
       },
       "_x": 15,
-      "_y": 75
+      "_y": 75,
+      "hidden": true
     },
     {
       "id": 1787968598884,
@@ -5866,7 +5998,8 @@
         "hScore": 2
       },
       "_x": 75,
-      "_y": 30
+      "_y": 30,
+      "hidden": true
     },
     {
       "id": 1787968655341,
@@ -5888,7 +6021,8 @@
         "hScore": 2
       },
       "_x": 75,
-      "_y": 65
+      "_y": 65,
+      "hidden": true
     },
     {
       "id": 1787968740495,
@@ -5910,7 +6044,8 @@
         "hScore": 6
       },
       "_x": 90,
-      "_y": 15
+      "_y": 15,
+      "hidden": true
     },
     {
       "id": 1787968854266,
@@ -5932,7 +6067,8 @@
         "hScore": 5
       },
       "_x": 75,
-      "_y": 15
+      "_y": 15,
+      "hidden": true
     },
     {
       "id": 1787968917669,
@@ -5949,7 +6085,8 @@
       "locked": true,
       "altStats": null,
       "_x": 25,
-      "_y": 65
+      "_y": 65,
+      "hidden": true
     },
     {
       "id": 1787969094645,
@@ -5966,7 +6103,8 @@
       "locked": true,
       "altStats": null,
       "_x": 35,
-      "_y": 75
+      "_y": 75,
+      "hidden": true
     },
     {
       "id": 1787969830395,
@@ -5983,7 +6121,8 @@
       "locked": true,
       "altStats": null,
       "_x": 25,
-      "_y": 75
+      "_y": 75,
+      "hidden": true
     },
     {
       "id": 1787969903973,
@@ -6005,7 +6144,8 @@
         "hScore": 3
       },
       "_x": 25,
-      "_y": 95
+      "_y": 95,
+      "hidden": true
     },
     {
       "id": 1787970025642,
@@ -6022,7 +6162,8 @@
       "locked": true,
       "altStats": null,
       "_x": 30,
-      "_y": 65
+      "_y": 65,
+      "hidden": true
     },
     {
       "id": 1787970078148,
@@ -6044,7 +6185,8 @@
         "hScore": 2
       },
       "_x": 40,
-      "_y": 65
+      "_y": 65,
+      "hidden": true
     },
     {
       "id": 1787970157608,
@@ -6066,7 +6208,8 @@
         "hScore": 2
       },
       "_x": 70,
-      "_y": 10
+      "_y": 10,
+      "hidden": true
     },
     {
       "id": 1787970261411,
@@ -6083,7 +6226,8 @@
       "locked": true,
       "altStats": null,
       "_x": 25,
-      "_y": 25
+      "_y": 25,
+      "hidden": true
     },
     {
       "id": 1787970368150,
@@ -6105,7 +6249,8 @@
         "hScore": 3
       },
       "_x": 95,
-      "_y": 85
+      "_y": 85,
+      "hidden": true
     },
     {
       "id": 1787970433397,
@@ -6127,7 +6272,8 @@
         "hScore": 2
       },
       "_x": 80,
-      "_y": 70
+      "_y": 70,
+      "hidden": true
     },
     {
       "id": 1787970787656,
@@ -6149,7 +6295,8 @@
         "hScore": 2
       },
       "_x": 70,
-      "_y": 60
+      "_y": 60,
+      "hidden": true
     },
     {
       "id": 1787970830940,
@@ -6166,7 +6313,8 @@
       "locked": true,
       "altStats": null,
       "_x": 40,
-      "_y": 40
+      "_y": 40,
+      "hidden": true
     },
     {
       "id": 1787970912141,
@@ -6188,7 +6336,8 @@
         "hScore": 7
       },
       "_x": 85,
-      "_y": 15
+      "_y": 15,
+      "hidden": true
     },
     {
       "id": 1787971060955,
@@ -6210,7 +6359,8 @@
         "hScore": 5
       },
       "_x": 25,
-      "_y": 65
+      "_y": 65,
+      "hidden": true
     },
     {
       "id": 1787971206724,
@@ -6232,9 +6382,32 @@
         "hScore": 4
       },
       "_x": 30,
-      "_y": 15
+      "_y": 15,
+      "hidden": true
+    },
+    {
+      "id": 1787971429383,
+      "name": "Hasol",
+      "rarity": "3",
+      "role": "Knight",
+      "element": "Dark",
+      "vType": "TNK",
+      "vScore": 3,
+      "hType": "SST",
+      "hScore": 5,
+      "notes": "",
+      "iconData": "https://raw.githubusercontent.com/iridesuwa18/e7-chart/main/assets/heroes/hasol.webp",
+      "locked": true,
+      "altStats": {
+        "vType": "SPD",
+        "vScore": 6,
+        "hType": "SUR",
+        "hScore": 5
+      },
+      "_x": 75,
+      "_y": 65
     }
   ],
   "draftData": null,
-  "savedAt": "2026-08-29T02:40:18.493Z"
+  "savedAt": "2026-08-29T02:43:53.618Z"
 }
