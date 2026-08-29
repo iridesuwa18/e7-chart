@@ -5185,8 +5185,42 @@
       "altStats": null,
       "_x": 40,
       "_y": 10
+    },
+    {
+      "id": 1787965466428,
+      "name": "Godmother",
+      "rarity": "3",
+      "role": "Ranger",
+      "element": "Fire",
+      "vType": "SPD",
+      "vScore": 5,
+      "hType": "SUR",
+      "hScore": 2,
+      "notes": "",
+      "iconData": "https://raw.githubusercontent.com/iridesuwa18/e7-chart/main/assets/heroes/godmother.webp",
+      "locked": true,
+      "altStats": null,
+      "_x": 40,
+      "_y": 25
+    },
+    {
+      "id": 1787965511350,
+      "name": "Nemunas",
+      "rarity": "3",
+      "role": "Ranger",
+      "element": "Fire",
+      "vType": "SPD",
+      "vScore": 5,
+      "hType": "SST",
+      "hScore": 3,
+      "notes": "",
+      "iconData": "https://raw.githubusercontent.com/iridesuwa18/e7-chart/main/assets/heroes/nemunas.webp",
+      "locked": true,
+      "altStats": null,
+      "_x": 65,
+      "_y": 25
     }
   ],
   "draftData": null,
-  "savedAt": "2026-08-29T01:02:53.446Z"
+  "savedAt": "2026-08-29T01:05:22.345Z"
 }
