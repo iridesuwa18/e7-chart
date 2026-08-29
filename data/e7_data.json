@@ -4939,8 +4939,30 @@
       "altStats": null,
       "_x": 15,
       "_y": 30
+    },
+    {
+      "id": 1787964233416,
+      "name": "Angel of Light Angelica",
+      "rarity": "4",
+      "role": "Mage",
+      "element": "Light",
+      "vType": "SPD",
+      "vScore": 10,
+      "hType": "SUR",
+      "hScore": 2,
+      "notes": "",
+      "iconData": "https://raw.githubusercontent.com/iridesuwa18/e7-chart/main/assets/heroes/angel-of-light-angelica.webp",
+      "locked": true,
+      "altStats": {
+        "vType": "TNK",
+        "vScore": 3,
+        "hType": "SUR",
+        "hScore": 2
+      },
+      "_x": 40,
+      "_y": 0
     }
   ],
   "draftData": null,
-  "savedAt": "2026-08-29T00:42:26.838Z"
+  "savedAt": "2026-08-29T00:44:02.960Z"
 }
