@@ -5984,8 +5984,30 @@
       "altStats": null,
       "_x": 25,
       "_y": 75
+    },
+    {
+      "id": 1787969903973,
+      "name": "Unbound Knight Arowell",
+      "rarity": "3",
+      "role": "Knight",
+      "element": "Light",
+      "vType": "TNK",
+      "vScore": 9,
+      "hType": "SUR",
+      "hScore": 5,
+      "notes": "",
+      "iconData": "https://raw.githubusercontent.com/iridesuwa18/e7-chart/main/assets/heroes/unbound-knight-arowell.webp",
+      "locked": true,
+      "altStats": {
+        "vType": "SPD",
+        "vScore": 5,
+        "hType": "SST",
+        "hScore": 3
+      },
+      "_x": 25,
+      "_y": 95
     }
   ],
   "draftData": null,
-  "savedAt": "2026-08-29T02:17:13.262Z"
+  "savedAt": "2026-08-29T02:18:25.838Z"
 }
