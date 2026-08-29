@@ -125,6 +125,12 @@ const QD_LOW  = 4;
 const QD_PASSABLE_SCORE = 5;
 let qdBanProtectElement = null; // the element of the enemy's un-bannable "Ban Protect" pick, if set (Rule 1)
 const QD_ELEMENT_COUNTER = { Fire: "Ice", Ice: "Earth", Earth: "Fire", Light: "Dark", Dark: "Light" }; // which element beats which
+// Reverse of the above: QD_ELEMENT_BEATS[X] = the element X beats. Used by
+// Rule 6's fallback to figure out which element is actually WEAK against
+// the enemy's Ban Protect pick (e.g. Ban Protect = Fire → Fire beats Earth,
+// so Earth is the element to avoid — not Fire itself, and not Ice, which is
+// the strong counter-pick already tried first).
+const QD_ELEMENT_BEATS = { Ice: "Fire", Earth: "Ice", Fire: "Earth", Dark: "Light", Light: "Dark" };
 
 /* ── Quick Draft rules (5-rule strategy) ──
    Rule 1 (Ban Protect counter): see qdBanProtectElement / qdSuggestForNextSlot.
@@ -178,6 +184,7 @@ const QD_LAST_TWO_INDICES = [3, 4];    // Rule 5a: the final two slots, filled a
 const QD_PROTECT_SW_LAST_TWO_PENALTY = 200; // Rule 5a: heavy penalty for a 2nd Soul Weaver in the last two slots once Protect is already one
 const QD_SUPPORT_MIN_ROLES = ["Knight", "Soul Weaver"]; // Rule 5b: roles the team needs at least 1 of each, checked across the last two slots
 const QD_SUPPORT_MIN_BONUS = 40;      // Rule 5b: bonus for covering a still-missing role while not yet forced
+const QD_SUSTAIN_FLOOR_BONUS = 40;    // Rule 6: bonus for clearing the final-slot Sustainability floor
 const QD_TEAM_SCORE_CAP = 30;         // Rule 4: max combined score (raw 0-10 Avg/Total-Avg per hero) across all 5 picks — ~6/hero on average
 const QD_BUDGET_OVER_PENALTY = 15;    // heavy backstop penalty per point the candidate would push the team's running total over QD_TEAM_SCORE_CAP entirely
 const QD_LAST_PICK_CLOSENESS_BONUS = 20; // for the 5th/final pick, max bonus for landing the team total as close to QD_TEAM_SCORE_CAP as possible without going over
@@ -923,6 +930,16 @@ function qdScoreCandidate(candidate, currentPicks, slotIndex) {
     reasons.push(`Protect slot is already a Soul Weaver — avoiding a 2nd one in the last two slots`);
   }
 
+  // ── Rule 6: final-slot Sustainability floor ──
+  // (qdSuggestForSlot already restricts the candidate pool to heroes
+  // clearing the Sustainability bar — this bonus keeps the reason
+  // visible and still helps ranking in the fallback case.)
+  const sustainInfo = qdSustainNeededInfo(currentPicks, slotIndex);
+  if (sustainInfo && t.best.sst >= sustainInfo.minNeededSst) {
+    score += QD_SUSTAIN_FLOOR_BONUS;
+    reasons.push(`Sustainability ${t.best.sst.toFixed(1)} clears the ${Math.min(10, sustainInfo.minNeededSst).toFixed(1)} floor needed to bring the team back over 50%`);
+  }
+
   // ── Rule 5b: work toward at least 1 Knight and 1 Soul Weaver (last two slots) ──
   // When forced (see qdSupportMinNeededInfo), qdSuggestForNextSlot has
   // already restricted candidates to whichever role(s) are still
@@ -1093,6 +1110,26 @@ function qdSupportMinNeededInfo(currentPicks, nextIdx) {
   return { missing, slotsLeftIncl, forced };
 }
 
+/* Rule 6 helper — before the final slot, is the team's cumulative
+   Sustainability (best sst per hero, 0-10 each) under 50% of its own
+   max-possible total so far? If so, the final pick needs to be enough
+   of a sustain hero to pull the full 5-hero total back over 50%. */
+function qdSustainNeededInfo(currentPicks, nextIdx) {
+  if (nextIdx !== QD_SIZE - 1 || currentPicks.length !== QD_SIZE - 1) return null;
+  const sstSoFar = currentPicks.reduce((sum, h) => sum + qdHeroTraits(h).best.sst, 0);
+  const maxSoFar = currentPicks.length * 10;
+  if (sstSoFar >= maxSoFar * 0.5) return null;
+  const minNeededSst = (QD_SIZE * 10 * 0.5) - sstSoFar;
+  return { sstSoFar, minNeededSst };
+}
+
+/* Rule 6 hint text for the suggestions panel. */
+function qdSustainHint(currentPicks, nextIdx) {
+  const info = qdSustainNeededInfo(currentPicks, nextIdx);
+  if (!info) return "";
+  return `🩹 Team's Sustainability is under 50% so far (${info.sstSoFar.toFixed(1)}/${(currentPicks.length * 10).toFixed(0)}) — final pick needs at least ${Math.min(10, info.minNeededSst).toFixed(1)} Sustainability to bring the full team back over 50%.`;
+}
+
 /* Ranks every Roster hero not already drafted for the next empty slot.
    Always returns a full ranked list (best first) as long as there's at
    least one hero left in the Roster to suggest. */
@@ -1124,6 +1161,43 @@ function qdSuggestForSlot(nextIdx) {
   if (supportInfo && supportInfo.forced) {
     const matches = candidates.filter(h => supportInfo.missing.includes(h.role));
     if (matches.length > 0) candidates = matches;
+  }
+
+  // Rule 6 — before the final slot, if the team's cumulative
+  // Sustainability is under 50% of its own max-possible total so far,
+  // the final pick must clear a minimum Sustainability of its own so the
+  // full 5-hero total comes back over 50%. Tries to also honor Rule 1's
+  // counter element first (staying countered AND sustaining); if no
+  // hero clears the bar in that element, falls back to any element
+  // except the one the Ban Protect element actually beats (rather than
+  // giving up the sustain requirement). Only enforced when the Roster
+  // still has a qualifying hero to suggest, so this never empties the
+  // list — if nothing clears the exact bar, it narrows to whoever has
+  // the single highest Sustainability available instead.
+  const sustainInfo = qdSustainNeededInfo(currentPicks, nextIdx);
+  if (sustainInfo) {
+    let sstPool = candidates.filter(h => qdHeroTraits(h).best.sst >= sustainInfo.minNeededSst);
+    if (sstPool.length === 0 && candidates.length > 0) {
+      const bestAvail = Math.max(...candidates.map(h => qdHeroTraits(h).best.sst));
+      sstPool = candidates.filter(h => qdHeroTraits(h).best.sst === bestAvail);
+    }
+    if (qdBanProtectElement && sstPool.length > 0) {
+      const counterEl = QD_ELEMENT_COUNTER[qdBanProtectElement];
+      const withCounter = sstPool.filter(h => h.element === counterEl);
+      if (withCounter.length > 0) {
+        sstPool = withCounter;
+      } else {
+        // No sustain-qualifying hero in the strong counter element — fall
+        // back to any element EXCEPT the one the Ban Protect element
+        // actually beats (e.g. Ban Protect = Fire beats Earth, so avoid
+        // Earth; Ice was already tried above, and any other element is
+        // neutral against Fire, same as Fire itself would be).
+        const weakEl = QD_ELEMENT_BEATS[qdBanProtectElement];
+        const notWeak = sstPool.filter(h => h.element !== weakEl);
+        if (notWeak.length > 0) sstPool = notWeak;
+      }
+    }
+    if (sstPool.length > 0) candidates = sstPool;
   }
 
   // Rule 1 — once the opponent's un-bannable Ban Protect element is set,
@@ -1169,18 +1243,38 @@ function addToQuickDraft(id) {
   renderRoster();
 }
 
-/* Next Best — re-picks whichever slot was most recently filled, walking
-   one step further down that slot's own ranked suggestion list each
-   time it's clicked (wrapping back to #1 after the last option). No
-   memory of "don't have" heroes is kept — it's just a live rank pointer
-   for the current session, recomputed fresh from the current roster and
-   picks every click. */
+/* Whichever slot is currently the rightmost filled one — i.e. the
+   "latest" hero on the team. Recomputed fresh every time rather than
+   tracked as a pointer, so removing a hero (which shifts everyone left)
+   automatically updates what Next Best targets without needing another
+   Autofill/pick first. Slots always fill left-to-right (see
+   addToQuickDraft), so the rightmost filled slot is always the most
+   recently added one. */
+function qdLatestFilledSlotIndex() {
+  for (let i = QD_SIZE - 1; i >= 0; i--) {
+    if (quickDraft[i] !== null) return i;
+  }
+  return null;
+}
+
+/* Next Best — re-picks whichever slot is currently the latest (rightmost
+   filled) one, walking one step further down that slot's own ranked
+   suggestion list each time it's clicked (wrapping back to #1 after the
+   last option). No memory of "don't have" heroes is kept — it's just a
+   live rank pointer for the current session, recomputed fresh from the
+   current roster and picks every click. The pointer resets to #1
+   whenever the targeted slot itself changes (e.g. after a removal shifts
+   which slot is "latest"). */
 function nextBestQuickDraftPick() {
-  if (qdLastFilledSlot === null || quickDraft[qdLastFilledSlot] === null) {
+  const slotIndex = qdLatestFilledSlotIndex();
+  if (slotIndex === null) {
     setStatus("⚠️ Fill a slot first, then Next Best can swap it.");
     return;
   }
-  const slotIndex = qdLastFilledSlot;
+  if (slotIndex !== qdLastFilledSlot) {
+    qdLastFilledSlot = slotIndex;
+    qdNextBestRank = 0;
+  }
   const scored = qdSuggestForSlot(slotIndex);
   if (scored.length === 0) { setStatus("⚠️ No more heroes left in your Roster to swap in."); return; }
 
@@ -1232,8 +1326,6 @@ function autofillTopQuickDraftPick() {
 function removeFromQuickDraft(id) {
   quickDraft = quickDraft.filter(x => x !== id);
   while (quickDraft.length < QD_SIZE) quickDraft.push(null);
-  qdLastFilledSlot = null;
-  qdNextBestRank = 0;
   saveQuickDraftLocal();
   renderQuickDraft();
   renderRoster();
@@ -1318,9 +1410,10 @@ function renderQuickDraft() {
   document.getElementById("btn-quickdraft-autofill").disabled = filledCount >= QD_SIZE;
   const nextBestBtn = document.getElementById("btn-quickdraft-nextbest");
   if (nextBestBtn) {
-    nextBestBtn.disabled = qdLastFilledSlot === null || quickDraft[qdLastFilledSlot] === null;
-    nextBestBtn.title = qdLastFilledSlot !== null
-      ? `Swap Slot ${qdLastFilledSlot + 1} for the next-best pick`
+    const latestSlot = qdLatestFilledSlotIndex();
+    nextBestBtn.disabled = latestSlot === null;
+    nextBestBtn.title = latestSlot !== null
+      ? `Swap Slot ${latestSlot + 1} (your latest pick) for the next-best pick`
       : "Fill a slot first";
   }
 
@@ -1344,7 +1437,7 @@ function renderQuickDraftSuggestions() {
 
   const currentPicks = quickDraft.filter(id => id !== null).map(id => heroes.find(h => h.id === id)).filter(Boolean);
   const hintEl = document.getElementById("quickdraft-element-hint");
-  const hints = [qdBanProtectHint(), qdProtectSwHint(nextIdx), qdSupportMinHint(currentPicks, nextIdx), qdStatHint(currentPicks), qdClassHint(currentPicks), qdBudgetHint(currentPicks)].filter(Boolean);
+  const hints = [qdBanProtectHint(), qdProtectSwHint(nextIdx), qdSupportMinHint(currentPicks, nextIdx), qdSustainHint(currentPicks, nextIdx), qdStatHint(currentPicks), qdClassHint(currentPicks), qdBudgetHint(currentPicks)].filter(Boolean);
   if (hints.length) { hintEl.innerHTML = hints.join("<br>"); hintEl.style.display = "block"; }
   else { hintEl.style.display = "none"; }
 
