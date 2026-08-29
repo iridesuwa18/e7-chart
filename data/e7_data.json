@@ -5000,8 +5000,42 @@
       },
       "_x": 25,
       "_y": 65
+    },
+    {
+      "id": 1787964705934,
+      "name": "Azalea",
+      "rarity": "3",
+      "role": "Warrior",
+      "element": "Fire",
+      "vType": "SPD",
+      "vScore": 2,
+      "hType": "SUR",
+      "hScore": 4,
+      "notes": "",
+      "iconData": "https://raw.githubusercontent.com/iridesuwa18/e7-chart/main/assets/heroes/azalea.webp",
+      "locked": true,
+      "altStats": null,
+      "_x": 30,
+      "_y": 40
+    },
+    {
+      "id": 1787964775861,
+      "name": "Januta",
+      "rarity": "3",
+      "role": "Warrior",
+      "element": "Fire",
+      "vType": "SPD",
+      "vScore": 5,
+      "hType": "SUR",
+      "hScore": 4,
+      "notes": "",
+      "iconData": "https://raw.githubusercontent.com/iridesuwa18/e7-chart/main/assets/heroes/januta.webp",
+      "locked": true,
+      "altStats": null,
+      "_x": 30,
+      "_y": 25
     }
   ],
   "draftData": null,
-  "savedAt": "2026-08-29T00:47:17.250Z"
+  "savedAt": "2026-08-29T00:53:05.666Z"
 }
