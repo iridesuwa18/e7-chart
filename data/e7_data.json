@@ -445,17 +445,17 @@
       "role": "Thief",
       "element": "Light",
       "vType": "SPD",
-      "vScore": 9,
+      "vScore": 8,
       "hType": "SST",
-      "hScore": 9,
+      "hScore": 7,
       "notes": "",
       "iconData": "https://raw.githubusercontent.com/iridesuwa18/e7-chart/main/assets/heroes/spirit-eye-celine.webp",
       "locked": true,
       "altStats": {
         "vType": "SPD",
-        "vScore": 9,
+        "vScore": 7,
         "hType": "SUR",
-        "hScore": 9
+        "hScore": 8
       },
       "_x": 95,
       "_y": 5,
@@ -6626,5 +6626,5 @@
     }
   ],
   "draftData": null,
-  "savedAt": "2026-08-29T03:09:51.462Z"
+  "savedAt": "2026-08-29T14:25:12.070Z"
 }
