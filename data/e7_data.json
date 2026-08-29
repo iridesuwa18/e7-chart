@@ -6445,8 +6445,30 @@
       "altStats": null,
       "_x": 15,
       "_y": 15
+    },
+    {
+      "id": 1787972097820,
+      "name": "Revna",
+      "rarity": "3",
+      "role": "Thief",
+      "element": "Dark",
+      "vType": "TNK",
+      "vScore": 6,
+      "hType": "SUR",
+      "hScore": 5,
+      "notes": "",
+      "iconData": "https://raw.githubusercontent.com/iridesuwa18/e7-chart/main/assets/heroes/revna.webp",
+      "locked": true,
+      "altStats": {
+        "vType": "SPD",
+        "vScore": 7,
+        "hType": "SUR",
+        "hScore": 5
+      },
+      "_x": 25,
+      "_y": 80
     }
   ],
   "draftData": null,
-  "savedAt": "2026-08-29T02:47:46.340Z"
+  "savedAt": "2026-08-29T02:57:25.815Z"
 }
