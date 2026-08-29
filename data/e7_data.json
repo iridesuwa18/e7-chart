@@ -4410,8 +4410,47 @@
       },
       "_x": 95,
       "_y": 40
+    },
+    {
+      "id": 1787961639767,
+      "name": "Kizuna Ai",
+      "rarity": "5ml",
+      "role": "Soul Weaver",
+      "element": "Fire",
+      "vType": "TNK",
+      "vScore": 4,
+      "hType": "SST",
+      "hScore": 7,
+      "notes": "",
+      "iconData": "https://raw.githubusercontent.com/iridesuwa18/e7-chart/main/assets/heroes/kizuna-ai.webp",
+      "locked": true,
+      "altStats": {
+        "vType": "SPD",
+        "vScore": 2,
+        "hType": "SUR",
+        "hScore": 2
+      },
+      "_x": 85,
+      "_y": 70
+    },
+    {
+      "id": 1787961686973,
+      "name": "Clarissa",
+      "rarity": "4",
+      "role": "Warrior",
+      "element": "Ice",
+      "vType": "SPD",
+      "vScore": 4,
+      "hType": "SUR",
+      "hScore": 6,
+      "notes": "",
+      "iconData": "https://raw.githubusercontent.com/iridesuwa18/e7-chart/main/assets/heroes/clarissa.webp",
+      "locked": true,
+      "altStats": null,
+      "_x": 20,
+      "_y": 30
     }
   ],
   "draftData": null,
-  "savedAt": "2026-08-28T23:49:25.665Z"
+  "savedAt": "2026-08-29T00:01:29.251Z"
 }
