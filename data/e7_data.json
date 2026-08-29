@@ -5285,8 +5285,25 @@
       },
       "_x": 95,
       "_y": 30
+    },
+    {
+      "id": 1787966066696,
+      "name": "Enott",
+      "rarity": "3",
+      "role": "Warrior",
+      "element": "Ice",
+      "vType": "SPD",
+      "vScore": 2,
+      "hType": "SUR",
+      "hScore": 4,
+      "notes": "",
+      "iconData": "https://raw.githubusercontent.com/iridesuwa18/e7-chart/main/assets/heroes/enott.webp",
+      "locked": true,
+      "altStats": null,
+      "_x": 30,
+      "_y": 40
     }
   ],
   "draftData": null,
-  "savedAt": "2026-08-29T01:13:03.792Z"
+  "savedAt": "2026-08-29T01:14:31.489Z"
 }
