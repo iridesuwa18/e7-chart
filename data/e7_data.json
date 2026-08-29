@@ -4978,8 +4978,30 @@
       "altStats": null,
       "_x": 35,
       "_y": 5
+    },
+    {
+      "id": 1787964370566,
+      "name": "Guider Aither",
+      "rarity": "4",
+      "role": "Mage",
+      "element": "Light",
+      "vType": "TNK",
+      "vScore": 3,
+      "hType": "SUR",
+      "hScore": 5,
+      "notes": "",
+      "iconData": "https://raw.githubusercontent.com/iridesuwa18/e7-chart/main/assets/heroes/guider-aither.webp",
+      "locked": true,
+      "altStats": {
+        "vType": "SPD",
+        "vScore": 5,
+        "hType": "SST",
+        "hScore": 5
+      },
+      "_x": 25,
+      "_y": 65
     }
   ],
   "draftData": null,
-  "savedAt": "2026-08-29T00:45:15.526Z"
+  "savedAt": "2026-08-29T00:46:52.012Z"
 }
