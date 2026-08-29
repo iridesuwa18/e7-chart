@@ -4905,8 +4905,25 @@
       },
       "_x": 25,
       "_y": 5
+    },
+    {
+      "id": 1787964066049,
+      "name": "Wanderer Silk",
+      "rarity": "4",
+      "role": "Ranger",
+      "element": "Light",
+      "vType": "SPD",
+      "vScore": 9,
+      "hType": "SUR",
+      "hScore": 4,
+      "notes": "",
+      "iconData": "https://raw.githubusercontent.com/iridesuwa18/e7-chart/main/assets/heroes/wanderer-silk.webp",
+      "locked": true,
+      "altStats": null,
+      "_x": 30,
+      "_y": 5
     }
   ],
   "draftData": null,
-  "savedAt": "2026-08-29T00:40:15.156Z"
+  "savedAt": "2026-08-29T00:41:11.902Z"
 }
