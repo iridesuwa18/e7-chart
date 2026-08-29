@@ -6611,7 +6611,7 @@
       "vType": "TNK",
       "vScore": 10,
       "hType": "SST",
-      "hScore": 10,
+      "hScore": 9,
       "notes": "",
       "iconData": "https://raw.githubusercontent.com/iridesuwa18/e7-chart/main/assets/heroes/lisette.webp",
       "locked": true,
@@ -6621,10 +6621,10 @@
         "hType": "SUR",
         "hScore": 8
       },
-      "_x": 100,
+      "_x": 95,
       "_y": 100
     }
   ],
   "draftData": null,
-  "savedAt": "2026-08-29T03:09:27.660Z"
+  "savedAt": "2026-08-29T03:09:51.462Z"
 }
