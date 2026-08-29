@@ -112,6 +112,14 @@ const QD_PROTECT_INDEX = 2; // middle slot — where you'd usually place your 1 
 let quickDraft = [null, null, null, null, null];
 let quickDraftOpen = false;
 let quickDraftSuggestOpen = false;
+
+/* "Next Best" — swaps out whichever slot was most recently filled for
+   the next-ranked candidate in that same slot's suggestion list. Doesn't
+   persist or remember which heroes you don't own; it's just a pointer
+   into the current ranked list for the last-touched slot, walking down
+   one rank per click and wrapping back to #1 if you run off the end. */
+let qdLastFilledSlot = null;
+let qdNextBestRank = 0;
 const QD_HIGH = 6;
 const QD_LOW  = 4;
 const QD_PASSABLE_SCORE = 5;
@@ -311,6 +319,8 @@ const saveStatus   = document.getElementById("save-status");
   });
 
   document.getElementById("btn-quickdraft-autofill").addEventListener("click", autofillTopQuickDraftPick);
+  const nextBestBtn = document.getElementById("btn-quickdraft-nextbest");
+  if (nextBestBtn) nextBestBtn.addEventListener("click", nextBestQuickDraftPick);
   document.getElementById("modal-cancel").addEventListener("click", closeModal);
   document.getElementById("modal-overlay").addEventListener("click", e => { if (e.target === overlay) closeModal(); });
   modalConfirm.addEventListener("click", onModalConfirm);
@@ -1086,10 +1096,16 @@ function qdSupportMinNeededInfo(currentPicks, nextIdx) {
 /* Ranks every Roster hero not already drafted for the next empty slot.
    Always returns a full ranked list (best first) as long as there's at
    least one hero left in the Roster to suggest. */
-function qdSuggestForNextSlot() {
-  const currentIds = quickDraft.filter(id => id !== null);
+/* Scores/ranks candidates for a given slot index, treating that slot as
+   the one being filled (everything else in quickDraft counts as
+   "already picked"). qdSuggestForNextSlot() is just this called on the
+   next empty slot; Next Best calls it on the last-filled slot instead,
+   with that slot's own hero excluded from currentIds so it re-enters
+   the candidate pool. */
+function qdSuggestForSlot(nextIdx) {
+  if (nextIdx === -1 || nextIdx == null) return [];
+  const currentIds = quickDraft.filter((id, i) => id !== null && i !== nextIdx);
   const currentPicks = currentIds.map(id => heroes.find(h => h.id === id)).filter(Boolean);
-  const nextIdx = quickDraft.indexOf(null);
   let candidates = heroes.filter(h => !currentIds.includes(h.id));
 
   // Rule 5b — steer the last two slots toward ending with at least 1
@@ -1137,14 +1153,47 @@ function qdSuggestForNextSlot() {
   return scored;
 }
 
+function qdSuggestForNextSlot() {
+  return qdSuggestForSlot(quickDraft.indexOf(null));
+}
+
 function addToQuickDraft(id) {
   if (quickDraft.includes(id)) return;
   const idx = quickDraft.indexOf(null);
   if (idx === -1) { setStatus("⚠️ Quick Draft is full (5/5)"); return; }
   quickDraft[idx] = id;
+  qdLastFilledSlot = idx;
+  qdNextBestRank = 0;
   saveQuickDraftLocal();
   renderQuickDraft();
   renderRoster();
+}
+
+/* Next Best — re-picks whichever slot was most recently filled, walking
+   one step further down that slot's own ranked suggestion list each
+   time it's clicked (wrapping back to #1 after the last option). No
+   memory of "don't have" heroes is kept — it's just a live rank pointer
+   for the current session, recomputed fresh from the current roster and
+   picks every click. */
+function nextBestQuickDraftPick() {
+  if (qdLastFilledSlot === null || quickDraft[qdLastFilledSlot] === null) {
+    setStatus("⚠️ Fill a slot first, then Next Best can swap it.");
+    return;
+  }
+  const slotIndex = qdLastFilledSlot;
+  const scored = qdSuggestForSlot(slotIndex);
+  if (scored.length === 0) { setStatus("⚠️ No more heroes left in your Roster to swap in."); return; }
+
+  qdNextBestRank = (qdNextBestRank + 1) % scored.length;
+  const pick = scored[qdNextBestRank];
+  quickDraft[slotIndex] = pick.hero.id;
+  saveQuickDraftLocal();
+  renderQuickDraft();
+  renderRoster();
+  if (quickDraftSuggestOpen) renderQuickDraftSuggestions();
+
+  if (qdNextBestRank === 0) setStatus("🔁 Back to the top pick for this slot.");
+  else setStatus(`🔁 Slot ${slotIndex + 1}: ${pick.hero.name || "Unnamed"} (#${qdNextBestRank + 1} best)`);
 }
 
 /* Randomize — picks a uniformly random hero from the Roster (excluding
@@ -1183,6 +1232,8 @@ function autofillTopQuickDraftPick() {
 function removeFromQuickDraft(id) {
   quickDraft = quickDraft.filter(x => x !== id);
   while (quickDraft.length < QD_SIZE) quickDraft.push(null);
+  qdLastFilledSlot = null;
+  qdNextBestRank = 0;
   saveQuickDraftLocal();
   renderQuickDraft();
   renderRoster();
@@ -1198,6 +1249,8 @@ function toggleQuickDraftDrawer() {
 function clearQuickDraft() {
   quickDraft = [null, null, null, null, null];
   quickDraftSuggestOpen = false;
+  qdLastFilledSlot = null;
+  qdNextBestRank = 0;
   document.getElementById("quickdraft-suggestions").style.display = "none";
   saveQuickDraftLocal();
 
@@ -1263,6 +1316,13 @@ function renderQuickDraft() {
   document.getElementById("btn-quickdraft-suggest").disabled = filledCount >= QD_SIZE;
   document.getElementById("btn-quickdraft-random").disabled = filledCount >= QD_SIZE;
   document.getElementById("btn-quickdraft-autofill").disabled = filledCount >= QD_SIZE;
+  const nextBestBtn = document.getElementById("btn-quickdraft-nextbest");
+  if (nextBestBtn) {
+    nextBestBtn.disabled = qdLastFilledSlot === null || quickDraft[qdLastFilledSlot] === null;
+    nextBestBtn.title = qdLastFilledSlot !== null
+      ? `Swap Slot ${qdLastFilledSlot + 1} for the next-best pick`
+      : "Fill a slot first";
+  }
 
   if (quickDraftSuggestOpen) renderQuickDraftSuggestions();
 }
