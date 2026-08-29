@@ -4700,8 +4700,25 @@
       "altStats": null,
       "_x": 15,
       "_y": 10
+    },
+    {
+      "id": 1787963187758,
+      "name": "Leo",
+      "rarity": "4",
+      "role": "Ranger",
+      "element": "Earth",
+      "vType": "SPD",
+      "vScore": 8,
+      "hType": "SUR",
+      "hScore": 3,
+      "notes": "",
+      "iconData": "https://raw.githubusercontent.com/iridesuwa18/e7-chart/main/assets/heroes/leo.webp",
+      "locked": true,
+      "altStats": null,
+      "_x": 35,
+      "_y": 10
     }
   ],
   "draftData": null,
-  "savedAt": "2026-08-29T00:25:33.171Z"
+  "savedAt": "2026-08-29T00:26:30.928Z"
 }
