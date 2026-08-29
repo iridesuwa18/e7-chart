@@ -6506,8 +6506,59 @@
       "altStats": null,
       "_x": 25,
       "_y": 20
+    },
+    {
+      "id": 1787972483258,
+      "name": "Hurado",
+      "rarity": "3",
+      "role": "Mage",
+      "element": "Dark",
+      "vType": "SPD",
+      "vScore": 7,
+      "hType": "SUR",
+      "hScore": 2,
+      "notes": "",
+      "iconData": "https://raw.githubusercontent.com/iridesuwa18/e7-chart/main/assets/heroes/hurado.webp",
+      "locked": true,
+      "altStats": null,
+      "_x": 40,
+      "_y": 15
+    },
+    {
+      "id": 1787972554796,
+      "name": "Otillie",
+      "rarity": "3",
+      "role": "Mage",
+      "element": "Dark",
+      "vType": "TNK",
+      "vScore": 3,
+      "hType": "SUR",
+      "hScore": 2,
+      "notes": "",
+      "iconData": "https://raw.githubusercontent.com/iridesuwa18/e7-chart/main/assets/heroes/otillie.webp",
+      "locked": true,
+      "altStats": null,
+      "_x": 40,
+      "_y": 65
+    },
+    {
+      "id": 1787972617177,
+      "name": "Suthan",
+      "rarity": "3",
+      "role": "Mage",
+      "element": "Dark",
+      "vType": "SPD",
+      "vScore": 2,
+      "hType": "SUR",
+      "hScore": 10,
+      "notes": "",
+      "iconData": "https://raw.githubusercontent.com/iridesuwa18/e7-chart/main/assets/heroes/suthan.webp",
+      "locked": true,
+      "altStats": null,
+      "_x": 0,
+      "_y": 40
     }
   ],
   "draftData": null,
-  "savedAt": "2026-08-29T03:00:25.847Z"
+  "savedAt": "2026-08-29T03:03:40.057Z"
 }
