@@ -6128,8 +6128,30 @@
       },
       "_x": 80,
       "_y": 70
+    },
+    {
+      "id": 1787970787656,
+      "name": "Sonia",
+      "rarity": "3",
+      "role": "Soul Weaver",
+      "element": "Light",
+      "vType": "TNK",
+      "vScore": 2,
+      "hType": "SST",
+      "hScore": 4,
+      "notes": "",
+      "iconData": "https://raw.githubusercontent.com/iridesuwa18/e7-chart/main/assets/heroes/sonia.webp",
+      "locked": true,
+      "altStats": {
+        "vType": "SPD",
+        "vScore": 2,
+        "hType": "SUR",
+        "hScore": 2
+      },
+      "_x": 70,
+      "_y": 60
     }
   ],
   "draftData": null,
-  "savedAt": "2026-08-29T02:28:01.731Z"
+  "savedAt": "2026-08-29T02:33:11.071Z"
 }
