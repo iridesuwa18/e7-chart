@@ -5733,8 +5733,25 @@
       "altStats": null,
       "_x": 30,
       "_y": 15
+    },
+    {
+      "id": 1787968088087,
+      "name": "Leah",
+      "rarity": "3",
+      "role": "Ranger",
+      "element": "Earth",
+      "vType": "SPD",
+      "vScore": 7,
+      "hType": "SUR",
+      "hScore": 3,
+      "notes": "",
+      "iconData": "https://raw.githubusercontent.com/iridesuwa18/e7-chart/main/assets/heroes/leah.webp",
+      "locked": true,
+      "altStats": null,
+      "_x": 35,
+      "_y": 15
     }
   ],
   "draftData": null,
-  "savedAt": "2026-08-29T01:46:24.140Z"
+  "savedAt": "2026-08-29T01:48:10.163Z"
 }
