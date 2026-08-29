@@ -6211,8 +6211,30 @@
       },
       "_x": 25,
       "_y": 65
+    },
+    {
+      "id": 1787971206724,
+      "name": "Pernilla",
+      "rarity": "3",
+      "role": "Warrior",
+      "element": "Dark",
+      "vType": "SPD",
+      "vScore": 7,
+      "hType": "SUR",
+      "hScore": 4,
+      "notes": "",
+      "iconData": "https://raw.githubusercontent.com/iridesuwa18/e7-chart/main/assets/heroes/pernilla.webp",
+      "locked": true,
+      "altStats": {
+        "vType": "TNK",
+        "vScore": 2,
+        "hType": "SUR",
+        "hScore": 4
+      },
+      "_x": 30,
+      "_y": 15
     }
   ],
   "draftData": null,
-  "savedAt": "2026-08-29T02:38:06.815Z"
+  "savedAt": "2026-08-29T02:40:08.743Z"
 }
