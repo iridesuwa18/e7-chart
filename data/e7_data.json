@@ -5419,8 +5419,25 @@
       },
       "_x": 75,
       "_y": 65
+    },
+    {
+      "id": 1787966665483,
+      "name": "Muwi",
+      "rarity": "3",
+      "role": "Thief",
+      "element": "Ice",
+      "vType": "SPD",
+      "vScore": 4,
+      "hType": "SUR",
+      "hScore": 3,
+      "notes": "",
+      "iconData": "https://raw.githubusercontent.com/iridesuwa18/e7-chart/main/assets/heroes/muwi.webp",
+      "locked": true,
+      "altStats": null,
+      "_x": 35,
+      "_y": 30
     }
   ],
   "draftData": null,
-  "savedAt": "2026-08-29T01:23:19.377Z"
+  "savedAt": "2026-08-29T01:24:32.796Z"
 }
