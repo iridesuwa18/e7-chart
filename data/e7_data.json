@@ -6150,8 +6150,25 @@
       },
       "_x": 70,
       "_y": 60
+    },
+    {
+      "id": 1787970830940,
+      "name": "Batisse",
+      "rarity": "3",
+      "role": "Warrior",
+      "element": "Dark",
+      "vType": "SPD",
+      "vScore": 2,
+      "hType": "SUR",
+      "hScore": 2,
+      "notes": "",
+      "iconData": "https://raw.githubusercontent.com/iridesuwa18/e7-chart/main/assets/heroes/batisse.webp",
+      "locked": true,
+      "altStats": null,
+      "_x": 40,
+      "_y": 40
     }
   ],
   "draftData": null,
-  "savedAt": "2026-08-29T02:33:12.534Z"
+  "savedAt": "2026-08-29T02:34:12.082Z"
 }
