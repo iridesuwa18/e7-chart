@@ -5609,8 +5609,25 @@
       "altStats": null,
       "_x": 30,
       "_y": 40
+    },
+    {
+      "id": 1787967530812,
+      "name": "Mercenary Helga",
+      "rarity": "3",
+      "role": "Warrior",
+      "element": "Earth",
+      "vType": "SPD",
+      "vScore": 6,
+      "hType": "SUR",
+      "hScore": 4,
+      "notes": "",
+      "iconData": "https://raw.githubusercontent.com/iridesuwa18/e7-chart/main/assets/heroes/mercenary-helga.webp",
+      "locked": true,
+      "altStats": null,
+      "_x": 30,
+      "_y": 20
     }
   ],
   "draftData": null,
-  "savedAt": "2026-08-29T01:37:30.023Z"
+  "savedAt": "2026-08-29T01:38:52.225Z"
 }
