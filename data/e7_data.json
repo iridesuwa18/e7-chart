@@ -5090,8 +5090,52 @@
       "altStats": null,
       "_x": 40,
       "_y": 15
+    },
+    {
+      "id": 1787965108194,
+      "name": "Adventurer Ras",
+      "rarity": "3",
+      "role": "Knight",
+      "element": "Fire",
+      "vType": "TNK",
+      "vScore": 5,
+      "hType": "SST",
+      "hScore": 4,
+      "notes": "",
+      "iconData": "https://raw.githubusercontent.com/iridesuwa18/e7-chart/main/assets/heroes/adventurer-ras.webp",
+      "locked": true,
+      "altStats": {
+        "vType": "SPD",
+        "vScore": 4,
+        "hType": "SUR",
+        "hScore": 3
+      },
+      "_x": 70,
+      "_y": 75
+    },
+    {
+      "id": 1787965200695,
+      "name": "Chaos Inquisitor",
+      "rarity": "3",
+      "role": "Knight",
+      "element": "Fire",
+      "vType": "SPD",
+      "vScore": 5,
+      "hType": "SST",
+      "hScore": 5,
+      "notes": "",
+      "iconData": "https://raw.githubusercontent.com/iridesuwa18/e7-chart/main/assets/heroes/chaos-inquisitor.webp",
+      "locked": true,
+      "altStats": {
+        "vType": "TNK",
+        "vScore": 3,
+        "hType": "SUR",
+        "hScore": 4
+      },
+      "_x": 75,
+      "_y": 25
     }
   ],
   "draftData": null,
-  "savedAt": "2026-08-29T00:57:03.749Z"
+  "savedAt": "2026-08-29T01:00:05.424Z"
 }
