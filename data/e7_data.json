@@ -4493,8 +4493,25 @@
       },
       "_x": 40,
       "_y": 10
+    },
+    {
+      "id": 1787962438781,
+      "name": "Coli",
+      "rarity": "4",
+      "role": "Thief",
+      "element": "Ice",
+      "vType": "SPD",
+      "vScore": 5,
+      "hType": "SUR",
+      "hScore": 3,
+      "notes": "",
+      "iconData": "https://raw.githubusercontent.com/iridesuwa18/e7-chart/main/assets/heroes/coli.webp",
+      "locked": true,
+      "altStats": null,
+      "_x": 35,
+      "_y": 25
     }
   ],
   "draftData": null,
-  "savedAt": "2026-08-29T00:06:08.859Z"
+  "savedAt": "2026-08-29T00:14:16.678Z"
 }
