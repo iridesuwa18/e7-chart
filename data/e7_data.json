@@ -5548,8 +5548,30 @@
       "altStats": null,
       "_x": 30,
       "_y": 15
+    },
+    {
+      "id": 1787967249846,
+      "name": "Aither",
+      "rarity": "3",
+      "role": "Soul Weaver",
+      "element": "Ice",
+      "vType": "SPD",
+      "vScore": 5,
+      "hType": "SST",
+      "hScore": 5,
+      "notes": "",
+      "iconData": "https://raw.githubusercontent.com/iridesuwa18/e7-chart/main/assets/heroes/aither.webp",
+      "locked": true,
+      "altStats": {
+        "vType": "TNK",
+        "vScore": 3,
+        "hType": "SUR",
+        "hScore": 2
+      },
+      "_x": 75,
+      "_y": 25
     }
   ],
   "draftData": null,
-  "savedAt": "2026-08-29T01:32:56.235Z"
+  "savedAt": "2026-08-29T01:34:32.364Z"
 }
