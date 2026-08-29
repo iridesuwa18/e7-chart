@@ -5699,8 +5699,25 @@
       "altStats": null,
       "_x": 40,
       "_y": 40
+    },
+    {
+      "id": 1787967908585,
+      "name": "Righteous Thief Roozid",
+      "rarity": "3",
+      "role": "Thief",
+      "element": "Earth",
+      "vType": "SPD",
+      "vScore": 8,
+      "hType": "SUR",
+      "hScore": 7,
+      "notes": "",
+      "iconData": "https://raw.githubusercontent.com/iridesuwa18/e7-chart/main/assets/heroes/righteous-thief-roozid.webp",
+      "locked": true,
+      "altStats": null,
+      "_x": 15,
+      "_y": 10
     }
   ],
   "draftData": null,
-  "savedAt": "2026-08-29T01:44:28.020Z"
+  "savedAt": "2026-08-29T01:45:26.719Z"
 }
