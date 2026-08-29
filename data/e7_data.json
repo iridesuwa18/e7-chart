@@ -4961,8 +4961,25 @@
       },
       "_x": 40,
       "_y": 0
+    },
+    {
+      "id": 1787964312318,
+      "name": "Benevolent Romann",
+      "rarity": "4",
+      "role": "Mage",
+      "element": "Light",
+      "vType": "SPD",
+      "vScore": 9,
+      "hType": "SUR",
+      "hScore": 3,
+      "notes": "",
+      "iconData": "https://raw.githubusercontent.com/iridesuwa18/e7-chart/main/assets/heroes/benevolent-romann.webp",
+      "locked": true,
+      "altStats": null,
+      "_x": 35,
+      "_y": 5
     }
   ],
   "draftData": null,
-  "savedAt": "2026-08-29T00:44:02.960Z"
+  "savedAt": "2026-08-29T00:45:15.526Z"
 }
