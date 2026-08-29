@@ -5134,8 +5134,42 @@
       },
       "_x": 75,
       "_y": 25
+    },
+    {
+      "id": 1787965266650,
+      "name": "Claudia",
+      "rarity": "3",
+      "role": "Knight",
+      "element": "Fire",
+      "vType": "TNK",
+      "vScore": 5,
+      "hType": "SST",
+      "hScore": 3,
+      "notes": "",
+      "iconData": "https://raw.githubusercontent.com/iridesuwa18/e7-chart/main/assets/heroes/claudia.webp",
+      "locked": true,
+      "altStats": null,
+      "_x": 65,
+      "_y": 75
+    },
+    {
+      "id": 1787965308767,
+      "name": "Hataan",
+      "rarity": "3",
+      "role": "Thief",
+      "element": "Fire",
+      "vType": "SPD",
+      "vScore": 4,
+      "hType": "SUR",
+      "hScore": 4,
+      "notes": "",
+      "iconData": "https://raw.githubusercontent.com/iridesuwa18/e7-chart/main/assets/heroes/hataan.webp",
+      "locked": true,
+      "altStats": null,
+      "_x": 30,
+      "_y": 30
     }
   ],
   "draftData": null,
-  "savedAt": "2026-08-29T01:00:05.424Z"
+  "savedAt": "2026-08-29T01:02:11.955Z"
 }
