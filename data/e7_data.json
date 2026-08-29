@@ -5492,8 +5492,25 @@
       "altStats": null,
       "_x": 35,
       "_y": 15
+    },
+    {
+      "id": 1787967016677,
+      "name": "Muse Rima",
+      "rarity": "3",
+      "role": "Ranger",
+      "element": "Ice",
+      "vType": "SPD",
+      "vScore": 7,
+      "hType": "SUR",
+      "hScore": 3,
+      "notes": "",
+      "iconData": "https://raw.githubusercontent.com/iridesuwa18/e7-chart/main/assets/heroes/muse-rima.webp",
+      "locked": true,
+      "altStats": null,
+      "_x": 35,
+      "_y": 15
     }
   ],
   "draftData": null,
-  "savedAt": "2026-08-29T01:28:28.369Z"
+  "savedAt": "2026-08-29T01:30:19.220Z"
 }
