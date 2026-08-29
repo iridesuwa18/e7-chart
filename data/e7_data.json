@@ -5911,8 +5911,30 @@
       },
       "_x": 90,
       "_y": 15
+    },
+    {
+      "id": 1787968854266,
+      "name": "Captain Rikoris",
+      "rarity": "3",
+      "role": "Warrior",
+      "element": "Light",
+      "vType": "SPD",
+      "vScore": 7,
+      "hType": "SST",
+      "hScore": 5,
+      "notes": "",
+      "iconData": "https://raw.githubusercontent.com/iridesuwa18/e7-chart/main/assets/heroes/captain-rikoris.webp",
+      "locked": true,
+      "altStats": {
+        "vType": "TNK",
+        "vScore": 2,
+        "hType": "SUR",
+        "hScore": 5
+      },
+      "_x": 75,
+      "_y": 15
     }
   ],
   "draftData": null,
-  "savedAt": "2026-08-29T01:59:02.775Z"
+  "savedAt": "2026-08-29T02:00:56.502Z"
 }
