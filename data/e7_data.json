@@ -5845,8 +5845,30 @@
       },
       "_x": 15,
       "_y": 75
+    },
+    {
+      "id": 1787968598884,
+      "name": "Jecht",
+      "rarity": "3",
+      "role": "Soul Weaver",
+      "element": "Earth",
+      "vType": "SPD",
+      "vScore": 4,
+      "hType": "SST",
+      "hScore": 5,
+      "notes": "",
+      "iconData": "https://raw.githubusercontent.com/iridesuwa18/e7-chart/main/assets/heroes/jecht.webp",
+      "locked": true,
+      "altStats": {
+        "vType": "TNK",
+        "vScore": 5,
+        "hType": "SUR",
+        "hScore": 2
+      },
+      "_x": 75,
+      "_y": 30
     }
   ],
   "draftData": null,
-  "savedAt": "2026-08-29T01:55:07.560Z"
+  "savedAt": "2026-08-29T01:56:40.320Z"
 }
