@@ -5867,8 +5867,30 @@
       },
       "_x": 75,
       "_y": 30
+    },
+    {
+      "id": 1787968655341,
+      "name": "Lucy",
+      "rarity": "3",
+      "role": "Soul Weaver",
+      "element": "Earth",
+      "vType": "TNK",
+      "vScore": 3,
+      "hType": "SST",
+      "hScore": 5,
+      "notes": "",
+      "iconData": "https://raw.githubusercontent.com/iridesuwa18/e7-chart/main/assets/heroes/lucy.webp",
+      "locked": true,
+      "altStats": {
+        "vType": "SPD",
+        "vScore": 2,
+        "hType": "SUR",
+        "hScore": 2
+      },
+      "_x": 75,
+      "_y": 65
     }
   ],
   "draftData": null,
-  "savedAt": "2026-08-29T01:56:40.320Z"
+  "savedAt": "2026-08-29T01:57:43.678Z"
 }
