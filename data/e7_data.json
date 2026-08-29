@@ -5750,8 +5750,25 @@
       "altStats": null,
       "_x": 35,
       "_y": 15
+    },
+    {
+      "id": 1787968165206,
+      "name": "Lilka",
+      "rarity": "3",
+      "role": "Ranger",
+      "element": "Earth",
+      "vType": "SPD",
+      "vScore": 7,
+      "hType": "SUR",
+      "hScore": 2,
+      "notes": "",
+      "iconData": "https://raw.githubusercontent.com/iridesuwa18/e7-chart/main/assets/heroes/lilka.webp",
+      "locked": true,
+      "altStats": null,
+      "_x": 40,
+      "_y": 15
     }
   ],
   "draftData": null,
-  "savedAt": "2026-08-29T01:48:10.163Z"
+  "savedAt": "2026-08-29T01:49:33.638Z"
 }
