@@ -6579,8 +6579,30 @@
       },
       "_x": 70,
       "_y": 15
+    },
+    {
+      "id": 1787972787956,
+      "name": "Requiemroar",
+      "rarity": "3",
+      "role": "Soul Weaver",
+      "element": "Dark",
+      "vType": "TNK",
+      "vScore": 5,
+      "hType": "SST",
+      "hScore": 6,
+      "notes": "",
+      "iconData": "https://raw.githubusercontent.com/iridesuwa18/e7-chart/main/assets/heroes/requiemroar.webp",
+      "locked": true,
+      "altStats": {
+        "vType": "SPD",
+        "vScore": 6,
+        "hType": "SUR",
+        "hScore": 2
+      },
+      "_x": 80,
+      "_y": 75
     }
   ],
   "draftData": null,
-  "savedAt": "2026-08-29T03:05:23.736Z"
+  "savedAt": "2026-08-29T03:06:34.950Z"
 }
