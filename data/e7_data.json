@@ -5034,8 +5034,47 @@
       "altStats": null,
       "_x": 30,
       "_y": 25
+    },
+    {
+      "id": 1787964858977,
+      "name": "Juni",
+      "rarity": "3",
+      "role": "Warrior",
+      "element": "Fire",
+      "vType": "SPD",
+      "vScore": 3,
+      "hType": "SUR",
+      "hScore": 3,
+      "notes": "",
+      "iconData": "https://raw.githubusercontent.com/iridesuwa18/e7-chart/main/assets/heroes/juni.webp",
+      "locked": true,
+      "altStats": null,
+      "_x": 35,
+      "_y": 35
+    },
+    {
+      "id": 1787964958954,
+      "name": "Melany",
+      "rarity": "3",
+      "role": "Warrior",
+      "element": "Fire",
+      "vType": "TNK",
+      "vScore": 2,
+      "hType": "SUR",
+      "hScore": 3,
+      "notes": "",
+      "iconData": "https://raw.githubusercontent.com/iridesuwa18/e7-chart/main/assets/heroes/melany.webp",
+      "locked": true,
+      "altStats": {
+        "vType": "SPD",
+        "vScore": 6,
+        "hType": "SUR",
+        "hScore": 3
+      },
+      "_x": 35,
+      "_y": 60
     }
   ],
   "draftData": null,
-  "savedAt": "2026-08-29T00:53:05.666Z"
+  "savedAt": "2026-08-29T00:56:03.146Z"
 }
