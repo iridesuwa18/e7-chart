@@ -6406,8 +6406,30 @@
       },
       "_x": 75,
       "_y": 65
+    },
+    {
+      "id": 1787971563798,
+      "name": "Shadow Knight Pyllis",
+      "rarity": "3",
+      "role": "Knight",
+      "element": "Dark",
+      "vType": "TNK",
+      "vScore": 9,
+      "hType": "SST",
+      "hScore": 5,
+      "notes": "",
+      "iconData": "https://raw.githubusercontent.com/iridesuwa18/e7-chart/main/assets/heroes/shadow-knight-pyllis.webp",
+      "locked": true,
+      "altStats": {
+        "vType": "SPD",
+        "vScore": 6,
+        "hType": "SUR",
+        "hScore": 4
+      },
+      "_x": 75,
+      "_y": 95
     }
   ],
   "draftData": null,
-  "savedAt": "2026-08-29T02:43:53.618Z"
+  "savedAt": "2026-08-29T02:46:31.260Z"
 }
