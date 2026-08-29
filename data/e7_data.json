@@ -6557,8 +6557,30 @@
       "altStats": null,
       "_x": 0,
       "_y": 40
+    },
+    {
+      "id": 1787972718563,
+      "name": "Ainos 2.0",
+      "rarity": "3",
+      "role": "Soul Weaver",
+      "element": "Dark",
+      "vType": "SPD",
+      "vScore": 7,
+      "hType": "SST",
+      "hScore": 4,
+      "notes": "",
+      "iconData": "https://raw.githubusercontent.com/iridesuwa18/e7-chart/main/assets/heroes/ainos-2-0.webp",
+      "locked": true,
+      "altStats": {
+        "vType": "TNK",
+        "vScore": 3,
+        "hType": "SUR",
+        "hScore": 2
+      },
+      "_x": 70,
+      "_y": 15
     }
   ],
   "draftData": null,
-  "savedAt": "2026-08-29T03:03:40.057Z"
+  "savedAt": "2026-08-29T03:05:23.736Z"
 }
