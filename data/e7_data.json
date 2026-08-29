@@ -5436,8 +5436,30 @@
       "altStats": null,
       "_x": 35,
       "_y": 30
+    },
+    {
+      "id": 1787966765429,
+      "name": "Ragnvald",
+      "rarity": "3",
+      "role": "Warrior",
+      "element": "Ice",
+      "vType": "SPD",
+      "vScore": 6,
+      "hType": "SUR",
+      "hScore": 4,
+      "notes": "",
+      "iconData": "https://raw.githubusercontent.com/iridesuwa18/e7-chart/main/assets/heroes/ragnvald.webp",
+      "locked": true,
+      "altStats": {
+        "vType": "TNK",
+        "vScore": 3,
+        "hType": "SST",
+        "hScore": 4
+      },
+      "_x": 30,
+      "_y": 20
     }
   ],
   "draftData": null,
-  "savedAt": "2026-08-29T01:24:40.293Z"
+  "savedAt": "2026-08-29T01:26:06.959Z"
 }
