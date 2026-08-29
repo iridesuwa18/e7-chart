@@ -5682,8 +5682,25 @@
       "altStats": null,
       "_x": 20,
       "_y": 30
+    },
+    {
+      "id": 1787967865012,
+      "name": "Orte",
+      "rarity": "3",
+      "role": "Thief",
+      "element": "Earth",
+      "vType": "SPD",
+      "vScore": 2,
+      "hType": "SUR",
+      "hScore": 2,
+      "notes": "",
+      "iconData": "https://raw.githubusercontent.com/iridesuwa18/e7-chart/main/assets/heroes/orte.webp",
+      "locked": true,
+      "altStats": null,
+      "_x": 40,
+      "_y": 40
     }
   ],
   "draftData": null,
-  "savedAt": "2026-08-29T01:43:08.468Z"
+  "savedAt": "2026-08-29T01:44:28.020Z"
 }
