@@ -6428,8 +6428,25 @@
       },
       "_x": 75,
       "_y": 95
+    },
+    {
+      "id": 1787971663954,
+      "name": "Penelope",
+      "rarity": "3",
+      "role": "Thief",
+      "element": "Dark",
+      "vType": "SPD",
+      "vScore": 7,
+      "hType": "SUR",
+      "hScore": 7,
+      "notes": "",
+      "iconData": "https://raw.githubusercontent.com/iridesuwa18/e7-chart/main/assets/heroes/penelope.webp",
+      "locked": true,
+      "altStats": null,
+      "_x": 15,
+      "_y": 15
     }
   ],
   "draftData": null,
-  "savedAt": "2026-08-29T02:46:31.260Z"
+  "savedAt": "2026-08-29T02:47:46.340Z"
 }
