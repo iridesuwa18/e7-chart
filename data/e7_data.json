@@ -6006,8 +6006,25 @@
       },
       "_x": 25,
       "_y": 95
+    },
+    {
+      "id": 1787970025642,
+      "name": "Yoonryoung",
+      "rarity": "3",
+      "role": "Knight",
+      "element": "Light",
+      "vType": "TNK",
+      "vScore": 3,
+      "hType": "SUR",
+      "hScore": 4,
+      "notes": "",
+      "iconData": "https://raw.githubusercontent.com/iridesuwa18/e7-chart/main/assets/heroes/yoonryoung.webp",
+      "locked": true,
+      "altStats": null,
+      "_x": 30,
+      "_y": 65
     }
   ],
   "draftData": null,
-  "savedAt": "2026-08-29T02:18:25.838Z"
+  "savedAt": "2026-08-29T02:20:27.048Z"
 }
