@@ -777,11 +777,25 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/babel-standalone/7.23.2/babel.min.js"></script>
   <script type="text/babel" data-presets="react" src="draft.js"></script>
 
-  <!-- PWA service worker registration -->
+  <!-- PWA service worker registration.
+       Whenever the app becomes visible again, ask the SW to check for an
+       update; if a new SW takes control, reload once to pick up the fresh
+       code automatically (covers home-screen shortcuts that get resumed
+       rather than freshly navigated). -->
   <script>
     if ("serviceWorker" in navigator) {
+      let reloadedForUpdate = false;
       window.addEventListener("load", () => {
-        navigator.serviceWorker.register("sw.js").catch(() => { /* offline-support is best-effort */ });
+        navigator.serviceWorker.register("sw.js").then(reg => {
+          navigator.serviceWorker.addEventListener("controllerchange", () => {
+            if (reloadedForUpdate) return;
+            reloadedForUpdate = true;
+            location.reload();
+          });
+          document.addEventListener("visibilitychange", () => {
+            if (document.visibilityState === "visible") reg.update().catch(() => {});
+          });
+        }).catch(() => { /* offline-support is best-effort */ });
       });
     }
   </script>

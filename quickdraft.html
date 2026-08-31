@@ -888,11 +888,29 @@
     })();
   </script>
 
-  <!-- PWA service worker registration -->
+  <!-- PWA service worker registration.
+       Quick Draft is often opened via a home-screen icon or a launcher
+       popup (e.g. Samsung Game Booster) that RESUMES an already-running
+       instance instead of doing a fresh navigation. A resumed page never
+       re-fetches anything on its own, so without this it can keep running
+       old/buggy code indefinitely even after sw.js and app.js are fixed
+       and redeployed. To guard against that: whenever the app becomes
+       visible again, ask the SW to check for an update; if a new SW takes
+       control, reload once to pick up the fresh code automatically. -->
   <script>
     if ("serviceWorker" in navigator) {
+      let reloadedForUpdate = false;
       window.addEventListener("load", () => {
-        navigator.serviceWorker.register("sw.js").catch(() => { /* offline-support is best-effort */ });
+        navigator.serviceWorker.register("sw.js").then(reg => {
+          navigator.serviceWorker.addEventListener("controllerchange", () => {
+            if (reloadedForUpdate) return;
+            reloadedForUpdate = true;
+            location.reload();
+          });
+          document.addEventListener("visibilitychange", () => {
+            if (document.visibilityState === "visible") reg.update().catch(() => {});
+          });
+        }).catch(() => { /* offline-support is best-effort */ });
       });
     }
   </script>

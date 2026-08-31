@@ -2,7 +2,7 @@
    Bump CACHE_NAME any time you change index.html / app.js / style.css,
    otherwise Android may keep serving the old cached versions even after
    you push new files to GitHub. */
-const CACHE_NAME = "e7-draft-v3";
+const CACHE_NAME = "e7-draft-v4";
 
 const SHELL_FILES = [
   "./index.html",
@@ -16,6 +16,17 @@ const SHELL_FILES = [
   "./icon-192-qd.png",
   "./icon-512-qd.png",
 ];
+
+// Files where correctness matters more than instant load — always try the
+// network first so a running app (e.g. a Quick Draft home-screen shortcut
+// that just gets resumed by a launcher instead of freshly navigated) picks
+// up fixes the moment it's back online, instead of quietly re-serving
+// whatever was cached from before the fix shipped. Falls back to cache
+// only when the network is unreachable (offline).
+const NETWORK_FIRST_FILES = new Set([
+  "index.html", "quickdraft.html", "app.js", "manifest.json", "manifest-quickdraft.json",
+]);
+const NETWORK_FIRST_TIMEOUT_MS = 3000;
 
 // Never cache calls to the live data API — Quick Draft should always see
 // your latest roster, not a stale offline snapshot.
@@ -37,6 +48,56 @@ self.addEventListener("activate", event => {
   self.clients.claim();
 });
 
+function isNetworkFirst(url) {
+  // Treat "/" and "" as index.html (root navigations).
+  const path = url.pathname.split("/").pop() || "index.html";
+  return NETWORK_FIRST_FILES.has(path) || url.pathname.endsWith("/");
+}
+
+function networkFirst(request) {
+  return new Promise(resolve => {
+    let settled = false;
+    const timer = setTimeout(() => {
+      if (settled) return;
+      settled = true;
+      caches.match(request).then(cached => resolve(cached || fetch(request)));
+    }, NETWORK_FIRST_TIMEOUT_MS);
+
+    fetch(request).then(res => {
+      if (settled) return;
+      settled = true;
+      clearTimeout(timer);
+      if (res && res.ok) {
+        const copy = res.clone();
+        caches.open(CACHE_NAME).then(cache => cache.put(request, copy));
+      }
+      resolve(res);
+    }).catch(() => {
+      if (settled) return;
+      settled = true;
+      clearTimeout(timer);
+      caches.match(request).then(cached => {
+        resolve(cached || new Response(null, { status: 503 }));
+      });
+    });
+  });
+}
+
+function staleWhileRevalidate(request) {
+  return caches.match(request).then(cached => {
+    const networkFetch = fetch(request)
+      .then(res => {
+        if (res && res.ok) {
+          const copy = res.clone();
+          caches.open(CACHE_NAME).then(cache => cache.put(request, copy));
+        }
+        return res;
+      })
+      .catch(() => cached);
+    return cached || networkFetch;
+  });
+}
+
 self.addEventListener("fetch", event => {
   const url = new URL(event.request.url);
 
@@ -48,20 +109,15 @@ self.addEventListener("fetch", event => {
 
   if (event.request.method !== "GET") return;
 
-  // App shell — stale-while-revalidate: instant load from cache, then
-  // quietly refresh the cache in the background for next time.
-  event.respondWith(
-    caches.match(event.request).then(cached => {
-      const networkFetch = fetch(event.request)
-        .then(res => {
-          if (res && res.ok) {
-            const copy = res.clone();
-            caches.open(CACHE_NAME).then(cache => cache.put(event.request, copy));
-          }
-          return res;
-        })
-        .catch(() => cached);
-      return cached || networkFetch;
-    })
-  );
+  // App shell HTML/JS/manifests — network-first, so a resumed/backgrounded
+  // instance (e.g. relaunched via a launcher popup) always tries to fetch
+  // the latest code first, and only falls back to cache when offline.
+  if (event.request.mode === "navigate" || isNetworkFirst(url)) {
+    event.respondWith(networkFirst(event.request));
+    return;
+  }
+
+  // Everything else (icons, fonts, etc.) — instant load from cache, quietly
+  // refreshed in the background for next time.
+  event.respondWith(staleWhileRevalidate(event.request));
 });
