@@ -184,7 +184,7 @@ const QD_LAST_TWO_INDICES = [3, 4];    // Rule 5a: the final two slots, filled a
 const QD_PROTECT_SW_LAST_TWO_PENALTY = 200; // Rule 5a: heavy penalty for a 2nd Soul Weaver in the last two slots once Protect is already one
 const QD_SUPPORT_MIN_ROLES = ["Knight", "Soul Weaver"]; // Rule 5b: roles the team needs at least 1 of each, checked across the last two slots
 const QD_SUPPORT_MIN_BONUS = 40;      // Rule 5b: bonus for covering a still-missing role while not yet forced
-const QD_SUSTAIN_FLOOR_BONUS = 40;    // Rule 6: bonus for clearing the final-slot Sustainability floor
+const QD_SUSTAIN_FLOOR_BONUS = 40;    // Rule 6: bonus for clearing the final-slot Speed+Sustainability floor
 const QD_TEAM_SCORE_CAP = 30;         // Rule 4: max combined score (raw 0-10 Avg/Total-Avg per hero) across all 5 picks — ~6/hero on average
 const QD_BUDGET_OVER_PENALTY = 15;    // heavy backstop penalty per point the candidate would push the team's running total over QD_TEAM_SCORE_CAP entirely
 const QD_LAST_PICK_CLOSENESS_BONUS = 20; // for the 5th/final pick, max bonus for landing the team total as close to QD_TEAM_SCORE_CAP as possible without going over
@@ -930,14 +930,17 @@ function qdScoreCandidate(candidate, currentPicks, slotIndex) {
     reasons.push(`Protect slot is already a Soul Weaver — avoiding a 2nd one in the last two slots`);
   }
 
-  // ── Rule 6: final-slot Sustainability floor ──
+  // ── Rule 6: final-slot Speed + Sustainability floor ──
   // (qdSuggestForSlot already restricts the candidate pool to heroes
-  // clearing the Sustainability bar — this bonus keeps the reason
-  // visible and still helps ranking in the fallback case.)
+  // clearing the combined floor — this bonus keeps the reason visible
+  // and still helps ranking in the fallback case.)
   const sustainInfo = qdSustainNeededInfo(currentPicks, slotIndex);
-  if (sustainInfo && t.best.sst >= sustainInfo.minNeededSst) {
-    score += QD_SUSTAIN_FLOOR_BONUS;
-    reasons.push(`Sustainability ${t.best.sst.toFixed(1)} clears the ${Math.min(10, sustainInfo.minNeededSst).toFixed(1)} floor needed to bring the team back over 50%`);
+  if (sustainInfo) {
+    const combined = t.best.spd + t.best.sst;
+    if (combined >= sustainInfo.minNeededCombined) {
+      score += QD_SUSTAIN_FLOOR_BONUS;
+      reasons.push(`Speed + Sustainability ${combined.toFixed(1)} clears the ${Math.min(20, sustainInfo.minNeededCombined).toFixed(1)} floor needed to bring the team back over 70%`);
+    }
   }
 
   // ── Rule 5b: work toward at least 1 Knight and 1 Soul Weaver (last two slots) ──
@@ -1111,23 +1114,30 @@ function qdSupportMinNeededInfo(currentPicks, nextIdx) {
 }
 
 /* Rule 6 helper — before the final slot, is the team's cumulative
-   Sustainability (best sst per hero, 0-10 each) under 50% of its own
-   max-possible total so far? If so, the final pick needs to be enough
-   of a sustain hero to pull the full 5-hero total back over 50%. */
+   Speed + Sustainability (best.spd + best.sst per hero, 0-20 each, since
+   each stat maxes at 10) under 70% of its own max-possible total so far?
+   If so, the final pick needs enough combined Speed + Sustainability to
+   pull the full 5-hero total back over 70% — factoring in Speed too
+   (not Sustainability alone) so the team can actually turn first instead
+   of just surviving longer. */
+const QD_RULE6_THRESHOLD = 0.7;
 function qdSustainNeededInfo(currentPicks, nextIdx) {
   if (nextIdx !== QD_SIZE - 1 || currentPicks.length !== QD_SIZE - 1) return null;
-  const sstSoFar = currentPicks.reduce((sum, h) => sum + qdHeroTraits(h).best.sst, 0);
-  const maxSoFar = currentPicks.length * 10;
-  if (sstSoFar >= maxSoFar * 0.5) return null;
-  const minNeededSst = (QD_SIZE * 10 * 0.5) - sstSoFar;
-  return { sstSoFar, minNeededSst };
+  const combinedSoFar = currentPicks.reduce((sum, h) => {
+    const t = qdHeroTraits(h).best;
+    return sum + t.spd + t.sst;
+  }, 0);
+  const maxSoFar = currentPicks.length * 20;
+  if (combinedSoFar >= maxSoFar * QD_RULE6_THRESHOLD) return null;
+  const minNeededCombined = (QD_SIZE * 20 * QD_RULE6_THRESHOLD) - combinedSoFar;
+  return { combinedSoFar, minNeededCombined };
 }
 
 /* Rule 6 hint text for the suggestions panel. */
 function qdSustainHint(currentPicks, nextIdx) {
   const info = qdSustainNeededInfo(currentPicks, nextIdx);
   if (!info) return "";
-  return `🩹 Team's Sustainability is under 50% so far (${info.sstSoFar.toFixed(1)}/${(currentPicks.length * 10).toFixed(0)}) — final pick needs at least ${Math.min(10, info.minNeededSst).toFixed(1)} Sustainability to bring the full team back over 50%.`;
+  return `⚡🩹 Team's Speed + Sustainability is under 70% so far (${info.combinedSoFar.toFixed(1)}/${(currentPicks.length * 20).toFixed(0)}) — final pick needs at least ${Math.min(20, info.minNeededCombined).toFixed(1)} combined Speed + Sustainability to bring the full team back over 70%.`;
 }
 
 /* Ranks every Roster hero not already drafted for the next empty slot.
@@ -1164,22 +1174,32 @@ function qdSuggestForSlot(nextIdx) {
   }
 
   // Rule 6 — before the final slot, if the team's cumulative
-  // Sustainability is under 50% of its own max-possible total so far,
-  // the final pick must clear a minimum Sustainability of its own so the
-  // full 5-hero total comes back over 50%. Tries to also honor Rule 1's
-  // counter element first (staying countered AND sustaining); if no
-  // hero clears the bar in that element, falls back to any element
-  // except the one the Ban Protect element actually beats (rather than
-  // giving up the sustain requirement). Only enforced when the Roster
-  // still has a qualifying hero to suggest, so this never empties the
-  // list — if nothing clears the exact bar, it narrows to whoever has
-  // the single highest Sustainability available instead.
+  // Speed + Sustainability is under 70% of its own max-possible total so
+  // far, the final pick must clear a minimum combined Speed + Sustainability
+  // of its own so the full 5-hero total comes back over 70%. Tries to
+  // also honor Rule 1's counter element first (staying countered AND
+  // fast/sustaining); if no hero clears the bar in that element, falls
+  // back to any element except the one the Ban Protect element actually
+  // beats (rather than giving up the requirement). Only enforced when
+  // the Roster still has a qualifying hero to suggest, so this never
+  // empties the list — if nothing clears the exact bar, it narrows to
+  // whoever has the single highest combined Speed + Sustainability
+  // available instead.
   const sustainInfo = qdSustainNeededInfo(currentPicks, nextIdx);
   if (sustainInfo) {
-    let sstPool = candidates.filter(h => qdHeroTraits(h).best.sst >= sustainInfo.minNeededSst);
+    let sstPool = candidates.filter(h => {
+      const t = qdHeroTraits(h).best;
+      return (t.spd + t.sst) >= sustainInfo.minNeededCombined;
+    });
     if (sstPool.length === 0 && candidates.length > 0) {
-      const bestAvail = Math.max(...candidates.map(h => qdHeroTraits(h).best.sst));
-      sstPool = candidates.filter(h => qdHeroTraits(h).best.sst === bestAvail);
+      const bestAvail = Math.max(...candidates.map(h => {
+        const t = qdHeroTraits(h).best;
+        return t.spd + t.sst;
+      }));
+      sstPool = candidates.filter(h => {
+        const t = qdHeroTraits(h).best;
+        return (t.spd + t.sst) === bestAvail;
+      });
     }
     if (qdBanProtectElement && sstPool.length > 0) {
       const counterEl = QD_ELEMENT_COUNTER[qdBanProtectElement];
