@@ -930,16 +930,27 @@ function qdScoreCandidate(candidate, currentPicks, slotIndex) {
     reasons.push(`Protect slot is already a Soul Weaver — avoiding a 2nd one in the last two slots`);
   }
 
-  // ── Rule 6: final-slot Speed + Sustainability floor ──
-  // (qdSuggestForSlot already restricts the candidate pool to heroes
-  // clearing the combined floor — this bonus keeps the reason visible
-  // and still helps ranking in the fallback case.)
+  // ── Rule 6: final-slot Speed + Sustainability preference ──
+  // Soft ranking bonus, not a hard filter (see qdSuggestForSlot) — a 70%
+  // combined bar is tough to clear, so this just pushes qualifying picks
+  // toward the top instead of hiding everyone who doesn't clear it.
+  // Rule 1's own bonus above already rewards the strong counter element;
+  // this adds a small penalty for the specific element that's actually
+  // WEAK against the enemy's Ban Protect pick (e.g. Ban Protect = Fire
+  // beats Earth, so Earth gets penalized here — not Fire itself).
   const sustainInfo = qdSustainNeededInfo(currentPicks, slotIndex);
   if (sustainInfo) {
     const combined = t.best.spd + t.best.sst;
     if (combined >= sustainInfo.minNeededCombined) {
       score += QD_SUSTAIN_FLOOR_BONUS;
       reasons.push(`Speed + Sustainability ${combined.toFixed(1)} clears the ${Math.min(20, sustainInfo.minNeededCombined).toFixed(1)} floor needed to bring the team back over 70%`);
+    }
+    if (qdBanProtectElement) {
+      const weakEl = QD_ELEMENT_BEATS[qdBanProtectElement];
+      if (candidate.element === weakEl) {
+        score -= QD_SUSTAIN_FLOOR_BONUS;
+        reasons.push(`${weakEl} is weak against the Ban Protect element (${qdBanProtectElement})`);
+      }
     }
   }
 
@@ -1175,51 +1186,14 @@ function qdSuggestForSlot(nextIdx) {
 
   // Rule 6 — before the final slot, if the team's cumulative
   // Speed + Sustainability is under 70% of its own max-possible total so
-  // far, the final pick must clear a minimum combined Speed + Sustainability
-  // of its own so the full 5-hero total comes back over 70%. Tries to
-  // also honor Rule 1's counter element first (staying countered AND
-  // fast/sustaining); if no hero clears the bar in that element, falls
-  // back to any element except the one the Ban Protect element actually
-  // beats (rather than giving up the requirement). Only enforced when
-  // the Roster still has a qualifying hero to suggest, so this never
-  // empties the list — if nothing clears the exact bar, it narrows to
-  // whoever has the single highest combined Speed + Sustainability
-  // available instead.
-  const sustainInfo = qdSustainNeededInfo(currentPicks, nextIdx);
-  if (sustainInfo) {
-    let sstPool = candidates.filter(h => {
-      const t = qdHeroTraits(h).best;
-      return (t.spd + t.sst) >= sustainInfo.minNeededCombined;
-    });
-    if (sstPool.length === 0 && candidates.length > 0) {
-      const bestAvail = Math.max(...candidates.map(h => {
-        const t = qdHeroTraits(h).best;
-        return t.spd + t.sst;
-      }));
-      sstPool = candidates.filter(h => {
-        const t = qdHeroTraits(h).best;
-        return (t.spd + t.sst) === bestAvail;
-      });
-    }
-    if (qdBanProtectElement && sstPool.length > 0) {
-      const counterEl = QD_ELEMENT_COUNTER[qdBanProtectElement];
-      const withCounter = sstPool.filter(h => h.element === counterEl);
-      if (withCounter.length > 0) {
-        sstPool = withCounter;
-      } else {
-        // No sustain-qualifying hero in the strong counter element — fall
-        // back to any element EXCEPT the one the Ban Protect element
-        // actually beats (e.g. Ban Protect = Fire beats Earth, so avoid
-        // Earth; Ice was already tried above, and any other element is
-        // neutral against Fire, same as Fire itself would be).
-        const weakEl = QD_ELEMENT_BEATS[qdBanProtectElement];
-        const notWeak = sstPool.filter(h => h.element !== weakEl);
-        if (notWeak.length > 0) sstPool = notWeak;
-      }
-    }
-    if (sstPool.length > 0) candidates = sstPool;
-  }
-
+  // far, candidates that would bring the full 5-hero total back over 70%
+  // get a heavy ranking bonus (see qdScoreCandidate) so they float to the
+  // top of the list. This is intentionally a SOFT preference, not a hard
+  // filter — a 70% combined Speed+Sustain bar is tough to clear, and
+  // hard-filtering down to only the heroes that clear it could collapse
+  // the whole slot to just 1-2 options. Keeping the full Roster visible
+  // means "Next Best" can still cycle through everyone if you don't own
+  // the top pick.
   // Rule 1 — once the opponent's un-bannable Ban Protect element is set,
   // every remaining pick should be the element that counters it. Applied
   // on top of the Rule 5b Knight narrowing above, so it only additionally
