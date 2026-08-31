@@ -1269,7 +1269,14 @@ function nextBestQuickDraftPick() {
     qdLastFilledSlot = slotIndex;
     qdNextBestRank = 0;
   }
-  const scored = qdSuggestForSlot(slotIndex);
+  let scored;
+  try {
+    scored = qdSuggestForSlot(slotIndex);
+  } catch (err) {
+    setStatus(`⚠️ Next Best crashed: ${(err && err.message) || err}`);
+    console.error(err);
+    return;
+  }
   if (scored.length === 0) { setStatus("⚠️ No more heroes left in your Roster to swap in."); return; }
 
   qdNextBestRank = (qdNextBestRank + 1) % scored.length;
@@ -1305,7 +1312,14 @@ function randomizeQuickDraft() {
 function autofillTopQuickDraftPick() {
   const idx = quickDraft.indexOf(null);
   if (idx === -1) { setStatus("⚠️ Quick Draft is full (5/5)"); return; }
-  const scored = qdSuggestForNextSlot();
+  let scored;
+  try {
+    scored = qdSuggestForNextSlot();
+  } catch (err) {
+    setStatus(`⚠️ Autofill crashed: ${(err && err.message) || err}`);
+    console.error(err);
+    return;
+  }
   if (scored.length === 0) { setStatus("⚠️ No more heroes left in your Roster."); return; }
   addToQuickDraft(scored[0].hero.id);
   if (quickDraft.indexOf(null) !== -1) renderQuickDraftSuggestions();
@@ -1418,23 +1432,42 @@ function renderQuickDraftSuggestions() {
   const panel = document.getElementById("quickdraft-suggestions");
   const listEl = document.getElementById("quickdraft-suggestions-list");
   const label = document.getElementById("quickdraft-suggest-slot-label");
-  const nextIdx = quickDraft.indexOf(null);
 
-  if (nextIdx === -1) {
-    panel.style.display = "none";
-    quickDraftSuggestOpen = false;
-    setStatus("Quick Draft is already full (5/5)");
-    return;
+  // Wrapped end-to-end: if anything below throws (e.g. a malformed hero
+  // record reaching qdScoreCandidate/qdHeroTraits), we used to fail
+  // silently mid-render — the panel would just keep showing whatever it
+  // last successfully rendered (looks like "stuck on the previous slot's
+  // suggestion"), and every future click would hit the same exception
+  // (looks like "can't get it to reopen"). Surfacing the real error text
+  // directly in the panel means you don't need DevTools to see it — same
+  // fix pattern as Summit's Extract-from-Document button.
+  try {
+    const nextIdx = quickDraft.indexOf(null);
+
+    if (nextIdx === -1) {
+      panel.style.display = "none";
+      quickDraftSuggestOpen = false;
+      setStatus("Quick Draft is already full (5/5)");
+      return;
+    }
+
+    label.textContent = `for Slot ${nextIdx + 1}` + (nextIdx === QD_PROTECT_INDEX ? " (Protect)" : "");
+
+    const currentPicks = quickDraft.filter(id => id !== null).map(id => heroes.find(h => h.id === id)).filter(Boolean);
+    const hintEl = document.getElementById("quickdraft-element-hint");
+    const hints = [qdBanProtectHint(), qdProtectSwHint(nextIdx), qdSupportMinHint(currentPicks, nextIdx), qdSustainHint(currentPicks, nextIdx), qdStatHint(currentPicks), qdClassHint(currentPicks), qdBudgetHint(currentPicks)].filter(Boolean);
+    if (hints.length) { hintEl.innerHTML = hints.join("<br>"); hintEl.style.display = "block"; }
+    else { hintEl.style.display = "none"; }
+
+    renderQuickDraftSuggestionsInner(nextIdx, listEl, panel);
+  } catch (err) {
+    listEl.innerHTML = `<div class="qd-suggest-empty" style="color:#ff6b6b; text-align:left; white-space:pre-wrap; font-family:monospace; font-size:11px;">⚠️ Suggest crashed:\n${(err && err.stack) || err}</div>`;
+    panel.style.display = "block";
+    quickDraftSuggestOpen = true;
   }
+}
 
-  label.textContent = `for Slot ${nextIdx + 1}` + (nextIdx === QD_PROTECT_INDEX ? " (Protect)" : "");
-
-  const currentPicks = quickDraft.filter(id => id !== null).map(id => heroes.find(h => h.id === id)).filter(Boolean);
-  const hintEl = document.getElementById("quickdraft-element-hint");
-  const hints = [qdBanProtectHint(), qdProtectSwHint(nextIdx), qdSupportMinHint(currentPicks, nextIdx), qdSustainHint(currentPicks, nextIdx), qdStatHint(currentPicks), qdClassHint(currentPicks), qdBudgetHint(currentPicks)].filter(Boolean);
-  if (hints.length) { hintEl.innerHTML = hints.join("<br>"); hintEl.style.display = "block"; }
-  else { hintEl.style.display = "none"; }
-
+function renderQuickDraftSuggestionsInner(nextIdx, listEl, panel) {
   const scored = qdSuggestForNextSlot();
 
   if (scored.length === 0) {
