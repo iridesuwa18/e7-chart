@@ -187,6 +187,15 @@ const QD_SUPPORT_MIN_BONUS = 40;      // Rule 5b: bonus for covering a still-mis
 const QD_SUSTAIN_FLOOR_BONUS = 40;    // Rule 6: bonus for clearing the final-slot Speed+Sustainability floor
 const QD_TEAM_SCORE_CAP = 30;         // Rule 4: max combined score (raw 0-10 Avg/Total-Avg per hero) across all 5 picks — ~6/hero on average
 const QD_BUDGET_OVER_PENALTY = 15;    // heavy backstop penalty per point the candidate would push the team's running total over QD_TEAM_SCORE_CAP entirely
+// Rule 6: moved up here (was previously declared right above
+// qdSustainNeededInfo, further down the file) after it was hit as a
+// temporal-dead-zone ReferenceError in production — "Cannot access
+// 'QD_RULE6_THRESHOLD' before initialization" — because Rule 6 only ever
+// runs on the last one or two slots, so a load-order/bundling quirk that
+// only affects late-file code wasn't caught until the final pick was
+// suggested. Declaring it alongside the other QD_* constants at the top
+// guarantees it's initialized before any Quick Draft function can run.
+const QD_RULE6_THRESHOLD = 0.7;
 const QD_LAST_PICK_CLOSENESS_BONUS = 20; // for the 5th/final pick, max bonus for landing the team total as close to QD_TEAM_SCORE_CAP as possible without going over
 const QD_LAST_PICK_CLOSENESS_SCALE = 3;  // how fast that bonus decays per point of leftover (unused) budget on the final pick
 const QD_PACE_CLOSENESS_BONUS = 15;   // for picks 1-4, max bonus for landing near the pacing target (see qdPaceTarget)
@@ -1131,7 +1140,6 @@ function qdSupportMinNeededInfo(currentPicks, nextIdx) {
    pull the full 5-hero total back over 70% — factoring in Speed too
    (not Sustainability alone) so the team can actually turn first instead
    of just surviving longer. */
-const QD_RULE6_THRESHOLD = 0.7;
 function qdSustainNeededInfo(currentPicks, nextIdx) {
   if (nextIdx !== QD_SIZE - 1 || currentPicks.length !== QD_SIZE - 1) return null;
   const combinedSoFar = currentPicks.reduce((sum, h) => {
