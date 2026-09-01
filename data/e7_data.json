@@ -1185,7 +1185,7 @@
       "vType": "SPD",
       "vScore": 8,
       "hType": "SST",
-      "hScore": 7,
+      "hScore": 4,
       "notes": "",
       "iconData": "https://raw.githubusercontent.com/iridesuwa18/e7-chart/main/assets/heroes/operator-sigret.webp",
       "locked": true,
@@ -1193,7 +1193,7 @@
         "vType": "SPD",
         "vScore": 8,
         "hType": "SUR",
-        "hScore": 7
+        "hScore": 4
       },
       "_x": 85,
       "_y": 10,
@@ -6626,5 +6626,5 @@
     }
   ],
   "draftData": null,
-  "savedAt": "2026-08-29T14:25:12.070Z"
+  "savedAt": "2026-09-01T02:27:45.836Z"
 }
