@@ -150,12 +150,16 @@ const QD_ELEMENT_COUNTER = { Fire: "Ice", Ice: "Earth", Earth: "Fire", Light: "D
    See qdSupportsRequired.
 
    Rule 3 (support quadrant + score) — a support must come from the
-   main's opposite quadrant, and its score must be ≥ the main's score.
-   Support eligibility/score uses a hero's COMBINED stats (best-per-lane
-   across primary + Ghost, same "Total Avg" number shown on the roster
-   card) — a hero only gets treated as a single, one-build-only entry
-   when picked as a MAIN (see Rule 5). See qdSupportQuadrants /
-   qdSupportScore.
+   main's opposite quadrant. Its score ideally clears 1.5x the main's
+   score (capped at 10) — that's the target qdSuggestForSlot tries first.
+   If nobody in that quadrant reaches the target, it falls back to the
+   plain "≥ main's score" floor; if even that's empty, it falls back to
+   quadrant-match only (never leaves the suggestion list empty). Support
+   eligibility/score uses a hero's COMBINED stats (best-per-lane across
+   primary + Ghost, same "Total Avg" number shown on the roster card) —
+   a hero only gets treated as a single, one-build-only entry when picked
+   as a MAIN (see Rule 5). See qdSupportQuadrants / qdSupportScore /
+   qdSlotRequirement.
 
    Rule 4 (chain filling) — slots fill left→right as a sequence of
    main+supports chains: pick a main, fill its required supports, then
@@ -943,11 +947,11 @@ function qdReplayDraft(uptoIdx) {
 function qdSlotRequirement(nextIdx) {
   const { activeMain } = qdReplayDraft(nextIdx);
   if (activeMain && activeMain.supplied < activeMain.required) {
-    return { type: "support", quadrant: QD_OPPOSITE_QUADRANT[activeMain.quadrant], minScore: activeMain.score, main: activeMain, bonus: false };
+    return { type: "support", quadrant: QD_OPPOSITE_QUADRANT[activeMain.quadrant], minScore: activeMain.score, targetScore: Math.min(10, activeMain.score * 1.5), main: activeMain, bonus: false };
   }
   const remainingAfter = QD_SIZE - (nextIdx + 1);
   if (activeMain && remainingAfter <= 0) {
-    return { type: "support", quadrant: QD_OPPOSITE_QUADRANT[activeMain.quadrant], minScore: activeMain.score, main: activeMain, bonus: true };
+    return { type: "support", quadrant: QD_OPPOSITE_QUADRANT[activeMain.quadrant], minScore: activeMain.score, targetScore: Math.min(10, activeMain.score * 1.5), main: activeMain, bonus: true };
   }
   return { type: "main", remainingAfter, activeMain };
 }
@@ -962,13 +966,14 @@ function qdScoreEntry(e, req) {
   const reasons = [];
   let rank;
   if (e.isSupport) {
-    // Highest score wins, full stop — never "just enough". A target of
-    // 1.5x the main's score (capped at 10) is called out when reached,
-    // but doesn't change the ranking itself; more is always better.
+    // Highest score wins among whichever tier qualified (see
+    // qdSuggestForSlot's 3-tier fallback: 1.5x target → plain floor →
+    // quadrant-only). Ranking is always by raw score, never inverted.
     rank = e.score;
-    const target = Math.min(10, req.minScore * 1.5);
+    const meetsTarget = e.score >= req.targetScore;
     const meetsFloor = e.score >= req.minScore;
-    reasons.push(`Supports the ${QD_QUADRANT_LABEL[QD_OPPOSITE_QUADRANT[req.quadrant]]} pick — needs ≥ ${req.minScore.toFixed(1)} (combined), has ${e.score.toFixed(1)}${e.score >= target ? " (1.5x+ target hit)" : ""}`);
+    reasons.push(`Supports the ${QD_QUADRANT_LABEL[QD_OPPOSITE_QUADRANT[req.quadrant]]} pick — target ≥ ${req.targetScore.toFixed(1)} (1.5x), floor ≥ ${req.minScore.toFixed(1)}, has ${e.score.toFixed(1)}`);
+    if (!meetsTarget && meetsFloor) reasons.push("Doesn't clear the 1.5x target — no one in this quadrant does, showing the best available above the plain floor");
     if (!meetsFloor) reasons.push(`⚠️ Below the required ${req.minScore.toFixed(1)} — no qualifying hero left in this quadrant, showing the closest option`);
     if (req.bonus) reasons.push("Bonus support — filling a leftover slot after the required count was already met");
   } else {
@@ -994,17 +999,16 @@ function qdSuggestForSlot(nextIdx) {
 
   let entries = [];
   if (req.type === "support") {
-    entries = candidateHeroes
-      .filter(h => qdSupportQuadrants(h).has(req.quadrant) && qdSupportScore(h) >= req.minScore)
-      .map(h => ({ heroId: h.id, hero: h, variant: "primary", isSupport: true, quadrant: req.quadrant, score: qdSupportScore(h) }));
-    if (entries.length === 0) {
-      // Graceful fallback — relax the score floor before ever showing an
-      // empty list. The quadrant match is the harder constraint (Rule 3)
-      // and stays enforced as long as it wouldn't itself empty the pool.
-      const quadrantOnly = candidateHeroes.filter(h => qdSupportQuadrants(h).has(req.quadrant));
-      const pool = quadrantOnly.length > 0 ? quadrantOnly : candidateHeroes;
-      entries = pool.map(h => ({ heroId: h.id, hero: h, variant: "primary", isSupport: true, quadrant: req.quadrant, score: qdSupportScore(h) }));
-    }
+    // Rule 3 — support must clear 1.5x the main's score (capped at 10)
+    // ideally; if nobody in the right quadrant reaches that, fall back
+    // to the plain "≥ main's score" floor; if even that's empty, fall
+    // back to quadrant-match only. Never emptied further than that.
+    const inQuadrant = candidateHeroes.filter(h => qdSupportQuadrants(h).has(req.quadrant));
+    const toEntries = pool => pool.map(h => ({ heroId: h.id, hero: h, variant: "primary", isSupport: true, quadrant: req.quadrant, score: qdSupportScore(h) }));
+    let pool = inQuadrant.filter(h => qdSupportScore(h) >= req.targetScore);
+    if (pool.length === 0) pool = inQuadrant.filter(h => qdSupportScore(h) >= req.minScore);
+    if (pool.length === 0) pool = inQuadrant.length > 0 ? inQuadrant : candidateHeroes;
+    entries = toEntries(pool);
   } else {
     candidateHeroes.forEach(h => {
       qdMainEntriesFor(h).forEach(build => {
@@ -1325,8 +1329,8 @@ function qdChainHint(nextIdx) {
   const req = qdSlotRequirement(nextIdx);
   if (req.type === "support") {
     return req.bonus
-      ? `🔗 Leftover slot — offered as a bonus ${QD_QUADRANT_LABEL[req.quadrant]} support (score ≥ ${req.minScore.toFixed(1)}) for the current chain.`
-      : `🔗 This slot needs a ${QD_QUADRANT_LABEL[req.quadrant]} support with score ≥ ${req.minScore.toFixed(1)} (combined stats).`;
+      ? `🔗 Leftover slot — offered as a bonus ${QD_QUADRANT_LABEL[req.quadrant]} support (targeting ≥ ${req.targetScore.toFixed(1)}, floor ≥ ${req.minScore.toFixed(1)}) for the current chain.`
+      : `🔗 This slot needs a ${QD_QUADRANT_LABEL[req.quadrant]} support — targeting score ≥ ${req.targetScore.toFixed(1)} (1.5x), floor ≥ ${req.minScore.toFixed(1)} (combined stats).`;
   }
   return `🔗 Free to start a new main pick here — its own tier's required supports must fit within the ${req.remainingAfter} slot${req.remainingAfter === 1 ? "" : "s"} left after it.`;
 }
