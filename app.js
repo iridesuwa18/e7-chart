@@ -962,9 +962,14 @@ function qdScoreEntry(e, req) {
   const reasons = [];
   let rank;
   if (e.isSupport) {
-    const excess = e.score - req.minScore;
-    rank = -excess;
-    reasons.push(`Supports the ${QD_QUADRANT_LABEL[QD_OPPOSITE_QUADRANT[req.quadrant]]} pick — needs ≥ ${req.minScore.toFixed(1)} (combined), has ${e.score.toFixed(1)}`);
+    // Highest score wins, full stop — never "just enough". A target of
+    // 1.5x the main's score (capped at 10) is called out when reached,
+    // but doesn't change the ranking itself; more is always better.
+    rank = e.score;
+    const target = Math.min(10, req.minScore * 1.5);
+    const meetsFloor = e.score >= req.minScore;
+    reasons.push(`Supports the ${QD_QUADRANT_LABEL[QD_OPPOSITE_QUADRANT[req.quadrant]]} pick — needs ≥ ${req.minScore.toFixed(1)} (combined), has ${e.score.toFixed(1)}${e.score >= target ? " (1.5x+ target hit)" : ""}`);
+    if (!meetsFloor) reasons.push(`⚠️ Below the required ${req.minScore.toFixed(1)} — no qualifying hero left in this quadrant, showing the closest option`);
     if (req.bonus) reasons.push("Bonus support — filling a leftover slot after the required count was already met");
   } else {
     rank = e.score;
