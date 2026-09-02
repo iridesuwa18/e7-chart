@@ -186,7 +186,7 @@ const QD_PROTECT_SW_LAST_TWO_PENALTY = 200; // Rule 5a: heavy penalty for a 2nd 
 const QD_SUPPORT_MIN_ROLES = ["Knight", "Soul Weaver"]; // Rule 5b: roles the team needs at least 1 of each, checked across the last two slots
 const QD_SUPPORT_MIN_BONUS = 40;      // Rule 5b: bonus for covering a still-missing role while not yet forced
 const QD_SUSTAIN_FLOOR_BONUS = 40;    // Rule 6: bonus for clearing the final-slot Speed+Sustainability floor
-const QD_TEAM_SCORE_CAP = 30;         // Rule 4: max combined score (raw 0-10 Avg/Total-Avg per hero) across all 5 picks — ~6/hero on average
+const QD_TEAM_SCORE_CAP = 40;         // Rule 4: max combined score (raw 0-10 Avg/Total-Avg per hero) across all 5 picks — ~8/hero on average
 const QD_BUDGET_OVER_PENALTY = 15;    // heavy backstop penalty per point the candidate would push the team's running total over QD_TEAM_SCORE_CAP entirely
 // Rule 6: moved up here (was previously declared right above
 // qdSustainNeededInfo, further down the file) after it was hit as a
