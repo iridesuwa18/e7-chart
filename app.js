@@ -156,16 +156,25 @@ const QD_ELEMENT_COUNTER = { Fire: "Ice", Ice: "Earth", Earth: "Fire", Light: "D
      - The Protect slot (QD_PROTECT_INDEX) must be a Knight or a Soul
        Weaver. If the other one of the two is already on the team, the
        Protect slot is forced to whichever one is still missing (e.g. the
-       first hero is a Knight → Protect is locked to Soul Weaver). Until
-       Protect is filled, at most one of Knight/Soul Weaver may be used
-       in an earlier slot, so the other is always still available for it.
+       first hero is a Knight → Protect is locked to Soul Weaver).
      - Warrior is reserved exclusively for the last slot (QD_SIZE - 1)
        and excluded everywhere else.
+     - Knight AND Soul Weaver must both end up on the team — not just
+       whichever one grabs Protect. Any non-Warrior slot (before or
+       after Protect) tracks how many of {Knight, Soul Weaver} are still
+       missing against how many non-Warrior slots remain open; once
+       those two numbers match (no slack left to spend on other
+       classes), every remaining non-Warrior slot is locked to the
+       missing class(es) until both are on the team. This generalizes
+       the old Protect-only reserve — it now also catches the case where
+       Protect got filled first and the other of the pair would
+       otherwise never get picked. See qdSuggestForSlot / qdPairCoverageHint.
      - Every other slot pulls from whichever classes haven't been used
        yet, ranked by Rule 2's class-fit score — so with 6 classes and 5
        slots, whichever class has nothing left to contribute (usually
-       Mage, once Speed is already covered) is naturally the one left
-       off the team. See qdSuggestForSlot.
+       Mage, once Speed is already covered and Knight/Soul Weaver
+       coverage is satisfied) is naturally the one left off the team.
+       See qdSuggestForSlot.
 
    Rule 4 (final Warrior slot) — once the first 4 heroes are picked,
    average their Speed/Tank/Survivability/Sustainability totals together
@@ -1066,15 +1075,23 @@ function qdProtectLockHint(currentPicks, nextIdx) {
   return `🛡️ Protect slot must be a Knight or Soul Weaver (the un-bannable pick calls for one of the tankier/support classes).`;
 }
 
-/* Rule 3 hint — shown for slots before the Protect slot, explaining that
-   at most one of Knight/Soul Weaver can be used here so the other stays
-   available for Protect. */
-function qdProtectReserveHint(currentPicks, nextIdx) {
-  if (nextIdx >= QD_PROTECT_INDEX) return "";
-  const already = ["Knight", "Soul Weaver"].filter(role => currentPicks.some(h => h.role === role));
-  if (already.length !== 1) return "";
-  const other = already[0] === "Knight" ? "Soul Weaver" : "Knight";
-  return `🔒 ${other} is being held back for the Protect slot, since ${already[0]} already filled the other half of that pair.`;
+/* Rule 3 hint — shown for any non-Warrior, non-Protect slot once the
+   Knight/Soul Weaver pair is running out of room: as soon as the number
+   of still-open non-Warrior slots matches the number of that pair still
+   missing from the team, every remaining non-Warrior slot (this one
+   included) is locked to the missing class(es) so both end up on the
+   team. Covers both directions — reserving room before Protect fills,
+   and forcing the leftover pick after Protect already took one of them. */
+function qdPairCoverageHint(currentPicks, nextIdx) {
+  if (nextIdx === QD_SIZE - 1) return ""; // final slot is Warrior — handled separately
+  const missingPair = ["Knight", "Soul Weaver"].filter(role => !currentPicks.some(h => h.role === role));
+  if (missingPair.length === 0) return "";
+  const nonWarriorSlotIdxs = [...Array(QD_SIZE - 1).keys()];
+  const emptyNonWarriorCount = nonWarriorSlotIdxs.filter(i => quickDraft[i] === null).length;
+  if (missingPair.length < emptyNonWarriorCount) return "";
+  if (nextIdx === QD_PROTECT_INDEX) return ""; // qdProtectLockHint already covers this slot
+  const names = missingPair.join(" and ");
+  return `🔒 ${names} still ${missingPair.length > 1 ? "need" : "needs"} a slot on this team, and there's no room left to spend elsewhere — this slot is locked to ${missingPair.length > 1 ? "one of them" : names}.`;
 }
 
 /* Rule 4 hint — shown for the final (Warrior) slot, explaining which
@@ -1134,16 +1151,23 @@ function qdSuggestForSlot(nextIdx) {
         : ["Knight", "Soul Weaver"];
       const matches = candidates.filter(h => allowedRoles.includes(h.role));
       if (matches.length > 0) candidates = matches;
-    } else if (nextIdx < QD_PROTECT_INDEX) {
-      // Rule 3 — before the Protect slot fills, don't let a pick use up
-      // BOTH Knight and Soul Weaver; once one is on the team, hold the
-      // other back so Protect always has a class to lock onto. Only
-      // enforced when it wouldn't empty the pool.
-      const already = ["Knight", "Soul Weaver"].filter(role => currentPicks.some(h => h.role === role));
-      if (already.length === 1) {
-        const reserved = already[0] === "Knight" ? "Soul Weaver" : "Knight";
-        const withoutReserved = candidates.filter(h => h.role !== reserved);
-        if (withoutReserved.length > 0) candidates = withoutReserved;
+    }
+
+    // Rule 3 (pair coverage) — Knight and Soul Weaver must both end up
+    // on the team, not just whichever one grabs Protect. Applies to
+    // every non-Warrior slot, before or after Protect: once the number
+    // of open non-Warrior slots (including this one) matches the number
+    // of {Knight, Soul Weaver} still missing, there's no slack left to
+    // spend on any other class — every remaining non-Warrior slot is
+    // locked to the missing one(s) until both are on the team. Only
+    // enforced when it wouldn't empty the pool. See qdPairCoverageHint.
+    const missingPair = ["Knight", "Soul Weaver"].filter(role => !currentPicks.some(h => h.role === role));
+    if (missingPair.length > 0) {
+      const nonWarriorSlotIdxs = [...Array(QD_SIZE - 1).keys()];
+      const emptyNonWarriorCount = nonWarriorSlotIdxs.filter(i => quickDraft[i] === null).length;
+      if (missingPair.length >= emptyNonWarriorCount) {
+        const matches = candidates.filter(h => missingPair.includes(h.role));
+        if (matches.length > 0) candidates = matches;
       }
     }
   }
@@ -1467,7 +1491,7 @@ function renderQuickDraftSuggestions() {
 
     const currentPicks = quickDraft.filter(id => id !== null).map(id => heroes.find(h => h.id === id)).filter(Boolean);
     const hintEl = document.getElementById("quickdraft-element-hint");
-    const hints = [qdBanProtectHint(), qdProtectLockHint(currentPicks, nextIdx), qdProtectReserveHint(currentPicks, nextIdx), qdWarriorLockHint(currentPicks, nextIdx), qdStatHint(currentPicks), qdClassHint(currentPicks)].filter(Boolean);
+    const hints = [qdBanProtectHint(), qdProtectLockHint(currentPicks, nextIdx), qdPairCoverageHint(currentPicks, nextIdx), qdWarriorLockHint(currentPicks, nextIdx), qdStatHint(currentPicks), qdClassHint(currentPicks)].filter(Boolean);
     if (hints.length) { hintEl.innerHTML = hints.join("<br>"); hintEl.style.display = "block"; }
     else { hintEl.style.display = "none"; }
 
