@@ -82,6 +82,15 @@
             </div>
           </div>
 
+          <!-- Search roster to add a hero to the current open slot -->
+          <div class="quickdraft-search-wrap" style="margin:8px 0;">
+            <div class="roster-search-wrap">
+              <input type="text" id="qd-hero-search" class="roster-search-input" placeholder="🔍 Search roster to add…" autocomplete="off" />
+              <button class="roster-search-clear" id="qd-hero-search-clear" title="Clear search" style="display:none;">✕</button>
+            </div>
+            <div class="quickdraft-suggestions-list" id="qd-hero-search-results" style="display:none; margin-top:6px;"></div>
+          </div>
+
           <!-- Rule 1: mark only the opponent's un-bannable "Ban Protect"
                element. Suggestions lock the remaining picks to whichever
                element counters it. -->
@@ -234,12 +243,6 @@
           <!-- Filter button -->
           <button class="btn btn-ghost btn-xs" id="btn-filter-toggle" title="Filters">⚙ Filter</button>
         </div>
-      </div>
-
-      <!-- Search -->
-      <div class="roster-search-wrap">
-        <input type="text" id="roster-search" class="roster-search-input" placeholder="Search heroes…" autocomplete="off" />
-        <button class="roster-search-clear" id="roster-search-clear" title="Clear search" style="display:none;">✕</button>
       </div>
 
       <!-- Filter panel -->

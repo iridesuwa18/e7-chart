@@ -97,6 +97,7 @@ let detailsHeroId = null; // which hero's details panel is open
 /* ── Roster UI state ── */
 let rosterSort = "date-desc";
 let rosterSearchQuery = "";
+let qdHeroSearchQuery = "";
 let filterRarity  = new Set(["5ml","5r","4","3"]);
 let filterRole    = new Set(["Warrior","Knight","Thief","Ranger","Mage","Soul Weaver",""]);
 let filterElement = new Set(["Fire","Ice","Earth","Light","Dark",""]);
@@ -506,9 +507,11 @@ const saveStatus   = document.getElementById("save-status");
     renderRoster();
   });
 
-  // Roster search box
+  // Roster search box (only present on index.html's sidebar — quickdraft.html
+  // doesn't have a roster sidebar, so guard instead of assuming it exists)
   const rosterSearchInput = document.getElementById("roster-search");
   const rosterSearchClear = document.getElementById("roster-search-clear");
+  if (rosterSearchInput && rosterSearchClear) {
   rosterSearchInput.addEventListener("input", e => {
     rosterSearchQuery = e.target.value.trim();
     rosterSearchClear.style.display = rosterSearchQuery ? "block" : "none";
@@ -521,6 +524,28 @@ const saveStatus   = document.getElementById("save-status");
     renderRoster();
     rosterSearchInput.focus();
   });
+  }
+
+  // Quick Draft hero search — only present in the quickdraft.html drawer.
+  // Lets you search your Roster and tap a match to drop it straight into
+  // the next open slot, without needing the full sidebar/roster list that
+  // companion mode hides.
+  const qdHeroSearchInput = document.getElementById("qd-hero-search");
+  const qdHeroSearchClear = document.getElementById("qd-hero-search-clear");
+  if (qdHeroSearchInput && qdHeroSearchClear) {
+    qdHeroSearchInput.addEventListener("input", e => {
+      qdHeroSearchQuery = e.target.value.trim();
+      qdHeroSearchClear.style.display = qdHeroSearchQuery ? "block" : "none";
+      renderQdHeroSearchResults();
+    });
+    qdHeroSearchClear.addEventListener("click", () => {
+      qdHeroSearchInput.value = "";
+      qdHeroSearchQuery = "";
+      qdHeroSearchClear.style.display = "none";
+      renderQdHeroSearchResults();
+      qdHeroSearchInput.focus();
+    });
+  }
 
   // ── Chart option buttons ──
   document.getElementById("btn-label-toggle").addEventListener("click", () => {
@@ -1371,6 +1396,63 @@ function clearQuickDraft() {
   renderRoster();
 }
 
+function renderQdHeroSearchResults() {
+  const resultsEl = document.getElementById("qd-hero-search-results");
+  if (!resultsEl) return; // not present on index.html, only quickdraft.html
+
+  if (!qdHeroSearchQuery) {
+    resultsEl.style.display = "none";
+    resultsEl.innerHTML = "";
+    return;
+  }
+
+  const nextIdx = quickDraft.indexOf(null);
+  if (nextIdx === -1) {
+    resultsEl.innerHTML = `<div class="qd-suggest-empty">Quick Draft is full (5/5).</div>`;
+    resultsEl.style.display = "block";
+    return;
+  }
+
+  const q = qdHeroSearchQuery.toLowerCase();
+  const matches = heroes
+    .filter(h => !quickDraft.includes(h.id))
+    .filter(h => (h.name || "").toLowerCase().includes(q))
+    .slice(0, 8);
+
+  if (matches.length === 0) {
+    resultsEl.innerHTML = `<div class="qd-suggest-empty">No matching heroes in your Roster.</div>`;
+  } else {
+    resultsEl.innerHTML = matches.map(h => {
+      const portrait = h.iconData ? `<img src="${h.iconData}">` : "⚔️";
+      const roleEl = h.role ? `<span class="tag tag-role">${h.role}</span>` : "";
+      const elemEl = h.element ? `<span class="tag tag-elem">${h.element}</span>` : "";
+      return `
+        <div class="qd-suggest-row" data-id="${h.id}">
+          <div class="qd-suggest-portrait">${portrait}</div>
+          <div class="qd-suggest-info">
+            <div class="qd-suggest-name">${h.name || "Unnamed"}</div>
+            <div class="qd-suggest-reasons">${roleEl}${elemEl}</div>
+          </div>
+        </div>`;
+    }).join("");
+
+    resultsEl.querySelectorAll(".qd-suggest-row").forEach(row => {
+      row.addEventListener("click", () => {
+        addToQuickDraft(Number(row.dataset.id));
+        const input = document.getElementById("qd-hero-search");
+        const clearBtn = document.getElementById("qd-hero-search-clear");
+        if (input) input.value = "";
+        if (clearBtn) clearBtn.style.display = "none";
+        qdHeroSearchQuery = "";
+        resultsEl.style.display = "none";
+        resultsEl.innerHTML = "";
+      });
+    });
+  }
+
+  resultsEl.style.display = "block";
+}
+
 function renderQuickDraft() {
   const slotsWrap = document.getElementById("quickdraft-slots");
   slotsWrap.innerHTML = "";
@@ -1434,6 +1516,7 @@ function renderQuickDraft() {
   }
 
   if (quickDraftSuggestOpen) renderQuickDraftSuggestions();
+  renderQdHeroSearchResults();
 }
 
 function renderQuickDraftSuggestions() {
