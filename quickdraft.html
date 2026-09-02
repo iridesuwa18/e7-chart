@@ -787,13 +787,13 @@
       </div>
       <div class="compare-body" style="padding-top:10px">
         <p style="font-size:11.5px;color:var(--text-dim);line-height:1.6;margin-bottom:12px">
-          This builds around what each <strong style="color:var(--gold2)">class</strong>
-          is actually good for, not a raw score total — a stacked-score
-          team doesn't hold up against a smart opponent. One candidate at
-          a time, for whichever slot is next empty (a one-slot-ahead
-          heuristic, not a full 5-hero optimizer). Slots: 1-2-3-4-5, where
-          slot 3 is the un-bannable <strong style="color:var(--gold2)">Protect</strong>
-          slot and slot 5 is always the flex <strong style="color:var(--gold2)">Warrior</strong> pick.
+          This builds around 4 <strong style="color:var(--gold2)">quadrants</strong>
+          (Speed+Survivability, Speed+Sustainability, Tanky+Survivability,
+          Tanky+Sustainability) and chains of a <strong style="color:var(--gold2)">main</strong>
+          pick plus however many <strong style="color:var(--gold2)">supports</strong>
+          its score-tier needs — not classes, and not a raw score total.
+          One candidate at a time, for whichever slot is next empty (a
+          one-slot-ahead heuristic, not a full 5-hero optimizer).
         </p>
         <div class="qd-rules-table-wrap">
           <table class="qd-rules-table">
@@ -804,64 +804,34 @@
               <tr>
                 <td>1 · Ban Protect counter</td>
                 <td>Enemy Ban Protect element is set</td>
-                <td>Pool locked to the countering element (Fire→Ice→Earth→Fire, Light↔Dark) whenever one's available</td>
+                <td>Pool favors the countering element (Fire→Ice→Earth→Fire, Light↔Dark); if unavailable, falls back to avoiding only the one element the protected element directly beats</td>
               </tr>
               <tr>
-                <td>2 · Ranger fit</td>
-                <td>Any open slot</td>
-                <td>Favors High Speed and/or High Survivability, whichever the team is missing; big bonus for covering both at once</td>
+                <td>2 · Tiers → supports needed</td>
+                <td>Any main pick</td>
+                <td>Score 1-3 needs 3 supports · 4-7 needs 2 · 8-10 needs 1</td>
               </tr>
               <tr>
-                <td>2 · Knight fit</td>
-                <td>Any open slot</td>
-                <td>Favors High Tankiness and/or High Sustainability, whichever the team is missing; big bonus for covering both at once</td>
+                <td>3 · Support quadrant + score</td>
+                <td>Any support slot</td>
+                <td>Must come from the main's diagonally-opposite quadrant, with a combined (Total Avg, both builds) score ≥ the main's own score</td>
               </tr>
               <tr>
-                <td>2 · Mage fit</td>
-                <td>Any open slot</td>
-                <td>Pure Speed pick — scores on raw Speed value only, secondary stat ignored</td>
+                <td>4 · Chain filling</td>
+                <td>Every slot, left→right</td>
+                <td>Fill a main's required supports first, then start a new main from a different quadrant if one fits in the slots left. If a new main wouldn't fit, the leftover slot becomes a bonus support for the still-open chain instead — also where the Ban Protect counter naturally lands if it hasn't found a home</td>
               </tr>
               <tr>
-                <td>2 · Thief fit</td>
-                <td>Any open slot</td>
-                <td>Covers Sustainability if the team lacks Tankiness, else Survivability; also valued for Speed if the team lacks it</td>
-              </tr>
-              <tr>
-                <td>2 · Soul Weaver fit</td>
-                <td>Any open slot</td>
-                <td>Only worth the slot while the team's average Survivability is under 4; always wants high Sustainability, plus Speed if the team has none yet</td>
-              </tr>
-              <tr>
-                <td>3 · No repeat classes</td>
-                <td>Every pick</td>
-                <td>Hard filter — a class already on the team is removed from the candidate pool entirely</td>
-              </tr>
-              <tr>
-                <td>3 · Protect slot lock</td>
-                <td>Slot 3 (Protect)</td>
-                <td>Locked to Knight or Soul Weaver; if the first hero is one of the two, Protect is forced to the other</td>
-              </tr>
-              <tr>
-                <td>3 · Knight + Soul Weaver coverage</td>
-                <td>Any non-Warrior slot (1, 2/Protect, or 4)</td>
-                <td>Both classes must end up on the team, not just whichever grabs Protect. Once the number of open non-Warrior slots left equals how many of the two are still missing, every remaining non-Warrior slot is locked to the missing one(s)</td>
-              </tr>
-              <tr>
-                <td>4 · Warrior slot lock</td>
-                <td>Slot 5 (final)</td>
-                <td>Locked to Warrior — reserved exclusively for this slot, excluded everywhere else</td>
-              </tr>
-              <tr>
-                <td>4 · Warrior fit</td>
-                <td>Slot 5 (final)</td>
-                <td>Averages the first 4 picks' Speed/Tank/Survivability/Sustainability totals together; whichever lane(s) fall under that average get targeted, favoring a Warrior that just barely covers the shortfall (not the single biggest stat available)</td>
+                <td>5 · Ghosts as standalone picks</td>
+                <td>Any main slot, hero has a Ghost build</td>
+                <td>Primary and Ghost builds are offered as two separate main candidates, each using only its own quadrant + score — never combined. Combined stats only apply once a hero is picked as a support (Rule 3)</td>
               </tr>
             </tbody>
           </table>
         </div>
         <p style="font-size:11px;color:var(--text-dim);line-height:1.6;margin-top:14px;padding-top:12px;border-top:1px solid var(--border)">
-          All of this lives in <code>qdClassFitScore()</code>,
-          <code>qdWarriorFitScore()</code>, and <code>qdSuggestForSlot()</code>
+          All of this lives in <code>qdReplayDraft()</code>,
+          <code>qdSlotRequirement()</code>, and <code>qdSuggestForSlot()</code>
           in <code>app.js</code> — those are the places to tune first if a
           suggestion feels off.
         </p>

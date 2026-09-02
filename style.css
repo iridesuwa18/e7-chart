@@ -338,6 +338,8 @@ main {
 .qd-slot.filled:hover { border-color: var(--danger); background: rgba(192,57,43,.10); transform: scale(.98); }
 .qd-slot.filled:hover .qd-slot-name::after { content: " ✕"; color: var(--danger); }
 .qd-slot.protect { box-shadow: inset 0 0 0 1px rgba(201,162,39,.35); }
+.qd-slot.qd-main { box-shadow: inset 0 0 0 1px rgba(201,162,39,.35); }
+.qd-slot.qd-support { box-shadow: inset 0 0 0 1px rgba(255,255,255,.12); }
 
 .qd-slot-placeholder {
   font-size: 20px;
@@ -377,6 +379,12 @@ main {
 .qd-slot-protect-badge {
   position: absolute;
   top: 3px; right: 4px;
+  font-size: 9px;
+  opacity: .75;
+}
+.qd-slot-ghost-badge {
+  position: absolute;
+  top: 3px; left: 4px;
   font-size: 9px;
   opacity: .75;
 }
@@ -560,6 +568,7 @@ main {
   .qd-slot-index { font-size: 8px; }
   .qd-slot-placeholder { font-size: 16px; }
   .qd-slot-protect-badge { font-size: 8px; top: 2px; right: 2px; }
+  .qd-slot-ghost-badge { font-size: 8px; top: 2px; left: 2px; }
 }
 
 @media (max-width: 360px) {
