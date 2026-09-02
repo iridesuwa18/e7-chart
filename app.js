@@ -123,85 +123,67 @@ let qdLastFilledSlot = null;
 let qdNextBestRank = 0;
 const QD_HIGH = 6;
 const QD_LOW  = 4;
-const QD_PASSABLE_SCORE = 5;
 let qdBanProtectElement = null; // the element of the enemy's un-bannable "Ban Protect" pick, if set (Rule 1)
 const QD_ELEMENT_COUNTER = { Fire: "Ice", Ice: "Earth", Earth: "Fire", Light: "Dark", Dark: "Light" }; // which element beats which
-// Reverse of the above: QD_ELEMENT_BEATS[X] = the element X beats. Used by
-// Rule 6's fallback to figure out which element is actually WEAK against
-// the enemy's Ban Protect pick (e.g. Ban Protect = Fire → Fire beats Earth,
-// so Earth is the element to avoid — not Fire itself, and not Ice, which is
-// the strong counter-pick already tried first).
-const QD_ELEMENT_BEATS = { Ice: "Fire", Earth: "Ice", Fire: "Earth", Dark: "Light", Light: "Dark" };
 
-/* ── Quick Draft rules (5-rule strategy) ──
-   Rule 1 (Ban Protect counter): see qdBanProtectElement / qdSuggestForNextSlot.
-   Rule 2 (stat balance): a hero counts as "High" in Speed/Tank/Survivability/
-   Sustainability at QD_HIGH — suggestions favor whichever of those 4 lanes
-   the team doesn't have covered yet, with a smaller top-up bonus for being
-   the 2nd cover of a lane.
-   Rule 3 (class caps): at most QD_CLASS_MAX of any one class per team;
-   Warrior/Mage/Ranger are the hard-hitting "no revive" classes and the
-   team should aim for QD_OFFENSE_TARGET of them; Knight/Soul Weaver/Thief
-   are favored specifically for the Protect slot instead (Ranger moved out
-   of that group earlier for being too squishy there; Thief moved in).
-   Rule 4 (team score budget): the whole 5-hero team's scores (each hero's
-   raw, un-boosted Avg/Total-Avg — never the ranking score after Rule 1-3
-   bonuses) must add up to at most QD_TEAM_SCORE_CAP. Rather than halving
-   or dividing evenly, each pick's pacing target is 1 / (slots left,
-   INCLUDING this one) of whatever budget remains — except the opening
-   pick, which has nothing banked yet so it targets the FULL budget (no
-   pacing pressure at all). That works out to: pick 1 = full budget,
-   pick 2 = 1/4 of what's left, pick 3 = 1/3 of what's left, pick 4 = 1/2
-   of what's left, pick 5 (final) = the full remainder — rewarding
-   landing as close to the QD_TEAM_SCORE_CAP as possible without going
-   over. Going over the overall cap outright is always penalized as a
-   backstop regardless of pacing. See qdPaceTarget, qdComputeTeamNeeds
-   (totalScore/remainingBudget), and the pacing penalty/bonus applied in
-   qdScoreCandidate.
-   Rule 5 (last-two-slot follow-up): the last two slots (indices 3 and 4,
-   filled after the Protect slot) have two independent checks — (a) if
-   the Protect slot is a Soul Weaver, they're steered away from a 2nd
-   one, and (b) the team is steered toward ending with at least
-   QD_SUPPORT_MIN_ROLES (1 Knight and 1 Soul Weaver): if both are
-   missing yet, BOTH of the last two slots are hard-restricted to
-   Knight-or-Soul-Weaver (each slot covering whichever role it lands
-   on); if only one role is missing, it's a soft scoring nudge at slot 4
-   (letting whichever slot fits leftover budget better cover it) that
-   becomes a hard requirement at slot 5 if still missing by then; once
-   both roles are covered, the rule is void. See
-   qdProtectIsSoulWeaver / qdSupportMinNeededInfo / qdSuggestForNextSlot. */
-const QD_STAT_FIRST_BONUS = 30;       // bonus for being the 1st High pick covering a stat lane
-const QD_STAT_SECOND_BONUS = 12;      // smaller bonus for being the 2nd High pick in that lane
-const QD_STAT_GAP_BONUS = 8;          // ongoing bonus per lane the candidate's stat is BEHIND the team's most-stacked stat lane — keeps Rule 2 balancing even after every lane has 1+ High picks (i.e. past 4/4), instead of going to 0
-const QD_CLASS_MAX = 2;               // hard cap: at most 2 of any one class per team
-const QD_CLASS_CAP_PENALTY = 100;     // heavy penalty once a class is already at QD_CLASS_MAX
-const QD_OFFENSE_CLASSES = new Set(["Warrior", "Mage", "Ranger"]);                  // hard-hitting, typically no revives
-const QD_SUPPORT_CLASSES = new Set(["Knight", "Soul Weaver", "Thief"]);             // more likely to be revive/support kits, or safe/tanky enough to sit in the un-bannable Protect slot — Ranger moved out earlier (too squishy for Protect), Thief moved in here
-const QD_OFFENSE_TARGET = 2;          // aim for at least 2 offense-class heroes on the team
-const QD_OFFENSE_BONUS = 20;
-const QD_PROTECT_SUPPORT_BONUS = 30;  // Rule 3: support classes are prioritized for the Protect slot
+/* ── Quick Draft rules (class/slot logic, v2) ──
+   This replaced an earlier score-and-budget-driven system. Chasing a raw
+   score total doesn't build a team that can actually cover for itself —
+   it rewards stacking high numbers over having the right kit for the
+   right job. This version instead asks "what does each CLASS do well",
+   and drafts around covering the team's actual gaps in four stat lanes:
+   Speed (spd), Tankiness (tnk), Survivability (sur), Sustainability (sst).
+   A lane counts as "covered" once some pick is High in it (>= QD_HIGH,
+   see qdHeroTraits) and "lacking" while no pick is.
+
+   Rule 1 (Ban Protect counter) — unchanged from before. Once the enemy's
+   un-bannable Ban Protect element is set, remaining picks are locked to
+   whichever element counters it. See qdBanProtectElement / qdSuggestForNextSlot.
+
+   Rule 2 (class fit) — every class has a job:
+     Ranger      → covers Speed and/or Survivability, whichever the team lacks.
+     Knight      → covers Tankiness and/or Sustainability, whichever the team lacks.
+     Mage        → pure Speed pick; the secondary stat doesn't matter.
+     Thief       → covers Sustainability if the team lacks Tankiness, else
+                   Survivability; also valued for Speed if the team lacks it.
+     Soul Weaver → only worth drafting once the team's average Survivability
+                   is under QD_SOUL_WEAVER_SUR_CEILING; always wants high
+                   Sustainability, and Speed too if the team has zero Speed.
+     Warrior     → flex pick, reserved for the final slot — see Rule 4.
+   See qdClassFitScore.
+
+   Rule 3 (slot structure) — one hero per class, no repeats:
+     - The Protect slot (QD_PROTECT_INDEX) must be a Knight or a Soul
+       Weaver. If the other one of the two is already on the team, the
+       Protect slot is forced to whichever one is still missing (e.g. the
+       first hero is a Knight → Protect is locked to Soul Weaver). Until
+       Protect is filled, at most one of Knight/Soul Weaver may be used
+       in an earlier slot, so the other is always still available for it.
+     - Warrior is reserved exclusively for the last slot (QD_SIZE - 1)
+       and excluded everywhere else.
+     - Every other slot pulls from whichever classes haven't been used
+       yet, ranked by Rule 2's class-fit score — so with 6 classes and 5
+       slots, whichever class has nothing left to contribute (usually
+       Mage, once Speed is already covered) is naturally the one left
+       off the team. See qdSuggestForSlot.
+
+   Rule 4 (final Warrior slot) — once the first 4 heroes are picked,
+   average their Speed/Tank/Survivability/Sustainability totals together
+   (grand total / 4) to get a single baseline. Any lane whose own team
+   total falls under that baseline is "underperforming". The Warrior
+   suggestion favors whoever covers those underperforming lane(s) by just
+   enough to pull them back over the baseline — barely clearing it or
+   slightly over, not the biggest possible number. See qdWarriorNeededInfo. */
+const QD_CLASS_FIRST_LANE_BONUS = 50;   // big bonus for being High in a lane the team is lacking
+const QD_CLASS_SECOND_LANE_BONUS = 20;  // smaller bonus for being High in a lane the team already covers
+const QD_CLASS_BOTH_LANES_BONUS = 25;   // extra bonus for a Ranger/Knight covering both of its lacking lanes at once
+const QD_MAGE_SPEED_WEIGHT = 8;         // per-point weight on raw Speed value for Mage candidates
+const QD_MAGE_LACKING_BONUS = 20;       // extra bonus if the team has zero Speed coverage yet
+const QD_SOUL_WEAVER_SUR_CEILING = 4;   // Soul Weaver only eligible while team's average Survivability is under this
+const QD_SOUL_WEAVER_SST_WEIGHT = 8;    // per-point weight on raw Sustainability value for Soul Weaver candidates
+const QD_SOUL_WEAVER_SPD_WEIGHT = 4;    // per-point weight on raw Speed value, only counted while team has zero Speed coverage
 const QD_BAN_PROTECT_COUNTER_BONUS = 50; // Rule 1: bonus for countering the Ban Protect element
-const QD_LAST_TWO_INDICES = [3, 4];    // Rule 5a: the final two slots, filled after the Protect slot
-const QD_PROTECT_SW_LAST_TWO_PENALTY = 200; // Rule 5a: heavy penalty for a 2nd Soul Weaver in the last two slots once Protect is already one
-const QD_SUPPORT_MIN_ROLES = ["Knight", "Soul Weaver"]; // Rule 5b: roles the team needs at least 1 of each, checked across the last two slots
-const QD_SUPPORT_MIN_BONUS = 40;      // Rule 5b: bonus for covering a still-missing role while not yet forced
-const QD_SUSTAIN_FLOOR_BONUS = 40;    // Rule 6: bonus for clearing the final-slot Speed+Sustainability floor
-const QD_TEAM_SCORE_CAP = 40;         // Rule 4: max combined score (raw 0-10 Avg/Total-Avg per hero) across all 5 picks — ~8/hero on average
-const QD_BUDGET_OVER_PENALTY = 15;    // heavy backstop penalty per point the candidate would push the team's running total over QD_TEAM_SCORE_CAP entirely
-// Rule 6: moved up here (was previously declared right above
-// qdSustainNeededInfo, further down the file) after it was hit as a
-// temporal-dead-zone ReferenceError in production — "Cannot access
-// 'QD_RULE6_THRESHOLD' before initialization" — because Rule 6 only ever
-// runs on the last one or two slots, so a load-order/bundling quirk that
-// only affects late-file code wasn't caught until the final pick was
-// suggested. Declaring it alongside the other QD_* constants at the top
-// guarantees it's initialized before any Quick Draft function can run.
-const QD_RULE6_THRESHOLD = 0.7;
-const QD_LAST_PICK_CLOSENESS_BONUS = 20; // for the 5th/final pick, max bonus for landing the team total as close to QD_TEAM_SCORE_CAP as possible without going over
-const QD_LAST_PICK_CLOSENESS_SCALE = 3;  // how fast that bonus decays per point of leftover (unused) budget on the final pick
-const QD_PACE_CLOSENESS_BONUS = 15;   // for picks 1-4, max bonus for landing near the pacing target (see qdPaceTarget)
-const QD_PACE_CLOSENESS_SCALE = 2;    // how fast that bonus decays per point under the pacing target
-const QD_PACE_OVER_PENALTY = 5;       // lighter penalty (than QD_BUDGET_OVER_PENALTY) per point a non-final pick spends past its pacing target, even while still under the hard cap
+const QD_QUALITY_TIEBREAK_WEIGHT = 0.5; // tiny nudge toward the better-quality hero when class fit is otherwise a wash — never enough to override Rule 2/3/4
 
 /* ── Image editor state ── */
 let editorImg   = null;   // loaded HTMLImageElement
@@ -832,120 +814,182 @@ function qdHeroTraits(h) {
   };
 }
 
-/* Aggregates the heroes already placed in Quick Draft into "team needs"
-   for the 3-rule strategy:
+/* Aggregates the heroes already placed in Quick Draft into "team needs":
    - statCounts: how many current picks are already a High in each of the
      4 stat lanes (Rule 2) — Speed, Tank, Survivability, Sustainability.
-   - classCounts / offenseCount: how many of each class, and how many of
-     the hard-hitting Warrior/Thief/Mage classes, are already picked
-     (Rule 3). */
+   - laneSums / laneAvgSur: raw (best-build) totals per lane, and the
+     average Survivability specifically — used by Soul Weaver's eligibility
+     gate (Rule 2) and the final Warrior slot's baseline (Rule 4).
+   - classCounts: how many of each class are already picked, so Rule 3 can
+     enforce "one hero per class". */
 function qdComputeTeamNeeds(currentPicks) {
   const traits = currentPicks.map(qdHeroTraits);
   const n = traits.length;
   const avgScore = n ? traits.reduce((s, t) => s + t.score, 0) / n : 0;
-  const totalScore = traits.reduce((s, t) => s + t.score, 0); // Rule 4: running sum toward QD_TEAM_SCORE_CAP
-  const remainingBudget = QD_TEAM_SCORE_CAP - totalScore;
 
   const statCounts = { spd: 0, tnk: 0, sur: 0, sst: 0 };
+  const laneSums = { spd: 0, tnk: 0, sur: 0, sst: 0 };
   traits.forEach(t => {
     if (t.isHighSpd) statCounts.spd++;
     if (t.isHighTnk) statCounts.tnk++;
     if (t.isHighSur) statCounts.sur++;
     if (t.isHighSst) statCounts.sst++;
+    laneSums.spd += t.best.spd;
+    laneSums.tnk += t.best.tnk;
+    laneSums.sur += t.best.sur;
+    laneSums.sst += t.best.sst;
   });
+  const laneAvgSur = n ? laneSums.sur / n : 0;
 
   const classCounts = {};
   currentPicks.forEach(h => {
     const role = h.role || "";
     classCounts[role] = (classCounts[role] || 0) + 1;
   });
-  const offenseCount = currentPicks.reduce((sum, h) => sum + (QD_OFFENSE_CLASSES.has(h.role || "") ? 1 : 0), 0);
 
-  return { traits, n, avgScore, totalScore, remainingBudget, statCounts, classCounts, offenseCount };
+  return { traits, n, avgScore, statCounts, laneSums, laneAvgSur, classCounts };
 }
 
-/* Rule 4 pacing target — how much of the remaining budget the pick at
-   position `n` (0-based count of picks already made) should aim to use.
-   The opening pick (n=0) has nothing banked yet, so it targets the FULL
-   remaining budget (no pacing pressure). Every pick after that targets
-   1 / (slots left, including this one) of what's left: 2nd pick 1/4,
-   3rd pick 1/3, 4th pick 1/2, 5th/final pick the full remainder. */
-function qdPaceTarget(n, remainingBudget) {
-  if (n === 0) return remainingBudget;
-  const slotsLeftIncl = QD_SIZE - n;
-  return remainingBudget / slotsLeftIncl;
+/* Rule 2 — how well a candidate's class fits what the team currently
+   lacks. Higher is better. Each class targets its own lane(s), as
+   described in the rules doc above; Warrior is handled separately by
+   qdWarriorNeededInfo since it's a Rule 4/final-slot-only pick, not a
+   general lane-fit candidate. */
+function qdClassFitScore(candidate, t, needs) {
+  const role = candidate.role || "";
+  const lacking = {
+    spd: needs.statCounts.spd === 0,
+    tnk: needs.statCounts.tnk === 0,
+    sur: needs.statCounts.sur === 0,
+    sst: needs.statCounts.sst === 0,
+  };
+  let score = 0;
+  const reasons = [];
+
+  const laneBonus = (isHigh, isLacking, label) => {
+    if (!isHigh) return 0;
+    const bonus = isLacking ? QD_CLASS_FIRST_LANE_BONUS : QD_CLASS_SECOND_LANE_BONUS;
+    reasons.push(isLacking ? `High ${label} — team has no High pick there yet` : `High ${label} (team already has coverage, still a solid top-up)`);
+    return bonus;
+  };
+
+  if (role === "Ranger") {
+    const spdBonus = laneBonus(t.isHighSpd, lacking.spd, "Speed");
+    const surBonus = laneBonus(t.isHighSur, lacking.sur, "Survivability");
+    score += spdBonus + surBonus;
+    if (spdBonus > 0 && surBonus > 0) { score += QD_CLASS_BOTH_LANES_BONUS; reasons.push("Covers both Speed and Survivability at once"); }
+  } else if (role === "Knight") {
+    const tnkBonus = laneBonus(t.isHighTnk, lacking.tnk, "Tankiness");
+    const sstBonus = laneBonus(t.isHighSst, lacking.sst, "Sustainability");
+    score += tnkBonus + sstBonus;
+    if (tnkBonus > 0 && sstBonus > 0) { score += QD_CLASS_BOTH_LANES_BONUS; reasons.push("Covers both Tankiness and Sustainability at once"); }
+  } else if (role === "Mage") {
+    score += t.best.spd * QD_MAGE_SPEED_WEIGHT;
+    if (t.best.spd > 0) reasons.push(`Speed ${t.best.spd.toFixed(1)} — Mages are a pure Speed pick`);
+    if (lacking.spd) { score += QD_MAGE_LACKING_BONUS; reasons.push("Team has no High Speed pick yet"); }
+  } else if (role === "Thief") {
+    if (lacking.tnk) {
+      if (t.isHighSst) { score += QD_CLASS_FIRST_LANE_BONUS; reasons.push("Team lacks Tankiness — high Sustainability covers for it here"); }
+    } else {
+      if (t.isHighSur) { score += QD_CLASS_FIRST_LANE_BONUS; reasons.push("Team already has Tankiness covered — high Survivability rounds it out"); }
+    }
+    if (lacking.spd && t.isHighSpd) { score += QD_CLASS_SECOND_LANE_BONUS; reasons.push("Also High Speed, which the team lacks"); }
+  } else if (role === "Soul Weaver") {
+    // Eligibility gate — qdSuggestForSlot already excludes Soul Weaver
+    // candidates entirely once this fails and a non-Soul-Weaver option
+    // exists; this scoring still applies in the fallback case.
+    if (needs.n > 0 && needs.laneAvgSur >= QD_SOUL_WEAVER_SUR_CEILING) {
+      reasons.push(`Team's average Survivability (${needs.laneAvgSur.toFixed(1)}) isn't low enough yet for a Soul Weaver to be worth the slot`);
+    } else {
+      score += t.best.sst * QD_SOUL_WEAVER_SST_WEIGHT;
+      if (t.best.sst > 0) reasons.push(`Sustainability ${t.best.sst.toFixed(1)} — Soul Weavers always want this high`);
+      if (lacking.spd) {
+        score += t.best.spd * QD_SOUL_WEAVER_SPD_WEIGHT;
+        if (t.best.spd > 0) reasons.push("Team has zero Speed coverage — Speed counts here too");
+      }
+    }
+  }
+
+  return { score, reasons };
+}
+
+/* Rule 4 — before the final (Warrior) slot, average the first 4 picks'
+   Speed/Tank/Survivability/Sustainability totals together into one
+   baseline (grand total / 4), then flag whichever lane(s) fall under it
+   as underperforming. Returns null once the team isn't exactly 4 picks
+   deep (i.e. not about to fill the final slot). */
+function qdWarriorNeededInfo(currentPicks) {
+  if (currentPicks.length !== QD_SIZE - 1) return null;
+  const needs = qdComputeTeamNeeds(currentPicks);
+  const grandTotal = needs.laneSums.spd + needs.laneSums.tnk + needs.laneSums.sur + needs.laneSums.sst;
+  const baseline = grandTotal / currentPicks.length;
+  const labels = { spd: "Speed", tnk: "Tankiness", sur: "Survivability", sst: "Sustainability" };
+  const underperforming = Object.keys(labels).filter(lane => needs.laneSums[lane] < baseline);
+  return { baseline, laneSums: needs.laneSums, underperforming, labels };
+}
+
+/* Rule 4 — scores a Warrior candidate against the underperforming
+   lane(s): reward covering the shortfall (baseline - current lane sum)
+   as closely as possible, favoring "just barely or slightly over" rather
+   than the single biggest number available. */
+function qdWarriorFitScore(candidate, t, warriorInfo) {
+  if (!warriorInfo || warriorInfo.underperforming.length === 0) {
+    // No lane is underperforming — any Warrior is fine; fall back to overall quality.
+    return { score: 0, reasons: ["All 4 stat lanes are already at/above the team's own baseline — any Warrior fits here"] };
+  }
+  let score = 0;
+  const reasons = [];
+  warriorInfo.underperforming.forEach(lane => {
+    const shortfall = warriorInfo.baseline - warriorInfo.laneSums[lane];
+    const value = t.best[lane];
+    if (value <= 0) return;
+    if (value >= shortfall) {
+      // Covers it — reward being close to the shortfall (barely-or-over),
+      // not the raw magnitude of the stat.
+      const overshoot = value - shortfall;
+      score += QD_CLASS_FIRST_LANE_BONUS - Math.min(QD_CLASS_FIRST_LANE_BONUS - 5, overshoot * 3);
+      reasons.push(`${warriorInfo.labels[lane]} ${value.toFixed(1)} clears the team's own ${shortfall.toFixed(1)} shortfall in that lane`);
+    } else {
+      // Doesn't fully cover it — still worth partial credit for effort.
+      score += (value / shortfall) * QD_CLASS_SECOND_LANE_BONUS;
+      reasons.push(`${warriorInfo.labels[lane]} ${value.toFixed(1)} helps but doesn't fully close the ${shortfall.toFixed(1)} shortfall`);
+    }
+  });
+  return { score, reasons };
 }
 
 /* Scores one candidate hero for whatever slot is next empty. Higher is
    better. This is a one-slot-ahead greedy heuristic — it only reasons
    about the heroes already locked in, same as how you'd actually draft
    in real time. `slotIndex` is which slot we're filling (0-4) — the
-   middle/Protect slot (QD_PROTECT_INDEX) gets its own Rule 3 bonus below. */
+   middle/Protect slot (QD_PROTECT_INDEX) and the final/Warrior slot
+   (QD_SIZE - 1) each have their own dedicated scoring above. */
 function qdScoreCandidate(candidate, currentPicks, slotIndex) {
   const t = qdHeroTraits(candidate);
   const needs = qdComputeTeamNeeds(currentPicks);
-  const isProtectSlot = slotIndex === QD_PROTECT_INDEX;
-  const reasons = [];
-
-  // Base hero quality — ghost-inclusive Total Avg / Avg.
-  let score = t.score * 10;
-  if (t.score < QD_PASSABLE_SCORE) {
-    score -= (QD_PASSABLE_SCORE - t.score) * 12;
-    reasons.push(`Below passable score (${t.score.toFixed(1)} < ${QD_PASSABLE_SCORE})`);
-  }
-
-  // ── Rule 2: stat balance ──
-  // Analyze the team's current Speed / Tankiness / Survivability /
-  // Sustainability coverage (ghost stats included, see qdHeroTraits) and
-  // reward this candidate for being High in whichever lane(s) the team
-  // doesn't have covered yet. A hero that's High in two needed lanes at
-  // once (e.g. both high Speed and high Tankiness) gets both bonuses —
-  // exactly the "covers multiple gaps in one pick" hero the team wants.
-  const STAT_LABELS = { spd: "Speed", tnk: "Tankiness", sur: "Survivability", sst: "Sustainability" };
-  const statFlag = { spd: t.isHighSpd, tnk: t.isHighTnk, sur: t.isHighSur, sst: t.isHighSst };
-  // How stacked the team's leading lane already is — used below so that,
-  // even once every lane has at least one High pick (4/4), the candidate
-  // keeps getting rewarded for covering whichever lane(s) are still
-  // relatively behind the team's most-covered lane, instead of the bonus
-  // dropping to 0 after the lane's 2nd High pick.
-  const maxStatCount = Math.max(needs.statCounts.spd, needs.statCounts.tnk, needs.statCounts.sur, needs.statCounts.sst);
-  const covered = [];
-  const caughtUp = [];
-  Object.keys(STAT_LABELS).forEach(key => {
-    if (!statFlag[key]) return;
-    const count = needs.statCounts[key];
-    const gapBehindLeader = maxStatCount - count; // 0 = already tied with (or leading) the most-covered lane
-    let bonus;
-    if (count === 0) bonus = QD_STAT_FIRST_BONUS;
-    else if (count === 1) bonus = QD_STAT_SECOND_BONUS + gapBehindLeader * QD_STAT_GAP_BONUS;
-    else bonus = gapBehindLeader * QD_STAT_GAP_BONUS; // 3rd+ pick in a lane: only rewarded while it's still catching up
-    if (bonus > 0) { score += bonus; covered.push(STAT_LABELS[key]); }
-    else if (statFlag[key]) caughtUp.push(STAT_LABELS[key]);
-  });
-  if (covered.length >= 2) reasons.push(`Covers multiple team gaps at once (${covered.join(" + ")})`);
-  else if (covered.length === 1) reasons.push(`Helps balance the team's ${covered[0]} lane`);
-
-  // ── Rule 3: class caps + role priorities ──
   const role = candidate.role || "";
-  const classCount = needs.classCounts[role] || 0;
-  if (role && classCount >= QD_CLASS_MAX) {
-    score -= QD_CLASS_CAP_PENALTY;
-    reasons.push(`Team already has ${classCount}× ${role} (max ${QD_CLASS_MAX} per class)`);
-  }
-  if (QD_OFFENSE_CLASSES.has(role) && needs.offenseCount < QD_OFFENSE_TARGET) {
-    score += QD_OFFENSE_BONUS;
-    reasons.push(`Hard-hitting ${role} (team has ${needs.offenseCount}/${QD_OFFENSE_TARGET} Warrior/Thief/Mage)`);
-  }
-  if (isProtectSlot && QD_SUPPORT_CLASSES.has(role)) {
-    score += QD_PROTECT_SUPPORT_BONUS;
-    reasons.push(`${role} in the Protect slot — support classes are safest here since this pick can't be banned`);
+  const isFinalSlot = slotIndex === QD_SIZE - 1;
+  let score = 0;
+  let reasons = [];
+
+  if (isFinalSlot && role === "Warrior") {
+    // ── Rule 4: final Warrior slot ──
+    const warriorInfo = qdWarriorNeededInfo(currentPicks);
+    const fit = qdWarriorFitScore(candidate, t, warriorInfo);
+    score += fit.score;
+    reasons = fit.reasons;
+  } else {
+    // ── Rule 2: class fit against the team's current lane gaps ──
+    const fit = qdClassFitScore(candidate, t, needs);
+    score += fit.score;
+    reasons = fit.reasons;
   }
 
   // ── Rule 1: counter the Ban Protect element ──
-  // (qdSuggestForNextSlot already restricts the candidate pool to the
-  // counter element once Ban Protect is set and a counter is available —
-  // this bonus keeps it visible in the reasons and still helps ranking
-  // in the fallback case where no counter-element hero is left.)
+  // (qdSuggestForSlot already restricts the candidate pool to the counter
+  // element once Ban Protect is set and a counter is available — this
+  // bonus keeps it visible in the reasons and still helps ranking in the
+  // fallback case where no counter-element hero is left.)
   if (qdBanProtectElement) {
     const counterEl = QD_ELEMENT_COUNTER[qdBanProtectElement];
     if (candidate.element === counterEl) {
@@ -954,101 +998,11 @@ function qdScoreCandidate(candidate, currentPicks, slotIndex) {
     }
   }
 
-  // ── Rule 5a: no 2nd Soul Weaver in the last two slots ──
-  // (qdSuggestForNextSlot already excludes Soul Weaver candidates for
-  // slots 3-4 once the Protect slot has one — this penalty keeps it
-  // visible in the reasons and still helps ranking in the fallback case
-  // where no non-Soul-Weaver hero is left.)
-  if (QD_LAST_TWO_INDICES.includes(slotIndex) && role === "Soul Weaver" && qdProtectIsSoulWeaver()) {
-    score -= QD_PROTECT_SW_LAST_TWO_PENALTY;
-    reasons.push(`Protect slot is already a Soul Weaver — avoiding a 2nd one in the last two slots`);
-  }
+  // Tiny quality tiebreak — never enough to override class fit above, just
+  // keeps ties sensible (a genuinely better hero edges out an equal-fit one).
+  score += t.score * QD_QUALITY_TIEBREAK_WEIGHT;
 
-  // ── Rule 6: final-slot Speed + Sustainability preference ──
-  // Soft ranking bonus, not a hard filter (see qdSuggestForSlot) — a 70%
-  // combined bar is tough to clear, so this just pushes qualifying picks
-  // toward the top instead of hiding everyone who doesn't clear it.
-  // Rule 1's own bonus above already rewards the strong counter element;
-  // this adds a small penalty for the specific element that's actually
-  // WEAK against the enemy's Ban Protect pick (e.g. Ban Protect = Fire
-  // beats Earth, so Earth gets penalized here — not Fire itself).
-  const sustainInfo = qdSustainNeededInfo(currentPicks, slotIndex);
-  if (sustainInfo) {
-    const combined = t.best.spd + t.best.sst;
-    if (combined >= sustainInfo.minNeededCombined) {
-      score += QD_SUSTAIN_FLOOR_BONUS;
-      reasons.push(`Speed + Sustainability ${combined.toFixed(1)} clears the ${Math.min(20, sustainInfo.minNeededCombined).toFixed(1)} floor needed to bring the team back over 70%`);
-    }
-    if (qdBanProtectElement) {
-      const weakEl = QD_ELEMENT_BEATS[qdBanProtectElement];
-      if (candidate.element === weakEl) {
-        score -= QD_SUSTAIN_FLOOR_BONUS;
-        reasons.push(`${weakEl} is weak against the Ban Protect element (${qdBanProtectElement})`);
-      }
-    }
-  }
-
-  // ── Rule 5b: work toward at least 1 Knight and 1 Soul Weaver (last two slots) ──
-  // When forced (see qdSupportMinNeededInfo), qdSuggestForNextSlot has
-  // already restricted candidates to whichever role(s) are still
-  // missing, so this bonus mainly keeps the reason visible and helps
-  // ranking in the fallback case where no matching hero is left in the
-  // Roster. When not forced (only 1 role missing, slot 4 only), this is
-  // the only mechanism — a soft nudge rather than a hard restriction,
-  // letting whichever of slot 4/5 fits the leftover budget better cover
-  // the missing role.
-  const supportInfo = qdSupportMinNeededInfo(currentPicks, slotIndex);
-  if (supportInfo && supportInfo.missing.includes(role)) {
-    score += QD_SUPPORT_MIN_BONUS;
-    reasons.push(supportInfo.forced
-      ? `Team is still missing ${supportInfo.missing.join(" & ")} with ${supportInfo.slotsLeftIncl} slot(s) left — this ${role} is needed`
-      : `Team is missing a ${role} — this pick would cover it early`);
-  }
-
-  // ── Rule 4: team score budget (1/slots-left pace) ──
-  // The 5-hero team's total score is capped at QD_TEAM_SCORE_CAP. Each
-  // pick's target is 1 / (slots left, including this one) of whatever
-  // budget remains — see qdPaceTarget. The opening pick has nothing
-  // banked yet, so it targets the full remaining budget (no pacing
-  // pressure); pick 2 paces toward 1/4 of what's left, pick 3 toward
-  // 1/3, pick 4 toward 1/2, and the final pick toward the FULL
-  // remainder — reward landing as close to it as possible without
-  // going over.
-  const projectedTotal = needs.totalScore + t.score;
-  const isLastPick = needs.n === QD_SIZE - 1;
-
-  if (projectedTotal > QD_TEAM_SCORE_CAP) {
-    // Backstop: never let a pick blow the whole team past the hard cap,
-    // regardless of pacing — this is always a real penalty, not just a
-    // pacing nudge.
-    const over = projectedTotal - QD_TEAM_SCORE_CAP;
-    score -= over * QD_BUDGET_OVER_PENALTY;
-    reasons.push(`Pushes team total to ${projectedTotal.toFixed(1)}, ${over.toFixed(1)} over the ${QD_TEAM_SCORE_CAP} budget cap`);
-  } else {
-    const paceTarget = qdPaceTarget(needs.n, needs.remainingBudget);
-    const diff = paceTarget - t.score; // >=0 = at/under this pick's pacing target (banks the rest); <0 = spent past it
-
-    if (diff >= 0) {
-      const bonusMax   = isLastPick ? QD_LAST_PICK_CLOSENESS_BONUS : QD_PACE_CLOSENESS_BONUS;
-      const bonusScale = isLastPick ? QD_LAST_PICK_CLOSENESS_SCALE : QD_PACE_CLOSENESS_SCALE;
-      const closeness = Math.max(0, bonusMax - diff * bonusScale);
-      if (closeness > 0) score += closeness;
-      reasons.push(isLastPick
-        ? `Finishes the team close to the ${QD_TEAM_SCORE_CAP} budget cap (total ${projectedTotal.toFixed(1)}, ${diff.toFixed(1)} left unused)`
-        : needs.n === 0
-          ? `Opening pick — no pacing target yet, ${diff.toFixed(1)} banked for the rest of the team`
-          : `Near this pick's ~${paceTarget.toFixed(1)} pacing target (1/${QD_SIZE - needs.n} of the ${needs.remainingBudget.toFixed(1)} left), banking ${diff.toFixed(1)} for later picks`);
-    } else {
-      // Still under the hard cap, but this pick eats more than its pacing
-      // target allows — a smaller penalty than blowing the cap outright,
-      // since it just tightens later picks.
-      const overPace = -diff;
-      score -= overPace * QD_PACE_OVER_PENALTY;
-      reasons.push(`Uses ${overPace.toFixed(1)} more than the ~${paceTarget.toFixed(1)} pacing target, leaving less budget for later picks`);
-    }
-  }
-
-  if (reasons.length === 0) reasons.push("Solid, balanced pick");
+  if (reasons.length === 0) reasons.push("No standout lane fit for this class right now, but no overlapping class has been used yet either");
 
   return { hero: candidate, score, reasons, traits: t };
 }
@@ -1071,34 +1025,13 @@ function qdStatHint(currentPicks) {
   return `✅ All 4 stats (Speed, Tankiness, Survivability, Sustainability) are evenly covered.`;
 }
 
-/* Rule 3 hint — class cap / offense-count status, so it's clear why
-   Quick Draft is steering toward or away from a class. */
+/* Rule 3 hint — which classes are already used (can't repeat) and
+   whether the Protect/Warrior slots are locked. */
 function qdClassHint(currentPicks) {
   if (currentPicks.length === 0) return "";
   const needs = qdComputeTeamNeeds(currentPicks);
-  const hints = [];
-  const stacked = Object.entries(needs.classCounts).find(([role, n]) => role && n >= QD_CLASS_MAX);
-  if (stacked) hints.push(`⚔️ ${stacked[1]}× ${stacked[0]} already picked — that class is capped at ${QD_CLASS_MAX}.`);
-  if (needs.offenseCount < QD_OFFENSE_TARGET) hints.push(`🗡️ ${needs.offenseCount}/${QD_OFFENSE_TARGET} hard-hitting Warrior/Mage/Ranger picks so far.`);
-  return hints.join("<br>");
-}
-
-/* Rule 4 hint — shows the team's running score total against the budget
-   cap, so it's clear why suggestions start favoring cheaper picks once
-   the earlier picks have used up most of the budget. */
-function qdBudgetHint(currentPicks) {
-  if (currentPicks.length === 0) return "";
-  const needs = qdComputeTeamNeeds(currentPicks);
-  const picksLeft = QD_SIZE - currentPicks.length;
-  if (picksLeft <= 0) return "";
-  if (needs.remainingBudget < 0) {
-    return `💰 Team total ${needs.totalScore.toFixed(1)} is already ${Math.abs(needs.remainingBudget).toFixed(1)} over the ${QD_TEAM_SCORE_CAP} budget cap — remaining picks are pushed toward lower scores.`;
-  }
-  const isLastPick = picksLeft === 1;
-  const paceTarget = qdPaceTarget(currentPicks.length, needs.remainingBudget);
-  return isLastPick
-    ? `💰 Budget: ${needs.totalScore.toFixed(1)}/${QD_TEAM_SCORE_CAP} used — final pick is paced toward using the full ~${paceTarget.toFixed(1)} left, to land close to the cap.`
-    : `💰 Budget: ${needs.totalScore.toFixed(1)}/${QD_TEAM_SCORE_CAP} used, ${needs.remainingBudget.toFixed(1)} left — this pick is paced toward ~${paceTarget.toFixed(1)} (1/${picksLeft} of what's left), banking the rest for later picks.`;
+  const used = Object.keys(needs.classCounts).filter(role => role && needs.classCounts[role] > 0);
+  return used.length ? `⚔️ Classes already on the team (no repeats): ${used.join(", ")}.` : "";
 }
 
 /* Rule 1 hint — shows the Ban Protect element and its counter, so it's
@@ -1109,79 +1042,52 @@ function qdBanProtectHint() {
   return `🛡 Ban Protect is ${qdBanProtectElement} — remaining picks are locked to ${counterEl} where possible.`;
 }
 
-/* Rule 5a hint — shows when the Protect slot's Soul Weaver is steering
-   the last two slots away from a 2nd one. */
-function qdProtectSwHint(nextIdx) {
-  if (!QD_LAST_TWO_INDICES.includes(nextIdx) || !qdProtectIsSoulWeaver()) return "";
-  return `🔮 Protect slot is a Soul Weaver — the last two slots are steered away from a 2nd one.`;
-}
-
-/* Rule 5b hint — shows when the last two slots still need a Knight
-   and/or Soul Weaver to reach the minimum. */
-function qdSupportMinHint(currentPicks, nextIdx) {
-  const info = qdSupportMinNeededInfo(currentPicks, nextIdx);
-  if (!info) return "";
-  const need = info.missing.join(" & ");
-  return info.forced
-    ? `🛡️ Team still needs ${need} with ${info.slotsLeftIncl} slot(s) left — this pick is locked to cover it.`
-    : `🛡️ Team is missing ${need} — favored here to cover it before the last slot.`;
-}
-
-/* Rule 5 helper — is the Protect slot (index QD_PROTECT_INDEX) currently
-   filled with a Soul Weaver? Used to steer the last two slots away from
-   picking a 2nd one. */
-function qdProtectIsSoulWeaver() {
+/* Rule 3 helper — is the Protect slot (index QD_PROTECT_INDEX) currently
+   filled, and with which class? Used both to lock the Protect slot to
+   Knight/Soul Weaver and to reserve whichever of the two is still free
+   for it while filling earlier slots. */
+function qdProtectFilledRole() {
   const protectId = quickDraft[QD_PROTECT_INDEX];
-  if (protectId === null) return false;
+  if (protectId === null) return null;
   const protectHero = heroes.find(h => h.id === protectId);
-  return !!protectHero && protectHero.role === "Soul Weaver";
+  return protectHero ? (protectHero.role || null) : null;
 }
 
-/* Rule 5b helper — works out which of QD_SUPPORT_MIN_ROLES (Knight,
-   Soul Weaver) the team is still missing at least 1 of, and whether
-   this pick (at `nextIdx`, one of the last two slots only) needs to
-   cover one of them. Returns null outside the last two slots or once
-   every role is covered (rule void). Otherwise returns
-   { missing, slotsLeftIncl, forced } where `missing` is the list of
-   roles the team has zero of yet, and `forced` is true when there
-   isn't enough room left to cover every missing role unless this slot
-   covers one (e.g. both Knight and Soul Weaver missing at slot 4, with
-   only 2 slots left to cover both; or 1 role still missing at slot 5,
-   the last chance). When forced with 2 roles still missing, either one
-   satisfies this slot — the other still needs the final slot. */
-function qdSupportMinNeededInfo(currentPicks, nextIdx) {
-  if (!QD_LAST_TWO_INDICES.includes(nextIdx)) return null;
-  const missing = QD_SUPPORT_MIN_ROLES.filter(role => !currentPicks.some(h => h.role === role));
-  if (missing.length === 0) return null;
-  const slotsLeftIncl = nextIdx === 3 ? 2 : 1; // last two slots remaining, including this one
-  const forced = missing.length >= slotsLeftIncl;
-  return { missing, slotsLeftIncl, forced };
+/* Rule 3 hint — shown for the Protect slot itself, explaining the
+   Knight/Soul Weaver lock (and which one specifically, if forced by the
+   first hero already being the other). */
+function qdProtectLockHint(currentPicks, nextIdx) {
+  if (nextIdx !== QD_PROTECT_INDEX) return "";
+  const already = ["Knight", "Soul Weaver"].filter(role => currentPicks.some(h => h.role === role));
+  if (already.length === 1) {
+    const other = already[0] === "Knight" ? "Soul Weaver" : "Knight";
+    return `🛡️ Protect slot must be a Knight or Soul Weaver — ${already[0]} is already on the team, so this is locked to ${other}.`;
+  }
+  return `🛡️ Protect slot must be a Knight or Soul Weaver (the un-bannable pick calls for one of the tankier/support classes).`;
 }
 
-/* Rule 6 helper — before the final slot, is the team's cumulative
-   Speed + Sustainability (best.spd + best.sst per hero, 0-20 each, since
-   each stat maxes at 10) under 70% of its own max-possible total so far?
-   If so, the final pick needs enough combined Speed + Sustainability to
-   pull the full 5-hero total back over 70% — factoring in Speed too
-   (not Sustainability alone) so the team can actually turn first instead
-   of just surviving longer. */
-function qdSustainNeededInfo(currentPicks, nextIdx) {
-  if (nextIdx !== QD_SIZE - 1 || currentPicks.length !== QD_SIZE - 1) return null;
-  const combinedSoFar = currentPicks.reduce((sum, h) => {
-    const t = qdHeroTraits(h).best;
-    return sum + t.spd + t.sst;
-  }, 0);
-  const maxSoFar = currentPicks.length * 20;
-  if (combinedSoFar >= maxSoFar * QD_RULE6_THRESHOLD) return null;
-  const minNeededCombined = (QD_SIZE * 20 * QD_RULE6_THRESHOLD) - combinedSoFar;
-  return { combinedSoFar, minNeededCombined };
+/* Rule 3 hint — shown for slots before the Protect slot, explaining that
+   at most one of Knight/Soul Weaver can be used here so the other stays
+   available for Protect. */
+function qdProtectReserveHint(currentPicks, nextIdx) {
+  if (nextIdx >= QD_PROTECT_INDEX) return "";
+  const already = ["Knight", "Soul Weaver"].filter(role => currentPicks.some(h => h.role === role));
+  if (already.length !== 1) return "";
+  const other = already[0] === "Knight" ? "Soul Weaver" : "Knight";
+  return `🔒 ${other} is being held back for the Protect slot, since ${already[0]} already filled the other half of that pair.`;
 }
 
-/* Rule 6 hint text for the suggestions panel. */
-function qdSustainHint(currentPicks, nextIdx) {
-  const info = qdSustainNeededInfo(currentPicks, nextIdx);
-  if (!info) return "";
-  return `⚡🩹 Team's Speed + Sustainability is under 70% so far (${info.combinedSoFar.toFixed(1)}/${(currentPicks.length * 20).toFixed(0)}) — final pick needs at least ${Math.min(20, info.minNeededCombined).toFixed(1)} combined Speed + Sustainability to bring the full team back over 70%.`;
+/* Rule 4 hint — shown for the final (Warrior) slot, explaining which
+   lane(s) are underperforming the team's own baseline. */
+function qdWarriorLockHint(currentPicks, nextIdx) {
+  if (nextIdx !== QD_SIZE - 1) return "";
+  const info = qdWarriorNeededInfo(currentPicks);
+  if (!info) return `🗡️ Final slot is locked to Warrior — a flex pick that fits whatever the team still needs.`;
+  if (info.underperforming.length === 0) {
+    return `🗡️ Final slot is locked to Warrior — all 4 stat lanes are already at/above the team's own baseline (${info.baseline.toFixed(1)}), so any Warrior fits.`;
+  }
+  const names = info.underperforming.map(l => info.labels[l]).join(", ");
+  return `🗡️ Final slot is locked to Warrior — ${names} ${info.underperforming.length > 1 ? "are" : "is"} below the team's own baseline (${info.baseline.toFixed(1)}); favoring a Warrior that just barely covers ${info.underperforming.length > 1 ? "them" : "it"}.`;
 }
 
 /* Ranks every Roster hero not already drafted for the next empty slot.
@@ -1199,54 +1105,70 @@ function qdSuggestForSlot(nextIdx) {
   const currentPicks = currentIds.map(id => heroes.find(h => h.id === id)).filter(Boolean);
   let candidates = heroes.filter(h => !currentIds.includes(h.id));
 
-  // Rule 5b — steer the last two slots toward ending with at least 1
-  // Knight and 1 Soul Weaver, independent of Ban Protect. Only actually
-  // hard-restricts the pool when `forced` (there isn't enough room left
-  // to cover every still-missing role unless this slot covers one) —
-  // otherwise it's left as a soft scoring nudge in qdScoreCandidate so
-  // slot 4 can go either way and slot 5 picks up the slack if still
-  // short. This runs BEFORE Rule 1's element narrowing (below) on
-  // purpose: if it ran after, a Roster with no matching-role hero of the
-  // exact counter element would silently fail to find one and this
-  // requirement would never actually apply. Only enforced when the
-  // Roster still has a matching hero left to suggest, so this never
-  // empties the list.
-  const supportInfo = qdSupportMinNeededInfo(currentPicks, nextIdx);
-  if (supportInfo && supportInfo.forced) {
-    const matches = candidates.filter(h => supportInfo.missing.includes(h.role));
-    if (matches.length > 0) candidates = matches;
+  // Rule 3 — no repeating a class already on the team. Hard filter,
+  // always enforced (this is what makes "1 hero per class" actually
+  // hold — never falls back to letting a repeat through).
+  const usedClasses = new Set(currentPicks.map(h => h.role).filter(Boolean));
+  candidates = candidates.filter(h => !usedClasses.has(h.role));
+
+  if (nextIdx === QD_SIZE - 1) {
+    // Rule 4 — the final slot is always Warrior. Hard lock: if the
+    // Roster has no Warrior left, fall back to whatever's left rather
+    // than returning an empty list.
+    const warriors = candidates.filter(h => h.role === "Warrior");
+    if (warriors.length > 0) candidates = warriors;
+  } else {
+    // Warrior is reserved exclusively for the final slot — excluded
+    // everywhere else, always (never falls back).
+    const nonWarrior = candidates.filter(h => h.role !== "Warrior");
+    if (nonWarrior.length > 0) candidates = nonWarrior;
+
+    if (nextIdx === QD_PROTECT_INDEX) {
+      // Rule 3 — Protect slot must be Knight or Soul Weaver; if one of
+      // the two is already on the team, lock to whichever is still
+      // missing. Hard lock, with a graceful fallback to the full pool
+      // only if the Roster genuinely has neither left to offer.
+      const already = ["Knight", "Soul Weaver"].filter(role => currentPicks.some(h => h.role === role));
+      const allowedRoles = already.length === 1
+        ? [already[0] === "Knight" ? "Soul Weaver" : "Knight"]
+        : ["Knight", "Soul Weaver"];
+      const matches = candidates.filter(h => allowedRoles.includes(h.role));
+      if (matches.length > 0) candidates = matches;
+    } else if (nextIdx < QD_PROTECT_INDEX) {
+      // Rule 3 — before the Protect slot fills, don't let a pick use up
+      // BOTH Knight and Soul Weaver; once one is on the team, hold the
+      // other back so Protect always has a class to lock onto. Only
+      // enforced when it wouldn't empty the pool.
+      const already = ["Knight", "Soul Weaver"].filter(role => currentPicks.some(h => h.role === role));
+      if (already.length === 1) {
+        const reserved = already[0] === "Knight" ? "Soul Weaver" : "Knight";
+        const withoutReserved = candidates.filter(h => h.role !== reserved);
+        if (withoutReserved.length > 0) candidates = withoutReserved;
+      }
+    }
   }
 
-  // Rule 6 — before the final slot, if the team's cumulative
-  // Speed + Sustainability is under 70% of its own max-possible total so
-  // far, candidates that would bring the full 5-hero total back over 70%
-  // get a heavy ranking bonus (see qdScoreCandidate) so they float to the
-  // top of the list. This is intentionally a SOFT preference, not a hard
-  // filter — a 70% combined Speed+Sustain bar is tough to clear, and
-  // hard-filtering down to only the heroes that clear it could collapse
-  // the whole slot to just 1-2 options. Keeping the full Roster visible
-  // means "Next Best" can still cycle through everyone if you don't own
-  // the top pick.
+  // Soul Weaver eligibility gate (part of Rule 2) — excluded from the
+  // pool entirely once the team's average Survivability is no longer
+  // low enough to be worth the slot, as long as that doesn't empty the
+  // candidate pool (e.g. the Protect slot forcing Soul Weaver overrides
+  // this, since Protect's Knight/Soul Weaver requirement always wins).
+  const needsForGate = qdComputeTeamNeeds(currentPicks);
+  if (needsForGate.n > 0 && needsForGate.laneAvgSur >= QD_SOUL_WEAVER_SUR_CEILING) {
+    const nonSW = candidates.filter(h => h.role !== "Soul Weaver");
+    if (nonSW.length > 0) candidates = nonSW;
+  }
+
   // Rule 1 — once the opponent's un-bannable Ban Protect element is set,
   // every remaining pick should be the element that counters it. Applied
-  // on top of the Rule 5b Knight narrowing above, so it only additionally
-  // prefers the counter element among Knights when one exists — it never
-  // overrides the Knight requirement itself. Only enforced when the pool
-  // actually still has a counter-element hero left, so this never empties
-  // the list.
+  // last, on top of all the class restrictions above, so it only
+  // additionally narrows within whatever classes are already allowed —
+  // it never overrides them. Only enforced when the pool actually still
+  // has a counter-element hero left, so this never empties the list.
   if (qdBanProtectElement) {
     const counterEl = QD_ELEMENT_COUNTER[qdBanProtectElement];
     const countered = candidates.filter(h => h.element === counterEl);
     if (countered.length > 0) candidates = countered;
-  }
-
-  // Rule 5a — once the Protect slot is filled with a Soul Weaver, don't
-  // suggest a 2nd one for either of the last two slots (indices 3 and 4).
-  // Only enforced when the Roster still has a non-Soul-Weaver hero left
-  // to suggest, so this never empties the list.
-  if (QD_LAST_TWO_INDICES.includes(nextIdx) && qdProtectIsSoulWeaver()) {
-    const nonSW = candidates.filter(h => h.role !== "Soul Weaver");
-    if (nonSW.length > 0) candidates = nonSW;
   }
 
   const scored = candidates.map(c => qdScoreCandidate(c, currentPicks, nextIdx));
@@ -1494,14 +1416,13 @@ function renderQuickDraft() {
   const avgTxt = filledCount ? needs.avgScore.toFixed(1) : "—";
   const statsCovered = Object.values(needs.statCounts).filter(n => n > 0).length;
   const statsClass = statsCovered >= 4 ? "good" : (filledCount ? "warn" : "");
-  const offenseClass = needs.offenseCount >= QD_OFFENSE_TARGET ? "good" : (filledCount ? "warn" : "");
-  const budgetClass = needs.totalScore > QD_TEAM_SCORE_CAP ? "warn" : (filledCount ? "good" : "");
+  const classesUsed = Object.keys(needs.classCounts).filter(role => role && needs.classCounts[role] > 0).length;
+  const classesClass = classesUsed >= filledCount ? "good" : "warn"; // should always be 1:1 — no repeats allowed
   statsEl.innerHTML = `
     <span class="qd-stat">${filledCount}/5 Picked</span>
     <span class="qd-stat">Avg ${avgTxt}</span>
     <span class="qd-stat ${statsClass}">⚖️ Stats ${statsCovered}/4</span>
-    <span class="qd-stat ${offenseClass}">🗡️ Offense ${needs.offenseCount}/${QD_OFFENSE_TARGET}</span>
-    <span class="qd-stat ${budgetClass}">💰 Budget ${needs.totalScore.toFixed(1)}/${QD_TEAM_SCORE_CAP}</span>`;
+    <span class="qd-stat ${classesClass}">⚔️ Classes ${classesUsed}/${filledCount}</span>`;
 
   document.getElementById("btn-quickdraft-suggest").disabled = filledCount >= QD_SIZE;
   document.getElementById("btn-quickdraft-random").disabled = filledCount >= QD_SIZE;
@@ -1546,7 +1467,7 @@ function renderQuickDraftSuggestions() {
 
     const currentPicks = quickDraft.filter(id => id !== null).map(id => heroes.find(h => h.id === id)).filter(Boolean);
     const hintEl = document.getElementById("quickdraft-element-hint");
-    const hints = [qdBanProtectHint(), qdProtectSwHint(nextIdx), qdSupportMinHint(currentPicks, nextIdx), qdSustainHint(currentPicks, nextIdx), qdStatHint(currentPicks), qdClassHint(currentPicks), qdBudgetHint(currentPicks)].filter(Boolean);
+    const hints = [qdBanProtectHint(), qdProtectLockHint(currentPicks, nextIdx), qdProtectReserveHint(currentPicks, nextIdx), qdWarriorLockHint(currentPicks, nextIdx), qdStatHint(currentPicks), qdClassHint(currentPicks)].filter(Boolean);
     if (hints.length) { hintEl.innerHTML = hints.join("<br>"); hintEl.style.display = "block"; }
     else { hintEl.style.display = "none"; }
 

@@ -776,91 +776,93 @@
   </div>
 
   <!-- QUICK DRAFT LOGIC INFO — Quick Draft page only. Reference doc for
-       how qdScoreCandidate() in app.js actually scores each candidate, so
-       it's easy to remember what to tune as you test. Keep this in sync
-       by hand whenever the scoring logic in app.js changes. -->
+       how qdScoreCandidate()/qdSuggestForSlot() in app.js actually pick
+       each candidate, so it's easy to remember what to tune as you test.
+       Keep this in sync by hand whenever the logic in app.js changes. -->
   <div class="overlay" id="qd-logic-overlay">
     <div class="modal compare-modal" id="qd-logic-modal">
       <div class="details-modal-header" style="padding:20px 22px 0">
-        <div class="modal-title" style="margin:0;padding:0;border:none">HOW QUICK DRAFT SCORES A PICK</div>
+        <div class="modal-title" style="margin:0;padding:0;border:none">HOW QUICK DRAFT PICKS A TEAM</div>
         <button class="det-close-btn" id="qd-logic-close">×</button>
       </div>
       <div class="compare-body" style="padding-top:10px">
         <p style="font-size:11.5px;color:var(--text-dim);line-height:1.6;margin-bottom:12px">
-          One candidate hero at a time, for whichever slot is next empty —
-          a <strong style="color:var(--gold2)">one-slot-ahead greedy heuristic</strong>,
-          not a full 5-hero optimizer. Whichever remaining hero ends up
-          highest is ranked #1 (what Autofill/👑 picks). Slots: 1-2-3-4-5,
-          where slot 3 is the un-bannable <strong style="color:var(--gold2)">Protect</strong> slot.
+          This builds around what each <strong style="color:var(--gold2)">class</strong>
+          is actually good for, not a raw score total — a stacked-score
+          team doesn't hold up against a smart opponent. One candidate at
+          a time, for whichever slot is next empty (a one-slot-ahead
+          heuristic, not a full 5-hero optimizer). Slots: 1-2-3-4-5, where
+          slot 3 is the un-bannable <strong style="color:var(--gold2)">Protect</strong>
+          slot and slot 5 is always the flex <strong style="color:var(--gold2)">Warrior</strong> pick.
         </p>
         <div class="qd-rules-table-wrap">
           <table class="qd-rules-table">
             <thead>
-              <tr><th>Rule</th><th>Trigger</th><th>Points</th></tr>
+              <tr><th>Rule</th><th>Trigger</th><th>What happens</th></tr>
             </thead>
             <tbody>
               <tr>
-                <td>Base quality</td>
-                <td>Every pick</td>
-                <td>Score × 10; below 5.0 passable score, −12 per point short</td>
-              </tr>
-              <tr>
                 <td>1 · Ban Protect counter</td>
                 <td>Enemy Ban Protect element is set</td>
-                <td>Pool locked to the countering element (Fire→Ice→Earth→Fire, Light↔Dark); +50 for matching it</td>
+                <td>Pool locked to the countering element (Fire→Ice→Earth→Fire, Light↔Dark) whenever one's available</td>
               </tr>
               <tr>
-                <td>2 · Stat balance</td>
+                <td>2 · Ranger fit</td>
+                <td>Any open slot</td>
+                <td>Favors High Speed and/or High Survivability, whichever the team is missing; big bonus for covering both at once</td>
+              </tr>
+              <tr>
+                <td>2 · Knight fit</td>
+                <td>Any open slot</td>
+                <td>Favors High Tankiness and/or High Sustainability, whichever the team is missing; big bonus for covering both at once</td>
+              </tr>
+              <tr>
+                <td>2 · Mage fit</td>
+                <td>Any open slot</td>
+                <td>Pure Speed pick — scores on raw Speed value only, secondary stat ignored</td>
+              </tr>
+              <tr>
+                <td>2 · Thief fit</td>
+                <td>Any open slot</td>
+                <td>Covers Sustainability if the team lacks Tankiness, else Survivability; also valued for Speed if the team lacks it</td>
+              </tr>
+              <tr>
+                <td>2 · Soul Weaver fit</td>
+                <td>Any open slot</td>
+                <td>Only worth the slot while the team's average Survivability is under 4; always wants high Sustainability, plus Speed if the team has none yet</td>
+              </tr>
+              <tr>
+                <td>3 · No repeat classes</td>
                 <td>Every pick</td>
-                <td>+30 for 1st High pick in an uncovered lane (Speed/Tank/Survivability/Sustainability), +12 for 2nd; +8 per lane still behind the team's top lane</td>
+                <td>Hard filter — a class already on the team is removed from the candidate pool entirely</td>
               </tr>
               <tr>
-                <td>3 · Offense target</td>
-                <td>Warrior/Mage/Ranger, team has &lt;2</td>
-                <td>+20</td>
+                <td>3 · Protect slot lock</td>
+                <td>Slot 3 (Protect)</td>
+                <td>Locked to Knight or Soul Weaver; if the first hero is one of the two, Protect is forced to the other</td>
               </tr>
               <tr>
-                <td>3 · Protect-slot support</td>
-                <td>Slot 3 (Protect), Knight/Soul Weaver/Thief</td>
-                <td>+30</td>
+                <td>3 · Protect reservation</td>
+                <td>Slots 1-2 (before Protect)</td>
+                <td>If one of Knight/Soul Weaver is already picked, the other is held back so Protect always has one available</td>
               </tr>
               <tr>
-                <td>3 · Class cap</td>
-                <td>Class already has 2 on team</td>
-                <td>−100 for a 3rd</td>
+                <td>4 · Warrior slot lock</td>
+                <td>Slot 5 (final)</td>
+                <td>Locked to Warrior — reserved exclusively for this slot, excluded everywhere else</td>
               </tr>
               <tr>
-                <td>4 · Budget: opening pick</td>
-                <td>Slot 1</td>
-                <td>No pacing target — full cap available, nothing banked yet</td>
-              </tr>
-              <tr>
-                <td>4 · Budget: pacing</td>
-                <td>Slots 2-4</td>
-                <td>Target = 1/(slots left, incl. this one) of budget left — 1/4, 1/3, 1/2; near it +15 (−2/pt over target decay), past it −5/pt</td>
-              </tr>
-              <tr>
-                <td>4 · Budget: final pick</td>
-                <td>Slot 5</td>
-                <td>Target = full remaining budget; near cap +20 (−3/pt decay); over the 30 cap outright −15/pt (hard backstop, any slot)</td>
-              </tr>
-              <tr>
-                <td>5a · No 2nd Soul Weaver</td>
-                <td>Slots 4-5, Protect slot is Soul Weaver</td>
-                <td>Pool excludes Soul Weaver; −200 if picked anyway</td>
-              </tr>
-              <tr>
-                <td>5b · Knight + Soul Weaver minimum</td>
-                <td>Slots 4-5</td>
-                <td>Both missing → slot 4 locked to Knight-or-Soul-Weaver (whichever the pick covers), slot 5 locked to whichever's still missing; only 1 missing → +40 soft nudge at slot 4, locked at slot 5; both covered → rule off</td>
+                <td>4 · Warrior fit</td>
+                <td>Slot 5 (final)</td>
+                <td>Averages the first 4 picks' Speed/Tank/Survivability/Sustainability totals together; whichever lane(s) fall under that average get targeted, favoring a Warrior that just barely covers the shortfall (not the single biggest stat available)</td>
               </tr>
             </tbody>
           </table>
         </div>
         <p style="font-size:11px;color:var(--text-dim);line-height:1.6;margin-top:14px;padding-top:12px;border-top:1px solid var(--border)">
-          All of this lives in <code>qdScoreCandidate()</code> and
-          <code>qdSuggestForNextSlot()</code> in <code>app.js</code> — the
-          point values above are the easiest things to tune first if a
+          All of this lives in <code>qdClassFitScore()</code>,
+          <code>qdWarriorFitScore()</code>, and <code>qdSuggestForSlot()</code>
+          in <code>app.js</code> — those are the places to tune first if a
           suggestion feels off.
         </p>
       </div>
