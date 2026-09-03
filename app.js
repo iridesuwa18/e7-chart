@@ -875,16 +875,32 @@ function qdSupportQuadrants(h) {
 /* Rule 3 — a hero's SUPPORT score is its combined/"Total Avg" score
    (same number as rankValue/the roster card badge) — reusing both
    builds' worth of value, not just one. */
-/* Rule 3 — a hero's SUPPORT score is its combined/"Total Avg" score.
-   Deliberately NOT calling rankValue(h) here: that function derives a
-   non-Ghosted hero's score from xyToScores(h._x, h._y), and _x/_y are
-   only ever populated by index.html's renderChart() — which Quick Draft
-   never runs. On this page h._x/h._y are always undefined, so rankValue
-   silently falls back to the chart's center point (50,50) → score 0 for
-   every non-Ghosted hero, regardless of its real stats. This computes
-   the same "Total Avg" number directly from the hero's own stored
-   fields instead, with no dependency on chart-rendering side effects. */
-function qdSupportScore(h) {
+/* Rule 3 — a hero's SUPPORT score, scoped to the quadrant it's being
+   evaluated for. Uses whichever of its builds (primary and/or Ghost)
+   actually sits in that quadrant — the same single-build average a
+   MAIN uses for its build (see qdBuildEntry) — so support candidates
+   are judged on the same scale as the main's own score they need to
+   clear.
+   FIX: this used to always blend all 4 raw stat values (both builds)
+   together regardless of which build was actually relevant. That
+   silently punished any hero with a second build — even a fantastic
+   primary support build got dragged down by an unrelated/weaker Ghost
+   build — which made the "≥ main's score" floor nearly impossible to
+   clear and showed a ⚠️ warning on almost every otherwise-solid
+   suggestion. Deliberately NOT calling rankValue(h) either: that
+   derives score from h._x/h._y, which are only populated by
+   index.html's renderChart() (never run on this page), so it would
+   silently return 0 for every non-Ghosted hero.
+   Falls back to the old blended average only if neither build actually
+   covers the requested quadrant — shouldn't normally happen once a
+   hero has passed the quadrant filter in qdSuggestForSlot, but keeps
+   this safe to call from qdReplayDraft too, where a manually-placed
+   pick isn't re-validated against its slot's expected quadrant. */
+function qdSupportScore(h, quadrant) {
+  const matches = [];
+  if (qdQuadrantOf(h.vType, h.hType) === quadrant) matches.push(avgScore(h.vScore, h.hScore));
+  if (h.altStats && qdQuadrantOf(h.altStats.vType, h.altStats.hType) === quadrant) matches.push(avgScore(h.altStats.vScore, h.altStats.hScore));
+  if (matches.length) return Math.max(...matches);
   if (h.altStats) {
     return +((Number(h.vScore || 0) + Number(h.hScore || 0) + Number(h.altStats.vScore) + Number(h.altStats.hScore)) / 4).toFixed(1);
   }
@@ -941,7 +957,7 @@ function qdReplayDraft(uptoIdx) {
       activeMain.supplied++;
       perSlot.push({
         index: i, heroId: parsed.heroId, hero, variant: parsed.variant, role: "support",
-        quadrant: QD_OPPOSITE_QUADRANT[activeMain.quadrant], score: qdSupportScore(hero),
+        quadrant: QD_OPPOSITE_QUADRANT[activeMain.quadrant], score: qdSupportScore(hero, QD_OPPOSITE_QUADRANT[activeMain.quadrant]),
         mainIndex: activeMain.index, bonus: false,
       });
       continue;
@@ -962,7 +978,7 @@ function qdReplayDraft(uptoIdx) {
       activeMain.supplied++;
       perSlot.push({
         index: i, heroId: parsed.heroId, hero, variant: parsed.variant, role: "support",
-        quadrant: QD_OPPOSITE_QUADRANT[activeMain.quadrant], score: qdSupportScore(hero),
+        quadrant: QD_OPPOSITE_QUADRANT[activeMain.quadrant], score: qdSupportScore(hero, QD_OPPOSITE_QUADRANT[activeMain.quadrant]),
         mainIndex: activeMain.index, bonus: true,
       });
     }
@@ -1040,9 +1056,9 @@ function qdSuggestForSlot(nextIdx) {
     // to the plain "≥ main's score" floor; if even that's empty, fall
     // back to quadrant-match only. Never emptied further than that.
     const inQuadrant = candidateHeroes.filter(h => qdSupportQuadrants(h).has(req.quadrant));
-    const toEntries = pool => pool.map(h => ({ heroId: h.id, hero: h, variant: "primary", isSupport: true, quadrant: req.quadrant, score: qdSupportScore(h) }));
-    let pool = inQuadrant.filter(h => req.targetStrict ? qdSupportScore(h) > req.targetScore : qdSupportScore(h) >= req.targetScore);
-    if (pool.length === 0) pool = inQuadrant.filter(h => qdSupportScore(h) >= req.minScore);
+    const toEntries = pool => pool.map(h => ({ heroId: h.id, hero: h, variant: "primary", isSupport: true, quadrant: req.quadrant, score: qdSupportScore(h, req.quadrant) }));
+    let pool = inQuadrant.filter(h => req.targetStrict ? qdSupportScore(h, req.quadrant) > req.targetScore : qdSupportScore(h, req.quadrant) >= req.targetScore);
+    if (pool.length === 0) pool = inQuadrant.filter(h => qdSupportScore(h, req.quadrant) >= req.minScore);
     if (pool.length === 0) pool = inQuadrant.length > 0 ? inQuadrant : candidateHeroes;
     entries = toEntries(pool);
   } else {
