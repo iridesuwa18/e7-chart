@@ -1196,19 +1196,31 @@ function nextBestQuickDraftPick() {
   else setStatus(`🔁 Slot ${slotIndex + 1}: ${pick.hero.name || "Unnamed"} (#${qdNextBestRank + 1} best)`);
 }
 
-/* Randomize — picks a uniformly random hero from the Roster (excluding
-   anyone already drafted) for the next empty slot, using its primary
-   build (Ghosts are only drafted deliberately via a Suggest row — see
-   Rule 5), then opens Suggest for the following slot so the rest of the
-   team strategizes around whatever the randomizer landed on. */
+/* Randomize — picks a uniformly random BUILD from the Roster (excluding
+   anyone already drafted, by heroId) for the next empty slot, then opens
+   Suggest for the following slot so the rest of the team strategizes
+   around whatever the randomizer landed on.
+   FIX: this used to only ever draw from primary builds — a hero's Ghost
+   build (if it has one) could never come up no matter how many times you
+   clicked, while Autofill could (rarely) land on one. Now each hero
+   contributes one "ticket" per build it has (primary always, Ghost too
+   if h.altStats exists) to the draw pool, mirroring how qdMainEntriesFor
+   already treats primary/Ghost as separate standalone options elsewhere.
+   A hero with a Ghost build is therefore twice as likely to be drawn
+   overall, split roughly 50/50 between its two builds when it is. */
 function randomizeQuickDraft() {
   const idx = quickDraft.indexOf(null);
   if (idx === -1) { setStatus("⚠️ Quick Draft is full (5/5)"); return; }
   const usedHeroIds = new Set(quickDraft.filter(raw => raw !== null).map(raw => qdParsePick(raw).heroId));
   const pool = heroes.filter(h => !usedHeroIds.has(h.id));
   if (pool.length === 0) { setStatus("⚠️ No more heroes left in your Roster."); return; }
-  const pick = pool[Math.floor(Math.random() * pool.length)];
-  addToQuickDraft(pick.id);
+  const entries = [];
+  pool.forEach(h => {
+    entries.push({ heroId: h.id, variant: "primary" });
+    if (h.altStats) entries.push({ heroId: h.id, variant: "ghost" });
+  });
+  const pick = entries[Math.floor(Math.random() * entries.length)];
+  addToQuickDraft(pick.heroId, pick.variant);
   if (quickDraft.indexOf(null) !== -1) renderQuickDraftSuggestions();
 }
 
