@@ -135,16 +135,14 @@ const QD_ELEMENT_COUNTER = { Fire: "Ice", Ice: "Earth", Earth: "Fire", Light: "D
    (TL⟷BR, TR⟷BL) — see QD_OPPOSITE_QUADRANT.
 
    Rule 1 (Ban Protect counter) — unchanged in spirit. Once the enemy's
-   un-bannable Ban Protect element is set, remaining picks favor whichever
-   element counters it (QD_ELEMENT_COUNTER), searched across EVERY
-   score/quadrant strictness tier for the slot before giving up on that
-   element — so a high-scoring open chain narrowing the pool doesn't
-   also starve out the element search. If no hero of that countering
-   element is available anywhere in the pool, the fallback avoids ONLY
-   the one element the protected element itself beats (its direct victim
-   in the 3-way Fire/Ice/Earth cycle) — everything else, including the
-   protected element itself, is still fair game. See qdSuggestForSlot /
-   qdApplyBanProtectElement.
+   un-bannable Ban Protect element is set, every remaining suggestion is
+   ranked with whichever element counters it (QD_ELEMENT_COUNTER) placed
+   first, elements that neither counter nor are countered by it next,
+   and the one element Ban Protect itself beats ranked last — but never
+   excluded outright. This is a PRIORITY ordering, not a filter: every
+   eligible hero always has a place in the list somewhere, so cycling
+   (Rep. Curr.) never runs out of new options as long as any unused
+   hero remains for that slot. See qdSuggestForSlot / qdElementBucket.
 
    Rule 2 (tiers → support count) — a hero/build's own score (1-10)
    determines how many supports it needs if drafted as a chain "main":
@@ -174,15 +172,16 @@ const QD_ELEMENT_COUNTER = { Fire: "Ice", Ice: "Earth", Earth: "Fire", Light: "D
    Rule 4 (chain filling) — slots fill left→right as a sequence of
    main+supports chains: pick a main, fill its required supports, then
    (if room remains) start a new main from a different quadrant, and so
-   on. A candidate can only start a new main if its own required support
-   count fits in however many slots remain after it — otherwise it's not
-   offered as a main option here at all. If the previous chain's
-   required supports are already met but a new main wouldn't fit in the
-   slots left (e.g. only 1 slot remains and every tier needs ≥1 support
-   of its own), that leftover slot is instead offered as a bonus support
-   for the still-open chain — this is also where the Ban Protect counter
-   naturally lands if it hasn't found a home yet. See qdReplayDraft /
-   qdSlotRequirement.
+   on. A candidate whose own required support count doesn't fit in
+   however many slots remain after it is ranked last rather than hidden
+   outright (see qdSuggestForSlot) — so a tight remainingAfter narrows
+   the TOP suggestion, not the whole list. If the previous chain's
+   required supports are already met but a new main wouldn't comfortably
+   fit in the slots left (e.g. only 1 slot remains and every top pick
+   needs ≥1 support of its own), that leftover slot is instead offered
+   as a bonus support for the still-open chain — this is also where the
+   Ban Protect counter naturally lands if it hasn't found a home yet.
+   See qdReplayDraft / qdSlotRequirement.
 
    Rule 5 (Ghosts as standalone picks) — a hero with a Ghost (altStats)
    build can be drafted as a MAIN using either its primary or its Ghost
@@ -1016,26 +1015,28 @@ function qdSlotRequirement(nextIdx) {
    score) rather than raw power, so your strongest heroes aren't forced
    into support duty when a cheaper one would clear the bar just fine.
    Mains rank by raw score (a stronger main needs fewer supports and is
-   simply the better anchor for its chain). */
+   simply the better anchor for its chain). e._bucket (set by
+   qdSuggestForSlot) is the PRIMARY sort key — it's a tie-breaking
+   priority, not a filter, so every eligible hero always has a place in
+   the list somewhere and cycling never runs out early. */
 function qdScoreEntry(e, req) {
   const reasons = [];
   let rank;
   if (e.isSupport) {
-    // Highest score wins among whichever tier qualified (see
-    // qdSuggestForSlot's 3-tier fallback: target → plain floor →
-    // quadrant-only). Ranking is always by raw score, never inverted.
     rank = e.score;
     const meetsTarget = req.targetStrict ? e.score > req.targetScore : e.score >= req.targetScore;
     const meetsFloor = e.score >= req.minScore;
     const cmp = req.targetStrict ? ">" : "≥";
     reasons.push(`Supports the ${QD_QUADRANT_LABEL[QD_OPPOSITE_QUADRANT[req.quadrant]]} pick — target ${cmp} ${req.targetScore.toFixed(1)}, floor ≥ ${req.minScore.toFixed(1)}, has ${e.score.toFixed(1)}`);
-    if (!meetsTarget && meetsFloor) reasons.push("Doesn't clear the target — no one in this quadrant does, showing the best available above the plain floor");
-    if (!meetsFloor) reasons.push(`⚠️ Below the required ${req.minScore.toFixed(1)} — no qualifying hero left in this quadrant, showing the closest option`);
+    if (!meetsTarget && meetsFloor) reasons.push("Doesn't clear the target — showing the best available above the plain floor");
+    if (!meetsFloor) reasons.push(`⚠️ Below the required ${req.minScore.toFixed(1)} — showing the closest option left`);
     if (req.bonus) reasons.push("Bonus support — filling a leftover slot after the required count was already met");
   } else {
     rank = e.score;
     reasons.push(`${QD_QUADRANT_LABEL[e.quadrant]} pick${e.variant === "ghost" ? " (Ghost build)" : ""} — needs ${e.supportsNeeded} support${e.supportsNeeded > 1 ? "s" : ""} from the ${QD_QUADRANT_LABEL[QD_OPPOSITE_QUADRANT[e.quadrant]]} side`);
+    if (e.supportsNeeded > req.remainingAfter) reasons.push(`⚠️ Needs more supports than the ${req.remainingAfter} slot${req.remainingAfter === 1 ? "" : "s"} left after it — showing anyway`);
   }
+  if (e._elNote) reasons.push(e._elNote);
   return { ...e, rank, reasons };
 }
 
@@ -1045,46 +1046,15 @@ function qdScoreEntry(e, req) {
    and sorts. Always falls back gracefully rather than returning an
    empty list, same philosophy as before — the score/quadrant/element
    filters only narrow the pool when doing so wouldn't empty it. */
-/* Returns the first non-empty tier in strict→loose order (or the last
-   tier if every tier is empty — the graceful "offer something anyway"
-   fallback). Used both for the no-Ban-Protect case and as the final
-   fallback inside qdApplyBanProtectElement. */
-function qdFirstNonEmptyTier(tiers) {
-  for (const t of tiers) if (t.length > 0) return t;
-  return tiers[tiers.length - 1] || [];
-}
-
-/* Rule 1 — Ban Protect counter element. Takes ALL of the slot's
-   score/quadrant tiers (strictest first, same ones qdSuggestForSlot
-   would otherwise pick from directly) and searches across the WHOLE
-   cascade for the countering element before ever giving up on it —
-   this is the fix for suggestions going sparse when the open chain's
-   score requirement is high: previously the element filter was only
-   applied to whichever single (often tiny) tier had already "won",
-   so a great countering hero sitting in a looser tier was never even
-   considered. Priority, each step tried across every tier before
-   moving to the next:
-     1. Best-fit tier(s) that are the element countering Ban Protect.
-     2. If literally no candidate anywhere counters it, widen to any
-        element except the one Ban Protect itself beats (its direct
-        victim) — still strictest tier first.
-     3. Total graceful fallback, ignoring element entirely. */
-function qdApplyBanProtectElement(tiers) {
-  if (!qdBanProtectElement) return qdFirstNonEmptyTier(tiers);
-  const counterEl = QD_ELEMENT_COUNTER[qdBanProtectElement];
-  const avoidEl = Object.keys(QD_ELEMENT_COUNTER).find(k => QD_ELEMENT_COUNTER[k] === qdBanProtectElement);
-
-  for (const t of tiers) {
-    const hit = t.filter(e => e.hero.element === counterEl);
-    if (hit.length > 0) return hit;
-  }
-  if (avoidEl) {
-    for (const t of tiers) {
-      const hit = t.filter(e => e.hero.element !== avoidEl);
-      if (hit.length > 0) return hit;
-    }
-  }
-  return qdFirstNonEmptyTier(tiers);
+/* Rule 1 — Ban Protect element bucket for one hero: 0 = counters it
+   (best), 1 = neutral (neither counters nor is countered by it), 2 =
+   the element Ban Protect itself beats (worst, but still offered — see
+   qdSuggestForSlot). Returns 0 for everyone if no Ban Protect is set. */
+function qdElementBucket(hero, counterEl, avoidEl) {
+  if (!counterEl) return 0;
+  if (hero.element === counterEl) return 0;
+  if (avoidEl && hero.element === avoidEl) return 2;
+  return 1;
 }
 
 function qdSuggestForSlot(nextIdx) {
@@ -1095,31 +1065,47 @@ function qdSuggestForSlot(nextIdx) {
   const candidateHeroes = heroes.filter(h => !usedHeroIds.has(h.id));
   const req = qdSlotRequirement(nextIdx);
 
-  let tiers;
+  const counterEl = qdBanProtectElement ? QD_ELEMENT_COUNTER[qdBanProtectElement] : null;
+  const avoidEl = qdBanProtectElement ? Object.keys(QD_ELEMENT_COUNTER).find(k => QD_ELEMENT_COUNTER[k] === qdBanProtectElement) : null;
+  const elNoteFor = bucket => {
+    if (!qdBanProtectElement) return null;
+    if (bucket === 0) return `⚔️ Counters the enemy's ${qdBanProtectElement} Ban Protect`;
+    if (bucket === 2) return `⚠️ Same element the enemy's ${qdBanProtectElement} Ban Protect already beats`;
+    return null;
+  };
+
+  let entries;
   if (req.type === "support") {
-    // Rule 3 — support must clear 1.5x the main's score (capped at 10)
-    // ideally; if nobody in the right quadrant reaches that, fall back
-    // to the plain "≥ main's score" floor; if even that's empty, fall
-    // back to quadrant-match only, then to any candidate at all. Built
-    // as tiers (rather than picking the first non-empty one right away)
-    // so Rule 1 below can search every strictness level for a countering
-    // element before giving up on it.
-    const inQuadrant = candidateHeroes.filter(h => qdSupportQuadrants(h).has(req.quadrant));
-    const toEntries = pool => pool.map(h => ({ heroId: h.id, hero: h, variant: "primary", isSupport: true, quadrant: req.quadrant, score: qdSupportScore(h, req.quadrant) }));
-    const tierTarget = toEntries(inQuadrant.filter(h => req.targetStrict ? qdSupportScore(h, req.quadrant) > req.targetScore : qdSupportScore(h, req.quadrant) >= req.targetScore));
-    const tierMin = toEntries(inQuadrant.filter(h => qdSupportScore(h, req.quadrant) >= req.minScore));
-    const tierQuadrant = toEntries(inQuadrant);
-    const tierAny = toEntries(candidateHeroes);
-    tiers = [tierTarget, tierMin, tierQuadrant, tierAny];
+    // Rule 3 — quadrant match is a hard requirement (a support literally
+    // has to sit in the main's opposite quadrant to do its job), but
+    // everything past that — clearing the score target, and the Ban
+    // Protect element — is a PRIORITY, not a filter. That's the fix:
+    // previously the first tier that had ANY hits was returned in full
+    // and nothing else, so once you'd cycled through it Rep. Curr. had
+    // nowhere further to go and just wrapped back to #1. Now every
+    // eligible hero is in the list somewhere, ranked best-first.
+    let pool = candidateHeroes.filter(h => qdSupportQuadrants(h).has(req.quadrant));
+    if (pool.length === 0) pool = candidateHeroes; // graceful: nobody in that quadrant at all
+    entries = pool.map(h => {
+      const score = qdSupportScore(h, req.quadrant);
+      const meetsTarget = req.targetStrict ? score > req.targetScore : score >= req.targetScore;
+      const meetsFloor = score >= req.minScore;
+      const scoreBucket = meetsTarget ? 0 : meetsFloor ? 1 : 2;
+      const elBucket = qdElementBucket(h, counterEl, avoidEl);
+      return {
+        heroId: h.id, hero: h, variant: "primary", isSupport: true, quadrant: req.quadrant, score,
+        _bucket: elBucket * 3 + scoreBucket, _elNote: elNoteFor(elBucket),
+      };
+    });
   } else {
-    // Rule 4 — if this slot already has an occupant (i.e. this is a
-    // Next Best re-suggestion, not a first-time pick), lock candidates
-    // to that occupant's SAME quadrant. Otherwise Next Best's pure
-    // score-ranking can silently jump the main to a different quadrant
-    // entirely, which flips the required support quadrant underneath
-    // whatever's already showing in Suggest — looks like a random
-    // warning even though the (new, different) requirement is correct.
-    // Built as tiers, same reasoning as the support branch above.
+    // Rule 4 — if this slot already has an occupant (a Rep. Curr.
+    // re-suggestion), lock candidates to that occupant's SAME quadrant
+    // so cycling can't silently flip the required support quadrant out
+    // from under an already-open chain. That lock is still hard. But
+    // "fits within the remaining slots" (Rule 2) and the Ban Protect
+    // element are priorities now, same reasoning as the support branch
+    // above — so a high-score chain with a tight remainingAfter no
+    // longer collapses the whole list down to 1-2 names.
     let lockedQuadrant = null;
     const currentRaw = quickDraft[nextIdx];
     if (currentRaw !== null && currentRaw !== undefined) {
@@ -1137,18 +1123,17 @@ function qdSuggestForSlot(nextIdx) {
       });
       return out;
     };
-    const lockedAll = lockedQuadrant ? buildEntries(lockedQuadrant) : [];
-    const anyAll = buildEntries(null);
-    const tierLockedFit = lockedQuadrant ? lockedAll.filter(e => e.supportsNeeded <= req.remainingAfter) : [];
-    const tierAnyFit = anyAll.filter(e => e.supportsNeeded <= req.remainingAfter);
-    // Graceful fallback tier — Roster only has heroes whose tier wouldn't
-    // fit the remaining slots; offer them anyway rather than nothing.
-    tiers = lockedQuadrant ? [tierLockedFit, tierAnyFit, anyAll] : [tierAnyFit, anyAll];
+    let pool = lockedQuadrant ? buildEntries(lockedQuadrant) : buildEntries(null);
+    if (pool.length === 0 && lockedQuadrant) pool = buildEntries(null); // graceful: nobody left in the locked quadrant
+    entries = pool.map(e => {
+      const fitBucket = e.supportsNeeded <= req.remainingAfter ? 0 : 1;
+      const elBucket = qdElementBucket(e.hero, counterEl, avoidEl);
+      return { ...e, _bucket: elBucket * 2 + fitBucket, _elNote: elNoteFor(elBucket) };
+    });
   }
 
-  const entries = qdApplyBanProtectElement(tiers);
   const scored = entries.map(e => qdScoreEntry(e, req));
-  scored.sort((a, b) => b.rank - a.rank);
+  scored.sort((a, b) => a._bucket - b._bucket || b.rank - a.rank);
   return scored;
 }
 
