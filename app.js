@@ -1034,12 +1034,38 @@ function qdSuggestForSlot(nextIdx) {
     if (pool.length === 0) pool = inQuadrant.length > 0 ? inQuadrant : candidateHeroes;
     entries = toEntries(pool);
   } else {
+    // Rule 4 — if this slot already has an occupant (i.e. this is a
+    // Next Best re-suggestion, not a first-time pick), lock candidates
+    // to that occupant's SAME quadrant. Otherwise Next Best's pure
+    // score-ranking can silently jump the main to a different quadrant
+    // entirely, which flips the required support quadrant underneath
+    // whatever's already showing in Suggest — looks like a random
+    // warning even though the (new, different) requirement is correct.
+    // Falls back to any quadrant only if that locked pool is empty.
+    let lockedQuadrant = null;
+    const currentRaw = quickDraft[nextIdx];
+    if (currentRaw !== null && currentRaw !== undefined) {
+      const curParsed = qdParsePick(currentRaw);
+      const curHero = heroes.find(h => h.id === curParsed.heroId);
+      if (curHero) lockedQuadrant = qdBuildEntry(curHero, curParsed.variant).quadrant;
+    }
     candidateHeroes.forEach(h => {
       qdMainEntriesFor(h).forEach(build => {
+        if (lockedQuadrant && build.quadrant !== lockedQuadrant) return;
         const supportsNeeded = qdSupportsRequired(build.score);
         if (supportsNeeded <= req.remainingAfter) entries.push({ ...build, isSupport: false, supportsNeeded });
       });
     });
+    if (entries.length === 0 && lockedQuadrant) {
+      // Same-quadrant pool exhausted — relax the quadrant lock before
+      // ever falling back further.
+      candidateHeroes.forEach(h => {
+        qdMainEntriesFor(h).forEach(build => {
+          const supportsNeeded = qdSupportsRequired(build.score);
+          if (supportsNeeded <= req.remainingAfter) entries.push({ ...build, isSupport: false, supportsNeeded });
+        });
+      });
+    }
     if (entries.length === 0) {
       // Graceful fallback — Roster only has heroes whose tier wouldn't
       // fit the remaining slots; offer them anyway rather than nothing.
@@ -1105,7 +1131,11 @@ function qdLatestFilledSlotIndex() {
    live rank pointer for the current session, recomputed fresh from the
    current roster and picks every click. The pointer resets to #1
    whenever the targeted slot itself changes (e.g. after a removal shifts
-   which slot is "latest"). */
+   which slot is "latest"). When the slot being cycled is a MAIN, the
+   candidate pool is locked to its current quadrant (see qdSuggestForSlot)
+   — otherwise a pure score-ranked cycle could silently jump the main to
+   a different quadrant, which flips the required support quadrant out
+   from under whatever's already showing in Suggest. */
 function nextBestQuickDraftPick() {
   const slotIndex = qdLatestFilledSlotIndex();
   if (slotIndex === null) {
