@@ -875,8 +875,20 @@ function qdSupportQuadrants(h) {
 /* Rule 3 — a hero's SUPPORT score is its combined/"Total Avg" score
    (same number as rankValue/the roster card badge) — reusing both
    builds' worth of value, not just one. */
+/* Rule 3 — a hero's SUPPORT score is its combined/"Total Avg" score.
+   Deliberately NOT calling rankValue(h) here: that function derives a
+   non-Ghosted hero's score from xyToScores(h._x, h._y), and _x/_y are
+   only ever populated by index.html's renderChart() — which Quick Draft
+   never runs. On this page h._x/h._y are always undefined, so rankValue
+   silently falls back to the chart's center point (50,50) → score 0 for
+   every non-Ghosted hero, regardless of its real stats. This computes
+   the same "Total Avg" number directly from the hero's own stored
+   fields instead, with no dependency on chart-rendering side effects. */
 function qdSupportScore(h) {
-  return rankValue(h);
+  if (h.altStats) {
+    return +((Number(h.vScore || 0) + Number(h.hScore || 0) + Number(h.altStats.vScore) + Number(h.altStats.hScore)) / 4).toFixed(1);
+  }
+  return avgScore(h.vScore, h.hScore);
 }
 
 /* Encodes a slot's pick as a single storable value. Ghost mains get a
