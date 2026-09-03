@@ -136,11 +136,15 @@ const QD_ELEMENT_COUNTER = { Fire: "Ice", Ice: "Earth", Earth: "Fire", Light: "D
 
    Rule 1 (Ban Protect counter) — unchanged in spirit. Once the enemy's
    un-bannable Ban Protect element is set, remaining picks favor whichever
-   element counters it (QD_ELEMENT_COUNTER). If no hero of that countering
-   element is available, the fallback avoids ONLY the one element the
-   protected element itself beats (its direct victim in the 3-way Fire/
-   Ice/Earth cycle) — everything else, including the protected element
-   itself, is still fair game. See qdSuggestForSlot.
+   element counters it (QD_ELEMENT_COUNTER), searched across EVERY
+   score/quadrant strictness tier for the slot before giving up on that
+   element — so a high-scoring open chain narrowing the pool doesn't
+   also starve out the element search. If no hero of that countering
+   element is available anywhere in the pool, the fallback avoids ONLY
+   the one element the protected element itself beats (its direct victim
+   in the 3-way Fire/Ice/Earth cycle) — everything else, including the
+   protected element itself, is still fair game. See qdSuggestForSlot /
+   qdApplyBanProtectElement.
 
    Rule 2 (tiers → support count) — a hero/build's own score (1-10)
    determines how many supports it needs if drafted as a chain "main":
@@ -1041,6 +1045,48 @@ function qdScoreEntry(e, req) {
    and sorts. Always falls back gracefully rather than returning an
    empty list, same philosophy as before — the score/quadrant/element
    filters only narrow the pool when doing so wouldn't empty it. */
+/* Returns the first non-empty tier in strict→loose order (or the last
+   tier if every tier is empty — the graceful "offer something anyway"
+   fallback). Used both for the no-Ban-Protect case and as the final
+   fallback inside qdApplyBanProtectElement. */
+function qdFirstNonEmptyTier(tiers) {
+  for (const t of tiers) if (t.length > 0) return t;
+  return tiers[tiers.length - 1] || [];
+}
+
+/* Rule 1 — Ban Protect counter element. Takes ALL of the slot's
+   score/quadrant tiers (strictest first, same ones qdSuggestForSlot
+   would otherwise pick from directly) and searches across the WHOLE
+   cascade for the countering element before ever giving up on it —
+   this is the fix for suggestions going sparse when the open chain's
+   score requirement is high: previously the element filter was only
+   applied to whichever single (often tiny) tier had already "won",
+   so a great countering hero sitting in a looser tier was never even
+   considered. Priority, each step tried across every tier before
+   moving to the next:
+     1. Best-fit tier(s) that are the element countering Ban Protect.
+     2. If literally no candidate anywhere counters it, widen to any
+        element except the one Ban Protect itself beats (its direct
+        victim) — still strictest tier first.
+     3. Total graceful fallback, ignoring element entirely. */
+function qdApplyBanProtectElement(tiers) {
+  if (!qdBanProtectElement) return qdFirstNonEmptyTier(tiers);
+  const counterEl = QD_ELEMENT_COUNTER[qdBanProtectElement];
+  const avoidEl = Object.keys(QD_ELEMENT_COUNTER).find(k => QD_ELEMENT_COUNTER[k] === qdBanProtectElement);
+
+  for (const t of tiers) {
+    const hit = t.filter(e => e.hero.element === counterEl);
+    if (hit.length > 0) return hit;
+  }
+  if (avoidEl) {
+    for (const t of tiers) {
+      const hit = t.filter(e => e.hero.element !== avoidEl);
+      if (hit.length > 0) return hit;
+    }
+  }
+  return qdFirstNonEmptyTier(tiers);
+}
+
 function qdSuggestForSlot(nextIdx) {
   if (nextIdx === -1 || nextIdx == null) return [];
   const usedHeroIds = new Set(
@@ -1049,18 +1095,22 @@ function qdSuggestForSlot(nextIdx) {
   const candidateHeroes = heroes.filter(h => !usedHeroIds.has(h.id));
   const req = qdSlotRequirement(nextIdx);
 
-  let entries = [];
+  let tiers;
   if (req.type === "support") {
     // Rule 3 — support must clear 1.5x the main's score (capped at 10)
     // ideally; if nobody in the right quadrant reaches that, fall back
     // to the plain "≥ main's score" floor; if even that's empty, fall
-    // back to quadrant-match only. Never emptied further than that.
+    // back to quadrant-match only, then to any candidate at all. Built
+    // as tiers (rather than picking the first non-empty one right away)
+    // so Rule 1 below can search every strictness level for a countering
+    // element before giving up on it.
     const inQuadrant = candidateHeroes.filter(h => qdSupportQuadrants(h).has(req.quadrant));
     const toEntries = pool => pool.map(h => ({ heroId: h.id, hero: h, variant: "primary", isSupport: true, quadrant: req.quadrant, score: qdSupportScore(h, req.quadrant) }));
-    let pool = inQuadrant.filter(h => req.targetStrict ? qdSupportScore(h, req.quadrant) > req.targetScore : qdSupportScore(h, req.quadrant) >= req.targetScore);
-    if (pool.length === 0) pool = inQuadrant.filter(h => qdSupportScore(h, req.quadrant) >= req.minScore);
-    if (pool.length === 0) pool = inQuadrant.length > 0 ? inQuadrant : candidateHeroes;
-    entries = toEntries(pool);
+    const tierTarget = toEntries(inQuadrant.filter(h => req.targetStrict ? qdSupportScore(h, req.quadrant) > req.targetScore : qdSupportScore(h, req.quadrant) >= req.targetScore));
+    const tierMin = toEntries(inQuadrant.filter(h => qdSupportScore(h, req.quadrant) >= req.minScore));
+    const tierQuadrant = toEntries(inQuadrant);
+    const tierAny = toEntries(candidateHeroes);
+    tiers = [tierTarget, tierMin, tierQuadrant, tierAny];
   } else {
     // Rule 4 — if this slot already has an occupant (i.e. this is a
     // Next Best re-suggestion, not a first-time pick), lock candidates
@@ -1069,7 +1119,7 @@ function qdSuggestForSlot(nextIdx) {
     // entirely, which flips the required support quadrant underneath
     // whatever's already showing in Suggest — looks like a random
     // warning even though the (new, different) requirement is correct.
-    // Falls back to any quadrant only if that locked pool is empty.
+    // Built as tiers, same reasoning as the support branch above.
     let lockedQuadrant = null;
     const currentRaw = quickDraft[nextIdx];
     if (currentRaw !== null && currentRaw !== undefined) {
@@ -1077,46 +1127,26 @@ function qdSuggestForSlot(nextIdx) {
       const curHero = heroes.find(h => h.id === curParsed.heroId);
       if (curHero) lockedQuadrant = qdBuildEntry(curHero, curParsed.variant).quadrant;
     }
-    candidateHeroes.forEach(h => {
-      qdMainEntriesFor(h).forEach(build => {
-        if (lockedQuadrant && build.quadrant !== lockedQuadrant) return;
-        const supportsNeeded = qdSupportsRequired(build.score);
-        if (supportsNeeded <= req.remainingAfter) entries.push({ ...build, isSupport: false, supportsNeeded });
-      });
-    });
-    if (entries.length === 0 && lockedQuadrant) {
-      // Same-quadrant pool exhausted — relax the quadrant lock before
-      // ever falling back further.
+    const buildEntries = quadrantFilter => {
+      const out = [];
       candidateHeroes.forEach(h => {
         qdMainEntriesFor(h).forEach(build => {
-          const supportsNeeded = qdSupportsRequired(build.score);
-          if (supportsNeeded <= req.remainingAfter) entries.push({ ...build, isSupport: false, supportsNeeded });
+          if (quadrantFilter && build.quadrant !== quadrantFilter) return;
+          out.push({ ...build, isSupport: false, supportsNeeded: qdSupportsRequired(build.score) });
         });
       });
-    }
-    if (entries.length === 0) {
-      // Graceful fallback — Roster only has heroes whose tier wouldn't
-      // fit the remaining slots; offer them anyway rather than nothing.
-      candidateHeroes.forEach(h => {
-        qdMainEntriesFor(h).forEach(build => {
-          entries.push({ ...build, isSupport: false, supportsNeeded: qdSupportsRequired(build.score) });
-        });
-      });
-    }
+      return out;
+    };
+    const lockedAll = lockedQuadrant ? buildEntries(lockedQuadrant) : [];
+    const anyAll = buildEntries(null);
+    const tierLockedFit = lockedQuadrant ? lockedAll.filter(e => e.supportsNeeded <= req.remainingAfter) : [];
+    const tierAnyFit = anyAll.filter(e => e.supportsNeeded <= req.remainingAfter);
+    // Graceful fallback tier — Roster only has heroes whose tier wouldn't
+    // fit the remaining slots; offer them anyway rather than nothing.
+    tiers = lockedQuadrant ? [tierLockedFit, tierAnyFit, anyAll] : [tierAnyFit, anyAll];
   }
 
-  // Rule 1 — Ban Protect counter element, applied last on top of
-  // whatever the pool already is. Prefers the countering element;
-  // falls back to avoiding only the element the protected one directly
-  // beats, never emptying the pool.
-  if (qdBanProtectElement) {
-    const counterEl = QD_ELEMENT_COUNTER[qdBanProtectElement];
-    const avoidEl = Object.keys(QD_ELEMENT_COUNTER).find(k => QD_ELEMENT_COUNTER[k] === qdBanProtectElement);
-    let filtered = entries.filter(e => e.hero.element === counterEl);
-    if (filtered.length === 0 && avoidEl) filtered = entries.filter(e => e.hero.element !== avoidEl);
-    if (filtered.length > 0) entries = filtered;
-  }
-
+  const entries = qdApplyBanProtectElement(tiers);
   const scored = entries.map(e => qdScoreEntry(e, req));
   scored.sort((a, b) => b.rank - a.rank);
   return scored;
@@ -1167,7 +1197,7 @@ function qdLatestFilledSlotIndex() {
 function nextBestQuickDraftPick() {
   const slotIndex = qdLatestFilledSlotIndex();
   if (slotIndex === null) {
-    setStatus("⚠️ Fill a slot first, then Next Best can swap it.");
+    setStatus("⚠️ Fill a slot first, then Rep. Curr. can swap it.");
     return;
   }
   if (slotIndex !== qdLastFilledSlot) {
@@ -1400,7 +1430,7 @@ function renderQuickDraft() {
     const latestSlot = qdLatestFilledSlotIndex();
     nextBestBtn.disabled = latestSlot === null;
     nextBestBtn.title = latestSlot !== null
-      ? `Swap Slot ${latestSlot + 1} (your latest pick) for the next-best pick`
+      ? `Replaces Slot ${latestSlot + 1} (your latest pick) with the next-best pick — does not add a new hero`
       : "Fill a slot first";
   }
 
