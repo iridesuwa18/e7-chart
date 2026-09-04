@@ -388,6 +388,12 @@ main {
   font-size: 9px;
   opacity: .75;
 }
+.qd-slot-supports-for {
+  font-size: 8px;
+  color: var(--text-dim);
+  line-height: 1.2;
+  opacity: .75;
+}
 
 .quickdraft-toolbar {
   display: flex;
@@ -569,6 +575,7 @@ main {
   .qd-slot-placeholder { font-size: 16px; }
   .qd-slot-protect-badge { font-size: 8px; top: 2px; right: 2px; }
   .qd-slot-ghost-badge { font-size: 8px; top: 2px; left: 2px; }
+  .qd-slot-supports-for { font-size: 7px; }
 }
 
 @media (max-width: 360px) {

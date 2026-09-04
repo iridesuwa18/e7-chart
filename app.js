@@ -968,14 +968,26 @@ function qdReplayDraft(uptoIdx) {
 
     const remainingAfter = QD_SIZE - (i + 1);
     const entry = qdBuildEntry(hero, parsed.variant);
-    const required = qdSupportsRequired(entry.score);
-    const canStartNewMain = activeMain === null || required <= remainingAfter;
+    const rawRequired = qdSupportsRequired(entry.score);
+    // A new chain only needs SOME room left to be worth starting (at
+    // least 1 slot for a support) — it doesn't need to fit its full
+    // ideal support count. If the roster's best available option for
+    // this element/quadrant is a Mid or Low tier hero and there isn't
+    // room for everyone it'd ideally want, it still becomes the chain's
+    // anchor — its required count is capped to whatever room actually
+    // exists, i.e. treated as the best tier that fits. This is what
+    // keeps a "best available, not perfect" pick from being silently
+    // downgraded to a bonus support for the PREVIOUS chain instead of
+    // becoming its own chain, which is what happens when required and
+    // remainingAfter mismatch.
+    const canStartNewMain = activeMain === null || remainingAfter >= 1;
+    const required = Math.min(rawRequired, Math.max(remainingAfter, 1));
 
     if (canStartNewMain) {
-      activeMain = { quadrant: entry.quadrant, score: entry.score, required, supplied: 0, index: i };
+      activeMain = { quadrant: entry.quadrant, score: entry.score, required, rawRequired, supplied: 0, index: i };
       perSlot.push({
         index: i, heroId: parsed.heroId, hero, variant: parsed.variant, role: "main",
-        quadrant: entry.quadrant, score: entry.score, required, mainIndex: i, bonus: false,
+        quadrant: entry.quadrant, score: entry.score, required, rawRequired, mainIndex: i, bonus: false,
       });
     } else {
       activeMain.supplied++;
@@ -1372,14 +1384,18 @@ function renderQuickDraft() {
     if (h) {
       const portrait = h.iconData ? `<img src="${h.iconData}">` : "⚔️";
       const roleBadge = info.role === "main"
-        ? `<div class="qd-slot-protect-badge" title="Main pick — ${QD_QUADRANT_LABEL[info.quadrant]}">🔗</div>`
-        : `<div class="qd-slot-protect-badge" title="${info.bonus ? "Bonus support" : "Support"} — ${QD_QUADRANT_LABEL[info.quadrant]}">🛡</div>`;
+        ? `<div class="qd-slot-protect-badge" title="Main pick — ${QD_QUADRANT_LABEL[info.quadrant]}${info.rawRequired > info.required ? ` — needs ${info.rawRequired}, only room for ${info.required}` : ""}">🔗</div>`
+        : `<div class="qd-slot-protect-badge" title="${info.bonus ? "Bonus support" : "Support"} for Slot ${info.mainIndex + 1} — ${QD_QUADRANT_LABEL[info.quadrant]}">🛡</div>`;
       const ghostBadge = info.variant === "ghost" ? `<div class="qd-slot-ghost-badge" title="Drafted as its Ghost build">👻</div>` : "";
+      const supportsForLabel = info.role === "support"
+        ? `<div class="qd-slot-supports-for">↳ Slot ${info.mainIndex + 1}${info.bonus ? " (bonus)" : ""}</div>`
+        : "";
       slot.innerHTML = `
         ${roleBadge}${ghostBadge}
         <div class="qd-slot-portrait">${portrait}</div>
         <div class="qd-slot-name">${h.name || "Unnamed"}</div>
-        <div class="qd-slot-score">${info.score.toFixed(1)}</div>`;
+        <div class="qd-slot-score">${info.score.toFixed(1)}</div>
+        ${supportsForLabel}`;
       slot.title = `Tap to remove ${h.name || "this hero"} from Quick Draft`;
       slot.addEventListener("click", () => removeFromQuickDraft(h.id));
     } else {
@@ -1427,8 +1443,7 @@ function renderQuickDraft() {
 function qdBanProtectHint() {
   if (!qdBanProtectElement) return "";
   const counterEl = QD_ELEMENT_COUNTER[qdBanProtectElement];
-  const avoidEl = Object.keys(QD_ELEMENT_COUNTER).find(k => QD_ELEMENT_COUNTER[k] === qdBanProtectElement);
-  return `🛡 Ban Protect is ${qdBanProtectElement} — remaining picks favor ${counterEl}${avoidEl ? `, avoiding only ${avoidEl} if ${counterEl} isn't available` : ""}.`;
+  return `🛡 Ban Protect is ${qdBanProtectElement} — remaining picks are ranked with ${counterEl} favored first, then other elements, ${qdBanProtectElement}'s own victim last (never excluded outright).`;
 }
 
 /* Rule 4 hint — explains whether the next slot is a required support, a
@@ -1442,7 +1457,7 @@ function qdChainHint(nextIdx) {
       ? `🔗 Leftover slot — offered as a bonus ${QD_QUADRANT_LABEL[req.quadrant]} support (targeting ${cmp} ${req.targetScore.toFixed(1)}, floor ≥ ${req.minScore.toFixed(1)}) for the current chain.`
       : `🔗 This slot needs a ${QD_QUADRANT_LABEL[req.quadrant]} support — targeting score ${cmp} ${req.targetScore.toFixed(1)}, floor ≥ ${req.minScore.toFixed(1)} (combined stats).`;
   }
-  return `🔗 Free to start a new main pick here — its own tier's required supports must fit within the ${req.remainingAfter} slot${req.remainingAfter === 1 ? "" : "s"} left after it.`;
+  return `🔗 Free to start a new main pick here — a hero whose full tier fits within the ${req.remainingAfter} slot${req.remainingAfter === 1 ? "" : "s"} left is favored, but the best available option still anchors a new chain even if its support count has to be capped to fit.`;
 }
 
 function renderQuickDraftSuggestions() {
