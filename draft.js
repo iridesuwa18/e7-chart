@@ -11,9 +11,10 @@
      strengths[], weaknesses[], counters[], strongAgainst[],
      synergies[], note (draft note).
 
-   - localStorage "e7draft_data" → draft-only data:
+   - window.chartDraftData (in-memory only, from app.js) → draft-only data:
      { buffs[], debuffs[], strengths[], weaknesses[],
        roles[], uniqueRoles[], settings:{classIcons,elementIcons} }
+     Populated from GitHub on page load; never persisted to the browser.
 
    SESSION PLAN:
    ✅ Session 1 — Heroes view, hero editor (all draft fields),
@@ -110,16 +111,16 @@ function enrichHero(h) {
   };
 }
 
-/* ── Persistence ── */
+/* ── Persistence ──
+   Draft data now lives only in memory, on window.chartDraftData — app.js
+   populates it from GitHub on page load (and after Save/Load), and this
+   file updates it whenever the Draft panel changes something. Nothing is
+   written to or read from localStorage anymore. */
 function loadDraftData() {
-  try {
-    const raw = localStorage.getItem(DRAFT_STORAGE_KEY);
-    if (raw) return migrateDraftData(raw);
-  } catch {}
-  return freshDraftData();
+  return window.chartDraftData ? migrateDraftData(window.chartDraftData) : freshDraftData();
 }
 function saveDraftData(d) {
-  try { localStorage.setItem(DRAFT_STORAGE_KEY, JSON.stringify(d)); } catch {}
+  window.chartDraftData = d;
 }
 
 /* ── Blank constructors ── */
@@ -128,11 +129,13 @@ const blankSW        = (parentId=null) => ({ id:uid(), name:"", icon:"", linkedB
 const blankRole      = () => ({ id:uid(), name:"", color:"#888888", createdAt:Date.now() });
 const blankUniqueRole= () => ({ id:uid(), name:"", color:"#888888", matchAll:false, linkedBuffs:[], linkedDebuffs:[], linkedStrengths:[], linkedWeaknesses:[], linkedElements:[], createdAt:Date.now() });
 
-/* ── Colour palette ── */
-const PALETTE_KEY = "e7draft_palette";
+/* ── Colour palette ──
+   Session-only now (in-memory module variable) — recently-used colors
+   reset each time the page reloads instead of persisting in the browser. */
 const PALETTE_MAX = 16;
-function loadPalette()  { try { return JSON.parse(localStorage.getItem(PALETTE_KEY)||"[]"); } catch { return []; } }
-function savePalette(c) { try { localStorage.setItem(PALETTE_KEY, JSON.stringify(c)); } catch {} }
+let _recentPalette = [];
+function loadPalette()  { return _recentPalette; }
+function savePalette(c) { _recentPalette = c; }
 function addToPalette(color) {
   if (!color || color==="#888888") return;
   let p = loadPalette().filter(c=>c.toLowerCase()!==color.toLowerCase());
@@ -2858,8 +2861,23 @@ function DraftApp() {
     };
   }, []);
 
-  // Persist draft data whenever it changes
+  // Push draft data changes out to the shared window.chartDraftData bridge
+  // (no browser storage — just keeps app.js's hero-details view in sync).
   useEffect(() => { saveDraftData(draftData); }, [draftData]);
+
+  // Pull in draft data that arrived from outside this component — e.g. the
+  // initial GitHub auto-load (which resolves asynchronously, after this
+  // component has already mounted with whatever was available at the time)
+  // or an explicit Load from the main chart's admin controls.
+  useEffect(() => {
+    function onExternalDraftData() {
+      if (window.chartDraftData && window.chartDraftData !== draftData) {
+        setDraftData(migrateDraftData(window.chartDraftData));
+      }
+    }
+    window.addEventListener("chartDraftDataUpdated", onExternalDraftData);
+    return () => window.removeEventListener("chartDraftDataUpdated", onExternalDraftData);
+  }, [draftData]);
 
   // Save a hero back to the shared chart array
   function handleHeroSave(saved) {

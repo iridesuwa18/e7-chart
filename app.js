@@ -258,8 +258,9 @@ const saveStatus   = document.getElementById("save-status");
    INIT
 ═══════════════════════════════════════ */
 (function init() {
-  loadLocal();
-  loadQuickDraftLocal();
+  // Heroes and Quick Draft state now start empty every page load — GitHub
+  // (via autoLoadFromServer, below) is the only source of truth. Nothing
+  // is read from or written to localStorage anymore.
 
   // Quick Draft "companion mode" — visiting index.html?view=quickdraft
   // (e.g. installed as its own home-screen shortcut on Android) shows
@@ -325,6 +326,28 @@ const saveStatus   = document.getElementById("save-status");
   });
   document.getElementById("btn-save").addEventListener("click", () => openAdminGate("save"));
   document.getElementById("btn-load").addEventListener("click", () => openAdminGate("load"));
+
+  // Import a save file — merges in only heroes you don't already have;
+  // never overwrites or touches any hero already in the current roster.
+  document.getElementById("btn-import").addEventListener("click", () => {
+    if (editSessionUnlocked) triggerImportFilePicker();
+    else openAdminGate("import");
+  });
+  document.getElementById("import-file-input").addEventListener("change", (e) => {
+    const file = e.target.files[0];
+    e.target.value = ""; // reset so picking the same file twice still fires "change"
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = () => {
+      let parsed;
+      try { parsed = JSON.parse(reader.result); }
+      catch { setStatus("❌ That file isn't valid JSON"); return; }
+      const importedHeroes = Array.isArray(parsed) ? parsed : parsed.heroes;
+      importHeroesMergeOnly(importedHeroes);
+    };
+    reader.onerror = () => setStatus("❌ Couldn't read that file");
+    reader.readAsText(file);
+  });
 
   // Quick Draft
   document.getElementById("quickdraft-handle").addEventListener("click", toggleQuickDraftDrawer);
@@ -512,17 +535,12 @@ const saveStatus   = document.getElementById("save-status");
     saveLocal(); renderAll(); renderVisibilityPanel();
   });
 
-  // Icon size control — persisted to localStorage
+  // Icon size control — session-only now (no browser persistence); resets
+  // to the CSS default each time the page loads.
   const iconSizeInput = document.getElementById("vis-icon-size");
-  const savedIconSize = localStorage.getItem("iconSize");
-  if (savedIconSize) {
-    iconSizeInput.value = savedIconSize;
-    document.documentElement.style.setProperty("--icon-size", savedIconSize + "px");
-  }
   iconSizeInput.addEventListener("input", () => {
     const size = Math.max(16, Math.min(80, Number(iconSizeInput.value) || 38));
     document.documentElement.style.setProperty("--icon-size", size + "px");
-    localStorage.setItem("iconSize", size);
   });
   document.getElementById("roster-sort").addEventListener("change", e => {
     rosterSort = e.target.value;
@@ -803,27 +821,12 @@ function rankValue(h) {
    init() — see the comment there for why.
 ═══════════════════════════════════════ */
 
-function saveQuickDraftLocal() {
-  try { localStorage.setItem("e7_quickdraft", JSON.stringify(quickDraft)); } catch { /* ignore */ }
-}
-function loadQuickDraftLocal() {
-  try {
-    const raw = localStorage.getItem("e7_quickdraft");
-    if (raw) {
-      const parsed = JSON.parse(raw);
-      if (Array.isArray(parsed)) {
-        quickDraft = [0,1,2,3,4].map(i => parsed[i] ?? null);
-      }
-    }
-  } catch { /* ignore, keep default empty slots */ }
-  try {
-    const rawBp = localStorage.getItem("e7_qd_ban_protect_element");
-    qdBanProtectElement = rawBp && rawBp !== "null" ? rawBp : null;
-  } catch { /* ignore, keep default null */ }
-}
-function saveQuickDraftModeLocal() {
-  try { localStorage.setItem("e7_qd_ban_protect_element", qdBanProtectElement || "null"); } catch { /* ignore */ }
-}
+// Quick Draft slot picks and Ban Protect element are now pure in-memory,
+// per-tab scratch state — nothing is written to or read from localStorage.
+// They simply reset to empty each time the page loads.
+function saveQuickDraftLocal() { /* no-op — session-only state now */ }
+function loadQuickDraftLocal() { /* no-op — session-only state now */ }
+function saveQuickDraftModeLocal() { /* no-op — session-only state now */ }
 
 /* Reads a hero build's raw axis values into 4 independent stat lanes.
    Only one of spd/tnk is ever non-zero (a hero is plotted as EITHER a
@@ -2664,12 +2667,10 @@ function openHeroDetails(h) {
 }
 
 function renderDetailsDraft(h) {
-  // We need to access draft data. It's stored in localStorage.
-  let dd = { buffs:[], debuffs:[], strengths:[], weaknesses:[], roles:[], uniqueRoles:[] };
-  try {
-    const raw = localStorage.getItem("e7draft_data");
-    if (raw) dd = JSON.parse(raw);
-  } catch {}
+  // Draft data now lives in memory only (window.chartDraftData), populated
+  // from GitHub on page load and kept in sync by the Draft panel — no
+  // localStorage involved.
+  const dd = window.chartDraftData || { buffs:[], debuffs:[], strengths:[], weaknesses:[], roles:[], uniqueRoles:[] };
 
   const dClass   = h.dClass || "KN";
   const dElement = h.dElement || h.element || "fire";
@@ -3426,26 +3427,14 @@ function applyYSlider() {
 }
 
 /* ═══════════════════════════════════════
-   LOCAL STORAGE
+   HEROES CHANGE NOTIFIER
+   (Renamed in spirit from the old localStorage
+   "saveLocal" — GitHub is the only place heroes
+   actually get saved now. This just tells the
+   Draft panel the in-memory roster changed.)
 ═══════════════════════════════════════ */
 function saveLocal() {
-  localStorage.setItem("e7_heroes", JSON.stringify(heroes));
-}
-
-function loadLocal() {
-  try {
-    const raw = localStorage.getItem("e7_heroes");
-    if (raw) heroes = JSON.parse(raw);
-    // Back-compat: convert old x/y to scores
-    heroes = heroes.map(h => {
-      if (h.vType === undefined) {
-        const s = xyToScores(h.x ?? 50, h.y ?? 50);
-        return { ...h, vType: s.vType, vScore: s.vScore, hType: s.hType, hScore: s.hScore };
-      }
-      return h;
-    });
-    heroes = migrateHeroTypes(heroes);
-  } catch { heroes = []; }
+  window.dispatchEvent(new CustomEvent("chartHeroesUpdated"));
 }
 
 /* ═══════════════════════════════════════
@@ -3461,6 +3450,7 @@ function openAdminGate(action) {
     if (action === "save") { saveToServer(cachedPw); return; }
     if (action === "load") { loadFromServer(cachedPw); return; }
     if (action === "add-hero") { editSessionUnlocked = true; openAddModal(); return; }
+    if (action === "import") { editSessionUnlocked = true; triggerImportFilePicker(); return; }
     if (action === "edit-hero") {
       editSessionUnlocked = true;
       if (detailsHeroId !== null) {
@@ -3471,7 +3461,7 @@ function openAdminGate(action) {
     }
   }
 
-  const label = action === "save" ? "save" : action === "load" ? "load" : action === "add-hero" ? "add a hero" : "edit this hero";
+  const label = action === "save" ? "save" : action === "load" ? "load" : action === "add-hero" ? "add a hero" : action === "import" ? "import a save file" : "edit this hero";
   document.getElementById("admin-action-label").textContent = label;
   document.getElementById("admin-password").value = "";
   document.getElementById("admin-error").style.display = "none";
@@ -3490,8 +3480,8 @@ async function onAdminConfirm() {
     showAdminError("Please enter the password.");
     return;
   }
-  // For edit/add actions, verify password via a lightweight server ping
-  if (pendingAdminAction === "edit-hero" || pendingAdminAction === "add-hero") {
+  // For edit/add/import actions, verify password via a lightweight server ping
+  if (pendingAdminAction === "edit-hero" || pendingAdminAction === "add-hero" || pendingAdminAction === "import") {
     // Attempt a lightweight verification
     try {
       const res = await fetch("https://e7-chart.vercel.app/api/load", {
@@ -3525,6 +3515,8 @@ async function onAdminConfirm() {
       }
     } else if (pendingAdminAction === "add-hero") {
       openAddModal();
+    } else if (pendingAdminAction === "import") {
+      triggerImportFilePicker();
     }
     return;
   }
@@ -3551,45 +3543,105 @@ function setStatus(msg, timeout = 4000) {
 }
 
 // Called on every page load for ALL visitors — no password needed.
-// Server data is the source of truth for positions/scores, but local-only
-// fields (altStats) are preserved if the server copy doesn't have them.
+// GitHub is now the ONLY source for heroes and draft data — there is no
+// local copy to merge with anymore, so whatever comes back here simply
+// becomes the app's state.
 async function autoLoadFromServer() {
   try {
     const res = await fetch("https://e7-chart.vercel.app/api/public-load", { method: "GET" });
-    if (!res.ok) return; // silently fail — local data stays
+    if (!res.ok) return; // silently fail — page just stays empty until retried
     const data = await res.json();
-    if (Array.isArray(data.heroes) && data.heroes.length > 0) {
-      // Build a map of local heroes so we can preserve local-only fields
-      const localMap = {};
-      heroes.forEach(h => { localMap[h.id] = h; });
 
-      heroes = data.heroes.map(serverHero => {
-        const local = localMap[serverHero.id];
-        if (!local) return serverHero;
-        // Server is authoritative for all core fields.
-        // Preserve local altStats only if server copy doesn't have it.
-        return {
-          ...serverHero,
-          altStats: serverHero.altStats ?? local.altStats ?? null,
-        };
-      });
-      heroes = migrateHeroTypes(heroes);
-
-      saveLocal();
+    if (Array.isArray(data.heroes)) {
+      heroes = migrateHeroTypes(data.heroes);
+      saveLocal(); // notifies Draft panel, no browser storage involved
       renderAll();
     }
+
+    // Draft-only data (buffs/debuffs/roles/etc) also comes from GitHub now,
+    // instead of localStorage — see window.chartDraftData above.
+    if (data.draftData) {
+      window.chartDraftData = data.draftData;
+    }
   } catch {
-    // Network error — silently fall back to local storage
+    // Network error — page stays empty; user can retry with the Load button
   }
+}
+
+/* ═══════════════════════════════════════
+   IMPORT (merge-only, never overwrites)
+   Lets you pull heroes in from an old export
+   or a downloaded save file without touching
+   anything already in your current roster.
+═══════════════════════════════════════ */
+function triggerImportFilePicker() {
+  document.getElementById("import-file-input").click();
+}
+
+// A hero "already exists" if its id matches OR its name+rarity+role match
+// (case/whitespace-insensitive) — covers re-imports where the id changed
+// (e.g. across two different exports) as well as true duplicates.
+function heroIdentityKey(h) {
+  return [h.name, h.rarity, h.role]
+    .map(v => String(v ?? "").trim().toLowerCase())
+    .join("|");
+}
+
+function importHeroesMergeOnly(importedHeroes) {
+  if (!Array.isArray(importedHeroes)) {
+    setStatus("❌ That file doesn't contain a heroes list");
+    return;
+  }
+
+  const existingIds  = new Set(heroes.map(h => h.id));
+  const existingKeys = new Set(heroes.map(heroIdentityKey));
+
+  const toAdd = [];
+  let skipped = 0;
+
+  importedHeroes.forEach(h => {
+    if (!h || typeof h !== "object") return;
+    const idMatch  = h.id !== undefined && h.id !== null && existingIds.has(h.id);
+    const keyMatch = existingKeys.has(heroIdentityKey(h));
+    if (idMatch || keyMatch) { skipped++; return; }
+
+    // Assign a fresh id if this one is missing or collides with something
+    // already in the roster (or already queued from earlier in this same
+    // file) — never reuse/overwrite an existing hero's id.
+    let id = h.id;
+    if (id === undefined || id === null || existingIds.has(id) || toAdd.some(x => x.id === id)) {
+      id = Date.now() + Math.floor(Math.random() * 1e6);
+    }
+
+    toAdd.push({ ...h, id });
+    existingKeys.add(heroIdentityKey(h)); // guard against dupes within the same file
+  });
+
+  if (toAdd.length === 0) {
+    setStatus(skipped > 0
+      ? `⚠️ Nothing new — all ${skipped} hero${skipped === 1 ? "" : "es"} in that file are already in your roster`
+      : "⚠️ No heroes found in that file");
+    return;
+  }
+
+  heroes = migrateHeroTypes([...heroes, ...toAdd]);
+  saveLocal();
+  renderAll();
+  setStatus(`✅ Imported ${toAdd.length} hero${toAdd.length === 1 ? "" : "es"}` +
+    (skipped ? ` (skipped ${skipped} already in your roster)` : ""));
 }
 
 async function saveToServer(password) {
   setStatus("⏳ Saving…", 0);
   try {
+    // Always include the current draftData too — the server overwrites
+    // whatever's on GitHub with exactly what's sent, so leaving this out
+    // would silently wipe your buffs/debuffs/roles/etc every time you hit
+    // Save from the main chart (rather than from inside the Draft panel).
     const res = await fetch("https://e7-chart.vercel.app/api/save", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ heroes, password }),
+      body: JSON.stringify({ heroes, draftData: window.chartDraftData || null, password }),
     });
     const data = await res.json();
     if (!res.ok) {
@@ -3633,6 +3685,7 @@ async function loadFromServer(password) {
       heroes = migrateHeroTypes(data.heroes);
       saveLocal();
       renderAll();
+      if (data.draftData) window.chartDraftData = data.draftData;
       setStatus("✅ Loaded from GitHub");
     } else {
       setStatus("⚠️ No data found");
@@ -3665,9 +3718,16 @@ Object.defineProperty(window, "chartHeroes", {
   set: (val) => { heroes = val; saveLocal(); renderAll(); },
 });
 
-// Fired by app.js saveLocal — lets Draft know the roster changed
-const _origSaveLocal = saveLocal;
-saveLocal = function () {
-  _origSaveLocal();
-  window.dispatchEvent(new CustomEvent("chartHeroesUpdated"));
-};
+// Let Draft (and app.js's own hero-details panel) read/write the live
+// draft-only data (buffs, debuffs, roles, etc). Populated from GitHub by
+// autoLoadFromServer() below and kept in memory only — never persisted to
+// the browser. The Draft panel calls the setter whenever it changes
+// something so app.js's non-Draft views (e.g. hero details) stay current.
+let _chartDraftData = null;
+Object.defineProperty(window, "chartDraftData", {
+  get: () => _chartDraftData,
+  set: (val) => {
+    _chartDraftData = val;
+    window.dispatchEvent(new CustomEvent("chartDraftDataUpdated"));
+  },
+});
