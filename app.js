@@ -1736,18 +1736,45 @@ function renderQuickDraftSuggestionsInner(nextIdx, listEl, panel) {
     listEl.innerHTML = scored.map((s, rank) => {
       const h = s.hero;
       const portrait = h.iconData ? `<img src="${h.iconData}">` : "⚔️";
-      const topReasons = s.reasons.slice(0, 2).join(" · ");
+      // Warnings float to the front so they survive the 2-reason/1-line
+      // truncation on a mobile-width card — previously a ⚠️ pushed in
+      // after a long "Supports the… target…" explanation could get cut
+      // off entirely, with no way to see the rest on a touch screen
+      // (title= tooltips don't show on tap in mobile Safari/Chrome).
+      const orderedReasons = [...s.reasons].sort(
+        (a, b) => (b.startsWith("⚠️") ? 1 : 0) - (a.startsWith("⚠️") ? 1 : 0)
+      );
+      const topReasons = orderedReasons.slice(0, 2).join(" · ");
       const nameSuffix = s.variant === "ghost" ? " (Ghost)" : "";
       return `
         <div class="qd-suggest-row${rank === 0 ? " best" : ""}" data-id="${s.heroId}" data-variant="${s.variant}">
           <div class="qd-suggest-portrait">${portrait}</div>
           <div class="qd-suggest-info">
             <div class="qd-suggest-name">${rank === 0 ? "👑 " : ""}${h.name || "Unnamed"}${nameSuffix}</div>
-            <div class="qd-suggest-reasons">${topReasons}</div>
+            <div class="qd-suggest-reasons" data-expanded="0">${topReasons}</div>
           </div>
           <div class="qd-suggest-score">${s.score.toFixed(1)}</div>
         </div>`;
     }).join("");
+
+    // Tap the reasons line itself to expand/collapse the full list, without
+    // triggering the row's own click (which adds the hero to the draft).
+    listEl.querySelectorAll(".qd-suggest-reasons").forEach((el, i) => {
+      const s = scored[i];
+      const orderedReasons = [...s.reasons].sort(
+        (a, b) => (b.startsWith("⚠️") ? 1 : 0) - (a.startsWith("⚠️") ? 1 : 0)
+      );
+      const topReasons = orderedReasons.slice(0, 2).join(" · ");
+      el.addEventListener("click", e => {
+        e.stopPropagation();
+        const expanded = el.dataset.expanded === "1";
+        el.dataset.expanded = expanded ? "0" : "1";
+        el.textContent = expanded ? topReasons : s.reasons.join(" · ");
+        el.style.whiteSpace   = expanded ? "" : "normal";
+        el.style.overflow     = expanded ? "" : "visible";
+        el.style.textOverflow = expanded ? "" : "unset";
+      });
+    });
 
     listEl.querySelectorAll(".qd-suggest-row").forEach(row => {
       row.addEventListener("click", () => {
