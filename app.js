@@ -1585,15 +1585,12 @@ function renderQuickDraft() {
     if (h) {
       const portrait = h.iconData ? `<img src="${h.iconData}">` : "⚔️";
       const banProtectSuffix = info.banProtectPick ? (qdBanProtectElement ? " (Ban Protect counter)" : " (best overall — Slot 3)") : "";
-      const dualRole = info.banProtectPick && info.role === "support"; // Slot 3 also anchoring chain 2
       const roleBadge = info.role === "main"
         ? `<div class="qd-slot-protect-badge" title="Main pick${banProtectSuffix} — ${QD_QUADRANT_LABEL[info.quadrant]}${info.rawRequired > info.required ? ` — needs ${info.rawRequired}, only room for ${info.required}` : ""}">🔗</div>`
-        : dualRole
-          ? `<div class="qd-slot-protect-badge" title="${info.bonus ? "Bonus support" : "Support"}${banProtectSuffix} for Slot ${info.mainIndex + 1} — ${QD_QUADRANT_LABEL[info.quadrant]} — AND anchors its own chain 2 for any slots left after Slot 1 is fully supported">🔗🎯</div>`
-          : `<div class="qd-slot-protect-badge" title="${info.bonus ? "Bonus support" : "Support"}${banProtectSuffix} for Slot ${info.mainIndex + 1} — ${QD_QUADRANT_LABEL[info.quadrant]}">${info.banProtectPick ? "🎯" : "🛡"}</div>`;
+        : `<div class="qd-slot-protect-badge" title="${info.bonus ? "Bonus support" : "Support"}${banProtectSuffix} for Slot ${info.mainIndex + 1} — ${QD_QUADRANT_LABEL[info.quadrant]}${info.banProtectPick ? " — also anchors Slot 3's own chain" : ""}">${info.banProtectPick ? "🎯" : "🛡"}</div>`;
       const ghostBadge = info.variant === "ghost" ? `<div class="qd-slot-ghost-badge" title="Drafted as its Ghost build">👻</div>` : "";
       const supportsForLabel = info.role === "support"
-        ? `<div class="qd-slot-supports-for">↳ Slot ${info.mainIndex + 1}${info.bonus ? " (bonus)" : ""}${dualRole ? " + chain 2" : ""}</div>`
+        ? `<div class="qd-slot-supports-for">↳ Slot ${info.mainIndex + 1}${info.bonus ? " (bonus)" : ""}</div>`
         : "";
       slot.innerHTML = `
         ${roleBadge}${ghostBadge}

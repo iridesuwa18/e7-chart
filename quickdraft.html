@@ -856,11 +856,8 @@
         if (!info) return `<div class="qd-mould-slot qd-mould-slot-empty">–</div>`;
         const h = info.hero;
         const portrait = h.iconData ? `<img src="${h.iconData}">` : "⚔️";
-        const dualRole = info.banProtectPick && info.role === "support"; // Slot 3 also anchoring chain 2
-        const badge = info.role === "main"
-          ? "🔗"
-          : dualRole ? "🔗🎯" : (info.banProtectPick ? "🎯" : (info.bonus ? "🛡+" : "🛡"));
-        const title = `${h.name || "Unnamed"} — ${QD_QUADRANT_LABEL[info.quadrant]} — ${info.score.toFixed(1)}${info.role !== "main" ? ` — supports Slot ${info.mainIndex + 1}` : ""}${dualRole ? " — AND anchors its own chain 2" : ""}`;
+        const badge = info.role === "main" ? "🔗" : (info.bonus ? "🛡+" : "🛡");
+        const title = `${h.name || "Unnamed"} — ${QD_QUADRANT_LABEL[info.quadrant]} — ${info.score.toFixed(1)}${info.role !== "main" ? ` — supports Slot ${info.mainIndex + 1}` : ""}`;
         return `
           <div class="qd-mould-slot qd-mould-slot-${info.role}" title="${title}">
             <div class="qd-mould-slot-badge">${badge}</div>
