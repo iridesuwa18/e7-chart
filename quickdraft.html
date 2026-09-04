@@ -806,11 +806,11 @@
           <p class="qd-mould-pane-note">
             Same fixed 1st pick every time —
             <select id="qd-mould-hero-select"></select>
-            — then Autofill for slots 2-5 with each Ban Protect element set.
-            "Before" and "after" your 1st pick look identical on purpose:
-            Ban Protect only changes ranking for whichever slots are still
-            empty when it's set, so it doesn't matter which order it
-            happened in — only that it's known by the time a slot gets filled.
+            — then Autofill for the rest, matching real PvP draft order:
+            going 1st means the enemy's Ban Protect isn't known until your
+            Slot 4, so only Slots 4-5 react to it; going 2nd means it's
+            known by your Slot 3, so Slots 3-5 react. Earlier slots are
+            filled exactly as if no Ban Protect element were set at all.
           </p>
           <div class="qd-mould-grid" id="qd-mould-grid-banprotect"></div>
         </div>
@@ -915,6 +915,33 @@
         }, heroes[0]).id;
       }
 
+      /* Like qdSimulateChain, but the Ban Protect element only starts
+         influencing suggestions once the replay reaches awareFromIdx —
+         slots before that are filled exactly as if no Ban Protect
+         element were set. This models real PvP draft order: your
+         earliest slots get committed before the enemy's Ban Protect is
+         even known, and only the slots you fill after that point can
+         react to it. */
+      function qdSimulateChainStaggered(hero, variant, banProtectEl, awareFromIdx) {
+        const draftArr = [qdMakePickId(hero.id, variant), null, null, null, null];
+        for (let i = 1; i < QD_SIZE; i++) {
+          const activeEl = i >= awareFromIdx ? banProtectEl : null;
+          const suggestions = qdSuggestForSlot(i, draftArr, activeEl);
+          if (!suggestions.length) break;
+          const top = suggestions[0];
+          draftArr[i] = qdMakePickId(top.heroId, top.variant);
+        }
+        return qdReplayDraft(QD_SIZE, draftArr).perSlot;
+      }
+
+      // Real E7 PvP draft order: going 1st leaves your last 2 slots
+      // (Slots 4-5, index 3) open to react once the enemy's Ban Protect
+      // is known; going 2nd leaves your last 3 slots (Slots 3-5, index 2).
+      const BAN_PROTECT_SCENARIOS = [
+        { label: "You go 1st", awareFromIdx: 3 },
+        { label: "You go 2nd", awareFromIdx: 2 },
+      ];
+
       function renderBanProtectGrid() {
         const grid = document.getElementById("qd-mould-grid-banprotect");
         const sel = document.getElementById("qd-mould-hero-select");
@@ -924,9 +951,9 @@
         const entry = qdBestEntryFor(hero);
         let html = "";
         ELEMENTS.forEach(el => {
-          ["Before your 1st pick", "After your 1st pick"].forEach(phase => {
-            const perSlot = qdSimulateChain(hero, entry.variant, el.key);
-            html += mouldCardHtml(`${el.emoji} Ban Protect ${el.key}<br><span class="qd-mould-card-subtitle">${phase}</span>`, perSlot, false);
+          BAN_PROTECT_SCENARIOS.forEach(scenario => {
+            const perSlot = qdSimulateChainStaggered(hero, entry.variant, el.key, scenario.awareFromIdx);
+            html += mouldCardHtml(`${el.emoji} Ban Protect ${el.key}<br><span class="qd-mould-card-subtitle">${scenario.label}</span>`, perSlot, false);
           });
         });
         grid.innerHTML = html;
