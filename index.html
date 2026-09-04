@@ -1,0 +1,803 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <title>Epic Seven — Character Quadrant</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700;900&family=Crimson+Pro:ital,wght@0,300;0,400;0,600;1,400&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="style.css" />
+
+  <!-- PWA / installable-app support -->
+  <link rel="manifest" href="manifest.json" />
+  <meta name="theme-color" content="#04090f" />
+  <link rel="icon" href="icon-192.png" />
+  <link rel="apple-touch-icon" href="icon-192.png" />
+  <meta name="mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="apple-mobile-web-app-title" content="E7 Draft" />
+</head>
+<body>
+
+  <!-- HEADER -->
+  <header>
+    <div class="header-top">
+      <div class="brand">
+        <div class="brand-emblem">✦</div>
+        <div class="brand-text">
+          <h1>EPIC SEVEN</h1>
+          <p>Character Quadrant &amp; Draft</p>
+        </div>
+      </div>
+      <div class="header-actions">
+        <span id="save-status" class="save-status"></span>
+        <!-- Admin-only controls: hidden until unlocked via brand emblem double-click -->
+        <div id="admin-controls" style="display:none;align-items:center;gap:7px;flex-wrap:wrap">
+          <button class="btn btn-ghost btn-sm" id="btn-load">↓ Load</button>
+          <button class="btn btn-gold btn-sm" id="btn-save">↑ Save</button>
+          <button class="btn btn-ghost btn-sm" id="btn-add">＋ Hero</button>
+          <div class="header-sep"></div>
+        </div>
+        <button class="btn btn-draft btn-sm" id="btn-draft-toggle">⚔ Draft</button>
+      </div>
+    </div>
+  </header>
+
+  <!-- MAIN -->
+  <main>
+
+    <!-- CHART AREA -->
+    <div class="chart-column">
+
+      <!-- QUICK DRAFT drawer — hidden above the chart; opening it pushes
+           the chart down since everything here shares normal flow. -->
+      <button class="quickdraft-handle" id="quickdraft-handle" title="Quick Draft">
+        <span class="quickdraft-handle-label">⚔ QUICK DRAFT</span>
+        <span class="quickdraft-handle-sub" id="quickdraft-handle-sub">0/5</span>
+        <span class="quickdraft-handle-chevron" id="quickdraft-chevron">▾</span>
+      </button>
+
+      <div class="quickdraft-drawer" id="quickdraft-drawer">
+        <div class="quickdraft-inner">
+          <div class="quickdraft-slots" id="quickdraft-slots"></div>
+
+          <div class="quickdraft-toolbar">
+            <div class="quickdraft-stats" id="quickdraft-stats"></div>
+            <div class="quickdraft-toolbar-actions">
+              <button class="btn btn-ghost btn-sm" id="btn-quickdraft-random" title="Randomize the first pick, then build around it">🎲 Randomize</button>
+              <button class="btn btn-gold btn-sm" id="btn-quickdraft-suggest">🔮 Suggest</button>
+              <button class="btn btn-gold btn-sm" id="btn-quickdraft-autofill" title="Add the top-suggested pick for the next empty slot">⚡ Autofill</button>
+              <button class="btn btn-ghost btn-sm" id="btn-quickdraft-nextbest" title="Swap the last-filled slot for the next-best option (does not add a new hero)" disabled>⏭ Rep. Curr.</button>
+              <button class="btn btn-ghost btn-xs" id="btn-quickdraft-clear">✕ Clear</button>
+            </div>
+          </div>
+
+          <!-- Rule 1: mark only the opponent's un-bannable "Ban Protect"
+               element. Suggestions lock the remaining picks to whichever
+               element counters it. -->
+          <div class="quickdraft-enemy-elements">
+            <div class="qd-ban-protect-row">
+              <span class="qd-enemy-el-label">🛡 Ban Protect element:</span>
+              <div class="qd-ban-protect-chips" id="qd-ban-protect-chips">
+                <button type="button" class="qd-el-chip qd-el-fire" data-el="Fire" title="Ban-protected character is Fire">🔥</button>
+                <button type="button" class="qd-el-chip qd-el-ice" data-el="Ice" title="Ban-protected character is Ice">❄️</button>
+                <button type="button" class="qd-el-chip qd-el-earth" data-el="Earth" title="Ban-protected character is Earth">🌿</button>
+                <button type="button" class="qd-el-chip qd-el-light" data-el="Light" title="Ban-protected character is Light">☀️</button>
+                <button type="button" class="qd-el-chip qd-el-dark" data-el="Dark" title="Ban-protected character is Dark">🌙</button>
+              </div>
+            </div>
+          </div>
+
+          <div class="quickdraft-suggestions" id="quickdraft-suggestions" style="display:none">
+            <div class="quickdraft-suggestions-title">
+              BEST PICKS <span id="quickdraft-suggest-slot-label"></span>
+            </div>
+            <div class="quickdraft-element-hint" id="quickdraft-element-hint" style="display:none"></div>
+            <div class="quickdraft-suggestions-list" id="quickdraft-suggestions-list"></div>
+          </div>
+        </div>
+      </div>
+
+    <div class="chart-outer">
+
+      <!-- Axis labels -->
+      <div class="axis-label axis-top">SPEED / CR GAIN</div>
+      <div class="axis-label axis-bottom">SLOW / TANKER</div>
+      <div class="axis-label axis-left"><span style="opacity:1">SURVIVABILITY</span><span>Can 1v4</span></div>
+      <div class="axis-label axis-right"><span style="opacity:1">SUSTAINABILITY</span><span>Self-Sustaining</span></div>
+
+      <!-- The chart -->
+      <div class="chart" id="chart">
+        <!-- Visual background (clipped); heroes overflow this -->
+        <div class="chart-bg"></div>
+
+        <!-- Axes -->
+        <div class="axis-h"></div>
+        <div class="axis-v"></div>
+
+        <!-- Arrow heads -->
+        <div class="arr arr-left"></div>
+        <div class="arr arr-right"></div>
+        <div class="arr arr-up"></div>
+        <div class="arr arr-down"></div>
+
+        <!-- Axis scale numbers -->
+        <!-- Vertical axis: 10 near top arrow (SPD), 10 near bottom arrow (TNK) -->
+        <div class="axis-num axis-num-spd">10</div>
+        <div class="axis-num axis-num-tnk">10</div>
+        <!-- Horizontal axis: 10 near left arrow (SUR), 10 near right arrow (SST) -->
+        <div class="axis-num axis-num-sur">10</div>
+        <div class="axis-num axis-num-sst">10</div>
+        <div class="axis-num axis-num-center">0</div>
+
+        <!-- Origin dot — the true (0,0) point. Only clickable in Dot Mode
+             (otherwise hero portraits sitting on top of it would make it
+             too easy to click by accident). Opens the axis-zero legend. -->
+        <div class="origin-dot" id="origin-dot" title="Click to see what 0 means on each axis (Dot Mode only)"></div>
+
+        <!-- Quadrant corner labels -->
+        <div class="quad-label quad-tl">
+          <div class="quad-title" style="color:#4fc3f7">Speed + Survivability</div>
+          <div class="quad-sub">Self-Sufficient Speedster</div>
+        </div>
+        <div class="quad-label quad-tr">
+          <div class="quad-title" style="color:#ffd54f">Speed + Sustainability</div>
+          <div class="quad-sub">Glass Cannon</div>
+        </div>
+        <div class="quad-label quad-bl">
+          <div class="quad-title" style="color:#81c784">Tank + Survivability</div>
+          <div class="quad-sub">Immovable Wall</div>
+        </div>
+        <div class="quad-label quad-br">
+          <div class="quad-title" style="color:#ef9a9a">Slow + Sustainability</div>
+          <div class="quad-sub">Burden Mode</div>
+        </div>
+
+        <!-- Heroes rendered here by JS -->
+
+        <!-- Circle-select ring overlay (Circle Mode) -->
+        <div class="circle-select-ring" id="circle-select-ring" style="display:none;"></div>
+      </div>
+
+      <!-- Chart options bar -->
+      <div class="chart-options-bar">
+        <button id="btn-snap-toggle" class="chart-opt-btn" data-tip="GRID SNAP" title="Grid Snap: OFF">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg>
+        </button>
+        <div class="chart-opt-divider"></div>
+        <button id="btn-visibility-toggle" class="chart-opt-btn" data-tip="SHOW / HIDE">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+        </button>
+        <button id="btn-label-toggle" class="chart-opt-btn" data-tip="LABELS">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+        </button>
+        <button id="btn-spread-toggle" class="chart-opt-btn" data-tip="SPREAD">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="1"/><circle cx="19" cy="5" r="1"/><circle cx="5" cy="19" r="1"/><circle cx="19" cy="19" r="1"/><circle cx="5" cy="5" r="1"/></svg>
+        </button>
+        <button id="btn-focus-toggle" class="chart-opt-btn" data-tip="FOCUS MODE">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
+        </button>
+        <div class="chart-opt-divider"></div>
+        <button id="btn-dot-toggle" class="chart-opt-btn" data-tip="DOT MODE">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor" stroke="none"><circle cx="12" cy="12" r="5"/></svg>
+        </button>
+        <button id="btn-circle-toggle" class="chart-opt-btn" data-tip="CIRCLE SELECT">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="8" stroke-dasharray="3 3"/><circle cx="12" cy="12" r="1.4" fill="currentColor" stroke="none"/></svg>
+        </button>
+        <div class="chart-opt-divider"></div>
+        <button id="btn-capture-chart" class="chart-opt-btn" data-tip="CAPTURE IMAGE">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>
+        </button>
+      </div>
+
+      <!-- Circle-select control panel — appears once a circle is placed -->
+      <div class="circle-control-panel" id="circle-control-panel" style="display:none;">
+        <div class="circle-control-row">
+          <span class="circle-control-label">RADIUS</span>
+          <input type="range" id="circle-radius-input" min="5" max="40" step="1" value="15" />
+          <span class="circle-count-label" id="circle-count-label">0 heroes in range</span>
+        </div>
+        <div class="circle-control-row circle-control-actions">
+          <button class="btn btn-gold btn-sm" id="btn-circle-magnify">🔍 Open Selection</button>
+          <button class="btn btn-ghost btn-sm" id="btn-circle-clear">✕ Clear Circle</button>
+        </div>
+      </div>
+    </div>
+    <!-- /chart-outer -->
+    </div>
+    <!-- /chart-column -->
+
+    <!-- SIDEBAR -->
+    <aside class="sidebar">
+      <div class="side-title">
+        ROSTER
+        <div class="roster-controls">
+          <!-- Sort -->
+          <select id="roster-sort" class="roster-mini-select" title="Sort">
+            <option value="date-desc">Newest</option>
+            <option value="date-asc">Oldest</option>
+            <option value="az">A → Z</option>
+            <option value="za">Z → A</option>
+            <option value="rank-desc">Rank (High → Low)</option>
+            <option value="rank-asc">Rank (Low → High)</option>
+          </select>
+          <!-- Filter button -->
+          <button class="btn btn-ghost btn-xs" id="btn-filter-toggle" title="Filters">⚙ Filter</button>
+        </div>
+      </div>
+
+      <!-- Search -->
+      <div class="roster-search-wrap">
+        <input type="text" id="roster-search" class="roster-search-input" placeholder="Search heroes…" autocomplete="off" />
+        <button class="roster-search-clear" id="roster-search-clear" title="Clear search" style="display:none;">✕</button>
+      </div>
+
+      <!-- Filter panel -->
+      <div class="filter-panel" id="filter-panel" style="display:none">
+        <div class="filter-group">
+          <div class="filter-label">RARITY</div>
+          <div class="filter-chips" id="filter-rarity">
+            <button class="chip active" data-val="5ml">5★ ML</button>
+            <button class="chip active" data-val="5r">5★ Reg</button>
+            <button class="chip active" data-val="4">4★</button>
+            <button class="chip active" data-val="3">3★</button>
+          </div>
+        </div>
+        <div class="filter-group">
+          <div class="filter-label">ROLE</div>
+          <div class="filter-chips" id="filter-role">
+            <button class="chip active" data-val="Warrior">Warrior</button>
+            <button class="chip active" data-val="Knight">Knight</button>
+            <button class="chip active" data-val="Thief">Thief</button>
+            <button class="chip active" data-val="Ranger">Ranger</button>
+            <button class="chip active" data-val="Mage">Mage</button>
+            <button class="chip active" data-val="Soul Weaver">Soul Weaver</button>
+            <button class="chip active" data-val="">— None —</button>
+          </div>
+        </div>
+        <div class="filter-group">
+          <div class="filter-label">ELEMENT</div>
+          <div class="filter-chips" id="filter-element">
+            <button class="chip active" data-val="Fire">🔥 Fire</button>
+            <button class="chip active" data-val="Ice">❄️ Ice</button>
+            <button class="chip active" data-val="Earth">🌿 Earth</button>
+            <button class="chip active" data-val="Light">☀️ Light</button>
+            <button class="chip active" data-val="Dark">💀 Dark</button>
+            <button class="chip active" data-val="">— None —</button>
+          </div>
+        </div>
+      </div>
+
+      <div id="roster-list">
+        <div class="empty-state" id="empty-msg">No heroes yet.<br>Tap ＋ Hero to add one.</div>
+      </div>
+
+      <div class="legend">
+        <div class="legend-title">RARITY</div>
+        <div class="legend-row"><span class="legend-dot" style="background:#e8c84a"></span><span style="color:#e8c84a" class="legend-lbl">5★ Moonlight / Limited</span></div>
+        <div class="legend-row"><span class="legend-dot" style="background:#e8c84a; opacity:0.6"></span><span style="color:#e8c84a; opacity:0.7" class="legend-lbl">5★ Regular</span></div>
+        <div class="legend-row"><span class="legend-dot" style="background:#a88fd4"></span><span style="color:#a88fd4" class="legend-lbl">4★</span></div>
+        <div class="legend-row"><span class="legend-dot" style="background:#7a9aaa"></span><span style="color:#7a9aaa" class="legend-lbl">3★</span></div>
+      </div>
+    </aside>
+  </main>
+
+  <!-- VISIBILITY MODAL -->
+  <div id="visibility-modal-overlay">
+    <div id="visibility-modal">
+      <div id="visibility-modal-header">
+        <span class="vis-modal-title">SHOW / HIDE HEROES</span>
+        <input id="vis-search" placeholder="Search heroes…" />
+        <button id="vis-check-all"   class="vis-btn">Show All</button>
+        <button id="vis-uncheck-all" class="vis-btn">Hide All</button>
+        <label style="display:flex;align-items:center;gap:5px;font-family:'Cinzel',serif;font-size:9px;letter-spacing:.12em;color:var(--text-dim);white-space:nowrap;flex-shrink:0">
+          ICON
+          <input id="vis-icon-size" type="number" min="16" max="80" value="38"
+            style="width:48px;padding:3px 5px;font-size:12px;text-align:center;flex-shrink:0" />
+        </label>
+        <button class="vis-modal-close" id="vis-modal-close">×</button>
+      </div>
+      <!-- Filter bar inside vis modal -->
+      <div id="vis-filter-bar">
+        <div class="vis-filter-group">
+          <span class="vis-filter-label">RARITY</span>
+          <div id="vis-filter-rarity" style="display:flex;gap:4px;flex-wrap:wrap">
+            <button class="vis-chip active" data-val="5ml">5★ ML</button>
+            <button class="vis-chip active" data-val="5r">5★ Reg</button>
+            <button class="vis-chip active" data-val="4">4★</button>
+            <button class="vis-chip active" data-val="3">3★</button>
+          </div>
+        </div>
+        <div class="vis-filter-group">
+          <span class="vis-filter-label">ELEMENT</span>
+          <div id="vis-filter-element" style="display:flex;gap:4px;flex-wrap:wrap">
+            <button class="vis-chip active" data-val="Fire">Fire</button>
+            <button class="vis-chip active" data-val="Ice">Ice</button>
+            <button class="vis-chip active" data-val="Earth">Earth</button>
+            <button class="vis-chip active" data-val="Light">Light</button>
+            <button class="vis-chip active" data-val="Dark">Dark</button>
+            <button class="vis-chip active" data-val="">None</button>
+          </div>
+        </div>
+        <div class="vis-filter-group">
+          <span class="vis-filter-label">ROLE</span>
+          <div id="vis-filter-role" style="display:flex;gap:4px;flex-wrap:wrap">
+            <button class="vis-chip active" data-val="Warrior">Warrior</button>
+            <button class="vis-chip active" data-val="Knight">Knight</button>
+            <button class="vis-chip active" data-val="Thief">Thief</button>
+            <button class="vis-chip active" data-val="Ranger">Ranger</button>
+            <button class="vis-chip active" data-val="Mage">Mage</button>
+            <button class="vis-chip active" data-val="Soul Weaver">S.Weaver</button>
+            <button class="vis-chip active" data-val="">None</button>
+          </div>
+        </div>
+      </div>
+      <div id="vis-list"></div>
+    </div>
+  </div>
+
+  <!-- FOOTER CREDITS -->
+  <footer class="site-footer">
+    <span>Reference: <a href="https://ceciliabot.github.io/#/" target="_blank" rel="noopener">ceciliabot.github.io</a> — Developer of ceciliabot: gio#0898 and Moriyaism.</span>
+    <span>Created by <strong>iridesuwa</strong>, powered by Claude, GitHub &amp; Vercel.</span>
+  </footer>
+
+  <!-- HERO DETAILS MODAL (read-only) -->
+  <div class="overlay" id="details-overlay">
+    <div class="modal details-modal" id="details-modal">
+      <div class="details-modal-header">
+        <div class="modal-title" id="details-title">HERO DETAILS</div>
+        <button class="det-close-btn" id="det-close">×</button>
+      </div>
+
+      <!-- Section 1: Chart Details -->
+      <div class="det-section">
+        <div class="det-section-label">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+          HERO DETAILS <span class="det-section-sub">(Chart)</span>
+        </div>
+        <div id="det-chart-body" class="det-section-body"></div>
+      </div>
+
+      <!-- Section 2: Draft Details -->
+      <div class="det-section">
+        <div class="det-section-label">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+          HERO DETAILS <span class="det-section-sub">(Draft)</span>
+        </div>
+        <div id="det-draft-body" class="det-section-body"></div>
+      </div>
+
+      <!-- Actions -->
+      <div class="det-actions">
+        <button class="btn btn-gold" id="det-edit-btn">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+          Edit Hero
+        </button>
+        <button class="btn btn-ghost" id="det-close-btn2" onclick="closeHeroDetails()">Close</button>
+        <button class="btn btn-danger" id="det-delete-btn" style="margin-left:auto">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg>
+          Delete
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ADD / EDIT MODAL -->
+  <div class="overlay" id="modal-overlay">
+    <div class="modal" id="modal">
+      <div class="modal-title" id="modal-title">ADD HERO</div>
+
+      <div class="form-group">
+        <label>Name</label>
+        <input type="text" id="f-name" placeholder="e.g. Ruele of Light" />
+      </div>
+
+      <div class="form-row">
+        <div class="form-group">
+          <label>Rarity</label>
+          <select id="f-rarity">
+            <option value="5ml">5★ Moonlight / Limited</option>
+            <option value="5r">5★ Regular</option>
+            <option value="4">4★</option>
+            <option value="3">3★</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Role</label>
+          <select id="f-role">
+            <option value="">— None —</option>
+            <option value="Warrior">Warrior</option>
+            <option value="Knight">Knight</option>
+            <option value="Thief">Thief</option>
+            <option value="Ranger">Ranger</option>
+            <option value="Mage">Mage</option>
+            <option value="Soul Weaver">Soul Weaver</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Element</label>
+          <select id="f-element">
+            <option value="">— None —</option>
+            <option value="Fire">🔥 Fire</option>
+            <option value="Ice">❄️ Ice</option>
+            <option value="Earth">🌿 Earth</option>
+            <option value="Light">☀️ Light</option>
+            <option value="Dark">💀 Dark</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- Score inputs -->
+      <div class="form-row">
+        <div class="form-group">
+          <label>Vertical (SPD / TNK)</label>
+          <div class="score-input-group">
+            <select id="f-v-type">
+              <option value="SPD">SPD</option>
+              <option value="TNK">TNK</option>
+            </select>
+            <input type="number" id="f-v-score" min="0" max="10" step="0.1" value="0" placeholder="0.0" />
+          </div>
+          <button type="button" class="stat-info-btn" id="btn-compare-v" title="Compare with heroes near this value">i</button>
+          <button type="button" class="stat-info-btn slider-trigger-btn" id="btn-open-v-slider" title="Open visual vertical slider">⇕</button>
+        </div>
+        <div class="form-group">
+          <label>Horizontal (SUR / SST)</label>
+          <div class="score-input-group">
+            <select id="f-h-type">
+              <option value="SUR">SUR</option>
+              <option value="SST">SST</option>
+            </select>
+            <input type="number" id="f-h-score" min="0" max="10" step="0.1" value="0" placeholder="0.0" />
+          </div>
+          <button type="button" class="stat-info-btn" id="btn-compare-h" title="Compare with heroes near this value">i</button>
+          <button type="button" class="stat-info-btn slider-trigger-btn" id="btn-open-h-slider" title="Open visual horizontal slider">⇔</button>
+        </div>
+      </div>
+
+      <!-- Image icon section (replaces emoji picker) -->
+      <div class="form-group">
+        <label>Icon Image</label>
+        <div class="icon-image-area" id="icon-image-area">
+          <!-- Preview circle -->
+          <div class="icon-preview-wrap">
+            <canvas id="icon-canvas" width="128" height="128" style="width:64px;height:64px;border-radius:50%"></canvas>
+            <div class="icon-preview-label">Preview</div>
+          </div>
+          <!-- Controls -->
+          <div class="icon-image-controls">
+            <button class="btn btn-ghost btn-sm" id="btn-paste-icon" type="button">📋 Paste Image</button>
+            <label class="btn btn-ghost btn-sm" style="cursor:pointer">
+              📁 Upload
+              <input type="file" id="f-icon-file" accept="image/*" style="display:none" />
+            </label>
+            <div class="icon-url-row">
+              <input type="text" id="f-icon-url" placeholder="Or paste image URL…" />
+              <button class="btn btn-ghost btn-sm" id="btn-load-url" type="button">Load</button>
+            </div>
+          </div>
+        </div>
+        <!-- Image editor -->
+        <div class="img-editor-wrap" id="img-editor-wrap" style="display:none">
+          <div class="img-editor-box" id="img-editor-box">
+            <img id="img-editor-src" draggable="false" />
+            <div class="img-editor-circle"></div>
+          </div>
+          <div class="img-editor-controls">
+            <label>Zoom <input type="range" id="img-zoom" min="0.1" max="5" step="0.01" value="1" /></label>
+            <button class="btn btn-gold btn-sm" id="btn-crop-confirm" type="button">✓ Use This</button>
+            <button class="btn btn-ghost btn-sm" id="btn-crop-cancel" type="button">✕ Cancel</button>
+          </div>
+        </div>
+        <input type="hidden" id="f-icon-data" />
+      </div>
+
+      <!-- Secondary / Ghost Stats -->
+      <div class="form-group alt-stats-section">
+        <div class="alt-stats-header">
+          <label style="display:flex;align-items:center;gap:8px;cursor:pointer;user-select:none;font-family:'Cinzel',serif;font-size:10px;letter-spacing:.15em;color:var(--text-dim)">
+            <input type="checkbox" id="f-alt-enabled" style="accent-color:#e040fb;width:14px;height:14px;cursor:pointer"/>
+            <span class="ghost-dot-icon">👻</span>
+            SECONDARY STATS — show ghost icon at alternate position
+          </label>
+        </div>
+        <div id="alt-stats-inputs" style="display:none;margin-top:10px">
+          <div class="form-row">
+            <div class="form-group">
+              <label>Vertical (SPD / TNK)</label>
+              <div class="score-input-group">
+                <select id="f-alt-v-type">
+                  <option value="SPD">SPD</option>
+                  <option value="TNK">TNK</option>
+                </select>
+                <input type="number" id="f-alt-v-score" min="0" max="10" step="0.1" value="0" placeholder="0.0" />
+              </div>
+              <button type="button" class="stat-info-btn slider-trigger-btn ghost-trigger-btn" id="btn-open-alt-v-slider" title="Open visual vertical slider (ghost)">⇕</button>
+            </div>
+            <div class="form-group">
+              <label>Horizontal (SUR / SST)</label>
+              <div class="score-input-group">
+                <select id="f-alt-h-type">
+                  <option value="SUR">SUR</option>
+                  <option value="SST">SST</option>
+                </select>
+                <input type="number" id="f-alt-h-score" min="0" max="10" step="0.1" value="0" placeholder="0.0" />
+              </div>
+              <button type="button" class="stat-info-btn slider-trigger-btn ghost-trigger-btn" id="btn-open-alt-h-slider" title="Open visual horizontal slider (ghost)">⇔</button>
+            </div>
+          </div>
+          <div style="font-size:11px;color:#b060c8;font-style:italic;margin-top:2px;font-family:'Crimson Pro',serif;">
+            Ghost icon will appear magenta &amp; faded at this position on the chart.
+          </div>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label>Notes <span style="color:var(--text-dim);font-size:11px">(optional)</span></label>
+        <textarea id="f-notes" rows="2" placeholder="e.g. Best paired with Seaside Bellona"></textarea>
+      </div>
+
+      <div class="form-group" style="display:flex;align-items:center;gap:10px;padding:6px 0">
+        <label style="display:flex;align-items:center;gap:8px;cursor:pointer;user-select:none;font-family:'Cinzel',serif;font-size:10px;letter-spacing:.15em;color:var(--text-dim)">
+          <input type="checkbox" id="f-locked" style="accent-color:var(--gold);width:14px;height:14px;cursor:pointer"/>
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+          LOCK POSITION — prevents dragging on chart
+        </label>
+      </div>
+
+      <div class="modal-btns">
+        <button class="btn btn-gold" id="modal-confirm">Add to Chart</button>
+        <button class="btn btn-ghost" id="modal-cancel">Cancel</button>
+        <button class="btn btn-danger" id="modal-delete" style="margin-left:auto;display:none">Delete</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- STAT COMPARISON OVERLAY -->
+  <div class="overlay" id="compare-overlay">
+    <div class="modal compare-modal" id="compare-modal">
+      <div class="details-modal-header">
+        <div class="modal-title" id="compare-title" style="margin:0;padding:0;border:none">STAT COMPARISON</div>
+        <button class="det-close-btn" id="compare-close">×</button>
+      </div>
+      <div class="compare-body" id="compare-body"></div>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════════
+       X-AXIS (HORIZONTAL) FULL-SCREEN SLIDER
+       Sets SUR / SST. Drag or tap the rail; portrait
+       rides along the top, description reads out below.
+  ═══════════════════════════════════════ -->
+  <div class="axis-slider-overlay" id="xslider-overlay">
+    <div class="axis-slider-screen axis-slider-x">
+      <div class="axis-slider-header">
+        <div class="axis-slider-title">SURVIVABILITY ⟷ SUSTAINABILITY</div>
+        <span class="ghost-badge" id="xslider-ghost-badge">👻 GHOST</span>
+        <label class="fine-toggle">
+          <input type="checkbox" id="xslider-fine-toggle" />
+          <span class="fine-toggle-track"><span class="fine-toggle-thumb"></span></span>
+          <span class="fine-toggle-label">Fine (0.1)</span>
+        </label>
+        <button class="axis-slider-close" id="xslider-close" title="Close">✕</button>
+      </div>
+
+      <div class="axis-slider-stage">
+        <div class="axis-slider-endlabel">
+          <span class="axis-slider-endname">SURVIVABILITY</span>
+          <span class="axis-slider-endval">10</span>
+        </div>
+
+        <div class="axis-slider-track-wrap">
+          <div class="axis-slider-track" id="xslider-track">
+            <div class="axis-slider-fill" id="xslider-fill"></div>
+            <div class="axis-ticks" id="xslider-ticks"></div>
+            <div class="axis-slider-handle" id="xslider-handle"></div>
+
+            <!-- Neighbor previews: closest hero below/above the current value, riding above the rail -->
+            <div class="axis-neighbor axis-neighbor-x axis-neighbor-below is-hidden" id="xslider-neighbor-below">
+              <div class="axis-neighbor-label" id="xslider-neighbor-below-label"></div>
+              <div class="axis-neighbor-portrait"><canvas id="xslider-neighbor-below-canvas" width="80" height="80"></canvas></div>
+            </div>
+            <div class="axis-neighbor axis-neighbor-x axis-neighbor-above is-hidden" id="xslider-neighbor-above">
+              <div class="axis-neighbor-label" id="xslider-neighbor-above-label"></div>
+              <div class="axis-neighbor-portrait"><canvas id="xslider-neighbor-above-canvas" width="80" height="80"></canvas></div>
+            </div>
+
+            <!-- The hero being set now rides below the rail -->
+            <div class="axis-slider-portrait" id="xslider-portrait">
+              <canvas id="xslider-portrait-canvas" width="128" height="128"></canvas>
+            </div>
+          </div>
+        </div>
+
+        <div class="axis-slider-endlabel">
+          <span class="axis-slider-endname">SUSTAINABILITY</span>
+          <span class="axis-slider-endval">10</span>
+        </div>
+      </div>
+
+      <div class="axis-slider-readout">
+        <div class="axis-slider-readout-num" id="xslider-readout-num">SUR 10</div>
+        <div class="axis-slider-desc" id="xslider-desc">Can survive in a 1v4 without support</div>
+      </div>
+
+      <div class="axis-slider-actions">
+        <button class="btn btn-gold" id="xslider-apply">✓ Set Value</button>
+        <button class="btn btn-ghost" id="xslider-cancel">Cancel</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════════
+       Y-AXIS (VERTICAL) FULL-SCREEN SLIDER
+       Sets SPD / TNK. Drag or tap the rail; portrait +
+       description ride alongside it as it moves up/down.
+  ═══════════════════════════════════════ -->
+  <div class="axis-slider-overlay" id="yslider-overlay">
+    <div class="axis-slider-screen axis-slider-y">
+      <div class="axis-slider-header">
+        <div class="axis-slider-title">SPEED / CR GAIN ⟷ TANKY</div>
+        <span class="ghost-badge" id="yslider-ghost-badge">👻 GHOST</span>
+        <label class="fine-toggle">
+          <input type="checkbox" id="yslider-fine-toggle" />
+          <span class="fine-toggle-track"><span class="fine-toggle-thumb"></span></span>
+          <span class="fine-toggle-label">Fine (0.1)</span>
+        </label>
+        <button class="axis-slider-close" id="yslider-close" title="Close">✕</button>
+      </div>
+
+      <div class="axis-slider-stage-y">
+        <div class="axis-slider-endlabel-y">
+          <span class="axis-slider-endname">SPEED / CR GAIN</span>
+          <span class="axis-slider-endval">10</span>
+        </div>
+
+        <div class="axis-slider-track-wrap-y">
+          <div class="axis-slider-track-y" id="yslider-track">
+            <div class="axis-slider-fill-y" id="yslider-fill"></div>
+            <div class="axis-ticks-y" id="yslider-ticks"></div>
+            <div class="axis-slider-handle-y" id="yslider-handle"></div>
+            <!-- Neighbor previews: closest hero below/above the current value -->
+            <div class="axis-neighbor axis-neighbor-y axis-neighbor-above is-hidden" id="yslider-neighbor-above">
+              <div class="axis-neighbor-portrait"><canvas id="yslider-neighbor-above-canvas" width="80" height="80"></canvas></div>
+              <div class="axis-neighbor-label" id="yslider-neighbor-above-label"></div>
+            </div>
+
+            <div class="axis-slider-side-panel" id="yslider-side-panel">
+              <div class="axis-slider-portrait" id="yslider-portrait">
+                <canvas id="yslider-portrait-canvas" width="128" height="128"></canvas>
+              </div>
+              <div class="axis-slider-side-text">
+                <div class="axis-slider-readout-num" id="yslider-readout-num">SPD 10</div>
+                <div class="axis-slider-desc" id="yslider-desc">Can gain 3 turns effectively.</div>
+              </div>
+            </div>
+
+            <div class="axis-neighbor axis-neighbor-y axis-neighbor-below is-hidden" id="yslider-neighbor-below">
+              <div class="axis-neighbor-portrait"><canvas id="yslider-neighbor-below-canvas" width="80" height="80"></canvas></div>
+              <div class="axis-neighbor-label" id="yslider-neighbor-below-label"></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="axis-slider-endlabel-y">
+          <span class="axis-slider-endname">TANKY</span>
+          <span class="axis-slider-endval">10</span>
+        </div>
+      </div>
+
+      <div class="axis-slider-actions">
+        <button class="btn btn-gold" id="yslider-apply">✓ Set Value</button>
+        <button class="btn btn-ghost" id="yslider-cancel">Cancel</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- CIRCLE-SELECT MAGNIFIER (fullscreen mini-grid of the selected area) -->
+  <div id="magnifier-overlay">
+    <div id="magnifier-modal">
+      <div id="magnifier-header">
+        <div class="magnifier-title">🔍 SELECTION AREA</div>
+        <div class="magnifier-sub" id="magnifier-count-label"></div>
+        <button class="vis-modal-close" id="magnifier-close">✕</button>
+      </div>
+      <div id="magnifier-body">
+        <div class="magnifier-grid-wrap">
+          <div class="magnifier-grid" id="magnifier-grid">
+            <div class="magnifier-grid-bg"></div>
+            <div class="magnifier-crosshair-h"></div>
+            <div class="magnifier-crosshair-v"></div>
+          </div>
+        </div>
+        <div class="magnifier-sidebar">
+          <div class="magnifier-filter-bar" id="magnifier-filter-bar"></div>
+          <div class="magnifier-list" id="magnifier-list"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ORIGIN LEGEND (plus-sign popup) — what "0" means on each axis.
+       Opened by clicking the origin dot at chart center, Dot Mode only. -->
+  <div class="overlay" id="origin-legend-overlay">
+    <div class="modal origin-legend-modal" id="origin-legend-modal">
+      <div class="details-modal-header">
+        <div class="modal-title" style="margin:0;padding:0;border:none">AT ZERO, EACH AXIS MEANS…</div>
+        <button class="det-close-btn" id="origin-legend-close">×</button>
+      </div>
+      <div class="origin-legend-plus">
+        <div class="origin-legend-circle origin-legend-top">
+          <span>Lacks<br>Speed</span>
+        </div>
+        <div class="origin-legend-circle origin-legend-left">
+          <span>Requires<br>Support</span>
+        </div>
+        <div class="origin-legend-circle origin-legend-center">0</div>
+        <div class="origin-legend-circle origin-legend-right">
+          <span>Cannot<br>Sustain</span>
+        </div>
+        <div class="origin-legend-circle origin-legend-bottom">
+          <span>Less<br>Tanky</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ADMIN PASSWORD MODAL -->
+  <div class="overlay" id="admin-overlay">
+    <div class="modal" id="admin-modal">
+      <div class="modal-title">ADMIN ONLY</div>
+      <p class="admin-desc">Please enter the GitHub Key password to <span id="admin-action-label">save</span>.</p>
+      <div class="form-group" style="margin-top:14px">
+        <label>Password</label>
+        <input type="text" id="admin-password" placeholder="Enter admin key…" autocomplete="off" spellcheck="false" style="-webkit-text-security:disc;text-security:disc" />
+      </div>
+      <div id="admin-error" class="admin-error" style="display:none"></div>
+      <div class="modal-btns">
+        <button class="btn btn-gold" id="admin-confirm">Confirm</button>
+        <button class="btn btn-ghost" id="admin-cancel">Cancel</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+  <script src="app.js"></script>
+
+  <!-- ═══ DRAFT PANEL ═══ -->
+  <div id="draft-panel" class="draft-panel" style="display:none">
+    <div id="draft-root"></div>
+  </div>
+
+  <!-- React + Babel (for Draft panel) -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/react/18.2.0/umd/react.production.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.2.0/umd/react-dom.production.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/babel-standalone/7.23.2/babel.min.js"></script>
+  <script type="text/babel" data-presets="react" src="draft.js"></script>
+
+  <!-- PWA service worker registration.
+       Whenever the app becomes visible again, ask the SW to check for an
+       update; if a new SW takes control, reload once to pick up the fresh
+       code automatically (covers home-screen shortcuts that get resumed
+       rather than freshly navigated). -->
+  <script>
+    if ("serviceWorker" in navigator) {
+      let reloadedForUpdate = false;
+      window.addEventListener("load", () => {
+        navigator.serviceWorker.register("sw.js").then(reg => {
+          navigator.serviceWorker.addEventListener("controllerchange", () => {
+            if (reloadedForUpdate) return;
+            reloadedForUpdate = true;
+            location.reload();
+          });
+          document.addEventListener("visibilitychange", () => {
+            if (document.visibilityState === "visible") reg.update().catch(() => {});
+          });
+        }).catch(() => { /* offline-support is best-effort */ });
+      });
+    }
+  </script>
+</body>
+</html>
