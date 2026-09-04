@@ -757,13 +757,31 @@ function avgScore(vScore, hScore) {
   return +((v + h) / 2).toFixed(1);
 }
 
+/* A hero's own vType/vScore/hType/hScore, clamped/formatted the same
+   way xyToScores() used to hand back — but read straight off the hero
+   object instead of round-tripping through h._x/h._y. Those chart
+   coordinates are only (re)computed inside renderChart(), and only for
+   heroes that aren't currently hidden (see the `if (h.hidden) return;`
+   guard there), so anything reading scores via h._x/h._y showed STALE
+   values after an edit for any hero hidden from the chart — the edit
+   modal writes the new vScore/hScore straight onto the hero, but
+   nothing ever refreshed _x/_y for it since renderChart() skips it. */
+function heroScores(h) {
+  return {
+    vType: h.vType || "SPD",
+    vScore: +Math.max(0, Math.min(10, Number(h.vScore) || 0)).toFixed(1),
+    hType: h.hType || "SUR",
+    hScore: +Math.max(0, Math.min(10, Number(h.hScore) || 0)).toFixed(1),
+  };
+}
+
 /* Ranking value used by the "Rank" roster sort options.
    If the hero has a ghost (altStats), rank by the Total Avg
    (primary + ghost scores averaged across all 4 axes) — matching the
    "Total Avg" badge shown in the roster card.
    Otherwise, fall back to the hero's regular Avg score. */
 function rankValue(h) {
-  const scores = xyToScores(h._x ?? 50, h._y ?? 50);
+  const scores = heroScores(h);
   if (h.altStats) {
     return +((Number(h.vScore || 0) + Number(h.hScore || 0) + Number(h.altStats.vScore) + Number(h.altStats.hScore)) / 4).toFixed(1);
   }
@@ -2235,7 +2253,7 @@ function renderMagnifierList(filtered) {
 
   filtered.forEach(h => {
     const meta   = RARITY_META[h.rarity] || RARITY_META["5r"];
-    const scores = xyToScores(h._x ?? 50, h._y ?? 50);
+    const scores = heroScores(h);
     const avg    = avgScore(scores.vScore, scores.hScore);
 
     const iconHTML = h.iconData
@@ -2299,7 +2317,7 @@ function renderRoster() {
 
   list.forEach(h => {
     const meta = RARITY_META[h.rarity] || RARITY_META["5r"];
-    const scores = xyToScores(h._x ?? 50, h._y ?? 50);
+    const scores = heroScores(h);
     const avg    = avgScore(scores.vScore, scores.hScore);
 
     const card = document.createElement("div");
