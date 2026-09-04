@@ -169,6 +169,19 @@ const QD_ELEMENT_COUNTER = { Fire: "Ice", Ice: "Earth", Earth: "Fire", Light: "D
    treated as a single, one-build-only entry when picked as a MAIN (see
    Rule 5). See qdSupportQuadrants / qdSupportScore / qdSlotRequirement.
 
+   Rule 3b (weak-axis tie-break) — the opposite-quadrant requirement
+   above is still a hard filter, never loosened. But when two support
+   candidates in that quadrant would show the same score (within 0.05,
+   i.e. after rounding to the UI's 1 decimal), the tie is broken by
+   which axis the WHOLE TEAM's raw stats (every hero drafted so far, on
+   whichever build/quadrant they're actually filling) are lower on: a
+   quadrant is 2 axes (e.g. BR = TNK + SST), and whichever of those 2
+   the team's running total is behind on gets the edge — the candidate
+   contributing more to that specific axis wins the tie. This never
+   overrides a genuine score difference and never picks a hero outside
+   the required quadrant. See qdTeamAxisTotals / qdWeakAxisInfo /
+   qdRawStatsForQuadrant.
+
    Rule 4 (chain filling) — slots fill left→right as a sequence of
    main+supports chains: pick a main, fill its required supports, then
    (if room remains) start a new main from a different quadrant, and so
@@ -920,6 +933,57 @@ function qdSupportScore(h, quadrant) {
   return avgScore(h.vScore, h.hScore);
 }
 
+/* Rule 3b — which two raw axes a quadrant is made of (its vType +
+   hType), used for the "team's weakest axis" support tie-break below. */
+function qdAxisFromQuadrant(quadrant) {
+  return {
+    vAxis: (quadrant === "TL" || quadrant === "TR") ? "spd" : "tnk",
+    hAxis: (quadrant === "TL" || quadrant === "BL") ? "sur" : "sst",
+  };
+}
+
+/* Rule 3b — a hero's raw (unblended) v/h stats for whichever build of
+   theirs actually sits in `quadrant`, mirroring qdSupportScore's
+   build-matching (same build wins when both match) but returning the
+   two raw numbers instead of one blended average — needed to compare
+   against a single team axis total rather than a combined score. */
+function qdRawStatsForQuadrant(h, quadrant) {
+  const cands = [];
+  if (qdQuadrantOf(h.vType, h.hType) === quadrant) {
+    cands.push({ vScore: Number(h.vScore) || 0, hScore: Number(h.hScore) || 0, avg: avgScore(h.vScore, h.hScore) });
+  }
+  if (h.altStats && qdQuadrantOf(h.altStats.vType, h.altStats.hType) === quadrant) {
+    cands.push({ vScore: Number(h.altStats.vScore) || 0, hScore: Number(h.altStats.hScore) || 0, avg: avgScore(h.altStats.vScore, h.altStats.hScore) });
+  }
+  if (cands.length) return cands.reduce((best, c) => (!best || c.avg > best.avg) ? c : best, null);
+  // Fallback (quadrant matches neither build — shouldn't normally happen
+  // once a hero has passed the quadrant filter): use primary raw stats.
+  return { vScore: Number(h.vScore) || 0, hScore: Number(h.hScore) || 0, avg: avgScore(h.vScore, h.hScore) };
+}
+
+/* Rule 3b (tie-break) — sums the team's raw SPD/TNK/SUR/SST totals from
+   every hero already drafted (slots [0, nextIdx)), using whichever
+   build each pick actually occupies (its role's quadrant, from the
+   chain replay). Deliberately NOT a filter or a primary ranking driver
+   — Rule 3's "must be the main's opposite quadrant" stays a hard
+   requirement (see qdSuggestForSlot). It only breaks near-ties between
+   same-quadrant support candidates: whichever of that quadrant's two
+   axes the team is currently lower on gets a slight edge — e.g. between
+   two BR (Tanky+Sustain) candidates scoring about the same, the one
+   contributing more TNK is favored if the team's TNK total so far is
+   behind its SST total, or vice-versa. */
+function qdTeamAxisTotals(nextIdx, draftArr) {
+  const { perSlot } = qdReplayDraft(nextIdx, draftArr);
+  const totals = { spd: 0, tnk: 0, sur: 0, sst: 0 };
+  perSlot.forEach(p => {
+    const raw = qdRawStatsForQuadrant(p.hero, p.quadrant);
+    const { vAxis, hAxis } = qdAxisFromQuadrant(p.quadrant);
+    totals[vAxis] += raw.vScore;
+    totals[hAxis] += raw.hScore;
+  });
+  return totals;
+}
+
 /* Encodes a slot's pick as a single storable value. Ghost mains get a
    "::ghost" suffix so they survive localStorage round-trips; everything
    else (primary mains, and ALL supports — variant is irrelevant for a
@@ -1034,16 +1098,30 @@ function qdReplayDraft(uptoIdx, draftArr) {
      { type: "main", remainingAfter, activeMain }
        — free to start a new chain; remainingAfter is how many slots
          are left AFTER this one, which caps which tiers can start here. */
+/* Rule 3b — for a support slot, figures out which of its required
+   quadrant's two axes the team is currently weaker on (from every
+   already-drafted hero's raw stats), so qdSuggestForSlot can use it as
+   a tie-break. Doesn't touch minScore/targetScore/quadrant at all —
+   those stay exactly as before. */
+function qdWeakAxisInfo(quadrant, nextIdx, draftArr) {
+  const totals = qdTeamAxisTotals(nextIdx, draftArr);
+  const { vAxis, hAxis } = qdAxisFromQuadrant(quadrant);
+  const weakAxis = totals[vAxis] <= totals[hAxis] ? vAxis : hAxis;
+  return { vAxis, hAxis, weakAxis, totals };
+}
+
 function qdSlotRequirement(nextIdx, draftArr) {
   const { activeMain } = qdReplayDraft(nextIdx, draftArr);
   if (activeMain && activeMain.supplied < activeMain.required) {
     const t = qdSupportTargetInfo(activeMain.score);
-    return { type: "support", quadrant: QD_OPPOSITE_QUADRANT[activeMain.quadrant], minScore: activeMain.score, targetScore: Math.min(10, activeMain.score * t.multiplier), targetStrict: t.strict, main: activeMain, bonus: false };
+    const quadrant = QD_OPPOSITE_QUADRANT[activeMain.quadrant];
+    return { type: "support", quadrant, minScore: activeMain.score, targetScore: Math.min(10, activeMain.score * t.multiplier), targetStrict: t.strict, main: activeMain, bonus: false, axisInfo: qdWeakAxisInfo(quadrant, nextIdx, draftArr) };
   }
   const remainingAfter = QD_SIZE - (nextIdx + 1);
   if (activeMain && remainingAfter <= 0) {
     const t = qdSupportTargetInfo(activeMain.score);
-    return { type: "support", quadrant: QD_OPPOSITE_QUADRANT[activeMain.quadrant], minScore: activeMain.score, targetScore: Math.min(10, activeMain.score * t.multiplier), targetStrict: t.strict, main: activeMain, bonus: true };
+    const quadrant = QD_OPPOSITE_QUADRANT[activeMain.quadrant];
+    return { type: "support", quadrant, minScore: activeMain.score, targetScore: Math.min(10, activeMain.score * t.multiplier), targetStrict: t.strict, main: activeMain, bonus: true, axisInfo: qdWeakAxisInfo(quadrant, nextIdx, draftArr) };
   }
   return { type: "main", remainingAfter, activeMain };
 }
@@ -1069,6 +1147,12 @@ function qdScoreEntry(e, req) {
     if (!meetsTarget && meetsFloor) reasons.push("Doesn't clear the target — showing the best available above the plain floor");
     if (!meetsFloor) reasons.push(`⚠️ Below the required ${req.minScore.toFixed(1)} — showing the closest option left`);
     if (req.bonus) reasons.push("Bonus support — filling a leftover slot after the required count was already met");
+    // Rule 3b — near-tie note: quadrant stays a hard requirement, this
+    // only nudges between candidates who'd otherwise score about the same.
+    if (req.axisInfo) {
+      const AXIS_LABEL = { spd: "SPD", tnk: "TNK", sur: "SUR", sst: "SST" };
+      reasons.push(`Team so far: ${AXIS_LABEL[req.axisInfo.vAxis]} ${req.axisInfo.totals[req.axisInfo.vAxis].toFixed(1)} vs ${AXIS_LABEL[req.axisInfo.hAxis]} ${req.axisInfo.totals[req.axisInfo.hAxis].toFixed(1)} — ${AXIS_LABEL[req.axisInfo.weakAxis]} currently lower, tie-break favors it`);
+    }
   } else {
     rank = e.score;
     reasons.push(`${QD_QUADRANT_LABEL[e.quadrant]} pick${e.variant === "ghost" ? " (Ghost build)" : ""} — needs ${e.supportsNeeded} support${e.supportsNeeded > 1 ? "s" : ""} from the ${QD_QUADRANT_LABEL[QD_OPPOSITE_QUADRANT[e.quadrant]]} side`);
@@ -1132,9 +1216,13 @@ function qdSuggestForSlot(nextIdx, draftArr, banProtectEl) {
       const meetsFloor = score >= req.minScore;
       const scoreBucket = meetsTarget ? 0 : meetsFloor ? 1 : 2;
       const elBucket = qdElementBucket(h, counterEl, avoidEl);
+      // Rule 3b — tie-break only (quadrant match above is still the hard
+      // requirement): whichever of this quadrant's 2 axes the team is
+      // currently lower on, prefer the candidate stronger on that axis.
+      const axisTieScore = req.axisInfo ? qdRawStatsForQuadrant(h, req.quadrant)[req.axisInfo.weakAxis === req.axisInfo.vAxis ? "vScore" : "hScore"] : 0;
       return {
         heroId: h.id, hero: h, variant: "primary", isSupport: true, quadrant: req.quadrant, score,
-        _bucket: elBucket * 3 + scoreBucket, _elNote: elNoteFor(elBucket),
+        _bucket: elBucket * 3 + scoreBucket, _elNote: elNoteFor(elBucket), _axisTieScore: axisTieScore,
       };
     });
   } else {
@@ -1188,7 +1276,16 @@ function qdSuggestForSlot(nextIdx, draftArr, banProtectEl) {
   }
 
   const scored = entries.map(e => qdScoreEntry(e, req));
-  scored.sort((a, b) => a._bucket - b._bucket || b.rank - a.rank);
+  // Rule 3b — the axis tie-break only kicks in when two candidates are
+  // within 0.05 of each other in rank (i.e. would show the same score
+  // once rounded to 1 decimal in the UI) — a clear score difference
+  // always wins on its own, same as before.
+  scored.sort((a, b) => {
+    if (a._bucket !== b._bucket) return a._bucket - b._bucket;
+    const rankDiff = b.rank - a.rank;
+    if (Math.abs(rankDiff) > 0.05) return rankDiff;
+    return (b._axisTieScore || 0) - (a._axisTieScore || 0);
+  });
   return scored;
 }
 
