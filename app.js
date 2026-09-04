@@ -183,6 +183,16 @@ const QD_ELEMENT_COUNTER = { Fire: "Ice", Ice: "Earth", Earth: "Fire", Light: "D
    Ban Protect counter naturally lands if it hasn't found a home yet.
    See qdReplayDraft / qdSlotRequirement.
 
+   Rule 4b (quadrant pairs) — there are only 4 quadrants, split into 2
+   fixed opposite pairs (TL↔BR, TR↔BL). A chain's main claims one
+   quadrant and its supports claim the opposite one, so a completed
+   chain always uses up a whole pair. A second main can't be started in
+   a quadrant that's part of an already-used pair — it has to come from
+   the other pair entirely, since that pair's opposite side is already
+   spoken for. Hard requirement, with the usual graceful fallback (allow
+   it anyway) only if literally no candidate exists outside the used
+   pair(s). See qdReplayDraft's usedQuadrants / qdSuggestForSlot.
+
    Rule 5 (Ghosts as standalone picks) — a hero with a Ghost (altStats)
    build can be drafted as a MAIN using either its primary or its Ghost
    build specifically — each is offered as its own suggestion entry,
@@ -946,11 +956,21 @@ function qdHeroInDraft(heroId) {
      activeMain  — the still-open chain's state at the end of the
                    replay ({ quadrant, score, required, supplied, index })
                    or null if there's no chain in progress. */
-function qdReplayDraft(uptoIdx) {
+function qdReplayDraft(uptoIdx, draftArr) {
+  draftArr = draftArr || quickDraft;
   const perSlot = [];
   let activeMain = null;
+  // Rule 4b — quadrant PAIRS, not just quadrants. There are only 4
+  // quadrants split into 2 opposite pairs (TL↔BR, TR↔BL). A chain's
+  // main claims one quadrant and its supports claim the opposite one,
+  // so together a chain always uses up a whole pair. A second chain's
+  // main must come from the OTHER pair entirely — reusing either
+  // quadrant from an already-used pair doesn't make sense, since that
+  // pair's "supporting side" is already spoken for. Tracked here as we
+  // walk the draft so canStartNewMain can check it below.
+  const usedQuadrants = new Set();
   for (let i = 0; i < uptoIdx; i++) {
-    const raw = quickDraft[i];
+    const raw = draftArr[i];
     if (raw === null || raw === undefined) continue;
     const parsed = qdParsePick(raw);
     const hero = heroes.find(h => h.id === parsed.heroId);
@@ -958,9 +978,11 @@ function qdReplayDraft(uptoIdx) {
 
     if (activeMain && activeMain.supplied < activeMain.required) {
       activeMain.supplied++;
+      const q = QD_OPPOSITE_QUADRANT[activeMain.quadrant];
+      usedQuadrants.add(q);
       perSlot.push({
         index: i, heroId: parsed.heroId, hero, variant: parsed.variant, role: "support",
-        quadrant: QD_OPPOSITE_QUADRANT[activeMain.quadrant], score: qdSupportScore(hero, QD_OPPOSITE_QUADRANT[activeMain.quadrant]),
+        quadrant: q, score: qdSupportScore(hero, q),
         mainIndex: activeMain.index, bonus: false,
       });
       continue;
@@ -979,21 +1001,25 @@ function qdReplayDraft(uptoIdx) {
     // keeps a "best available, not perfect" pick from being silently
     // downgraded to a bonus support for the PREVIOUS chain instead of
     // becoming its own chain, which is what happens when required and
-    // remainingAfter mismatch.
-    const canStartNewMain = activeMain === null || remainingAfter >= 1;
+    // remainingAfter mismatch. It also can't start a new chain in a
+    // quadrant pair that's already in use (see usedQuadrants above).
+    const canStartNewMain = (activeMain === null || remainingAfter >= 1) && !usedQuadrants.has(entry.quadrant);
     const required = Math.min(rawRequired, Math.max(remainingAfter, 1));
 
     if (canStartNewMain) {
       activeMain = { quadrant: entry.quadrant, score: entry.score, required, rawRequired, supplied: 0, index: i };
+      usedQuadrants.add(entry.quadrant);
       perSlot.push({
         index: i, heroId: parsed.heroId, hero, variant: parsed.variant, role: "main",
         quadrant: entry.quadrant, score: entry.score, required, rawRequired, mainIndex: i, bonus: false,
       });
     } else {
       activeMain.supplied++;
+      const q = QD_OPPOSITE_QUADRANT[activeMain.quadrant];
+      usedQuadrants.add(q);
       perSlot.push({
         index: i, heroId: parsed.heroId, hero, variant: parsed.variant, role: "support",
-        quadrant: QD_OPPOSITE_QUADRANT[activeMain.quadrant], score: qdSupportScore(hero, QD_OPPOSITE_QUADRANT[activeMain.quadrant]),
+        quadrant: q, score: qdSupportScore(hero, q),
         mainIndex: activeMain.index, bonus: true,
       });
     }
@@ -1008,8 +1034,8 @@ function qdReplayDraft(uptoIdx) {
      { type: "main", remainingAfter, activeMain }
        — free to start a new chain; remainingAfter is how many slots
          are left AFTER this one, which caps which tiers can start here. */
-function qdSlotRequirement(nextIdx) {
-  const { activeMain } = qdReplayDraft(nextIdx);
+function qdSlotRequirement(nextIdx, draftArr) {
+  const { activeMain } = qdReplayDraft(nextIdx, draftArr);
   if (activeMain && activeMain.supplied < activeMain.required) {
     const t = qdSupportTargetInfo(activeMain.score);
     return { type: "support", quadrant: QD_OPPOSITE_QUADRANT[activeMain.quadrant], minScore: activeMain.score, targetScore: Math.min(10, activeMain.score * t.multiplier), targetStrict: t.strict, main: activeMain, bonus: false };
@@ -1069,20 +1095,22 @@ function qdElementBucket(hero, counterEl, avoidEl) {
   return 1;
 }
 
-function qdSuggestForSlot(nextIdx) {
+function qdSuggestForSlot(nextIdx, draftArr, banProtectEl) {
+  draftArr = draftArr || quickDraft;
+  banProtectEl = banProtectEl === undefined ? qdBanProtectElement : banProtectEl;
   if (nextIdx === -1 || nextIdx == null) return [];
   const usedHeroIds = new Set(
-    quickDraft.filter((raw, i) => raw !== null && i !== nextIdx).map(raw => qdParsePick(raw).heroId)
+    draftArr.filter((raw, i) => raw !== null && i !== nextIdx).map(raw => qdParsePick(raw).heroId)
   );
   const candidateHeroes = heroes.filter(h => !usedHeroIds.has(h.id));
-  const req = qdSlotRequirement(nextIdx);
+  const req = qdSlotRequirement(nextIdx, draftArr);
 
-  const counterEl = qdBanProtectElement ? QD_ELEMENT_COUNTER[qdBanProtectElement] : null;
-  const avoidEl = qdBanProtectElement ? Object.keys(QD_ELEMENT_COUNTER).find(k => QD_ELEMENT_COUNTER[k] === qdBanProtectElement) : null;
+  const counterEl = banProtectEl ? QD_ELEMENT_COUNTER[banProtectEl] : null;
+  const avoidEl = banProtectEl ? Object.keys(QD_ELEMENT_COUNTER).find(k => QD_ELEMENT_COUNTER[k] === banProtectEl) : null;
   const elNoteFor = bucket => {
-    if (!qdBanProtectElement) return null;
-    if (bucket === 0) return `⚔️ Counters the enemy's ${qdBanProtectElement} Ban Protect`;
-    if (bucket === 2) return `⚠️ Same element the enemy's ${qdBanProtectElement} Ban Protect already beats`;
+    if (!banProtectEl) return null;
+    if (bucket === 0) return `⚔️ Counters the enemy's ${banProtectEl} Ban Protect`;
+    if (bucket === 2) return `⚠️ Same element the enemy's ${banProtectEl} Ban Protect already beats`;
     return null;
   };
 
@@ -1119,24 +1147,39 @@ function qdSuggestForSlot(nextIdx) {
     // above — so a high-score chain with a tight remainingAfter no
     // longer collapses the whole list down to 1-2 names.
     let lockedQuadrant = null;
-    const currentRaw = quickDraft[nextIdx];
+    const currentRaw = draftArr[nextIdx];
     if (currentRaw !== null && currentRaw !== undefined) {
       const curParsed = qdParsePick(currentRaw);
       const curHero = heroes.find(h => h.id === curParsed.heroId);
       if (curHero) lockedQuadrant = qdBuildEntry(curHero, curParsed.variant).quadrant;
     }
-    const buildEntries = quadrantFilter => {
+    // Rule 4b — a fresh main can't start in a quadrant pair a previous
+    // chain already claimed (see qdReplayDraft). Only matters for a
+    // brand-new pick, not a Rep. Curr. re-suggestion (lockedQuadrant is
+    // already scoped correctly by definition there).
+    const usedQuadrants = lockedQuadrant ? null : new Set(qdReplayDraft(nextIdx, draftArr).perSlot.map(p => p.quadrant));
+    const buildEntries = (quadrantFilter, excludeUsedPair) => {
       const out = [];
       candidateHeroes.forEach(h => {
         qdMainEntriesFor(h).forEach(build => {
           if (quadrantFilter && build.quadrant !== quadrantFilter) return;
+          if (excludeUsedPair && usedQuadrants.has(build.quadrant)) return;
           out.push({ ...build, isSupport: false, supportsNeeded: qdSupportsRequired(build.score) });
         });
       });
       return out;
     };
-    let pool = lockedQuadrant ? buildEntries(lockedQuadrant) : buildEntries(null);
-    if (pool.length === 0 && lockedQuadrant) pool = buildEntries(null); // graceful: nobody left in the locked quadrant
+    let pool;
+    if (lockedQuadrant) {
+      pool = buildEntries(lockedQuadrant, false);
+    } else {
+      pool = buildEntries(null, true);
+      // Graceful fallback: if literally nobody's left outside the
+      // already-used pair(s), allow it rather than showing nothing —
+      // same philosophy as every other fallback in this function.
+      if (pool.length === 0) pool = buildEntries(null, false);
+    }
+    if (pool.length === 0 && lockedQuadrant) pool = buildEntries(null, false); // graceful: nobody left in the locked quadrant
     entries = pool.map(e => {
       const fitBucket = e.supportsNeeded <= req.remainingAfter ? 0 : 1;
       const elBucket = qdElementBucket(e.hero, counterEl, avoidEl);
@@ -1151,6 +1194,30 @@ function qdSuggestForSlot(nextIdx) {
 
 function qdSuggestForNextSlot() {
   return qdSuggestForSlot(quickDraft.indexOf(null));
+}
+
+/* Simulates a full 5-slot Quick Draft from a single fixed first pick,
+   entirely separate from the real in-progress draft — used by the "How
+   Quick Draft picks a team" mould examples (see quickdraft.html). Each
+   remaining slot takes whatever qdSuggestForSlot ranks #1, exactly like
+   repeatedly pressing Autofill. Never touches the global quickDraft
+   array or qdBanProtectElement. */
+function qdSimulateChain(hero, variant, banProtectEl) {
+  const draftArr = [qdMakePickId(hero.id, variant), null, null, null, null];
+  for (let i = 1; i < QD_SIZE; i++) {
+    const suggestions = qdSuggestForSlot(i, draftArr, banProtectEl || null);
+    if (!suggestions.length) break;
+    const top = suggestions[0];
+    draftArr[i] = qdMakePickId(top.heroId, top.variant);
+  }
+  return qdReplayDraft(QD_SIZE, draftArr).perSlot;
+}
+
+/* The single best MAIN-eligible build for one hero (primary, or Ghost
+   if it beats primary) — used to pick a representative example hero
+   for a given element+role in the mould examples. */
+function qdBestEntryFor(h) {
+  return qdMainEntriesFor(h).reduce((best, e) => (!best || e.score > best.score) ? e : best, null);
 }
 
 function addToQuickDraft(heroId, variant = "primary") {

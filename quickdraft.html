@@ -775,70 +775,48 @@
     </div>
   </div>
 
-  <!-- QUICK DRAFT LOGIC INFO — Quick Draft page only. Reference doc for
-       how qdScoreCandidate()/qdSuggestForSlot() in app.js actually pick
-       each candidate, so it's easy to remember what to tune as you test.
-       Keep this in sync by hand whenever the logic in app.js changes. -->
+  <!-- QUICK DRAFT LOGIC INFO — Quick Draft page only. Live, generated
+       examples instead of a rules table: simulates qdSuggestForSlot for
+       real roster heroes so this always reflects the current logic in
+       app.js with nothing to keep manually in sync. -->
   <div class="overlay" id="qd-logic-overlay">
-    <div class="modal compare-modal" id="qd-logic-modal">
+    <div class="modal compare-modal qd-mould-modal" id="qd-logic-modal">
       <div class="details-modal-header" style="padding:20px 22px 0">
         <div class="modal-title" style="margin:0;padding:0;border:none">HOW QUICK DRAFT PICKS A TEAM</div>
         <button class="det-close-btn" id="qd-logic-close">×</button>
       </div>
       <div class="compare-body" style="padding-top:10px">
         <p style="font-size:11.5px;color:var(--text-dim);line-height:1.6;margin-bottom:12px">
-          This builds around 4 <strong style="color:var(--gold2)">quadrants</strong>
-          (Speed+Survivability, Speed+Sustainability, Tanky+Survivability,
-          Tanky+Sustainability) and chains of a <strong style="color:var(--gold2)">main</strong>
-          pick plus however many <strong style="color:var(--gold2)">supports</strong>
-          its score-tier needs — not classes, and not a raw score total.
-          One candidate at a time, for whichever slot is next empty (a
-          one-slot-ahead heuristic, not a full 5-hero optimizer).
+          Each example below is a REAL simulation against your current
+          Roster — 🔗 marks the main pick, 🛡 a required support, 🛡+ a
+          leftover bonus support. Not hardcoded — reopen this after
+          changing your Roster and it re-runs.
         </p>
-        <div class="qd-rules-table-wrap">
-          <table class="qd-rules-table">
-            <thead>
-              <tr><th>Rule</th><th>Trigger</th><th>What happens</th></tr>
-            </thead>
-            <tbody>
-              <tr>
-                <td>1 · Ban Protect counter</td>
-                <td>Enemy Ban Protect element is set</td>
-                <td>Pool favors the countering element (Fire→Ice→Earth→Fire, Light↔Dark); if unavailable, falls back to avoiding only the one element the protected element directly beats</td>
-              </tr>
-              <tr>
-                <td>2 · Tiers → supports needed</td>
-                <td>Any main pick</td>
-                <td>Score 1-3 needs 3 supports · 4-7 needs 2 · 8-10 needs 1</td>
-              </tr>
-              <tr>
-                <td>3 · Support quadrant + score</td>
-                <td>Any support slot</td>
-                <td>Must come from the main's diagonally-opposite quadrant. Target depends on the main's own tier: Low main (&lt;4) needs a support strictly above 1.5x · Mid main (4-7) needs ≥1.25x · High main (≥8) needs strictly above 1x. Falls back to ≥ the main's plain score, then to quadrant-match only, if nothing clears the tier target</td>
-              </tr>
-              <tr>
-                <td>4 · Chain filling</td>
-                <td>Every slot, left→right</td>
-                <td>Fill a main's required supports first, then start a new main from a different quadrant if one fits in the slots left. If a new main wouldn't fit, the leftover slot becomes a bonus support for the still-open chain instead — also where the Ban Protect counter naturally lands if it hasn't found a home</td>
-              </tr>
-              <tr>
-                <td>5 · Ghosts as standalone picks</td>
-                <td>Any main slot, hero has a Ghost build</td>
-                <td>Primary and Ghost builds are offered as two separate main candidates, each using only its own quadrant + score — never combined. Combined stats only apply once a hero is picked as a support (Rule 3)</td>
-              </tr>
-            </tbody>
-          </table>
+        <div class="qd-mould-tabs">
+          <button class="qd-mould-tab active" data-tab="combo">Element + Class</button>
+          <button class="qd-mould-tab" data-tab="banprotect">Ban Protect</button>
         </div>
-        <p style="font-size:11px;color:var(--text-dim);line-height:1.6;margin-top:14px;padding-top:12px;border-top:1px solid var(--border)">
-          All of this lives in <code>qdReplayDraft()</code>,
-          <code>qdSlotRequirement()</code>, and <code>qdSuggestForSlot()</code>
-          in <code>app.js</code> — those are the places to tune first if a
-          suggestion feels off.
-        </p>
+
+        <div class="qd-mould-pane active" id="qd-mould-pane-combo">
+          <p class="qd-mould-pane-note">Best available hero of each element+class as the 1st pick, then Autofill for slots 2-5. Greyed out where your Roster has no hero of that combo.</p>
+          <div class="qd-mould-grid" id="qd-mould-grid-combo"></div>
+        </div>
+
+        <div class="qd-mould-pane" id="qd-mould-pane-banprotect">
+          <p class="qd-mould-pane-note">
+            Same fixed 1st pick every time —
+            <select id="qd-mould-hero-select"></select>
+            — then Autofill for slots 2-5 with each Ban Protect element set.
+            "Before" and "after" your 1st pick look identical on purpose:
+            Ban Protect only changes ranking for whichever slots are still
+            empty when it's set, so it doesn't matter which order it
+            happened in — only that it's known by the time a slot gets filled.
+          </p>
+          <div class="qd-mould-grid" id="qd-mould-grid-banprotect"></div>
+        </div>
       </div>
     </div>
   </div>
-
   <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
   <script src="app.js"></script>
 
@@ -853,19 +831,129 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/babel-standalone/7.23.2/babel.min.js"></script>
   <script type="text/babel" data-presets="react" src="draft.js"></script>
 
-  <!-- Quick Draft logic info modal — self-contained, Quick Draft page
-       only, so it doesn't touch the shared app.js. -->
+  <!-- Quick Draft logic info modal. References app.js globals (heroes,
+       qdSimulateChain, QD_SIZE, QD_QUADRANT_LABEL, QD_ELEMENT_COUNTER,
+       qdMakePickId, qdBestEntryFor) directly — app.js is loaded first,
+       and everything it defines is a plain top-level global, not scoped
+       to a module. Kept in its own script (not inside app.js) since it's
+       Quick Draft-page-only UI. -->
   <script>
     (function () {
       const btn = document.getElementById("btn-qd-logic-info");
       const overlay = document.getElementById("qd-logic-overlay");
       const closeBtn = document.getElementById("qd-logic-close");
       if (!btn || !overlay) return;
-      const open = () => overlay.classList.add("open");
+
+      const ELEMENTS = [
+        { key: "Fire",  emoji: "🔥" }, { key: "Ice",   emoji: "❄️" },
+        { key: "Earth", emoji: "🌿" }, { key: "Light", emoji: "☀️" },
+        { key: "Dark",  emoji: "💀" },
+      ];
+      const ROLES = ["Warrior", "Knight", "Thief", "Ranger", "Mage", "Soul Weaver"];
+      const ROLE_ABBR = { "Warrior": "War", "Knight": "Kni", "Thief": "Thf", "Ranger": "Rgr", "Mage": "Mag", "Soul Weaver": "S.W" };
+
+      function mouldSlotHtml(info) {
+        if (!info) return `<div class="qd-mould-slot qd-mould-slot-empty">–</div>`;
+        const h = info.hero;
+        const portrait = h.iconData ? `<img src="${h.iconData}">` : "⚔️";
+        const badge = info.role === "main" ? "🔗" : (info.bonus ? "🛡+" : "🛡");
+        const title = `${h.name || "Unnamed"} — ${QD_QUADRANT_LABEL[info.quadrant]} — ${info.score.toFixed(1)}${info.role !== "main" ? ` — supports Slot ${info.mainIndex + 1}` : ""}`;
+        return `
+          <div class="qd-mould-slot qd-mould-slot-${info.role}" title="${title}">
+            <div class="qd-mould-slot-badge">${badge}</div>
+            <div class="qd-mould-slot-portrait">${portrait}</div>
+            <div class="qd-mould-slot-score">${info.score.toFixed(1)}</div>
+          </div>`;
+      }
+
+      function mouldCardHtml(title, perSlot, dim) {
+        const byIndex = {};
+        perSlot.forEach(p => { byIndex[p.index] = p; });
+        const slots = [];
+        for (let i = 0; i < QD_SIZE; i++) slots.push(mouldSlotHtml(byIndex[i]));
+        return `
+          <div class="qd-mould-card${dim ? " qd-mould-card-dim" : ""}">
+            <div class="qd-mould-card-title">${title}</div>
+            <div class="qd-mould-card-slots">${slots.join("")}</div>
+          </div>`;
+      }
+
+      function renderComboGrid() {
+        const grid = document.getElementById("qd-mould-grid-combo");
+        if (!grid) return;
+        let html = "";
+        ELEMENTS.forEach(el => {
+          ROLES.forEach(role => {
+            const pool = heroes.filter(h => h.element === el.key && h.role === role);
+            let best = null;
+            pool.forEach(h => {
+              const e = qdBestEntryFor(h);
+              if (e && (!best || e.score > best.score)) best = e;
+            });
+            const title = `${el.emoji} ${el.key} ${ROLE_ABBR[role]}`;
+            if (!best) { html += mouldCardHtml(title, [], true); return; }
+            const perSlot = qdSimulateChain(best.hero, best.variant, null);
+            html += mouldCardHtml(title, perSlot, false);
+          });
+        });
+        grid.innerHTML = html;
+      }
+
+      function populateHeroSelect() {
+        const sel = document.getElementById("qd-mould-hero-select");
+        if (!sel || !heroes.length) return;
+        const stored = (() => { try { return Number(localStorage.getItem("e7_qd_mould_hero_id")); } catch { return null; } })();
+        sel.innerHTML = heroes.map(h => `<option value="${h.id}">${h.name || "Unnamed"}</option>`).join("");
+        const validStored = stored && heroes.some(h => h.id === stored);
+        sel.value = validStored ? stored : heroes.reduce((best, h) => {
+          const e = qdBestEntryFor(h);
+          const bestE = best ? qdBestEntryFor(best) : null;
+          return (!bestE || (e && e.score > bestE.score)) ? h : best;
+        }, heroes[0]).id;
+      }
+
+      function renderBanProtectGrid() {
+        const grid = document.getElementById("qd-mould-grid-banprotect");
+        const sel = document.getElementById("qd-mould-hero-select");
+        if (!grid || !sel || !heroes.length) return;
+        const hero = heroes.find(h => h.id === Number(sel.value));
+        if (!hero) { grid.innerHTML = ""; return; }
+        const entry = qdBestEntryFor(hero);
+        let html = "";
+        ELEMENTS.forEach(el => {
+          ["Before your 1st pick", "After your 1st pick"].forEach(phase => {
+            const perSlot = qdSimulateChain(hero, entry.variant, el.key);
+            html += mouldCardHtml(`${el.emoji} Ban Protect ${el.key}<br><span class="qd-mould-card-subtitle">${phase}</span>`, perSlot, false);
+          });
+        });
+        grid.innerHTML = html;
+      }
+
+      const open = () => {
+        overlay.classList.add("open");
+        renderComboGrid();
+        populateHeroSelect();
+        renderBanProtectGrid();
+      };
       const close = () => overlay.classList.remove("open");
       btn.addEventListener("click", open);
       closeBtn.addEventListener("click", close);
       overlay.addEventListener("click", e => { if (e.target === overlay) close(); });
+
+      document.querySelectorAll(".qd-mould-tab").forEach(tab => {
+        tab.addEventListener("click", () => {
+          document.querySelectorAll(".qd-mould-tab").forEach(t => t.classList.toggle("active", t === tab));
+          document.querySelectorAll(".qd-mould-pane").forEach(p => p.classList.toggle("active", p.id === `qd-mould-pane-${tab.dataset.tab}`));
+        });
+      });
+
+      const heroSelect = document.getElementById("qd-mould-hero-select");
+      if (heroSelect) {
+        heroSelect.addEventListener("change", () => {
+          try { localStorage.setItem("e7_qd_mould_hero_id", heroSelect.value); } catch { /* ignore */ }
+          renderBanProtectGrid();
+        });
+      }
     })();
   </script>
 

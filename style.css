@@ -1358,45 +1358,120 @@ body.dot-mode .origin-dot:hover {
   border-radius: 3px;
 }
 
-/* ── Quick Draft logic info modal: rules table ── */
-.qd-rules-table-wrap {
-  max-height: 340px;
-  overflow-y: auto;
-  border: 1px solid var(--border);
-  border-radius: 6px;
-}
-.qd-rules-table {
-  width: 100%;
-  border-collapse: collapse;
+/* ── Quick Draft logic info modal: mould examples ── */
+.qd-mould-modal { max-width: 960px; }
+.qd-mould-pane-note {
   font-size: 11px;
-  line-height: 1.5;
+  color: var(--text-dim);
+  line-height: 1.6;
+  margin-bottom: 12px;
 }
-.qd-rules-table thead th {
-  position: sticky;
-  top: 0;
-  background: var(--bg3);
-  color: var(--gold2);
+.qd-mould-pane-note select {
+  font-size: 11px;
+  padding: 3px 6px;
+  margin: 0 2px;
+}
+.qd-mould-tabs {
+  display: flex;
+  gap: 6px;
+  margin-bottom: 14px;
+  border-bottom: 1px solid var(--border);
+}
+.qd-mould-tab {
+  background: none;
+  border: none;
+  border-bottom: 2px solid transparent;
+  color: var(--text-dim);
   font-family: 'Cinzel', serif;
   font-size: 10.5px;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+  padding: 8px 4px 10px;
+  cursor: pointer;
+  transition: color .15s, border-color .15s;
+}
+.qd-mould-tab:hover { color: var(--text); }
+.qd-mould-tab.active { color: var(--gold2); border-bottom-color: var(--gold2); }
+.qd-mould-pane { display: none; }
+.qd-mould-pane.active { display: block; }
+
+.qd-mould-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+  gap: 8px;
+  max-height: 440px;
+  overflow-y: auto;
+  padding: 2px;
+}
+.qd-mould-card {
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  background: rgba(255,255,255,.02);
+  padding: 8px;
+}
+.qd-mould-card-dim { opacity: .35; }
+.qd-mould-card-title {
+  font-family: 'Cinzel', serif;
+  font-size: 9.5px;
   letter-spacing: .04em;
-  text-align: left;
-  padding: 8px 10px;
-  border-bottom: 1px solid var(--gold-dim);
-  z-index: 1;
-}
-.qd-rules-table td {
-  padding: 8px 10px;
-  color: var(--text-dim);
-  border-bottom: 1px solid rgba(255,255,255,.06);
-  vertical-align: top;
-}
-.qd-rules-table td:first-child {
   color: var(--gold2);
-  white-space: nowrap;
-  font-weight: 600;
+  margin-bottom: 6px;
+  line-height: 1.4;
 }
-.qd-rules-table tbody tr:last-child td { border-bottom: none; }
-.qd-rules-table tbody tr:hover td { background: rgba(201,162,39,.06); }
+.qd-mould-card-subtitle {
+  display: block;
+  font-family: inherit;
+  letter-spacing: normal;
+  text-transform: none;
+  font-size: 8.5px;
+  color: var(--text-dim);
+}
+.qd-mould-card-slots {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 3px;
+}
+.qd-mould-slot {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1px;
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  padding: 3px 1px;
+  background: rgba(255,255,255,.02);
+}
+.qd-mould-slot-main { box-shadow: inset 0 0 0 1px rgba(201,162,39,.35); }
+.qd-mould-slot-support { box-shadow: inset 0 0 0 1px rgba(255,255,255,.1); }
+.qd-mould-slot-empty {
+  align-items: center;
+  justify-content: center;
+  color: var(--text-dim);
+  font-size: 10px;
+  min-height: 34px;
+}
+.qd-mould-slot-badge {
+  position: absolute;
+  top: 1px; right: 1px;
+  font-size: 6px;
+  opacity: .8;
+}
+.qd-mould-slot-portrait {
+  width: 20px; height: 20px;
+  border-radius: 50%;
+  overflow: hidden;
+  display: flex; align-items: center; justify-content: center;
+  background: var(--bg3);
+  border: 1px solid var(--gold-dim);
+  font-size: 10px;
+}
+.qd-mould-slot-portrait img { width: 100%; height: 100%; object-fit: cover; }
+.qd-mould-slot-score {
+  font-size: 7.5px;
+  color: var(--gold2);
+  font-weight: 700;
+}
 
 .compare-target {
   text-align: center;
