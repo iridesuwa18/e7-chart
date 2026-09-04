@@ -134,15 +134,17 @@ const QD_ELEMENT_COUNTER = { Fire: "Ice", Ice: "Earth", Earth: "Fire", Light: "D
    Each quadrant's "support" quadrant is its diagonal opposite
    (TL⟷BR, TR⟷BL) — see QD_OPPOSITE_QUADRANT.
 
-   Rule 1 (Ban Protect counter) — unchanged in spirit. Once the enemy's
-   un-bannable Ban Protect element is set, every remaining suggestion is
-   ranked with whichever element counters it (QD_ELEMENT_COUNTER) placed
-   first, elements that neither counter nor are countered by it next,
-   and the one element Ban Protect itself beats ranked last — but never
+   Rule 1 (Ban Protect counter) — once the enemy's un-bannable Ban
+   Protect element is set, every remaining suggestion is ranked with
+   whichever element counters it (QD_ELEMENT_COUNTER) placed first,
+   elements that neither counter nor are countered by it next, and the
+   one element Ban Protect itself beats ranked last — but never
    excluded outright. This is a PRIORITY ordering, not a filter: every
    eligible hero always has a place in the list somewhere, so cycling
    (Rep. Curr.) never runs out of new options as long as any unused
    hero remains for that slot. See qdSuggestForSlot / qdElementBucket.
+   (With no Ban Protect element set, this ordering is simply skipped —
+   Slot 3 below still always exists regardless of whether one is set.)
 
    Rule 2 (tiers → support count) — a hero/build's own score (1-10)
    determines how many supports it needs if drafted as a chain "main":
@@ -182,29 +184,31 @@ const QD_ELEMENT_COUNTER = { Fire: "Ice", Ice: "Earth", Earth: "Fire", Light: "D
    the required quadrant. See qdTeamAxisTotals / qdWeakAxisInfo /
    qdRawStatsForQuadrant.
 
-   Rule 4 (chain filling) — slots fill left→right as a sequence of
-   main+supports chains: pick a main, fill its required supports, then
-   (if room remains) start a new main from a different quadrant, and so
-   on. A candidate whose own required support count doesn't fit in
-   however many slots remain after it is ranked last rather than hidden
-   outright (see qdSuggestForSlot) — so a tight remainingAfter narrows
-   the TOP suggestion, not the whole list. If the previous chain's
-   required supports are already met but a new main wouldn't comfortably
-   fit in the slots left (e.g. only 1 slot remains and every top pick
-   needs ≥1 support of its own), that leftover slot is instead offered
-   as a bonus support for the still-open chain — this is also where the
-   Ban Protect counter naturally lands if it hasn't found a home yet.
-   See qdReplayDraft / qdSlotRequirement.
-
-   Rule 4b (quadrant pairs) — there are only 4 quadrants, split into 2
-   fixed opposite pairs (TL↔BR, TR↔BL). A chain's main claims one
-   quadrant and its supports claim the opposite one, so a completed
-   chain always uses up a whole pair. A second main can't be started in
-   a quadrant that's part of an already-used pair — it has to come from
-   the other pair entirely, since that pair's opposite side is already
-   spoken for. Hard requirement, with the usual graceful fallback (allow
-   it anyway) only if literally no candidate exists outside the used
-   pair(s). See qdReplayDraft's usedQuadrants / qdSuggestForSlot.
+   Rule 4 (fixed chain shape, v4) — a Quick Draft team is no longer a
+   free-roaming sequence of independent main+supports chains. Instead
+   the 5 slots have a FIXED structure built around Slot 1:
+     Slot 1 — the main. Its own score (Rule 2) sets how many supports
+              it ideally wants.
+     Slot 2 — always Slot 1's first support (Rule 3, opposite quadrant).
+     Slot 3 — always the Ban Protect counter pick (or, if no Ban
+              Protect element is set, simply the best remaining hero
+              overall) — NEVER quadrant-restricted, since its job is to
+              answer the enemy's un-bannable pick, not to fill a role.
+              If Slot 1 still needs more supports at this point, Slot 3
+              ALSO counts as one of them (a nominal support — it need
+              not sit in Slot 1's opposite quadrant to count). Either
+              way, Slot 3 simultaneously becomes "chain 2": once Slot
+              1's requirement is fully met, every slot after that
+              supports Slot 3 instead (Rule 3, relative to Slot 3's own
+              quadrant) — no further independent chain is ever started.
+     Slots 4–5 — support whichever chain (Slot 1 or Slot 3) still needs
+              more, Slot 1 taking priority until its own requirement is
+              completely used up. A candidate whose required support
+              count doesn't fit the slots actually left is ranked last
+              rather than hidden outright (see qdSuggestForSlot), and a
+              slot left over once both chains' requirements are already
+              met is offered as a bonus support for whichever chain is
+              still open. See qdReplayDraft / qdSlotRequirement.
 
    Rule 5 (Ghosts as standalone picks) — a hero with a Ghost (altStats)
    build can be drafted as a MAIN using either its primary or its Ghost
@@ -1023,72 +1027,88 @@ function qdHeroInDraft(heroId) {
 function qdReplayDraft(uptoIdx, draftArr) {
   draftArr = draftArr || quickDraft;
   const perSlot = [];
-  let activeMain = null;
-  // Rule 4b — quadrant PAIRS, not just quadrants. There are only 4
-  // quadrants split into 2 opposite pairs (TL↔BR, TR↔BL). A chain's
-  // main claims one quadrant and its supports claim the opposite one,
-  // so together a chain always uses up a whole pair. A second chain's
-  // main must come from the OTHER pair entirely — reusing either
-  // quadrant from an already-used pair doesn't make sense, since that
-  // pair's "supporting side" is already spoken for. Tracked here as we
-  // walk the draft so canStartNewMain can check it below.
-  const usedQuadrants = new Set();
+  let chain1 = null; // Slot 1's chain: { quadrant, score, required, rawRequired, supplied, index }
+  let chain2 = null; // Slot 3's chain (Ban Protect pick), same shape — established at index 2
+
   for (let i = 0; i < uptoIdx; i++) {
     const raw = draftArr[i];
     if (raw === null || raw === undefined) continue;
     const parsed = qdParsePick(raw);
     const hero = heroes.find(h => h.id === parsed.heroId);
     if (!hero) continue;
-
-    if (activeMain && activeMain.supplied < activeMain.required) {
-      activeMain.supplied++;
-      const q = QD_OPPOSITE_QUADRANT[activeMain.quadrant];
-      usedQuadrants.add(q);
-      perSlot.push({
-        index: i, heroId: parsed.heroId, hero, variant: parsed.variant, role: "support",
-        quadrant: q, score: qdSupportScore(hero, q),
-        mainIndex: activeMain.index, bonus: false,
-      });
-      continue;
-    }
-
-    const remainingAfter = QD_SIZE - (i + 1);
     const entry = qdBuildEntry(hero, parsed.variant);
-    const rawRequired = qdSupportsRequired(entry.score);
-    // A new chain only needs SOME room left to be worth starting (at
-    // least 1 slot for a support) — it doesn't need to fit its full
-    // ideal support count. If the roster's best available option for
-    // this element/quadrant is a Mid or Low tier hero and there isn't
-    // room for everyone it'd ideally want, it still becomes the chain's
-    // anchor — its required count is capped to whatever room actually
-    // exists, i.e. treated as the best tier that fits. This is what
-    // keeps a "best available, not perfect" pick from being silently
-    // downgraded to a bonus support for the PREVIOUS chain instead of
-    // becoming its own chain, which is what happens when required and
-    // remainingAfter mismatch. It also can't start a new chain in a
-    // quadrant pair that's already in use (see usedQuadrants above).
-    const canStartNewMain = (activeMain === null || remainingAfter >= 1) && !usedQuadrants.has(entry.quadrant);
-    const required = Math.min(rawRequired, Math.max(remainingAfter, 1));
 
-    if (canStartNewMain) {
-      activeMain = { quadrant: entry.quadrant, score: entry.score, required, rawRequired, supplied: 0, index: i };
-      usedQuadrants.add(entry.quadrant);
+    if (i === 0) {
+      // Slot 1 — the main. Its own score sets how many supports it wants.
+      const rawRequired = qdSupportsRequired(entry.score);
+      const required = Math.min(rawRequired, QD_SIZE - 1);
+      chain1 = { quadrant: entry.quadrant, score: entry.score, required, rawRequired, supplied: 0, index: i };
       perSlot.push({
         index: i, heroId: parsed.heroId, hero, variant: parsed.variant, role: "main",
         quadrant: entry.quadrant, score: entry.score, required, rawRequired, mainIndex: i, bonus: false,
       });
-    } else {
-      activeMain.supplied++;
-      const q = QD_OPPOSITE_QUADRANT[activeMain.quadrant];
-      usedQuadrants.add(q);
+      continue;
+    }
+
+    if (i === 1) {
+      // Slot 2 — always Slot 1's first guaranteed support.
+      chain1.supplied++;
+      const q = QD_OPPOSITE_QUADRANT[chain1.quadrant];
       perSlot.push({
         index: i, heroId: parsed.heroId, hero, variant: parsed.variant, role: "support",
-        quadrant: q, score: qdSupportScore(hero, q),
-        mainIndex: activeMain.index, bonus: true,
+        quadrant: q, score: qdSupportScore(hero, q), mainIndex: chain1.index, bonus: false,
       });
+      continue;
     }
+
+    if (i === 2) {
+      // Slot 3 — always the Ban Protect counter (or best overall with
+      // no Ban Protect set), never quadrant-restricted. Simultaneously
+      // becomes "chain 2" for whatever room is left after Slot 1's own
+      // requirement is used up, AND — if Slot 1 still needs more
+      // supports right now — also counts as one of those, nominally
+      // (using its own real quadrant, since it isn't actually required
+      // to sit in Slot 1's opposite quadrant to fill this role).
+      const rawRequired2 = qdSupportsRequired(entry.score);
+      const required2 = Math.min(rawRequired2, QD_SIZE - (i + 1));
+      chain2 = { quadrant: entry.quadrant, score: entry.score, required: required2, rawRequired: rawRequired2, supplied: 0, index: i };
+      if (chain1 && chain1.supplied < chain1.required) {
+        chain1.supplied++;
+        perSlot.push({
+          index: i, heroId: parsed.heroId, hero, variant: parsed.variant, role: "support",
+          quadrant: entry.quadrant, score: entry.score, mainIndex: chain1.index, bonus: false, banProtectPick: true,
+        });
+      } else {
+        perSlot.push({
+          index: i, heroId: parsed.heroId, hero, variant: parsed.variant, role: "main",
+          quadrant: entry.quadrant, score: entry.score, required: required2, rawRequired: rawRequired2, mainIndex: i, bonus: false, banProtectPick: true,
+        });
+      }
+      continue;
+    }
+
+    // Slots 4–5 — support whichever chain is still open, Slot 1's chain
+    // taking priority until its own requirement is completely used up;
+    // after that, everything supports Slot 3's chain instead.
+    const target = (chain1 && chain1.supplied < chain1.required) ? chain1 : (chain2 || chain1);
+    const bonus = !!target && target.supplied >= target.required;
+    if (target) target.supplied++;
+    const q = target ? QD_OPPOSITE_QUADRANT[target.quadrant] : entry.quadrant;
+    perSlot.push({
+      index: i, heroId: parsed.heroId, hero, variant: parsed.variant, role: "support",
+      quadrant: q, score: qdSupportScore(hero, q), mainIndex: target ? target.index : i, bonus,
+    });
   }
-  return { perSlot, activeMain };
+
+  // activeMain — whichever chain is still open at the end of the replay
+  // (kept under this name for the callers that only care "is there an
+  // under-supported chain right now", regardless of whether it's Slot
+  // 1's or Slot 3's): Slot 3's chain takes precedence once it exists,
+  // since Slot 1's chain is always resolved first.
+  const activeMain = (chain2 && chain2.supplied < chain2.required) ? chain2
+                    : (chain1 && chain1.supplied < chain1.required) ? chain1
+                    : (chain2 || chain1);
+  return { perSlot, activeMain, chain1, chain2 };
 }
 
 /* What the next empty slot needs, derived from the chain replay:
@@ -1111,19 +1131,29 @@ function qdWeakAxisInfo(quadrant, nextIdx, draftArr) {
 }
 
 function qdSlotRequirement(nextIdx, draftArr) {
-  const { activeMain } = qdReplayDraft(nextIdx, draftArr);
-  if (activeMain && activeMain.supplied < activeMain.required) {
-    const t = qdSupportTargetInfo(activeMain.score);
-    const quadrant = QD_OPPOSITE_QUADRANT[activeMain.quadrant];
-    return { type: "support", quadrant, minScore: activeMain.score, targetScore: Math.min(10, activeMain.score * t.multiplier), targetStrict: t.strict, main: activeMain, bonus: false, axisInfo: qdWeakAxisInfo(quadrant, nextIdx, draftArr) };
+  // Slot 1 — free to pick any main; nothing drafted yet to constrain it.
+  if (nextIdx === 0) return { type: "main", remainingAfter: QD_SIZE - 1, activeMain: null };
+
+  const { chain1, chain2 } = qdReplayDraft(nextIdx, draftArr);
+
+  // Slot 3 — always the fixed Ban Protect / best-overall pick, never
+  // quadrant-restricted (see Rule 4, v4).
+  if (nextIdx === 2) {
+    return { type: "banProtectMain", remainingAfter: QD_SIZE - (nextIdx + 1), activeMain: chain1 };
   }
-  const remainingAfter = QD_SIZE - (nextIdx + 1);
-  if (activeMain && remainingAfter <= 0) {
-    const t = qdSupportTargetInfo(activeMain.score);
-    const quadrant = QD_OPPOSITE_QUADRANT[activeMain.quadrant];
-    return { type: "support", quadrant, minScore: activeMain.score, targetScore: Math.min(10, activeMain.score * t.multiplier), targetStrict: t.strict, main: activeMain, bonus: true, axisInfo: qdWeakAxisInfo(quadrant, nextIdx, draftArr) };
-  }
-  return { type: "main", remainingAfter, activeMain };
+
+  // Slots 2, 4, 5 — a support for whichever chain is currently open:
+  // Slot 1's chain takes priority until its requirement is fully met,
+  // then Slot 3's chain (which only exists once Slot 3 is filled).
+  const target = (chain1 && chain1.supplied < chain1.required) ? chain1 : (chain2 || chain1);
+  const t = qdSupportTargetInfo(target.score);
+  const quadrant = QD_OPPOSITE_QUADRANT[target.quadrant];
+  const bonus = target.supplied >= target.required;
+  return {
+    type: "support", quadrant, minScore: target.score,
+    targetScore: Math.min(10, target.score * t.multiplier), targetStrict: t.strict,
+    main: target, bonus, axisInfo: qdWeakAxisInfo(quadrant, nextIdx, draftArr),
+  };
 }
 
 /* Ranks/labels one candidate entry for whichever slot is next empty.
@@ -1153,6 +1183,11 @@ function qdScoreEntry(e, req) {
       const AXIS_LABEL = { spd: "SPD", tnk: "TNK", sur: "SUR", sst: "SST" };
       reasons.push(`Team so far: ${AXIS_LABEL[req.axisInfo.vAxis]} ${req.axisInfo.totals[req.axisInfo.vAxis].toFixed(1)} vs ${AXIS_LABEL[req.axisInfo.hAxis]} ${req.axisInfo.totals[req.axisInfo.hAxis].toFixed(1)} — ${AXIS_LABEL[req.axisInfo.weakAxis]} currently lower, tie-break favors it`);
     }
+  } else if (req.type === "banProtectMain") {
+    rank = e.score;
+    reasons.push(`Slot 3 — always the Ban Protect counter (or best overall with no Ban Protect set), any quadrant`);
+    reasons.push(`${QD_QUADRANT_LABEL[e.quadrant]} — needs ${e.supportsNeeded} support${e.supportsNeeded > 1 ? "s" : ""} from the ${QD_QUADRANT_LABEL[QD_OPPOSITE_QUADRANT[e.quadrant]]} side once Slot 1's own supports are filled`);
+    if (e.supportsNeeded > req.remainingAfter) reasons.push(`⚠️ Needs more supports than the ${req.remainingAfter} slot${req.remainingAfter === 1 ? "" : "s"} left after it — showing anyway`);
   } else {
     rank = e.score;
     reasons.push(`${QD_QUADRANT_LABEL[e.quadrant]} pick${e.variant === "ghost" ? " (Ghost build)" : ""} — needs ${e.supportsNeeded} support${e.supportsNeeded > 1 ? "s" : ""} from the ${QD_QUADRANT_LABEL[QD_OPPOSITE_QUADRANT[e.quadrant]]} side`);
@@ -1225,15 +1260,32 @@ function qdSuggestForSlot(nextIdx, draftArr, banProtectEl) {
         _bucket: elBucket * 3 + scoreBucket, _elNote: elNoteFor(elBucket), _axisTieScore: axisTieScore,
       };
     });
+  } else if (req.type === "banProtectMain") {
+    // Slot 3 (v4) — always the Ban Protect counter, or the single best
+    // remaining hero overall if no Ban Protect element is set. Deliberately
+    // NEVER quadrant-restricted (its job is answering the enemy's
+    // un-bannable pick / grabbing the best value left, not filling a
+    // role) and there's no quadrant-PAIR exclusion either, since Slot 3
+    // is the only place a "second chain" can ever begin now — there's
+    // nothing left for it to collide with.
+    const pool = [];
+    candidateHeroes.forEach(h => {
+      qdMainEntriesFor(h).forEach(build => {
+        pool.push({ ...build, isSupport: false, supportsNeeded: qdSupportsRequired(build.score) });
+      });
+    });
+    entries = pool.map(e => {
+      const fitBucket = e.supportsNeeded <= req.remainingAfter ? 0 : 1;
+      const elBucket = qdElementBucket(e.hero, counterEl, avoidEl);
+      return { ...e, _bucket: elBucket * 2 + fitBucket, _elNote: elNoteFor(elBucket) };
+    });
   } else {
-    // Rule 4 — if this slot already has an occupant (a Rep. Curr.
-    // re-suggestion), lock candidates to that occupant's SAME quadrant
-    // so cycling can't silently flip the required support quadrant out
-    // from under an already-open chain. That lock is still hard. But
-    // "fits within the remaining slots" (Rule 2) and the Ban Protect
-    // element are priorities now, same reasoning as the support branch
-    // above — so a high-score chain with a tight remainingAfter no
-    // longer collapses the whole list down to 1-2 names.
+    // req.type === "main" — only ever true for Slot 1 (the very first
+    // pick) now that Slot 3 is a fixed, separately-handled slot rather
+    // than a freely-started second chain. If this slot already has an
+    // occupant (a Rep. Curr. re-suggestion), lock candidates to that
+    // occupant's SAME quadrant so cycling can't silently flip Slot 1's
+    // quadrant out from under Slots 2+ that are already committed.
     let lockedQuadrant = null;
     const currentRaw = draftArr[nextIdx];
     if (currentRaw !== null && currentRaw !== undefined) {
@@ -1241,33 +1293,18 @@ function qdSuggestForSlot(nextIdx, draftArr, banProtectEl) {
       const curHero = heroes.find(h => h.id === curParsed.heroId);
       if (curHero) lockedQuadrant = qdBuildEntry(curHero, curParsed.variant).quadrant;
     }
-    // Rule 4b — a fresh main can't start in a quadrant pair a previous
-    // chain already claimed (see qdReplayDraft). Only matters for a
-    // brand-new pick, not a Rep. Curr. re-suggestion (lockedQuadrant is
-    // already scoped correctly by definition there).
-    const usedQuadrants = lockedQuadrant ? null : new Set(qdReplayDraft(nextIdx, draftArr).perSlot.map(p => p.quadrant));
-    const buildEntries = (quadrantFilter, excludeUsedPair) => {
+    const buildEntries = (quadrantFilter) => {
       const out = [];
       candidateHeroes.forEach(h => {
         qdMainEntriesFor(h).forEach(build => {
           if (quadrantFilter && build.quadrant !== quadrantFilter) return;
-          if (excludeUsedPair && usedQuadrants.has(build.quadrant)) return;
           out.push({ ...build, isSupport: false, supportsNeeded: qdSupportsRequired(build.score) });
         });
       });
       return out;
     };
-    let pool;
-    if (lockedQuadrant) {
-      pool = buildEntries(lockedQuadrant, false);
-    } else {
-      pool = buildEntries(null, true);
-      // Graceful fallback: if literally nobody's left outside the
-      // already-used pair(s), allow it rather than showing nothing —
-      // same philosophy as every other fallback in this function.
-      if (pool.length === 0) pool = buildEntries(null, false);
-    }
-    if (pool.length === 0 && lockedQuadrant) pool = buildEntries(null, false); // graceful: nobody left in the locked quadrant
+    let pool = lockedQuadrant ? buildEntries(lockedQuadrant) : buildEntries(null);
+    if (pool.length === 0) pool = buildEntries(null); // graceful: nobody left in the locked quadrant
     entries = pool.map(e => {
       const fitBucket = e.supportsNeeded <= req.remainingAfter ? 0 : 1;
       const elBucket = qdElementBucket(e.hero, counterEl, avoidEl);
@@ -1535,7 +1572,7 @@ function renderQuickDraft() {
   const slotsWrap = document.getElementById("quickdraft-slots");
   slotsWrap.innerHTML = "";
 
-  const { perSlot, activeMain } = qdReplayDraft(QD_SIZE);
+  const { perSlot, activeMain, chain1, chain2 } = qdReplayDraft(QD_SIZE);
   const slotInfoByIndex = {};
   perSlot.forEach(p => { slotInfoByIndex[p.index] = p; });
 
@@ -1547,9 +1584,10 @@ function renderQuickDraft() {
 
     if (h) {
       const portrait = h.iconData ? `<img src="${h.iconData}">` : "⚔️";
+      const banProtectSuffix = info.banProtectPick ? (qdBanProtectElement ? " (Ban Protect counter)" : " (best overall — Slot 3)") : "";
       const roleBadge = info.role === "main"
-        ? `<div class="qd-slot-protect-badge" title="Main pick — ${QD_QUADRANT_LABEL[info.quadrant]}${info.rawRequired > info.required ? ` — needs ${info.rawRequired}, only room for ${info.required}` : ""}">🔗</div>`
-        : `<div class="qd-slot-protect-badge" title="${info.bonus ? "Bonus support" : "Support"} for Slot ${info.mainIndex + 1} — ${QD_QUADRANT_LABEL[info.quadrant]}">🛡</div>`;
+        ? `<div class="qd-slot-protect-badge" title="Main pick${banProtectSuffix} — ${QD_QUADRANT_LABEL[info.quadrant]}${info.rawRequired > info.required ? ` — needs ${info.rawRequired}, only room for ${info.required}` : ""}">🔗</div>`
+        : `<div class="qd-slot-protect-badge" title="${info.bonus ? "Bonus support" : "Support"}${banProtectSuffix} for Slot ${info.mainIndex + 1} — ${QD_QUADRANT_LABEL[info.quadrant]}${info.banProtectPick ? " — also anchors Slot 3's own chain" : ""}">${info.banProtectPick ? "🎯" : "🛡"}</div>`;
       const ghostBadge = info.variant === "ghost" ? `<div class="qd-slot-ghost-badge" title="Drafted as its Ghost build">👻</div>` : "";
       const supportsForLabel = info.role === "support"
         ? `<div class="qd-slot-supports-for">↳ Slot ${info.mainIndex + 1}${info.bonus ? " (bonus)" : ""}</div>`
@@ -1577,7 +1615,7 @@ function renderQuickDraft() {
   const statsEl = document.getElementById("quickdraft-stats");
   const avgTxt = filledCount ? (perSlot.reduce((s, p) => s + p.score, 0) / filledCount).toFixed(1) : "—";
   const quadrantsUsed = new Set(perSlot.map(p => p.quadrant)).size;
-  const mainCount = perSlot.filter(p => p.role === "main").length;
+  const mainCount = (chain1 ? 1 : 0) + (chain2 ? 1 : 0);
   const underSupported = activeMain && activeMain.supplied < activeMain.required && filledCount >= QD_SIZE;
   const quadClass = quadrantsUsed >= Math.min(4, filledCount) ? "good" : (filledCount ? "warn" : "");
   statsEl.innerHTML = `
@@ -1610,18 +1648,24 @@ function qdBanProtectHint() {
   return `🛡 Ban Protect is ${qdBanProtectElement} — remaining picks are ranked with ${counterEl} favored first, then other elements, ${qdBanProtectElement}'s own victim last (never excluded outright).`;
 }
 
-/* Rule 4 hint — explains whether the next slot is a required support, a
-   leftover bonus support, or free to start a new main chain. */
+/* Rule 4 hint (v4) — explains whether the next slot is a required
+   support, a leftover bonus support, the fixed Slot 3 pick, or free to
+   pick the very first main. */
 function qdChainHint(nextIdx) {
   if (nextIdx === -1 || nextIdx == null) return "";
   const req = qdSlotRequirement(nextIdx);
+  if (req.type === "banProtectMain") {
+    return qdBanProtectElement
+      ? `🎯 Slot 3 is always the Ban Protect counter — any quadrant, ranked by score. If Slot 1 still needs supports, this pick also fills one of them; either way it becomes its own chain for whatever's left over.`
+      : `🎯 Slot 3 is always the best remaining hero overall — any quadrant, ranked by score. If Slot 1 still needs supports, this pick also fills one of them; either way it becomes its own chain for whatever's left over.`;
+  }
   if (req.type === "support") {
     const cmp = req.targetStrict ? ">" : "≥";
     return req.bonus
       ? `🔗 Leftover slot — offered as a bonus ${QD_QUADRANT_LABEL[req.quadrant]} support (targeting ${cmp} ${req.targetScore.toFixed(1)}, floor ≥ ${req.minScore.toFixed(1)}) for the current chain.`
       : `🔗 This slot needs a ${QD_QUADRANT_LABEL[req.quadrant]} support — targeting score ${cmp} ${req.targetScore.toFixed(1)}, floor ≥ ${req.minScore.toFixed(1)} (combined stats).`;
   }
-  return `🔗 Free to start a new main pick here — a hero whose full tier fits within the ${req.remainingAfter} slot${req.remainingAfter === 1 ? "" : "s"} left is favored, but the best available option still anchors a new chain even if its support count has to be capped to fit.`;
+  return `🔗 Free to pick the first main here — a hero whose full tier fits within the ${req.remainingAfter} slot${req.remainingAfter === 1 ? "" : "s"} left is favored, but the best available option still anchors the chain even if its support count has to be capped to fit.`;
 }
 
 function renderQuickDraftSuggestions() {
