@@ -44,6 +44,8 @@
         <div id="admin-controls" style="display:none;align-items:center;gap:7px;flex-wrap:wrap">
           <button class="btn btn-ghost btn-sm" id="btn-load">↓ Load</button>
           <button class="btn btn-gold btn-sm" id="btn-save">↑ Save</button>
+          <button class="btn btn-ghost btn-sm" id="btn-import" title="Import a save file — only adds heroes you don't already have, never overwrites">⇪ Import</button>
+          <input type="file" id="import-file-input" accept=".json,application/json" style="display:none">
           <button class="btn btn-ghost btn-sm" id="btn-add">＋ Hero</button>
           <div class="header-sep"></div>
         </div>
@@ -905,7 +907,7 @@
       function populateHeroSelect() {
         const sel = document.getElementById("qd-mould-hero-select");
         if (!sel || !heroes.length) return;
-        const stored = (() => { try { return Number(localStorage.getItem("e7_qd_mould_hero_id")); } catch { return null; } })();
+        const stored = window._qdMouldHeroId ?? null; // session-only now, no localStorage
         sel.innerHTML = heroes.map(h => `<option value="${h.id}">${h.name || "Unnamed"}</option>`).join("");
         const validStored = stored && heroes.some(h => h.id === stored);
         sel.value = validStored ? stored : heroes.reduce((best, h) => {
@@ -980,7 +982,7 @@
       const heroSelect = document.getElementById("qd-mould-hero-select");
       if (heroSelect) {
         heroSelect.addEventListener("change", () => {
-          try { localStorage.setItem("e7_qd_mould_hero_id", heroSelect.value); } catch { /* ignore */ }
+          window._qdMouldHeroId = Number(heroSelect.value); // session-only, no localStorage
           renderBanProtectGrid();
         });
       }

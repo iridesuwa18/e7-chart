@@ -329,25 +329,33 @@ const saveStatus   = document.getElementById("save-status");
 
   // Import a save file — merges in only heroes you don't already have;
   // never overwrites or touches any hero already in the current roster.
-  document.getElementById("btn-import").addEventListener("click", () => {
-    if (editSessionUnlocked) triggerImportFilePicker();
-    else openAdminGate("import");
-  });
-  document.getElementById("import-file-input").addEventListener("change", (e) => {
-    const file = e.target.files[0];
-    e.target.value = ""; // reset so picking the same file twice still fires "change"
-    if (!file) return;
-    const reader = new FileReader();
-    reader.onload = () => {
-      let parsed;
-      try { parsed = JSON.parse(reader.result); }
-      catch { setStatus("❌ That file isn't valid JSON"); return; }
-      const importedHeroes = Array.isArray(parsed) ? parsed : parsed.heroes;
-      importHeroesMergeOnly(importedHeroes);
-    };
-    reader.onerror = () => setStatus("❌ Couldn't read that file");
-    reader.readAsText(file);
-  });
+  // Guarded with existence checks: if some future page includes app.js
+  // without these two elements, we skip wiring them up instead of
+  // throwing and silently breaking every listener that comes after this
+  // in init() (which is exactly what happened here before this fix).
+  const btnImport = document.getElementById("btn-import");
+  const importFileInput = document.getElementById("import-file-input");
+  if (btnImport && importFileInput) {
+    btnImport.addEventListener("click", () => {
+      if (editSessionUnlocked) triggerImportFilePicker();
+      else openAdminGate("import");
+    });
+    importFileInput.addEventListener("change", (e) => {
+      const file = e.target.files[0];
+      e.target.value = ""; // reset so picking the same file twice still fires "change"
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = () => {
+        let parsed;
+        try { parsed = JSON.parse(reader.result); }
+        catch { setStatus("❌ That file isn't valid JSON"); return; }
+        const importedHeroes = Array.isArray(parsed) ? parsed : parsed.heroes;
+        importHeroesMergeOnly(importedHeroes);
+      };
+      reader.onerror = () => setStatus("❌ Couldn't read that file");
+      reader.readAsText(file);
+    });
+  }
 
   // Quick Draft
   document.getElementById("quickdraft-handle").addEventListener("click", toggleQuickDraftDrawer);
@@ -3575,7 +3583,8 @@ async function autoLoadFromServer() {
    anything already in your current roster.
 ═══════════════════════════════════════ */
 function triggerImportFilePicker() {
-  document.getElementById("import-file-input").click();
+  const input = document.getElementById("import-file-input");
+  if (input) input.click();
 }
 
 // A hero "already exists" if its id matches OR its name+rarity+role match
