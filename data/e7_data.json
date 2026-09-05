@@ -1832,7 +1832,8 @@
       },
       "_x": 10,
       "_y": 10,
-      "hidden": true
+      "hidden": true,
+      "pvpTag": true
     },
     {
       "id": 1787483937003,
@@ -2290,7 +2291,8 @@
       },
       "_x": 70,
       "_y": 30,
-      "hidden": true
+      "hidden": true,
+      "pvpTag": true
     },
     {
       "id": 1787497684937,
@@ -5340,7 +5342,8 @@
       },
       "_x": 20,
       "_y": 30,
-      "hidden": true
+      "hidden": true,
+      "pvpTag": true
     },
     {
       "id": 1787965852915,
@@ -5663,7 +5666,8 @@
       "altStats": null,
       "_x": 30,
       "_y": 15,
-      "hidden": true
+      "hidden": true,
+      "pvpTag": true
     },
     {
       "id": 1787967249846,
@@ -6125,29 +6129,6 @@
       "hidden": true
     },
     {
-      "id": 1787969903973,
-      "name": "Unbound Knight Arowell",
-      "rarity": "3",
-      "role": "Knight",
-      "element": "Light",
-      "vType": "TNK",
-      "vScore": 9,
-      "hType": "SUR",
-      "hScore": 5,
-      "notes": "",
-      "iconData": "https://raw.githubusercontent.com/iridesuwa18/e7-chart/main/assets/heroes/unbound-knight-arowell.webp",
-      "locked": true,
-      "altStats": {
-        "vType": "SPD",
-        "vScore": 5,
-        "hType": "SST",
-        "hScore": 3
-      },
-      "_x": 25,
-      "_y": 95,
-      "hidden": true
-    },
-    {
       "id": 1787970025642,
       "name": "Yoonryoung",
       "rarity": "3",
@@ -6250,7 +6231,8 @@
       },
       "_x": 95,
       "_y": 85,
-      "hidden": true
+      "hidden": true,
+      "pvpTag": true
     },
     {
       "id": 1787970433397,
@@ -6405,7 +6387,8 @@
         "hScore": 5
       },
       "_x": 75,
-      "_y": 65
+      "_y": 65,
+      "pvpTag": true
     },
     {
       "id": 1787971563798,
@@ -7354,5 +7337,5 @@
       "elementIcons": {}
     }
   },
-  "savedAt": "2026-09-04T20:48:29.483Z"
+  "savedAt": "2026-09-05T01:37:19.164Z"
 }
