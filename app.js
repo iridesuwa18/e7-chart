@@ -121,6 +121,15 @@ let quickDraftSuggestOpen = false;
 let qdLastFilledSlot = null;
 let qdNextBestRank = 0;
 let qdBanProtectElement = null; // the element of the enemy's un-bannable "Ban Protect" pick, if set (Rule 1)
+let qdCompetitiveMode = false; // when on: 3★ heroes (chained or support) are excluded from Randomize/Suggest/Autofill unless pvpTag is set. Session-only, like the rest of Quick Draft's state.
+
+// Shared by every Quick Draft pick source (Randomize, Suggest, Autofill —
+// Autofill just calls into Suggest under the hood) so the ban is applied
+// consistently everywhere a hero could be chosen, whether as a chain
+// "main" or as a support.
+function qdIsBannedByCompetitive(h) {
+  return qdCompetitiveMode && h.rarity === "3" && !h.pvpTag;
+}
 const QD_ELEMENT_COUNTER = { Fire: "Ice", Ice: "Earth", Earth: "Fire", Light: "Dark", Dark: "Light" }; // which element beats which
 
 /* ── Quick Draft rules (quadrant/tier/chain logic, v3) ──
@@ -389,6 +398,18 @@ const saveStatus   = document.getElementById("save-status");
   });
 
   document.getElementById("btn-quickdraft-autofill").addEventListener("click", autofillTopQuickDraftPick);
+
+  // Competitive mode — bans all 3★ heroes (as chained mains or supports)
+  // from Quick Draft's pick pool, except any explicitly PVP-tagged ones.
+  // Session-only, like the rest of Quick Draft's state — resets each load.
+  const qdCompetitiveCheckbox = document.getElementById("qd-competitive-mode");
+  if (qdCompetitiveCheckbox) {
+    qdCompetitiveCheckbox.checked = qdCompetitiveMode;
+    qdCompetitiveCheckbox.addEventListener("change", () => {
+      qdCompetitiveMode = qdCompetitiveCheckbox.checked;
+      if (quickDraftSuggestOpen) renderQuickDraftSuggestions();
+    });
+  }
   const nextBestBtn = document.getElementById("btn-quickdraft-nextbest");
   if (nextBestBtn) nextBestBtn.addEventListener("click", nextBestQuickDraftPick);
   document.getElementById("modal-cancel").addEventListener("click", closeModal);
@@ -1250,7 +1271,7 @@ function qdSuggestForSlot(nextIdx, draftArr, banProtectEl) {
   const usedHeroIds = new Set(
     draftArr.filter((raw, i) => raw !== null && i !== nextIdx).map(raw => qdParsePick(raw).heroId)
   );
-  const candidateHeroes = heroes.filter(h => !usedHeroIds.has(h.id));
+  const candidateHeroes = heroes.filter(h => !usedHeroIds.has(h.id) && !qdIsBannedByCompetitive(h));
   const req = qdSlotRequirement(nextIdx, draftArr);
 
   const counterEl = banProtectEl ? QD_ELEMENT_COUNTER[banProtectEl] : null;
@@ -1469,8 +1490,13 @@ function randomizeQuickDraft() {
   const idx = quickDraft.indexOf(null);
   if (idx === -1) { setStatus("⚠️ Quick Draft is full (5/5)"); return; }
   const usedHeroIds = new Set(quickDraft.filter(raw => raw !== null).map(raw => qdParsePick(raw).heroId));
-  const pool = heroes.filter(h => !usedHeroIds.has(h.id));
-  if (pool.length === 0) { setStatus("⚠️ No more heroes left in your Roster."); return; }
+  const pool = heroes.filter(h => !usedHeroIds.has(h.id) && !qdIsBannedByCompetitive(h));
+  if (pool.length === 0) {
+    setStatus(qdCompetitiveMode
+      ? "⚠️ No eligible heroes left (Competitive mode is banning non-PVP-tagged 3★s)."
+      : "⚠️ No more heroes left in your Roster.");
+    return;
+  }
   const entries = [];
   pool.forEach(h => {
     entries.push({ heroId: h.id, variant: "primary" });
@@ -2379,7 +2405,7 @@ function renderRoster() {
     card.innerHTML = `
       ${iconHTML}
       <div class="hero-card-info">
-        <div class="hero-card-name">${h.name || "Unnamed Hero"}${h.locked ? `<span class="lock-badge" title="Locked">${lockSVG}</span>` : ""}</div>
+        <div class="hero-card-name">${h.name || "Unnamed Hero"}${h.locked ? `<span class="lock-badge" title="Locked">${lockSVG}</span>` : ""}${h.pvpTag ? `<span class="lock-badge" title="PVP tag — exempt from Quick Draft's Competitive 3★ ban">🏆</span>` : ""}</div>
         <div class="hero-card-rarity" style="color:${meta.color}">${meta.label}</div>
         <div class="hero-card-tags">${roleEl}${elemEl}</div>
         <div class="hero-card-scores">
@@ -2757,6 +2783,7 @@ function openAddModal() {
   fNotes.value    = "";
   fIconData.value = "";
   document.getElementById("f-locked").checked = false;
+  document.getElementById("f-pvp-tag").checked = false;
   document.getElementById("f-alt-enabled").checked = false;
   document.getElementById("alt-stats-inputs").style.display = "none";
   document.getElementById("f-alt-v-type").value  = "SPD";
@@ -2786,6 +2813,7 @@ function openEditModal(h) {
   fNotes.value   = h.notes   || "";
   fIconData.value = h.iconData || "";
   document.getElementById("f-locked").checked = h.locked || false;
+  document.getElementById("f-pvp-tag").checked = h.pvpTag || false;
   // Alt stats
   const hasAlt = !!(h.altStats);
   document.getElementById("f-alt-enabled").checked = hasAlt;
@@ -2849,6 +2877,7 @@ async function onModalConfirm() {
   const notes    = fNotes.value.trim();
   let   iconData = fIconData.value || null;
   const locked   = document.getElementById("f-locked").checked;
+  const pvpTag   = document.getElementById("f-pvp-tag").checked;
 
   // Upload any new pasted/cropped image to GitHub before saving the hero,
   // so heroes[] and e7_data.json only ever hold a small URL, not base64.
@@ -2877,14 +2906,14 @@ async function onModalConfirm() {
 
   if (editingId !== null) {
     heroes = heroes.map(h => h.id === editingId
-      ? { ...h, name, rarity, role, element, vType, vScore, hType, hScore, notes, iconData, locked, altStats }
+      ? { ...h, name, rarity, role, element, vType, vScore, hType, hScore, notes, iconData, locked, pvpTag, altStats }
       : h
     );
   } else {
     heroes.push({
       id: Date.now(),
       name, rarity, role, element, vType, vScore, hType, hScore, notes, iconData,
-      locked, altStats,
+      locked, pvpTag, altStats,
     });
   }
 

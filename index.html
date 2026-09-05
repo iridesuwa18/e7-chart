@@ -80,6 +80,12 @@
                element counters it. -->
           <div class="quickdraft-enemy-elements">
             <div class="qd-ban-protect-row">
+              <label class="qd-competitive-toggle" style="display:flex;align-items:center;gap:8px;cursor:pointer;user-select:none;font-family:'Cinzel',serif;font-size:10px;letter-spacing:.1em;color:var(--text-dim)">
+                <input type="checkbox" id="qd-competitive-mode" style="accent-color:#4ade80;width:14px;height:14px;cursor:pointer"/>
+                🏆 COMPETITIVE — bans all 3★ (chained &amp; support) except PVP-tagged
+              </label>
+            </div>
+            <div class="qd-ban-protect-row">
               <span class="qd-enemy-el-label">🛡 Ban Protect element:</span>
               <div class="qd-ban-protect-chips" id="qd-ban-protect-chips">
                 <button type="button" class="qd-el-chip qd-el-fire" data-el="Fire" title="Ban-protected character is Fire">🔥</button>
@@ -546,6 +552,13 @@
           <input type="checkbox" id="f-locked" style="accent-color:var(--gold);width:14px;height:14px;cursor:pointer"/>
           <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
           LOCK POSITION — prevents dragging on chart
+        </label>
+      </div>
+
+      <div class="form-group" style="display:flex;align-items:center;gap:10px;padding:6px 0">
+        <label style="display:flex;align-items:center;gap:8px;cursor:pointer;user-select:none;font-family:'Cinzel',serif;font-size:10px;letter-spacing:.15em;color:var(--text-dim)">
+          <input type="checkbox" id="f-pvp-tag" style="accent-color:#4ade80;width:14px;height:14px;cursor:pointer"/>
+          🏆 PVP TAG — exempt from Quick Draft's Competitive 3★ ban
         </label>
       </div>
 
