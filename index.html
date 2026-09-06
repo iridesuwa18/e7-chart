@@ -1,0 +1,975 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <title>Epic Seven — Character Quadrant</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700;900&family=Crimson+Pro:ital,wght@0,300;0,400;0,600;1,400&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="style.css" />
+
+  <!-- PWA / installable-app support -->
+  <link rel="manifest" href="manifest.json" />
+  <meta name="theme-color" content="#04090f" />
+  <link rel="icon" href="icon-192.png" />
+  <link rel="apple-touch-icon" href="icon-192.png" />
+  <meta name="mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="apple-mobile-web-app-title" content="E7 Draft" />
+</head>
+<body>
+
+  <!-- HEADER -->
+  <header>
+    <div class="header-top">
+      <div class="brand">
+        <div class="brand-emblem">✦</div>
+        <div class="brand-text">
+          <h1>EPIC SEVEN</h1>
+          <p>Character Quadrant &amp; Draft</p>
+        </div>
+      </div>
+      <div class="header-actions">
+        <span id="save-status" class="save-status"></span>
+        <!-- Admin-only controls: hidden until unlocked via brand emblem double-click -->
+        <div id="admin-controls" style="display:none;align-items:center;gap:7px;flex-wrap:wrap">
+          <button class="btn btn-ghost btn-sm" id="btn-load">↓ Load</button>
+          <button class="btn btn-gold btn-sm" id="btn-save">↑ Save</button>
+          <button class="btn btn-ghost btn-sm" id="btn-import" title="Import a save file — only adds heroes you don't already have, never overwrites">⇪ Import</button>
+          <input type="file" id="import-file-input" accept=".json,application/json" style="display:none">
+          <button class="btn btn-ghost btn-sm" id="btn-export" title="Download your current roster + Reaction/Engagement/Factor library as a Schema v2 JSON file">⇩ Export</button>
+          <button class="btn btn-ghost btn-sm" id="btn-add">＋ Hero</button>
+          <button class="btn btn-ghost btn-sm" id="btn-taxonomy" title="Manage Reactions, Engagements &amp; Factors">🗂 Taxonomy</button>
+          <div class="header-sep"></div>
+        </div>
+        <button class="btn btn-draft btn-sm" id="btn-draft-toggle">⚔ Draft</button>
+      </div>
+    </div>
+  </header>
+
+  <!-- MAIN -->
+  <main>
+
+    <!-- CHART AREA -->
+    <div class="chart-column">
+
+      <!-- QUICK DRAFT drawer — hidden above the chart; opening it pushes
+           the chart down since everything here shares normal flow. -->
+      <button class="quickdraft-handle" id="quickdraft-handle" title="Quick Draft">
+        <span class="quickdraft-handle-label">⚔ QUICK DRAFT</span>
+        <span class="quickdraft-handle-sub" id="quickdraft-handle-sub">0/5</span>
+        <span class="quickdraft-handle-chevron" id="quickdraft-chevron">▾</span>
+      </button>
+
+      <div class="quickdraft-drawer" id="quickdraft-drawer">
+        <div class="quickdraft-inner">
+          <div class="quickdraft-slots" id="quickdraft-slots"></div>
+
+          <div class="quickdraft-toolbar">
+            <div class="quickdraft-stats" id="quickdraft-stats"></div>
+            <div class="quickdraft-toolbar-actions">
+              <button class="btn btn-ghost btn-sm" id="btn-quickdraft-random" title="Randomize the first pick, then build around it">🎲 Randomize</button>
+              <button class="btn btn-gold btn-sm" id="btn-quickdraft-suggest">🔮 Suggest</button>
+              <button class="btn btn-gold btn-sm" id="btn-quickdraft-autofill" title="Add the top-suggested pick for the next empty slot">⚡ Autofill</button>
+              <button class="btn btn-ghost btn-sm" id="btn-quickdraft-nextbest" title="Swap the last-filled slot for the next-best option (does not add a new hero)" disabled>⏭ Rep. Curr.</button>
+              <button class="btn btn-ghost btn-xs" id="btn-quickdraft-clear">✕ Clear</button>
+            </div>
+          </div>
+
+          <!-- Rule 1: mark only the opponent's un-bannable "Ban Protect"
+               element. Suggestions prioritize whichever element counters
+               it ahead of score — same priority-ordering role as the old
+               Rule 1, just no longer quadrant-scoped (Quick Draft Refactor
+               Section 4). Unlike the old quadrant engine, this stays
+               active in BOTH plain kit-score mode and Factor mode — it
+               does not go dormant when an Enemy Factor is ticked. -->
+          <div class="quickdraft-enemy-elements">
+            <div class="qd-ban-protect-row">
+              <label class="qd-competitive-toggle" style="display:flex;align-items:center;gap:8px;cursor:pointer;user-select:none;font-family:'Cinzel',serif;font-size:10px;letter-spacing:.1em;color:var(--text-dim)">
+                <input type="checkbox" id="qd-competitive-mode" style="accent-color:#4ade80;width:14px;height:14px;cursor:pointer"/>
+                🏆 COMPETITIVE — bans all 3★ (chained &amp; support) except PVP-tagged
+              </label>
+            </div>
+
+            <!-- Section 8.1: Enemy Factor checklist — fast, tick-during-
+                 a-match input, separate from hero picking. Ticking a
+                 Factor here is what now represents "the enemy has this",
+                 including standing in for the old Ban Protect pick
+                 (Section 8.4) — no separate "element to counter" input
+                 is needed once Factors are driving recommendations. -->
+            <div class="qd-ban-protect-row qd-factor-row">
+              <span class="qd-enemy-el-label">🎯 Enemy Factors:</span>
+              <div class="qd-factor-chips" id="qd-factor-chips"><!-- populated from the taxonomy Factors library --></div>
+            </div>
+
+            <div class="qd-ban-protect-row">
+              <span class="qd-enemy-el-label" title="Prioritizes counter-element picks ahead of score. Stays active alongside ticked Enemy Factors.">🛡 Ban Protect element:</span>
+              <div class="qd-ban-protect-chips" id="qd-ban-protect-chips">
+                <button type="button" class="qd-el-chip qd-el-fire" data-el="Fire" title="Ban-protected character is Fire">🔥</button>
+                <button type="button" class="qd-el-chip qd-el-ice" data-el="Ice" title="Ban-protected character is Ice">❄️</button>
+                <button type="button" class="qd-el-chip qd-el-earth" data-el="Earth" title="Ban-protected character is Earth">🌿</button>
+                <button type="button" class="qd-el-chip qd-el-light" data-el="Light" title="Ban-protected character is Light">☀️</button>
+                <button type="button" class="qd-el-chip qd-el-dark" data-el="Dark" title="Ban-protected character is Dark">🌙</button>
+              </div>
+            </div>
+          </div>
+
+          <div class="quickdraft-suggestions" id="quickdraft-suggestions" style="display:none">
+            <div class="quickdraft-suggestions-title">
+              BEST PICKS <span id="quickdraft-suggest-slot-label"></span>
+            </div>
+            <div class="quickdraft-element-hint" id="quickdraft-element-hint" style="display:none"></div>
+            <!-- Rebuild Spec Section 9.1 — two independently scrollable
+                 columns (Selfless / Selfish) instead of one blended list,
+                 so the ratio of each in the draft can be chosen on
+                 purpose. See renderQuickDraftSuggestionsInner in app.js. -->
+            <div class="qd-suggest-columns">
+              <div class="qd-suggest-column">
+                <div class="qd-suggest-column-header selfless">💚 Selfless</div>
+                <div class="quickdraft-suggestions-list" id="quickdraft-suggestions-list-selfless"></div>
+              </div>
+              <div class="qd-suggest-column">
+                <div class="qd-suggest-column-header selfish">🗡 Selfish</div>
+                <div class="quickdraft-suggestions-list" id="quickdraft-suggestions-list-selfish"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    <div class="chart-outer">
+
+      <!-- Axis labels -->
+      <div class="axis-label axis-top">SELFISH</div>
+      <div class="axis-label axis-bottom">SELFLESS</div>
+      <div class="axis-label axis-left"><span style="opacity:1">REACTION SCORE</span><span>Reacts &amp; Counters</span></div>
+      <div class="axis-label axis-right"><span style="opacity:1">ENGAGE SCORE</span><span>Proactive &amp; Enabling</span></div>
+
+      <!-- The chart -->
+      <div class="chart" id="chart">
+        <!-- Visual background (clipped); heroes overflow this -->
+        <div class="chart-bg"></div>
+
+        <!-- Axes -->
+        <div class="axis-h"></div>
+        <div class="axis-v"></div>
+
+        <!-- Arrow heads -->
+        <div class="arr arr-left"></div>
+        <div class="arr arr-right"></div>
+        <div class="arr arr-up"></div>
+        <div class="arr arr-down"></div>
+
+        <!-- Axis scale numbers -->
+        <!-- Vertical axis: 10 near top arrow (SPD), 10 near bottom arrow (TNK) -->
+        <div class="axis-num axis-num-spd">10</div>
+        <div class="axis-num axis-num-tnk">10</div>
+        <!-- Horizontal axis: 10 near left arrow (SUR), 10 near right arrow (SST) -->
+        <div class="axis-num axis-num-sur">10</div>
+        <div class="axis-num axis-num-sst">10</div>
+        <div class="axis-num axis-num-center">0</div>
+
+        <!-- Origin dot — the true (0,0) point. Only clickable in Dot Mode
+             (otherwise hero portraits sitting on top of it would make it
+             too easy to click by accident). Opens the axis-zero legend. -->
+        <div class="origin-dot" id="origin-dot" title="Click to see what 0 means on each axis (Dot Mode only)"></div>
+
+        <!-- Quadrant corner labels — renamed per Rebuild Spec Section 6.2.
+             TL/TR keep the old top-axis corners (now Selfish instead of
+             Speed); BL/BR keep the old bottom-axis corners (now Selfless
+             instead of Tanky). Left/right still Reaction/Engage as before
+             Survivability/Sustainability. -->
+        <div class="quad-label quad-tl">
+          <div class="quad-title" style="color:#4fc3f7">Reaction + Selfish</div>
+          <div class="quad-sub">Lone Wolf Counter</div>
+        </div>
+        <div class="quad-label quad-tr">
+          <div class="quad-title" style="color:#ffd54f">Engage + Selfish</div>
+          <div class="quad-sub">Solo Aggressor</div>
+        </div>
+        <div class="quad-label quad-bl">
+          <div class="quad-title" style="color:#81c784">Reaction + Selfless</div>
+          <div class="quad-sub">Guardian Angel</div>
+        </div>
+        <div class="quad-label quad-br">
+          <div class="quad-title" style="color:#ef9a9a">Engage + Selfless</div>
+          <div class="quad-sub">Team Engine</div>
+        </div>
+
+        <!-- Heroes rendered here by JS -->
+
+        <!-- Circle-select ring overlay (Circle Mode) -->
+        <div class="circle-select-ring" id="circle-select-ring" style="display:none;"></div>
+      </div>
+
+      <!-- Chart options bar -->
+      <div class="chart-options-bar">
+        <button id="btn-snap-toggle" class="chart-opt-btn" data-tip="GRID SNAP" title="Grid Snap: OFF">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg>
+        </button>
+        <div class="chart-opt-divider"></div>
+        <button id="btn-visibility-toggle" class="chart-opt-btn" data-tip="SHOW / HIDE">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+        </button>
+        <button id="btn-label-toggle" class="chart-opt-btn" data-tip="LABELS">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+        </button>
+        <button id="btn-spread-toggle" class="chart-opt-btn" data-tip="SPREAD">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="1"/><circle cx="19" cy="5" r="1"/><circle cx="5" cy="19" r="1"/><circle cx="19" cy="19" r="1"/><circle cx="5" cy="5" r="1"/></svg>
+        </button>
+        <button id="btn-focus-toggle" class="chart-opt-btn" data-tip="FOCUS MODE">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
+        </button>
+        <div class="chart-opt-divider"></div>
+        <button id="btn-dot-toggle" class="chart-opt-btn" data-tip="DOT MODE">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor" stroke="none"><circle cx="12" cy="12" r="5"/></svg>
+        </button>
+        <button id="btn-circle-toggle" class="chart-opt-btn" data-tip="CIRCLE SELECT">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="8" stroke-dasharray="3 3"/><circle cx="12" cy="12" r="1.4" fill="currentColor" stroke="none"/></svg>
+        </button>
+        <div class="chart-opt-divider"></div>
+        <button id="btn-capture-chart" class="chart-opt-btn" data-tip="CAPTURE IMAGE">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>
+        </button>
+      </div>
+
+      <!-- Circle-select control panel — appears once a circle is placed -->
+      <div class="circle-control-panel" id="circle-control-panel" style="display:none;">
+        <div class="circle-control-row">
+          <span class="circle-control-label">RADIUS</span>
+          <input type="range" id="circle-radius-input" min="5" max="40" step="1" value="15" />
+          <span class="circle-count-label" id="circle-count-label">0 heroes in range</span>
+        </div>
+        <div class="circle-control-row circle-control-actions">
+          <button class="btn btn-gold btn-sm" id="btn-circle-magnify">🔍 Open Selection</button>
+          <button class="btn btn-ghost btn-sm" id="btn-circle-clear">✕ Clear Circle</button>
+        </div>
+      </div>
+    </div>
+    <!-- /chart-outer -->
+    </div>
+    <!-- /chart-column -->
+
+    <!-- SIDEBAR -->
+    <aside class="sidebar">
+      <div class="side-title">
+        ROSTER
+        <div class="roster-controls">
+          <!-- Sort -->
+          <select id="roster-sort" class="roster-mini-select" title="Sort">
+            <option value="date-desc">Newest</option>
+            <option value="date-asc">Oldest</option>
+            <option value="az">A → Z</option>
+            <option value="za">Z → A</option>
+            <option value="rank-desc">Rank (High → Low)</option>
+            <option value="rank-asc">Rank (Low → High)</option>
+          </select>
+          <!-- Filter button -->
+          <button class="btn btn-ghost btn-xs" id="btn-filter-toggle" title="Filters">⚙ Filter</button>
+        </div>
+      </div>
+
+      <!-- Search -->
+      <div class="roster-search-wrap">
+        <input type="text" id="roster-search" class="roster-search-input" placeholder="Search heroes…" autocomplete="off" />
+        <button class="roster-search-clear" id="roster-search-clear" title="Clear search" style="display:none;">✕</button>
+      </div>
+
+      <!-- Filter panel -->
+      <div class="filter-panel" id="filter-panel" style="display:none">
+        <div class="filter-group">
+          <div class="filter-label">RARITY</div>
+          <div class="filter-chips" id="filter-rarity">
+            <button class="chip active" data-val="5ml">5★ ML</button>
+            <button class="chip active" data-val="5r">5★ Reg</button>
+            <button class="chip active" data-val="4">4★</button>
+            <button class="chip active" data-val="3">3★</button>
+          </div>
+        </div>
+        <div class="filter-group">
+          <div class="filter-label">ROLE</div>
+          <div class="filter-chips" id="filter-role">
+            <button class="chip active" data-val="Warrior">Warrior</button>
+            <button class="chip active" data-val="Knight">Knight</button>
+            <button class="chip active" data-val="Thief">Thief</button>
+            <button class="chip active" data-val="Ranger">Ranger</button>
+            <button class="chip active" data-val="Mage">Mage</button>
+            <button class="chip active" data-val="Soul Weaver">Soul Weaver</button>
+            <button class="chip active" data-val="">— None —</button>
+          </div>
+        </div>
+        <div class="filter-group">
+          <div class="filter-label">ELEMENT</div>
+          <div class="filter-chips" id="filter-element">
+            <button class="chip active" data-val="Fire">🔥 Fire</button>
+            <button class="chip active" data-val="Ice">❄️ Ice</button>
+            <button class="chip active" data-val="Earth">🌿 Earth</button>
+            <button class="chip active" data-val="Light">☀️ Light</button>
+            <button class="chip active" data-val="Dark">💀 Dark</button>
+            <button class="chip active" data-val="">— None —</button>
+          </div>
+        </div>
+      </div>
+
+      <div id="roster-list">
+        <div class="empty-state" id="empty-msg">No heroes yet.<br>Tap ＋ Hero to add one.</div>
+      </div>
+
+      <div class="legend">
+        <div class="legend-title">RARITY</div>
+        <div class="legend-row"><span class="legend-dot" style="background:#e8c84a"></span><span style="color:#e8c84a" class="legend-lbl">5★ Moonlight / Limited</span></div>
+        <div class="legend-row"><span class="legend-dot" style="background:#e8c84a; opacity:0.6"></span><span style="color:#e8c84a; opacity:0.7" class="legend-lbl">5★ Regular</span></div>
+        <div class="legend-row"><span class="legend-dot" style="background:#a88fd4"></span><span style="color:#a88fd4" class="legend-lbl">4★</span></div>
+        <div class="legend-row"><span class="legend-dot" style="background:#7a9aaa"></span><span style="color:#7a9aaa" class="legend-lbl">3★</span></div>
+      </div>
+    </aside>
+  </main>
+
+  <!-- VISIBILITY MODAL -->
+  <div id="visibility-modal-overlay">
+    <div id="visibility-modal">
+      <div id="visibility-modal-header">
+        <span class="vis-modal-title">SHOW / HIDE HEROES</span>
+        <input id="vis-search" placeholder="Search heroes…" />
+        <button id="vis-check-all"   class="vis-btn">Show All</button>
+        <button id="vis-uncheck-all" class="vis-btn">Hide All</button>
+        <label style="display:flex;align-items:center;gap:5px;font-family:'Cinzel',serif;font-size:9px;letter-spacing:.12em;color:var(--text-dim);white-space:nowrap;flex-shrink:0">
+          ICON
+          <input id="vis-icon-size" type="number" min="16" max="80" value="38"
+            style="width:48px;padding:3px 5px;font-size:12px;text-align:center;flex-shrink:0" />
+        </label>
+        <button class="vis-modal-close" id="vis-modal-close">×</button>
+      </div>
+      <!-- Filter bar inside vis modal -->
+      <div id="vis-filter-bar">
+        <div class="vis-filter-group">
+          <span class="vis-filter-label">RARITY</span>
+          <div id="vis-filter-rarity" style="display:flex;gap:4px;flex-wrap:wrap">
+            <button class="vis-chip active" data-val="5ml">5★ ML</button>
+            <button class="vis-chip active" data-val="5r">5★ Reg</button>
+            <button class="vis-chip active" data-val="4">4★</button>
+            <button class="vis-chip active" data-val="3">3★</button>
+          </div>
+        </div>
+        <div class="vis-filter-group">
+          <span class="vis-filter-label">ELEMENT</span>
+          <div id="vis-filter-element" style="display:flex;gap:4px;flex-wrap:wrap">
+            <button class="vis-chip active" data-val="Fire">Fire</button>
+            <button class="vis-chip active" data-val="Ice">Ice</button>
+            <button class="vis-chip active" data-val="Earth">Earth</button>
+            <button class="vis-chip active" data-val="Light">Light</button>
+            <button class="vis-chip active" data-val="Dark">Dark</button>
+            <button class="vis-chip active" data-val="">None</button>
+          </div>
+        </div>
+        <div class="vis-filter-group">
+          <span class="vis-filter-label">ROLE</span>
+          <div id="vis-filter-role" style="display:flex;gap:4px;flex-wrap:wrap">
+            <button class="vis-chip active" data-val="Warrior">Warrior</button>
+            <button class="vis-chip active" data-val="Knight">Knight</button>
+            <button class="vis-chip active" data-val="Thief">Thief</button>
+            <button class="vis-chip active" data-val="Ranger">Ranger</button>
+            <button class="vis-chip active" data-val="Mage">Mage</button>
+            <button class="vis-chip active" data-val="Soul Weaver">S.Weaver</button>
+            <button class="vis-chip active" data-val="">None</button>
+          </div>
+        </div>
+      </div>
+      <div id="vis-list"></div>
+    </div>
+  </div>
+
+  <!-- FOOTER CREDITS -->
+  <footer class="site-footer">
+    <span>Reference: <a href="https://ceciliabot.github.io/#/" target="_blank" rel="noopener">ceciliabot.github.io</a> — Developer of ceciliabot: gio#0898 and Moriyaism.</span>
+    <span>Created by <strong>iridesuwa</strong>, powered by Claude, GitHub &amp; Vercel.</span>
+  </footer>
+
+  <!-- HERO DETAILS MODAL (read-only) -->
+  <div class="overlay" id="details-overlay">
+    <div class="modal details-modal" id="details-modal">
+      <div class="details-modal-header">
+        <div class="modal-title" id="details-title">HERO DETAILS</div>
+        <button class="det-close-btn" id="det-close">×</button>
+      </div>
+
+      <!-- Section 1: Chart Details -->
+      <div class="det-section">
+        <div class="det-section-label">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+          HERO DETAILS <span class="det-section-sub">(Chart)</span>
+        </div>
+        <div id="det-chart-body" class="det-section-body"></div>
+      </div>
+
+      <!-- Section 2: Draft Details -->
+      <div class="det-section">
+        <div class="det-section-label">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+          HERO DETAILS <span class="det-section-sub">(Draft)</span>
+        </div>
+        <div id="det-draft-body" class="det-section-body"></div>
+      </div>
+
+      <!-- Actions -->
+      <div class="det-actions">
+        <button class="btn btn-gold" id="det-edit-btn">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+          Edit Hero
+        </button>
+        <button class="btn btn-ghost" id="det-close-btn2" onclick="closeHeroDetails()">Close</button>
+        <button class="btn btn-danger" id="det-delete-btn" style="margin-left:auto">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg>
+          Delete
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ADD / EDIT MODAL -->
+  <div class="overlay" id="modal-overlay">
+    <div class="modal" id="modal">
+      <div class="modal-title" id="modal-title">ADD HERO</div>
+
+      <div class="form-group">
+        <label>Name</label>
+        <input type="text" id="f-name" placeholder="e.g. Ruele of Light" />
+      </div>
+
+      <div class="form-row">
+        <div class="form-group">
+          <label>Rarity</label>
+          <select id="f-rarity">
+            <option value="5ml">5★ Moonlight / Limited</option>
+            <option value="5r">5★ Regular</option>
+            <option value="4">4★</option>
+            <option value="3">3★</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Role</label>
+          <select id="f-role">
+            <option value="">— None —</option>
+            <option value="Warrior">Warrior</option>
+            <option value="Knight">Knight</option>
+            <option value="Thief">Thief</option>
+            <option value="Ranger">Ranger</option>
+            <option value="Mage">Mage</option>
+            <option value="Soul Weaver">Soul Weaver</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Element</label>
+          <select id="f-element">
+            <option value="">— None —</option>
+            <option value="Fire">🔥 Fire</option>
+            <option value="Ice">❄️ Ice</option>
+            <option value="Earth">🌿 Earth</option>
+            <option value="Light">☀️ Light</option>
+            <option value="Dark">💀 Dark</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- Selfish / Selfless (Rebuild Spec Section 3/4) — this is the
+           chart's Y axis now. -->
+      <div class="form-group">
+        <label>Selfish / Selfless</label>
+        <div class="ss-slider-row">
+          <span class="ss-slider-end ss-slider-end-selfish">Selfish</span>
+          <div class="ss-slider-track">
+            <div class="ss-slider-fill" id="ss-slider-fill"></div>
+            <div class="ss-slider-mid"></div>
+            <input type="range" id="f-ss-score" min="-10" max="10" step="0.1" value="0" class="ss-slider-input" />
+          </div>
+          <span class="ss-slider-end ss-slider-end-selfless">Selfless</span>
+          <button type="button" class="stat-info-btn slider-trigger-btn" id="btn-open-v-slider" title="Open full-screen slider">⇕</button>
+        </div>
+        <div class="ss-slider-readout" id="ss-slider-readout">Neutral</div>
+        <button type="button" class="btn btn-ghost btn-sm" id="btn-open-questionnaire">📋 Questionnaire</button>
+      </div>
+
+      <!-- Image icon section (replaces emoji picker) -->
+      <div class="form-group">
+        <label>Icon Image</label>
+        <div class="icon-image-area" id="icon-image-area">
+          <!-- Preview circle -->
+          <div class="icon-preview-wrap">
+            <canvas id="icon-canvas" width="128" height="128" style="width:64px;height:64px;border-radius:50%"></canvas>
+            <div class="icon-preview-label">Preview</div>
+          </div>
+          <!-- Controls -->
+          <div class="icon-image-controls">
+            <button class="btn btn-ghost btn-sm" id="btn-paste-icon" type="button">📋 Paste Image</button>
+            <label class="btn btn-ghost btn-sm" style="cursor:pointer">
+              📁 Upload
+              <input type="file" id="f-icon-file" accept="image/*" style="display:none" />
+            </label>
+            <div class="icon-url-row">
+              <input type="text" id="f-icon-url" placeholder="Or paste image URL…" />
+              <button class="btn btn-ghost btn-sm" id="btn-load-url" type="button">Load</button>
+            </div>
+          </div>
+        </div>
+        <!-- Image editor -->
+        <div class="img-editor-wrap" id="img-editor-wrap" style="display:none">
+          <div class="img-editor-box" id="img-editor-box">
+            <img id="img-editor-src" draggable="false" />
+            <div class="img-editor-circle"></div>
+          </div>
+          <div class="img-editor-controls">
+            <label>Zoom <input type="range" id="img-zoom" min="0.1" max="5" step="0.01" value="1" /></label>
+            <button class="btn btn-gold btn-sm" id="btn-crop-confirm" type="button">✓ Use This</button>
+            <button class="btn btn-ghost btn-sm" id="btn-crop-cancel" type="button">✕ Cancel</button>
+          </div>
+        </div>
+        <input type="hidden" id="f-icon-data" />
+      </div>
+
+      <!-- Secondary / Ghost Stats -->
+      <div class="form-group alt-stats-section">
+        <div class="alt-stats-header">
+          <label style="display:flex;align-items:center;gap:8px;cursor:pointer;user-select:none;font-family:'Cinzel',serif;font-size:10px;letter-spacing:.15em;color:var(--text-dim)">
+            <input type="checkbox" id="f-alt-enabled" style="accent-color:#e040fb;width:14px;height:14px;cursor:pointer"/>
+            <span class="ghost-dot-icon">👻</span>
+            SECONDARY STATS — show ghost icon at alternate position
+          </label>
+        </div>
+        <div id="alt-stats-inputs" style="display:none;margin-top:10px">
+          <!-- Ghost Selfish / Selfless (Section 6 open-decision: extend ghost to the new axes) -->
+          <div class="form-group" style="margin-top:12px">
+            <label>Ghost Selfish / Selfless</label>
+            <div class="ss-slider-row">
+              <span class="ss-slider-end ss-slider-end-selfish">Selfish</span>
+              <div class="ss-slider-track">
+                <div class="ss-slider-fill" id="alt-ss-slider-fill"></div>
+                <div class="ss-slider-mid"></div>
+                <input type="range" id="f-alt-ss-score" min="-10" max="10" step="0.1" value="0" class="ss-slider-input" />
+              </div>
+              <span class="ss-slider-end ss-slider-end-selfless">Selfless</span>
+              <button type="button" class="stat-info-btn slider-trigger-btn ghost-trigger-btn" id="btn-open-alt-v-slider" title="Open full-screen slider (ghost)">⇕</button>
+            </div>
+            <div class="ss-slider-readout" id="alt-ss-slider-readout">Neutral</div>
+            <button type="button" class="btn btn-ghost btn-sm" id="btn-open-alt-questionnaire">📋 Ghost Questionnaire</button>
+          </div>
+
+          <!-- Ghost Reactions & Engagements -->
+          <div class="form-group rte-section" style="margin-top:10px">
+            <label>Ghost Reactions &amp; Engagements
+              <button type="button" class="stat-info-btn slider-trigger-btn ghost-trigger-btn" id="btn-open-alt-h-slider" title="View Reaction/Engage breakdown (ghost)" style="position:static;margin-left:6px">⇔</button>
+            </label>
+            <div class="rte-score-badges">
+              <span class="rte-score-badge" id="alt-rte-reaction-score-badge">Reaction Score: —</span>
+              <span class="rte-score-badge" id="alt-rte-engage-score-badge">Engage Score: —</span>
+            </div>
+
+            <div class="rte-block">
+              <div class="rte-block-title">Reactions</div>
+              <div class="rte-assigned-list" id="alt-rte-reactions-list"></div>
+              <div class="rte-add-row">
+                <select id="alt-rte-add-reaction-select"><option value="">+ Add a Reaction…</option></select>
+                <input type="number" id="alt-rte-add-reaction-score" min="0" max="10" step="0.1" value="5" />
+                <button type="button" class="btn btn-ghost btn-sm" id="alt-rte-add-reaction-btn">Add</button>
+              </div>
+            </div>
+
+            <div class="rte-block">
+              <div class="rte-block-title">Engagements</div>
+              <div class="rte-assigned-list" id="alt-rte-engagements-list"></div>
+              <div class="rte-add-row">
+                <select id="alt-rte-add-engagement-select"><option value="">+ Add an Engagement…</option></select>
+                <input type="number" id="alt-rte-add-engagement-score" min="0" max="10" step="0.1" value="5" />
+                <button type="button" class="btn btn-ghost btn-sm" id="alt-rte-add-engagement-btn">Add</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Reactions & Engagements assignment (Rebuild Spec Section 5.3) —
+           attaches existing library items (Section 5.1/5.2) to this hero
+           with a per-hero 0–10 score. Never free-typed; always picked from
+           the shared taxonomy so renaming/re-tagging stays in sync. -->
+      <div class="form-group rte-section">
+        <label>Reactions &amp; Engagements
+          <button type="button" class="stat-info-btn slider-trigger-btn" id="btn-open-h-slider" title="View Reaction/Engage breakdown" style="position:static;margin-left:6px">⇔</button>
+        </label>
+        <div class="rte-score-badges">
+          <span class="rte-score-badge" id="rte-reaction-score-badge">Reaction Score: —</span>
+          <span class="rte-score-badge" id="rte-engage-score-badge">Engage Score: —</span>
+        </div>
+
+        <div class="rte-block">
+          <div class="rte-block-title">Reactions</div>
+          <div class="rte-assigned-list" id="rte-reactions-list"></div>
+          <div class="rte-add-row">
+            <select id="rte-add-reaction-select"><option value="">+ Add a Reaction…</option></select>
+            <input type="number" id="rte-add-reaction-score" min="0" max="10" step="0.1" value="5" />
+            <button type="button" class="btn btn-ghost btn-sm" id="rte-add-reaction-btn">Add</button>
+          </div>
+        </div>
+
+        <div class="rte-block">
+          <div class="rte-block-title">Engagements</div>
+          <div class="rte-assigned-list" id="rte-engagements-list"></div>
+          <div class="rte-add-row">
+            <select id="rte-add-engagement-select"><option value="">+ Add an Engagement…</option></select>
+            <input type="number" id="rte-add-engagement-score" min="0" max="10" step="0.1" value="5" />
+            <button type="button" class="btn btn-ghost btn-sm" id="rte-add-engagement-btn">Add</button>
+          </div>
+        </div>
+
+        <div class="rte-manage-hint">
+          Need a new Reaction, Engagement, or Factor? Use the 🗂 Taxonomy manager (header bar) — it's shared across every hero.
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label>Notes <span style="color:var(--text-dim);font-size:11px">(optional)</span></label>
+        <textarea id="f-notes" rows="2" placeholder="e.g. Best paired with Seaside Bellona"></textarea>
+      </div>
+
+      <div class="form-group" style="display:flex;align-items:center;gap:10px;padding:6px 0">
+        <label style="display:flex;align-items:center;gap:8px;cursor:pointer;user-select:none;font-family:'Cinzel',serif;font-size:10px;letter-spacing:.15em;color:var(--text-dim)">
+          <input type="checkbox" id="f-locked" style="accent-color:var(--gold);width:14px;height:14px;cursor:pointer"/>
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+          LOCK POSITION — prevents dragging on chart
+        </label>
+      </div>
+
+      <div class="form-group" style="display:flex;align-items:center;gap:10px;padding:6px 0">
+        <label style="display:flex;align-items:center;gap:8px;cursor:pointer;user-select:none;font-family:'Cinzel',serif;font-size:10px;letter-spacing:.15em;color:var(--text-dim)">
+          <input type="checkbox" id="f-pvp-tag" style="accent-color:#4ade80;width:14px;height:14px;cursor:pointer"/>
+          🏆 PVP TAG — exempt from Quick Draft's Competitive 3★ ban
+        </label>
+      </div>
+
+      <div class="modal-btns">
+        <button class="btn btn-gold" id="modal-confirm">Add to Chart</button>
+        <button class="btn btn-ghost" id="modal-cancel">Cancel</button>
+        <button class="btn btn-danger" id="modal-delete" style="margin-left:auto;display:none">Delete</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- SELFISH/SELFLESS QUESTIONNAIRE OVERLAY (Rebuild Spec Section 4) -->
+  <div class="overlay" id="ss-modal-overlay">
+    <div class="modal ss-modal" id="ss-modal">
+      <div class="modal-title">SELFISH OR SELFLESS?</div>
+
+      <!-- Step 0: pick a side -->
+      <div id="ss-step-choose">
+        <p class="ss-modal-question">Is this hero Selfish or Selfless?</p>
+        <div class="modal-btns" style="justify-content:center">
+          <button type="button" class="btn btn-gold" id="ss-choose-selfish">Selfish</button>
+          <button type="button" class="btn btn-gold" id="ss-choose-selfless">Selfless</button>
+        </div>
+      </div>
+
+      <!-- Step 1a: Selfish self-skill checklist (Section 3.1) -->
+      <div id="ss-step-selfish" style="display:none">
+        <p class="ss-modal-question">Check every self-skill this hero's kit has:</p>
+        <div class="ss-checklist" id="ss-selfish-checklist"></div>
+        <div class="ss-modal-score-preview" id="ss-selfish-preview">Score: 0 / 10</div>
+      </div>
+
+      <!-- Step 1b: Selfless ally-support table (Section 3.2) -->
+      <div id="ss-step-selfless" style="display:none">
+        <p class="ss-modal-question">How many other heroes does this hero support (healing, buffs, or a passive)?</p>
+        <div class="ss-ally-count" id="ss-ally-count">
+          <button type="button" class="btn btn-ghost btn-sm ss-count-btn" data-count="0">0</button>
+          <button type="button" class="btn btn-ghost btn-sm ss-count-btn" data-count="1">1</button>
+          <button type="button" class="btn btn-ghost btn-sm ss-count-btn" data-count="2">2</button>
+          <button type="button" class="btn btn-ghost btn-sm ss-count-btn" data-count="3">3</button>
+          <button type="button" class="btn btn-ghost btn-sm ss-count-btn" data-count="4">4</button>
+        </div>
+        <div id="ss-ally-rows"></div>
+        <div class="ss-modal-score-preview" id="ss-selfless-preview">Score: 0</div>
+      </div>
+
+      <div class="modal-btns">
+        <button class="btn btn-gold" id="ss-modal-confirm" style="display:none">Set Score</button>
+        <button class="btn btn-ghost" id="ss-modal-back" style="display:none">Back</button>
+        <button class="btn btn-ghost" id="ss-modal-cancel">Cancel</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════════
+       X-AXIS (HORIZONTAL) FULL-SCREEN SLIDER
+       Sets SUR / SST. Drag or tap the rail; portrait rides
+       along the top. Rebuild Spec Section 7.1: numeric readout
+       only, no long-form descriptive caption underneath.
+  ═══════════════════════════════════════ -->
+  <!-- ═══════════════════════════════════════
+       X-AXIS (HORIZONTAL) FULL-SCREEN VIEWER
+       Rebuild Spec Section 6 open-decision: Reaction/Engage is a
+       DERIVED live average (Section 1.2) — it can never be manually
+       set, so this is a read-only breakdown viewer now, not a slider.
+       Shows the two aggregate scores plus the individual Reactions/
+       Engagements feeding them. Edit the underlying assignments in
+       the Reactions & Engagements panel on the form itself.
+  ═══════════════════════════════════════ -->
+  <div class="axis-slider-overlay" id="xslider-overlay">
+    <div class="axis-slider-screen axis-slider-x">
+      <div class="axis-slider-header">
+        <div class="axis-slider-title">REACTION ⟷ ENGAGE</div>
+        <span class="ghost-badge" id="xslider-ghost-badge">👻 GHOST</span>
+        <button class="axis-slider-close" id="xslider-close" title="Close">✕</button>
+      </div>
+
+      <div style="padding:14px 18px;max-height:60vh;overflow-y:auto">
+        <div style="font-size:11px;color:var(--text-dim);font-style:italic;margin-bottom:12px;font-family:'Crimson Pro',serif;">
+          Derived from this hero's assigned Reactions and Engagements — always live, never set directly.
+        </div>
+        <div id="xslider-portrait" style="width:64px;height:64px;margin:0 auto 14px;">
+          <canvas id="xslider-portrait-canvas" width="128" height="128" style="width:64px;height:64px;border-radius:50%"></canvas>
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+          <div>
+            <div style="font-family:'Cinzel',serif;font-size:10px;letter-spacing:.15em;color:var(--text-dim);margin-bottom:6px">REACTION</div>
+            <div id="xslider-reaction-total" style="font-size:20px;font-weight:600;color:var(--gold);margin-bottom:8px">—</div>
+            <div id="xslider-reaction-list" style="display:flex;flex-direction:column;gap:4px;font-size:12px"></div>
+          </div>
+          <div>
+            <div style="font-family:'Cinzel',serif;font-size:10px;letter-spacing:.15em;color:var(--text-dim);margin-bottom:6px">ENGAGE</div>
+            <div id="xslider-engage-total" style="font-size:20px;font-weight:600;color:var(--gold);margin-bottom:8px">—</div>
+            <div id="xslider-engage-list" style="display:flex;flex-direction:column;gap:4px;font-size:12px"></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="axis-slider-actions">
+        <button class="btn btn-ghost" id="xslider-cancel">Close</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════════
+       Y-AXIS (VERTICAL) FULL-SCREEN SLIDER
+       Sets Selfish / Selfless — kept in sync with the compact
+       Selfish/Selfless slider on the form (Section 6 open-decision).
+       Drag or tap the rail; portrait rides alongside it as it moves
+       up/down. Rebuild Spec Section 7.1: numeric readout only, no
+       descriptive caption.
+  ═══════════════════════════════════════ -->
+  <div class="axis-slider-overlay" id="yslider-overlay">
+    <div class="axis-slider-screen axis-slider-y">
+      <div class="axis-slider-header">
+        <div class="axis-slider-title">SELFISH ⟷ SELFLESS</div>
+        <span class="ghost-badge" id="yslider-ghost-badge">👻 GHOST</span>
+        <label class="fine-toggle">
+          <input type="checkbox" id="yslider-fine-toggle" />
+          <span class="fine-toggle-track"><span class="fine-toggle-thumb"></span></span>
+          <span class="fine-toggle-label">Fine (0.1)</span>
+        </label>
+        <button class="axis-slider-close" id="yslider-close" title="Close">✕</button>
+      </div>
+
+      <div class="axis-slider-stage-y">
+        <div class="axis-slider-endlabel-y">
+          <span class="axis-slider-endname">SELFISH</span>
+          <span class="axis-slider-endval">10</span>
+        </div>
+
+        <div class="axis-slider-track-wrap-y" id="yslider-track-wrap">
+          <div class="axis-slider-track-y" id="yslider-track">
+            <div class="axis-slider-fill-y" id="yslider-fill"></div>
+            <div class="axis-ticks-y" id="yslider-ticks"></div>
+            <div class="axis-slider-handle-y" id="yslider-handle"></div>
+            <!-- Neighbor previews: closest hero below/above the current value -->
+            <div class="axis-neighbor axis-neighbor-y axis-neighbor-above is-hidden" id="yslider-neighbor-above">
+              <div class="axis-neighbor-portrait"><canvas id="yslider-neighbor-above-canvas" width="80" height="80"></canvas></div>
+              <div class="axis-neighbor-label" id="yslider-neighbor-above-label"></div>
+            </div>
+
+            <div class="axis-slider-side-panel" id="yslider-side-panel">
+              <div class="axis-slider-portrait" id="yslider-portrait">
+                <canvas id="yslider-portrait-canvas" width="128" height="128"></canvas>
+              </div>
+              <div class="axis-slider-side-text">
+                <div class="axis-slider-readout-num" id="yslider-readout-num">SPD 10</div>
+              </div>
+            </div>
+
+            <div class="axis-neighbor axis-neighbor-y axis-neighbor-below is-hidden" id="yslider-neighbor-below">
+              <div class="axis-neighbor-portrait"><canvas id="yslider-neighbor-below-canvas" width="80" height="80"></canvas></div>
+              <div class="axis-neighbor-label" id="yslider-neighbor-below-label"></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="axis-slider-endlabel-y">
+          <span class="axis-slider-endname">SELFLESS</span>
+          <span class="axis-slider-endval">10</span>
+        </div>
+      </div>
+
+      <div class="axis-slider-actions">
+        <button class="btn btn-gold" id="yslider-apply">✓ Set Value</button>
+        <button class="btn btn-ghost" id="yslider-cancel">Cancel</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- CIRCLE-SELECT MAGNIFIER (fullscreen mini-grid of the selected area) -->
+  <div id="magnifier-overlay">
+    <div id="magnifier-modal">
+      <div id="magnifier-header">
+        <div class="magnifier-title">🔍 SELECTION AREA</div>
+        <div class="magnifier-sub" id="magnifier-count-label"></div>
+        <button class="vis-modal-close" id="magnifier-close">✕</button>
+      </div>
+      <div id="magnifier-body">
+        <div class="magnifier-grid-wrap">
+          <div class="magnifier-grid" id="magnifier-grid">
+            <div class="magnifier-grid-bg"></div>
+            <div class="magnifier-crosshair-h"></div>
+            <div class="magnifier-crosshair-v"></div>
+          </div>
+        </div>
+        <div class="magnifier-sidebar">
+          <div class="magnifier-filter-bar" id="magnifier-filter-bar"></div>
+          <div class="magnifier-list" id="magnifier-list"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ORIGIN LEGEND (plus-sign popup) — what "0" means on each axis.
+       Opened by clicking the origin dot at chart center, Dot Mode only. -->
+  <div class="overlay" id="origin-legend-overlay">
+    <div class="modal origin-legend-modal" id="origin-legend-modal">
+      <div class="details-modal-header">
+        <div class="modal-title" style="margin:0;padding:0;border:none">AT ZERO, EACH AXIS MEANS…</div>
+        <button class="det-close-btn" id="origin-legend-close">×</button>
+      </div>
+      <!-- Renamed per Rebuild Spec Section 6.1. Top/bottom both read
+           Neutral — the Selfish/Selfless slider is one continuous scale
+           (Section 3.3), so 0 means the same thing from either end.
+           Left/right stay distinct since Reaction and Engage are
+           separate, independent scores. -->
+      <div class="origin-legend-plus">
+        <div class="origin-legend-circle origin-legend-top">
+          <span>Neutral</span>
+        </div>
+        <div class="origin-legend-circle origin-legend-left">
+          <span>Non-<br>Reactor</span>
+        </div>
+        <div class="origin-legend-circle origin-legend-center">0</div>
+        <div class="origin-legend-circle origin-legend-right">
+          <span>Non-<br>Engager</span>
+        </div>
+        <div class="origin-legend-circle origin-legend-bottom">
+          <span>Neutral</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- REACTION / ENGAGEMENT / FACTOR TAXONOMY MANAGER (Rebuild Spec Section 5) —
+       admin-side screen for managing the shared library, separate from any
+       individual hero's edit screen (Section 5.1/5.2). -->
+  <div class="overlay" id="taxonomy-overlay">
+    <div class="modal taxonomy-modal" id="taxonomy-modal">
+      <div class="details-modal-header">
+        <div class="modal-title" style="margin:0;padding:0;border:none">REACTIONS · ENGAGEMENTS · FACTORS</div>
+        <button class="det-close-btn" id="taxonomy-close">×</button>
+      </div>
+
+      <div class="taxonomy-tabs">
+        <button type="button" class="taxonomy-tab active" data-tab="reactions">Reactions</button>
+        <button type="button" class="taxonomy-tab" data-tab="engagements">Engagements</button>
+        <button type="button" class="taxonomy-tab" data-tab="factors">Factors</button>
+      </div>
+
+      <div class="taxonomy-body">
+        <!-- Reactions manager (5.1) -->
+        <div class="taxonomy-panel" id="taxonomy-panel-reactions">
+          <p class="taxonomy-panel-hint">Named, reusable tags a hero can hold (e.g. "Reacts to Counterattack"). Tag Factors here — every hero holding this Reaction inherits the tag automatically.</p>
+          <div class="taxonomy-add-row">
+            <input type="text" id="taxonomy-new-reaction" placeholder="New Reaction name…" />
+            <button type="button" class="btn btn-gold btn-sm" id="taxonomy-add-reaction">+ Add</button>
+          </div>
+          <div class="taxonomy-list" id="taxonomy-list-reactions"></div>
+        </div>
+
+        <!-- Engagements manager (5.1) -->
+        <div class="taxonomy-panel" id="taxonomy-panel-engagements" style="display:none">
+          <p class="taxonomy-panel-hint">Things a hero proactively does or provides (e.g. "Stops all counterattacks"). Tag Factors here the same way as Reactions.</p>
+          <div class="taxonomy-add-row">
+            <input type="text" id="taxonomy-new-engagement" placeholder="New Engagement name…" />
+            <button type="button" class="btn btn-gold btn-sm" id="taxonomy-add-engagement">+ Add</button>
+          </div>
+          <div class="taxonomy-list" id="taxonomy-list-engagements"></div>
+        </div>
+
+        <!-- Factors manager (5.2) -->
+        <div class="taxonomy-panel" id="taxonomy-panel-factors" style="display:none">
+          <p class="taxonomy-panel-hint">The checklist vocabulary used during Quick Draft (e.g. "Counterattack", "Speedy units"). Factors are just names — tag them onto a Reaction/Engagement from those tabs.</p>
+          <div class="taxonomy-add-row">
+            <input type="text" id="taxonomy-new-factor" placeholder="New Factor name…" />
+            <button type="button" class="btn btn-gold btn-sm" id="taxonomy-add-factor">+ Add</button>
+          </div>
+          <div class="taxonomy-list" id="taxonomy-list-factors"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ADMIN PASSWORD MODAL -->
+  <div class="overlay" id="admin-overlay">
+    <div class="modal" id="admin-modal">
+      <div class="modal-title">ADMIN ONLY</div>
+      <p class="admin-desc">Please enter the GitHub Key password to <span id="admin-action-label">save</span>.</p>
+      <div class="form-group" style="margin-top:14px">
+        <label>Password</label>
+        <input type="text" id="admin-password" placeholder="Enter admin key…" autocomplete="off" spellcheck="false" style="-webkit-text-security:disc;text-security:disc" />
+      </div>
+      <div id="admin-error" class="admin-error" style="display:none"></div>
+      <div class="modal-btns">
+        <button class="btn btn-gold" id="admin-confirm">Confirm</button>
+        <button class="btn btn-ghost" id="admin-cancel">Cancel</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+  <script src="app.js"></script>
+
+  <!-- ═══ DRAFT PANEL ═══ -->
+  <div id="draft-panel" class="draft-panel" style="display:none">
+    <div id="draft-root"></div>
+  </div>
+
+  <!-- React + Babel (for Draft panel) -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/react/18.2.0/umd/react.production.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.2.0/umd/react-dom.production.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/babel-standalone/7.23.2/babel.min.js"></script>
+  <script type="text/babel" data-presets="react" src="draft.js"></script>
+
+  <!-- PWA service worker registration.
+       Whenever the app becomes visible again, ask the SW to check for an
+       update; if a new SW takes control, reload once to pick up the fresh
+       code automatically (covers home-screen shortcuts that get resumed
+       rather than freshly navigated). -->
+  <script>
+    if ("serviceWorker" in navigator) {
+      let reloadedForUpdate = false;
+      window.addEventListener("load", () => {
+        navigator.serviceWorker.register("sw.js").then(reg => {
+          navigator.serviceWorker.addEventListener("controllerchange", () => {
+            if (reloadedForUpdate) return;
+            reloadedForUpdate = true;
+            location.reload();
+          });
+          document.addEventListener("visibilitychange", () => {
+            if (document.visibilityState === "visible") reg.update().catch(() => {});
+          });
+        }).catch(() => { /* offline-support is best-effort */ });
+      });
+    }
+  </script>
+</body>
+</html>
