@@ -38,7 +38,13 @@
       "pvpTag": false,
       "altStats": null,
       "selfSkillIds": [],
-      "allySupport": []
+      "allySupport": [
+        {
+          "healing": 100,
+          "passive": 50,
+          "buffCount": 3
+        }
+      ]
     },
     {
       "id": 1779353267841,
@@ -9223,5 +9229,5 @@
     ]
   },
   "schemaVersion": 2,
-  "savedAt": "2026-09-06T12:15:45.944Z"
+  "savedAt": "2026-09-06T12:35:47.854Z"
 }
