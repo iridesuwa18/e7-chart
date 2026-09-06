@@ -370,6 +370,17 @@ let modalSelflessScore = 0;
 let modalAltSelfishScore  = 0;
 let modalAltSelflessScore = 0;
 
+// Raw Questionnaire answers behind the score above — which of the 10
+// self-skill checklist items were ticked (selfish), or the per-ally
+// healing/passive/buff breakdown (selfless). Persisted on the hero
+// itself (selfSkillIds/allySupport, altStats.selfSkillIds/allySupport)
+// purely so the hero details "ⓘ" can show how the score was derived;
+// the score fields above remain the source of truth for scoring/ranking.
+let modalSelfSkillIds   = [];
+let modalAllySupport    = [];
+let modalAltSelfSkillIds = [];
+let modalAltAllySupport  = [];
+
 // The hero edit modal's in-progress Reactions/Engagements assignment
 // (Rebuild Spec Section 5.3) — same batching pattern as the Selfish/
 // Selfless state above: arrays of { refId, score }, local to the modal
@@ -3088,6 +3099,43 @@ function onLoadUrl() {
   openImageEditor(url);
 }
 
+// Renders the "how was this derived" breakdown behind a hero's Selfish/
+// Selfless score, for the details view's ⓘ toggle. isAlt reads the
+// ghost/secondary stats instead of the primary ones. Falls back to a
+// plain note for heroes rated before this breakdown existed (no
+// selfSkillIds/allySupport on file) or for Neutral heroes.
+function heroSelfishSelflessBreakdownHTML(h, isAlt) {
+  const src      = isAlt ? (h.altStats || {}) : h;
+  const selfish  = Math.max(0, Number(src.selfishScore)  || 0);
+  const selfless = Math.max(0, Number(src.selflessScore) || 0);
+
+  if (selfless > 0) {
+    const allies = Array.isArray(src.allySupport) ? src.allySupport : [];
+    if (!allies.length) return `<div class="det-breakdown-empty">No ally breakdown on file for this score.</div>`;
+    return allies.map((a, i) => `
+      <div class="det-breakdown-row"><strong>Ally ${i + 1}:</strong> Healing ${Number(a?.healing) || 0}% · Passive ${Number(a?.passive) || 0}% · Buffs ${Number(a?.buffCount) || 0}</div>
+    `).join("");
+  }
+  if (selfish > 0) {
+    const ids = Array.isArray(src.selfSkillIds) ? src.selfSkillIds : [];
+    if (!ids.length) return `<div class="det-breakdown-empty">No checklist breakdown on file for this score.</div>`;
+    const labels = ids.map(id => SELF_SKILLS.find(s => s.id === id)?.label).filter(Boolean);
+    return labels.map(l => `<div class="det-breakdown-row">✓ ${l}</div>`).join("");
+  }
+  return `<div class="det-breakdown-empty">Neutral — no checklist items ticked.</div>`;
+}
+
+// Toggles one details-view breakdown panel open/closed, lazily filling
+// it in on first open (cheap either way, but avoids building markup
+// for a panel the person never expands).
+function toggleDetBreakdown(btnId, boxId, h, isAlt) {
+  const box = document.getElementById(boxId);
+  if (!box) return;
+  const opening = box.style.display === "none";
+  if (opening) box.innerHTML = heroSelfishSelflessBreakdownHTML(h, isAlt);
+  box.style.display = opening ? "block" : "none";
+}
+
 /* ═══════════════════════════════════════
    HERO DETAILS (read-only view)
 ═══════════════════════════════════════ */
@@ -3121,7 +3169,11 @@ function openHeroDetails(h) {
       <div class="det-field"><div class="det-field-label">RARITY</div><div class="det-field-value" style="color:${meta.color}">${meta.label}</div></div>
       <div class="det-field"><div class="det-field-label">ROLE</div><div class="det-field-value">${roleEl}</div></div>
       <div class="det-field"><div class="det-field-label">ELEMENT</div><div class="det-field-value">${elementEl}</div></div>
-      <div class="det-field"><div class="det-field-label">SELFISH / SELFLESS</div><div class="det-field-value"><span class="det-score-pill">${vStr}</span></div></div>
+      <div class="det-field det-field-full">
+        <div class="det-field-label">SELFISH / SELFLESS <button type="button" class="det-info-btn" id="det-ss-info-btn" title="See how this score was derived">ⓘ</button></div>
+        <div class="det-field-value"><span class="det-score-pill">${vStr}</span></div>
+        <div class="det-breakdown" id="det-ss-breakdown" style="display:none"></div>
+      </div>
       <div class="det-field"><div class="det-field-label">REACTION / ENGAGE</div><div class="det-field-value"><span class="det-score-pill">${hStr}</span></div></div>
       <div class="det-field det-field-full"><div class="det-field-label">NOTES</div><div class="det-field-value det-notes">${h.notes || '<span style="opacity:.45;font-style:italic">No notes.</span>'}</div></div>
     </div>
@@ -3129,13 +3181,25 @@ function openHeroDetails(h) {
     <div style="margin-top:14px;padding:10px 12px;background:rgba(224,64,251,.07);border:1px solid rgba(224,64,251,.25);border-radius:5px;">
       <div style="font-family:'Cinzel',serif;font-size:9px;letter-spacing:.2em;color:#e040fb;margin-bottom:8px;">👻 SECONDARY STATS (GHOST)</div>
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;">
-        <div class="det-field"><div class="det-field-label">SELFISH / SELFLESS</div><div class="det-field-value"><span class="det-score-pill" style="border-color:rgba(224,64,251,.4);color:#e040fb;background:rgba(224,64,251,.1)">${(() => { const a = heroAltYAxis(h); return (a.value === 0 ? "Neutral" : (a.side === "SELFISH" ? "Selfish" : "Selfless")) + " " + a.value; })()}</span></div></div>
+        <div class="det-field" style="grid-column:1 / -1">
+          <div class="det-field-label">SELFISH / SELFLESS <button type="button" class="det-info-btn" id="det-alt-ss-info-btn" title="See how this score was derived">ⓘ</button></div>
+          <div class="det-field-value"><span class="det-score-pill" style="border-color:rgba(224,64,251,.4);color:#e040fb;background:rgba(224,64,251,.1)">${(() => { const a = heroAltYAxis(h); return (a.value === 0 ? "Neutral" : (a.side === "SELFISH" ? "Selfish" : "Selfless")) + " " + a.value; })()}</span></div>
+          <div class="det-breakdown" id="det-alt-ss-breakdown" style="display:none"></div>
+        </div>
         <div class="det-field"><div class="det-field-label">REACTION / ENGAGE</div><div class="det-field-value"><span class="det-score-pill" style="border-color:rgba(224,64,251,.4);color:#e040fb;background:rgba(224,64,251,.1)">${(() => { const a = heroAltXAxis(h); return (a.side === "REACTION" ? "Reaction" : "Engage") + " " + a.value; })()}</span></div></div>
         <div class="det-field"><div class="det-field-label">GHOST AVG</div><div class="det-field-value"><span class="det-score-pill" style="border-color:rgba(224,64,251,.4);color:#e040fb;background:rgba(224,64,251,.1)">${heroAltDisplayAvg(h)}</span></div></div>
         <div class="det-field" style="border-color:rgba(224,64,251,.3);background:rgba(224,64,251,.06)"><div class="det-field-label" style="color:#e040fb">TOTAL AVG</div><div class="det-field-value"><span class="det-score-pill" style="border-color:rgba(224,64,251,.5);color:#f0a0ff;background:rgba(224,64,251,.18);font-size:13px">${+((xa.value + ya.value + heroAltXAxis(h).value + heroAltYAxis(h).value) / 4).toFixed(1)}</span></div></div>
       </div>
     </div>` : ""}
   `;
+
+  // Selfish/Selfless ⓘ toggles — main always present, ghost only if altStats exists.
+  document.getElementById("det-ss-info-btn")?.addEventListener("click", () =>
+    toggleDetBreakdown("det-ss-info-btn", "det-ss-breakdown", h, false)
+  );
+  document.getElementById("det-alt-ss-info-btn")?.addEventListener("click", () =>
+    toggleDetBreakdown("det-alt-ss-info-btn", "det-alt-ss-breakdown", h, true)
+  );
 
   // Draft section — fetch draft-enriched data from window.chartHeroes
   const liveHero = (window.chartHeroes || heroes).find(x => x.id === h.id) || h;
@@ -3231,6 +3295,8 @@ function openAddModal() {
   updateIconPreview(null);
   modalSelfishScore  = 0;
   modalSelflessScore = 0;
+  modalSelfSkillIds  = [];
+  modalAllySupport   = [];
   updateSelfishSelflessDisplay();
   modalReactions   = [];
   modalEngagements = [];
@@ -3238,6 +3304,8 @@ function openAddModal() {
   // Ghost Selfish/Selfless + Reactions/Engagements
   modalAltSelfishScore  = 0;
   modalAltSelflessScore = 0;
+  modalAltSelfSkillIds  = [];
+  modalAltAllySupport   = [];
   updateAltSelfishSelflessDisplay();
   modalAltReactions   = [];
   modalAltEngagements = [];
@@ -3268,6 +3336,8 @@ function openEditModal(h) {
   updateIconPreview(h.iconData || null);
   modalSelfishScore  = typeof h.selfishScore === "number" ? h.selfishScore : 0;
   modalSelflessScore = typeof h.selflessScore === "number" ? h.selflessScore : 0;
+  modalSelfSkillIds  = Array.isArray(h.selfSkillIds) ? h.selfSkillIds.slice() : [];
+  modalAllySupport   = Array.isArray(h.allySupport)  ? h.allySupport.map(a => ({ ...a })) : [];
   updateSelfishSelflessDisplay();
   // Reactions/Engagements (Section 5.3) — clone so editing in the modal
   // never mutates the hero's array directly until Save Changes commits it.
@@ -3277,6 +3347,8 @@ function openEditModal(h) {
   // Ghost Selfish/Selfless + Reactions/Engagements
   modalAltSelfishScore  = typeof h.altStats?.selfishScore === "number" ? h.altStats.selfishScore : 0;
   modalAltSelflessScore = typeof h.altStats?.selflessScore === "number" ? h.altStats.selflessScore : 0;
+  modalAltSelfSkillIds  = Array.isArray(h.altStats?.selfSkillIds) ? h.altStats.selfSkillIds.slice() : [];
+  modalAltAllySupport   = Array.isArray(h.altStats?.allySupport)  ? h.altStats.allySupport.map(a => ({ ...a })) : [];
   updateAltSelfishSelflessDisplay();
   modalAltReactions   = Array.isArray(h.altStats?.reactions)   ? h.altStats.reactions.map(x => ({ refId: x?.refId ?? x }))   : [];
   modalAltEngagements = Array.isArray(h.altStats?.engagements) ? h.altStats.engagements.map(x => ({ refId: x?.refId ?? x })) : [];
@@ -3355,6 +3427,8 @@ async function onModalConfirm() {
   const altStats = altEnabled ? {
     selfishScore:  modalAltSelfishScore,
     selflessScore: modalAltSelflessScore,
+    selfSkillIds:  modalAltSelfSkillIds.slice(),
+    allySupport:   modalAltAllySupport.map(a => ({ ...a })),
     reactions:   modalAltReactions.map(x => ({ ...x })),
     engagements: modalAltEngagements.map(x => ({ ...x })),
   } : null;
@@ -3363,6 +3437,10 @@ async function onModalConfirm() {
   // left in modalSelfishScore/modalSelflessScore for this modal session.
   const selfishScore  = modalSelfishScore;
   const selflessScore = modalSelflessScore;
+  // Raw checklist/ally answers behind the score, kept only so the hero
+  // details "ⓘ" can show how it was derived — see the state comment above.
+  const selfSkillIds = modalSelfSkillIds.slice();
+  const allySupport  = modalAllySupport.map(a => ({ ...a }));
 
   // Reactions/Engagements (Section 5.3) — whatever the assignment list
   // in this modal session ended up with (library refs never free text).
@@ -3371,14 +3449,14 @@ async function onModalConfirm() {
 
   if (editingId !== null) {
     heroes = heroes.map(h => h.id === editingId
-      ? { ...h, name, rarity, role, element, notes, iconData, locked, pvpTag, altStats, selfishScore, selflessScore, reactions, engagements }
+      ? { ...h, name, rarity, role, element, notes, iconData, locked, pvpTag, altStats, selfishScore, selflessScore, selfSkillIds, allySupport, reactions, engagements }
       : h
     );
   } else {
     heroes.push({
       id: Date.now(),
       name, rarity, role, element, notes, iconData,
-      locked, pvpTag, altStats, selfishScore, selflessScore, reactions, engagements,
+      locked, pvpTag, altStats, selfishScore, selflessScore, selfSkillIds, allySupport, reactions, engagements,
     });
   }
 
@@ -3428,6 +3506,11 @@ function onSsSliderInput() {
   if (pos < 0)      { modalSelfishScore = -pos; modalSelflessScore = 0; }
   else if (pos > 0) { modalSelflessScore = pos;  modalSelfishScore = 0; }
   else              { modalSelfishScore = 0;     modalSelflessScore = 0; }
+  // Dragging the raw slider bypasses the Questionnaire, so whatever
+  // checklist/ally breakdown was on file no longer matches this score —
+  // drop it rather than show a stale "why" for a number nobody derived.
+  modalSelfSkillIds = [];
+  modalAllySupport  = [];
   updateSelfishSelflessDisplay();
 }
 
@@ -3466,6 +3549,10 @@ function onAltSsSliderInput() {
   if (pos < 0)      { modalAltSelfishScore = -pos; modalAltSelflessScore = 0; }
   else if (pos > 0) { modalAltSelflessScore = pos;  modalAltSelfishScore = 0; }
   else              { modalAltSelfishScore = 0;     modalAltSelflessScore = 0; }
+  // Same reasoning as onSsSliderInput above — manual drag invalidates
+  // whatever Questionnaire breakdown was on file for the ghost stats.
+  modalAltSelfSkillIds = [];
+  modalAltAllySupport  = [];
   updateAltSelfishSelflessDisplay();
 }
 
@@ -3506,9 +3593,12 @@ function ssChooseSide(side) {
   } else {
     document.getElementById("ss-step-selfish").style.display  = "none";
     document.getElementById("ss-step-selfless").style.display = "block";
-    ssAllyCount = 0;
+    // Re-opening an already-Selfless hero picks up where its saved
+    // ally breakdown left off, instead of starting blank every time.
+    const priorAllies = (ssTarget === "alt" ? modalAltAllySupport : modalAllySupport) || [];
+    ssAllyCount = priorAllies.length;
     renderSsAllyCountButtons();
-    renderSsAllyRows();
+    renderSsAllyRows(priorAllies);
     updateSsSelflessPreview();
   }
 }
@@ -3519,9 +3609,12 @@ function ssBackToChoose() {
 
 function renderSsSelfishChecklist() {
   const box = document.getElementById("ss-selfish-checklist");
+  // Re-opening an already-Selfish hero comes back ticked the way it was
+  // saved, instead of starting blank every time.
+  const priorChecked = new Set((ssTarget === "alt" ? modalAltSelfSkillIds : modalSelfSkillIds) || []);
   box.innerHTML = SELF_SKILLS.map(s => `
     <label class="ss-check-item">
-      <input type="checkbox" class="ss-selfish-check" value="${s.id}" />
+      <input type="checkbox" class="ss-selfish-check" value="${s.id}" ${priorChecked.has(s.id) ? "checked" : ""} />
       ${s.label}
     </label>
   `).join("");
@@ -3564,7 +3657,7 @@ function ssAllyTypeRowHTML(type, label, max, unit) {
     </div>`;
 }
 
-function renderSsAllyRows() {
+function renderSsAllyRows(prefill) {
   const box = document.getElementById("ss-ally-rows");
   const rows = [];
   for (let i = 1; i <= ssAllyCount; i++) {
@@ -3580,6 +3673,21 @@ function renderSsAllyRows() {
     `);
   }
   box.innerHTML = rows.join("");
+  // Restore any prior values for this ally slot (see the ssChooseSide
+  // call site — keeps re-opening the Questionnaire non-destructive).
+  box.querySelectorAll(".ss-ally-row").forEach(row => {
+    const idx = Number(row.dataset.ally) - 1;
+    const prior = prefill && prefill[idx];
+    if (!prior) return;
+    ["healing", "passive", "buff"].forEach(type => {
+      const key = type === "buff" ? "buffCount" : type;
+      const val = Number(prior[key]) || 0;
+      const input = row.querySelector(`[data-type="${type}"]`);
+      const readout = row.querySelector(`[data-readout-for="${type}"]`);
+      input.value = val;
+      readout.textContent = val + (type === "buff" ? "" : "%");
+    });
+  });
   box.querySelectorAll(".ss-ally-range").forEach(input => {
     input.addEventListener("input", () => {
       const row = input.closest(".ss-ally-row");
@@ -3612,12 +3720,13 @@ function confirmQuestionnaire() {
   if (ssPhase === "selfish") {
     const checked = Array.from(document.querySelectorAll(".ss-selfish-check:checked")).map(cb => cb.value);
     const score = computeSelfishScore(checked);
-    if (isAlt) { modalAltSelfishScore = score; modalAltSelflessScore = 0; }
-    else       { modalSelfishScore = score;    modalSelflessScore = 0; }
+    if (isAlt) { modalAltSelfishScore = score; modalAltSelflessScore = 0; modalAltSelfSkillIds = checked; modalAltAllySupport = []; }
+    else       { modalSelfishScore = score;    modalSelflessScore = 0;    modalSelfSkillIds = checked;    modalAllySupport = []; }
   } else if (ssPhase === "selfless") {
-    const score = computeSelflessScore(ssCollectSupportedAllies());
-    if (isAlt) { modalAltSelflessScore = score; modalAltSelfishScore = 0; }
-    else       { modalSelflessScore = score;    modalSelfishScore = 0; }
+    const allies = ssCollectSupportedAllies();
+    const score = computeSelflessScore(allies);
+    if (isAlt) { modalAltSelflessScore = score; modalAltSelfishScore = 0; modalAltAllySupport = allies; modalAltSelfSkillIds = []; }
+    else       { modalSelflessScore = score;    modalSelfishScore = 0;    modalAllySupport = allies;    modalSelfSkillIds = []; }
   }
   if (isAlt) updateAltSelfishSelflessDisplay();
   else       updateSelfishSelflessDisplay();
