@@ -3449,7 +3449,11 @@ async function onModalConfirm() {
 
   if (editingId !== null) {
     heroes = heroes.map(h => h.id === editingId
-      ? { ...h, name, rarity, role, element, notes, iconData, locked, pvpTag, altStats, selfishScore, selflessScore, selfSkillIds, allySupport, reactions, engagements }
+      // needsRerating only exists to flag a legacy import that still has
+      // stale zeroed-out scores (see migrateLegacyHero) — once the person
+      // has actually gone through Save Changes on it, it's been re-rated,
+      // so the badge should clear regardless of what values they left it at.
+      ? { ...h, name, rarity, role, element, notes, iconData, locked, pvpTag, altStats, selfishScore, selflessScore, selfSkillIds, allySupport, reactions, engagements, needsRerating: false }
       : h
     );
   } else {
