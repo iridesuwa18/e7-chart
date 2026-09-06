@@ -9185,10 +9185,21 @@
     }
   },
   "taxonomy": {
-    "reactions": [],
+    "reactions": [
+      {
+        "id": 1788693701095,
+        "name": "Revives upon death",
+        "factorIds": []
+      },
+      {
+        "id": 1788693685769,
+        "name": "x",
+        "factorIds": []
+      }
+    ],
     "engagements": [],
     "factors": []
   },
   "schemaVersion": 2,
-  "savedAt": "2026-09-06T11:13:09.831Z"
+  "savedAt": "2026-09-06T11:21:06.360Z"
 }
