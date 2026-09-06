@@ -3760,6 +3760,11 @@ let taxonomyActiveTab = "reactions"; // "reactions" | "engagements" | "factors"
 // clear what you'd typed in another one.
 let taxonomySearchQuery = { reactions: "", engagements: "", factors: "" };
 
+// Per-row search text for the Factor-tagging search box under a Reaction/
+// Engagement row (keyed by "kind-id"), session-only like the tab search
+// above. Kept separate so typing in one row's search doesn't touch another.
+let taxonomyFactorRowSearch = {};
+
 // Taxonomy names are free text; a stray double-quote would otherwise
 // break the `value="..."` attribute of the rename inputs below.
 function escAttr(s) {
@@ -3867,6 +3872,9 @@ function toggleTaxonomyRowFactors(kind, id) {
   renderTaxonomyFactorChips(kind, id);
 }
 
+// Tagged Factors show as removable chips; everything else is reached by
+// searching instead of dumping the whole Factors library into the row —
+// once there are dozens of Factors that list would be unusable here.
 function renderTaxonomyFactorChips(kind, id) {
   const row = document.getElementById(`taxonomy-factors-${kind}-${id}`);
   const item = taxonomy[kind].find(x => x.id === id);
@@ -3875,19 +3883,72 @@ function renderTaxonomyFactorChips(kind, id) {
     row.innerHTML = `<div class="taxonomy-empty-note">No Factors defined yet — add one in the Factors tab first.</div>`;
     return;
   }
-  row.innerHTML = taxonomy.factors.map(f => `
-    <button type="button" class="taxonomy-factor-chip${item.factorIds.includes(f.id) ? " tagged" : ""}" data-factor-id="${f.id}">${f.name}</button>
-  `).join("");
-  row.querySelectorAll(".taxonomy-factor-chip").forEach(chip => {
+
+  const rowKey = `${kind}-${id}`;
+  const query = taxonomyFactorRowSearch[rowKey] || "";
+  const taggedFactors = item.factorIds
+    .map(fid => taxonomy.factors.find(f => f.id === fid))
+    .filter(Boolean);
+
+  row.innerHTML = `
+    <div class="taxonomy-tagged-chips">
+      ${taggedFactors.length
+        ? taggedFactors.map(f => `<button type="button" class="taxonomy-factor-chip tagged" data-factor-id="${f.id}" title="Remove">${f.name} ✕</button>`).join("")
+        : `<div class="taxonomy-empty-note">No Factors tagged yet — search below to add one.</div>`}
+    </div>
+    <input type="text" class="taxonomy-search taxonomy-factor-search" placeholder="🔍 Search Factors to add…" value="${escAttr(query)}" />
+    <div class="taxonomy-factor-search-results"></div>
+  `;
+
+  // Click a tagged chip to remove it.
+  row.querySelectorAll(".taxonomy-tagged-chips .taxonomy-factor-chip").forEach(chip => {
     chip.addEventListener("click", () => {
-      const factorId = Number(chip.dataset.factorId);
-      const nowTagged = item.factorIds.includes(factorId);
-      if (nowTagged) untagFactor(kind, id, factorId);
-      else tagFactor(kind, id, factorId);
-      renderTaxonomyPanel(kind); // refresh the tag-count badge too
+      untagFactor(kind, id, Number(chip.dataset.factorId));
+      renderTaxonomyPanel(kind); // refresh the tag-count badge too (rebuilds row closed)
       toggleTaxonomyRowFactors(kind, id); // reopen it, expanded, post-refresh
     });
   });
+
+  const searchInput = row.querySelector(".taxonomy-factor-search");
+  const resultsBox = row.querySelector(".taxonomy-factor-search-results");
+
+  const renderResults = () => {
+    const q = (taxonomyFactorRowSearch[rowKey] || "").trim().toLowerCase();
+    const candidates = taxonomy.factors.filter(f =>
+      !item.factorIds.includes(f.id) && (!q || f.name.toLowerCase().includes(q))
+    );
+    if (!q) {
+      resultsBox.innerHTML = candidates.length
+        ? `<div class="taxonomy-empty-note">Type to search ${candidates.length} untagged Factor${candidates.length === 1 ? "" : "s"}…</div>`
+        : `<div class="taxonomy-empty-note">Every Factor is already tagged here.</div>`;
+      return;
+    }
+    resultsBox.innerHTML = candidates.length
+      ? candidates.map(f => `<button type="button" class="taxonomy-factor-chip" data-factor-id="${f.id}">+ ${f.name}</button>`).join("")
+      : `<div class="taxonomy-empty-note">No matching Factors.</div>`;
+    resultsBox.querySelectorAll(".taxonomy-factor-chip").forEach(chip => {
+      chip.addEventListener("click", () => {
+        tagFactor(kind, id, Number(chip.dataset.factorId));
+        taxonomyFactorRowSearch[rowKey] = ""; // clear search after a successful add
+        renderTaxonomyPanel(kind); // refresh the tag-count badge too (rebuilds row closed)
+        toggleTaxonomyRowFactors(kind, id); // reopen it, expanded, post-refresh
+      });
+    });
+  };
+
+  searchInput.addEventListener("input", () => {
+    taxonomyFactorRowSearch[rowKey] = searchInput.value;
+    renderResults();
+  });
+  searchInput.addEventListener("keydown", e => {
+    if (e.key !== "Enter") return;
+    e.preventDefault();
+    const firstResult = resultsBox.querySelector(".taxonomy-factor-chip");
+    if (firstResult) firstResult.click(); // Enter adds the top match
+  });
+
+  renderResults();
+  if (query) searchInput.focus({ preventScroll: true }); // restore focus/cursor after a re-render
 }
 
 // Factors panel (5.2) — plain create/rename/delete, no tagging UI here.

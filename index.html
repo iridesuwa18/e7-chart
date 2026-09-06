@@ -143,6 +143,27 @@
       text-align: center;
     }
 
+    /* Factor-tagging row under a Reaction/Engagement (search-to-add,
+       instead of listing every Factor in the library) */
+    .taxonomy-row-factors {
+      flex-direction: column;
+      gap: 4px;
+      padding: 8px 0 4px;
+    }
+    .taxonomy-tagged-chips {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+    }
+    .taxonomy-factor-search { margin: 4px 0 6px; }
+    .taxonomy-factor-search-results {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      max-height: 140px;
+      overflow-y: auto;
+    }
+
     /* Fixed-value note + read-only value badge in the hero edit modal's
        Reactions/Engagements assignment list */
     .rte-fixed-value-note {
