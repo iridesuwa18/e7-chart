@@ -61,19 +61,32 @@
       "notes": "",
       "iconData": "https://raw.githubusercontent.com/iridesuwa18/e7-chart/main/assets/heroes/genesis-ras.webp",
       "locked": true,
-      "_x": 50,
-      "_y": 50,
+      "_x": 5,
+      "_y": 30,
       "hidden": false,
       "vType_legacy": "SPD",
       "vScore_legacy": 4.5,
       "hType_legacy": "SUR",
       "hScore_legacy": 10,
       "altStats_legacy": null,
-      "reactions": [],
+      "reactions": [
+        {
+          "refId": 1788693701095
+        }
+      ],
       "engagements": [],
-      "selfishScore": 0,
+      "selfishScore": 4,
       "selflessScore": 0,
-      "needsRerating": true
+      "needsRerating": false,
+      "pvpTag": false,
+      "altStats": null,
+      "selfSkillIds": [
+        "spdCr",
+        "extraTurns",
+        "selfPassive",
+        "immunity"
+      ],
+      "allySupport": []
     },
     {
       "id": 1779353620344,
@@ -9215,6 +9228,14 @@
         "factorIds": [
           1788694866469
         ]
+      },
+      {
+        "id": 1788700730226,
+        "name": "Immune to Debuffs",
+        "value": 10,
+        "factorIds": [
+          1788700781693
+        ]
       }
     ],
     "engagements": [
@@ -9241,15 +9262,55 @@
         "factorIds": [
           1788694866469
         ]
+      },
+      {
+        "id": 1788700305259,
+        "name": "Seal enemies",
+        "value": 9,
+        "factorIds": [
+          1788700862798
+        ]
+      },
+      {
+        "id": 1788700311844,
+        "name": "Ignore defense",
+        "value": 8,
+        "factorIds": [
+          1788701036557
+        ]
+      },
+      {
+        "id": 1788700350538,
+        "name": "Collapse on enemies",
+        "value": 7,
+        "factorIds": [
+          1788700420912
+        ]
       }
     ],
     "factors": [
       {
         "id": 1788694866469,
-        "name": "High Damage Units"
+        "name": "High Damage units"
+      },
+      {
+        "id": 1788700781693,
+        "name": "Debuffers"
+      },
+      {
+        "id": 1788700862798,
+        "name": "Enemy Passives"
+      },
+      {
+        "id": 1788701036557,
+        "name": "High Defense units"
+      },
+      {
+        "id": 1788700420912,
+        "name": "High HP units"
       }
     ]
   },
   "schemaVersion": 2,
-  "savedAt": "2026-09-06T12:42:05.766Z"
+  "savedAt": "2026-09-06T13:13:36.467Z"
 }
