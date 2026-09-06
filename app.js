@@ -658,11 +658,10 @@ const fSsScore     = document.getElementById("f-ss-score");
   wireTaxonomySearch("taxonomy-search-engagements", "engagements", renderTaxonomyPanel);
   wireTaxonomySearch("taxonomy-search-factors", "factors", renderFactorsPanel);
 
-  // Per-hero Reaction/Engagement assignment (Section 5.3), inside the hero edit modal
-  document.getElementById("rte-add-reaction-btn").addEventListener("click", () => addRteItem("reactions", "main"));
-  document.getElementById("rte-add-engagement-btn").addEventListener("click", () => addRteItem("engagements", "main"));
-  document.getElementById("alt-rte-add-reaction-btn").addEventListener("click", () => addRteItem("reactions", "alt"));
-  document.getElementById("alt-rte-add-engagement-btn").addEventListener("click", () => addRteItem("engagements", "alt"));
+  // Per-hero Reaction/Engagement assignment (Section 5.3), inside the hero
+  // edit modal — search-to-add is wired lazily from renderRteAddSearch()
+  // itself (see rte section below) since the search inputs need to bind
+  // once and then just be refreshed, not re-wired, on every render.
 
   // Hero details overlay
   document.getElementById("details-overlay").addEventListener("click", e => {
@@ -2090,15 +2089,24 @@ function renderQuickDraft() {
 
 /* Rule 1 hint — Ban Protect element reminder. */
 /* ── Section 8.1: Enemy Factor checklist ──
-   Rendered fresh from the taxonomy library every time, since Factors
-   are user-defined (unlike the fixed 5-element Ban Protect chips this
-   sits next to, which can stay hardcoded in the HTML). Called on init,
+   A searchable checklist menu, not a flat chip row — Factors are
+   user-defined and can grow past what fits inline, same reasoning as
+   the search-to-add UI on Taxonomy rows and the RTE assignment lists.
+   Rendered fresh from the taxonomy library every time: on init,
    whenever the taxonomy Factors panel changes something (add/rename/
    delete — see renderFactorsPanel), and after Suggest re-renders so a
-   freshly-ticked chip's state never drifts from qdTickedFactorIds. */
+   freshly-ticked item's state never drifts from qdTickedFactorIds. */
+let qdFactorMenuSearch = "";
+
+function qdFactorMenuLabel() {
+  const n = qdTickedFactorIds.size;
+  return n === 0 ? "🎯 Enemy Factors ▾" : `🎯 Enemy Factors (${n} ticked) ▾`;
+}
+
 function renderQdFactorChips() {
-  const wrap = document.getElementById("qd-factor-chips");
-  if (!wrap) return;
+  const btn  = document.getElementById("qd-factor-menu-btn");
+  const menu = document.getElementById("qd-factor-menu");
+  if (!btn || !menu) return;
 
   // Prune ticks pointing at a Factor that's since been deleted, so a
   // stale id can't silently keep affecting recommendations forever.
@@ -2106,22 +2114,69 @@ function renderQdFactorChips() {
     if (!taxonomy.factors.some(f => f.id === id)) qdTickedFactorIds.delete(id);
   });
 
+  document.getElementById("qd-factor-menu-btn-label").textContent = qdFactorMenuLabel();
+  renderQdFactorMenuList();
+
+  // Wire the trigger/search/outside-click just once — every other call
+  // just refreshes the label and list content above, so re-adding a
+  // Factor or re-opening the menu never touches these listeners twice.
+  if (btn.dataset.wired) return;
+  btn.dataset.wired = "1";
+
+  btn.addEventListener("click", e => {
+    e.stopPropagation();
+    const opening = menu.style.display === "none";
+    menu.style.display = opening ? "block" : "none";
+    if (opening) document.getElementById("qd-factor-menu-search")?.focus();
+  });
+  document.addEventListener("click", e => {
+    if (menu.style.display === "none") return;
+    if (menu.contains(e.target) || btn.contains(e.target)) return;
+    menu.style.display = "none";
+  });
+  document.addEventListener("keydown", e => {
+    if (e.key === "Escape" && menu.style.display !== "none") menu.style.display = "none";
+  });
+  document.getElementById("qd-factor-menu-search").addEventListener("input", e => {
+    qdFactorMenuSearch = e.target.value;
+    renderQdFactorMenuList();
+  });
+}
+
+// Alphabetical (case-insensitive), filtered by the menu's search box.
+function renderQdFactorMenuList() {
+  const list = document.getElementById("qd-factor-menu-list");
+  if (!list) return;
+
   if (taxonomy.factors.length === 0) {
-    wrap.innerHTML = `<span class="qd-factor-empty">No Factors defined yet — add some in 🗂 Taxonomy.</span>`;
+    list.innerHTML = `<div class="qd-factor-empty">No Factors defined yet — add some in 🗂 Taxonomy.</div>`;
     return;
   }
 
-  wrap.innerHTML = taxonomy.factors.map(f => `
-    <button type="button" class="qd-factor-chip${qdTickedFactorIds.has(f.id) ? " active" : ""}" data-factor-id="${f.id}">${f.name || "(unnamed)"}</button>
+  const q = qdFactorMenuSearch.trim().toLowerCase();
+  const sorted = [...taxonomy.factors].sort((a, b) =>
+    (a.name || "").toLowerCase().localeCompare((b.name || "").toLowerCase())
+  );
+  const filtered = sorted.filter(f => !q || (f.name || "").toLowerCase().includes(q));
+
+  if (!filtered.length) {
+    list.innerHTML = `<div class="qd-factor-empty">No matching Factors.</div>`;
+    return;
+  }
+
+  list.innerHTML = filtered.map(f => `
+    <label class="qd-factor-menu-item">
+      <input type="checkbox" data-factor-id="${f.id}" ${qdTickedFactorIds.has(f.id) ? "checked" : ""} />
+      <span>${f.name || "(unnamed)"}</span>
+    </label>
   `).join("");
 
-  wrap.querySelectorAll(".qd-factor-chip").forEach(chip => {
-    chip.addEventListener("click", () => {
-      const factorId = taxonomy.factors.find(f => String(f.id) === chip.dataset.factorId)?.id;
+  list.querySelectorAll('input[type="checkbox"]').forEach(cb => {
+    cb.addEventListener("change", () => {
+      const factorId = taxonomy.factors.find(f => String(f.id) === cb.dataset.factorId)?.id;
       if (factorId === undefined) return;
-      if (qdTickedFactorIds.has(factorId)) qdTickedFactorIds.delete(factorId);
-      else qdTickedFactorIds.add(factorId);
-      chip.classList.toggle("active", qdTickedFactorIds.has(factorId));
+      if (cb.checked) qdTickedFactorIds.add(factorId); else qdTickedFactorIds.delete(factorId);
+      document.getElementById("qd-factor-menu-btn-label").textContent = qdFactorMenuLabel();
       saveQuickDraftModeLocal();
       if (quickDraftSuggestOpen) renderQuickDraftSuggestions();
     });
@@ -3300,6 +3355,7 @@ function openAddModal() {
   updateSelfishSelflessDisplay();
   modalReactions   = [];
   modalEngagements = [];
+  rteAddSearchQuery = {}; // fresh search boxes for a new hero session
   renderRteSection("main");
   // Ghost Selfish/Selfless + Reactions/Engagements
   modalAltSelfishScore  = 0;
@@ -3343,6 +3399,7 @@ function openEditModal(h) {
   // never mutates the hero's array directly until Save Changes commits it.
   modalReactions   = Array.isArray(h.reactions)   ? h.reactions.map(x => ({ refId: x?.refId ?? x }))   : [];
   modalEngagements = Array.isArray(h.engagements) ? h.engagements.map(x => ({ refId: x?.refId ?? x })) : [];
+  rteAddSearchQuery = {}; // fresh search boxes for this hero's edit session
   renderRteSection("main");
   // Ghost Selfish/Selfless + Reactions/Engagements
   modalAltSelfishScore  = typeof h.altStats?.selfishScore === "number" ? h.altStats.selfishScore : 0;
@@ -3762,8 +3819,8 @@ function renderRteSection(target) {
   target = target || "main";
   renderRteAssignedList("reactions", target);
   renderRteAssignedList("engagements", target);
-  renderRteAddSelect("reactions", target);
-  renderRteAddSelect("engagements", target);
+  renderRteAddSearch("reactions", target);
+  renderRteAddSearch("engagements", target);
   updateRteScoreBadges(target);
 }
 
@@ -3811,29 +3868,67 @@ function renderRteAssignedList(kind, target) {
   });
 }
 
-// Populates the "+ Add a Reaction/Engagement…" dropdown with whatever's
-// in the library that this hero doesn't already hold, so the same item
-// can't be added twice from here. Shows each item's fixed value in the
-// option label so it's clear what picking it will contribute.
-function renderRteAddSelect(kind, target) {
-  const prefix = rteIdPrefix(target);
-  const select = document.getElementById(kind === "reactions" ? prefix + "add-reaction-select" : prefix + "add-engagement-select");
-  const assignedIds = new Set(rteModalArray(kind, target).map(x => x?.refId ?? x));
-  const available = taxonomy[kind].filter(item => !assignedIds.has(item.id));
-  const placeholder = `<option value="">+ Add ${kind === "reactions" ? "a Reaction" : "an Engagement"}…</option>`;
-  select.innerHTML = placeholder + available.map(item =>
-    `<option value="${item.id}">${escAttr(item.name)} (${item.value.toFixed(1)})</option>`
-  ).join("");
-}
+// Search-to-add for Reactions/Engagements — same reasoning as the Factor
+// search under a Taxonomy row (renderTaxonomyFactorChips): dumping the
+// whole library into a dropdown/chip list gets unusable as it grows, so
+// typing narrows it down instead. Session-only search text, keyed by
+// kind+target so main/ghost and Reactions/Engagements don't collide.
+let rteAddSearchQuery = {};
 
-function addRteItem(kind, target) {
-  target = target || "main";
+function renderRteAddSearch(kind, target) {
   const prefix = rteIdPrefix(target);
-  const select = document.getElementById(kind === "reactions" ? prefix + "add-reaction-select" : prefix + "add-engagement-select");
-  const refId = Number(select.value);
-  if (!select.value) return;
-  setRteModalArray(kind, target, [...rteModalArray(kind, target), { refId }]);
-  renderRteSection(target);
+  const inputId   = kind === "reactions" ? prefix + "add-reaction-search"  : prefix + "add-engagement-search";
+  const resultsId = kind === "reactions" ? prefix + "add-reaction-results" : prefix + "add-engagement-results";
+  const input = document.getElementById(inputId);
+  const resultsBox = document.getElementById(resultsId);
+  if (!input || !resultsBox) return;
+
+  const key = `${kind}-${target}`;
+  const label = kind === "reactions" ? "Reaction" : "Engagement";
+
+  const renderResults = () => {
+    const q = (rteAddSearchQuery[key] || "").trim().toLowerCase();
+    const assignedIds = new Set(rteModalArray(kind, target).map(x => x?.refId ?? x));
+    const candidates = taxonomy[kind].filter(item => !assignedIds.has(item.id) && (!q || item.name.toLowerCase().includes(q)));
+    if (!q) {
+      resultsBox.innerHTML = candidates.length
+        ? `<div class="rte-empty-note">Type to search ${candidates.length} available ${label}${candidates.length === 1 ? "" : "s"}…</div>`
+        : `<div class="rte-empty-note">Every ${label} is already assigned.</div>`;
+      return;
+    }
+    resultsBox.innerHTML = candidates.length
+      ? candidates.map(item => `<button type="button" class="taxonomy-factor-chip" data-ref-id="${item.id}">+ ${escAttr(item.name)} (${item.value.toFixed(1)})</button>`).join("")
+      : `<div class="rte-empty-note">No matching ${label}s.</div>`;
+    resultsBox.querySelectorAll(".taxonomy-factor-chip").forEach(chip => {
+      chip.addEventListener("click", () => {
+        const refId = Number(chip.dataset.refId);
+        setRteModalArray(kind, target, [...rteModalArray(kind, target), { refId }]);
+        rteAddSearchQuery[key] = ""; // clear after a successful add
+        renderRteSection(target);
+      });
+    });
+  };
+
+  // The input itself is static markup (see index.html), not rebuilt on
+  // every render — wire its listeners once, then just refresh results.
+  if (!input.dataset.wired) {
+    input.dataset.wired = "1";
+    input.addEventListener("input", () => {
+      rteAddSearchQuery[key] = input.value;
+      renderResults();
+    });
+    input.addEventListener("keydown", e => {
+      if (e.key !== "Enter") return;
+      e.preventDefault();
+      const first = resultsBox.querySelector(".taxonomy-factor-chip");
+      if (first) first.click(); // Enter adds the top match
+    });
+  }
+
+  const query = rteAddSearchQuery[key] || "";
+  input.value = query;
+  renderResults();
+  if (query) input.focus({ preventScroll: true }); // restore focus/cursor after a re-render
 }
 
 function removeRteItem(kind, refId, target) {
