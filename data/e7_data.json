@@ -27,7 +27,11 @@
           "refId": 1788693701095
         }
       ],
-      "engagements": [],
+      "engagements": [
+        {
+          "refId": 1788697411172
+        }
+      ],
       "selfishScore": 0,
       "selflessScore": 1.5,
       "needsRerating": false,
@@ -9201,7 +9205,16 @@
         ]
       }
     ],
-    "engagements": [],
+    "engagements": [
+      {
+        "id": 1788697411172,
+        "name": "Revives allies",
+        "value": 9,
+        "factorIds": [
+          1788694866469
+        ]
+      }
+    ],
     "factors": [
       {
         "id": 1788694866469,
@@ -9210,5 +9223,5 @@
     ]
   },
   "schemaVersion": 2,
-  "savedAt": "2026-09-06T12:12:10.707Z"
+  "savedAt": "2026-09-06T12:15:45.944Z"
 }
