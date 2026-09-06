@@ -2238,6 +2238,16 @@ function renderQdFactorChips() {
     e.stopPropagation();
     const opening = menu.style.display === "none";
     if (opening) {
+      // Re-render fresh on every open rather than trusting whatever was
+      // last drawn: renderQdFactorChips() can run once at page load
+      // before taxonomy.factors has finished loading from storage, and
+      // nothing else was forcing a re-render afterward — the list would
+      // then sit empty until something incidental (like typing in the
+      // search box) triggered renderQdFactorMenuList() again.
+      [...qdTickedFactorIds].forEach(id => {
+        if (!taxonomy.factors.some(f => f.id === id)) qdTickedFactorIds.delete(id);
+      });
+      renderQdFactorMenuList();
       menu.style.display = "block";
       positionQdFactorMenu(); // real width/height only known once visible
       document.getElementById("qd-factor-menu-search")?.focus();
