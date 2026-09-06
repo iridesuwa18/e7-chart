@@ -76,6 +76,91 @@
       color: #e8c84a;
       font-size: 12px;
     }
+
+    /* Taxonomy Manager — header + tabs stay fixed; only the panel content
+       (hint, add-row, search, list) scrolls beneath them. */
+    .taxonomy-modal {
+      display: flex !important;
+      flex-direction: column !important;
+      max-height: 82vh;
+      overflow: hidden !important;
+      padding: 0 !important;
+    }
+    .taxonomy-modal-sticky {
+      flex: 0 0 auto;
+      padding: 20px 22px 0;
+      background: inherit;
+      position: relative;
+      z-index: 2;
+    }
+    .taxonomy-modal .taxonomy-body {
+      flex: 1 1 auto;
+      overflow-y: auto !important;
+      min-height: 0;
+      padding: 14px 22px 20px;
+    }
+    .taxonomy-modal .taxonomy-panel {
+      display: flex;
+      flex-direction: column;
+      min-height: 0;
+    }
+
+    /* Taxonomy search box — filters the currently active tab's list */
+    .taxonomy-search {
+      width: 100%;
+      box-sizing: border-box;
+      margin: 8px 0 10px;
+      padding: 7px 10px;
+      background: rgba(255,255,255,0.04);
+      border: 1px solid rgba(201,162,39,0.3);
+      border-radius: 5px;
+      color: #dce8f5;
+      font-size: 13px;
+    }
+    .taxonomy-search::placeholder { color: #607a90; }
+
+    /* Fixed taxonomy value shown/edited per Reaction/Engagement row */
+    .taxonomy-row-value {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      flex-shrink: 0;
+    }
+    .taxonomy-row-value label {
+      font-size: 9px;
+      letter-spacing: .08em;
+      color: #607a90;
+      font-family: 'Cinzel', serif;
+    }
+    .taxonomy-row-value input[type="number"] {
+      width: 48px;
+      padding: 3px 5px;
+      background: rgba(255,255,255,0.05);
+      border: 1px solid rgba(201,162,39,0.3);
+      border-radius: 4px;
+      color: #e8c84a;
+      font-size: 12px;
+      text-align: center;
+    }
+
+    /* Fixed-value note + read-only value badge in the hero edit modal's
+       Reactions/Engagements assignment list */
+    .rte-fixed-value-note {
+      font-size: 11px;
+      color: #607a90;
+      font-style: italic;
+      margin: 2px 0 8px;
+    }
+    .rte-assigned-value {
+      flex-shrink: 0;
+      padding: 2px 8px;
+      background: rgba(201,162,39,0.12);
+      border: 1px solid rgba(201,162,39,0.3);
+      border-radius: 4px;
+      color: #e8c84a;
+      font-size: 12px;
+      font-variant-numeric: tabular-nums;
+    }
   </style>
 
   <!-- PWA / installable-app support — a SEPARATE manifest from index.html
@@ -644,13 +729,13 @@
               <span class="rte-score-badge" id="alt-rte-reaction-score-badge">Reaction Score: —</span>
               <span class="rte-score-badge" id="alt-rte-engage-score-badge">Engage Score: —</span>
             </div>
+            <p class="rte-fixed-value-note">Values are fixed per Reaction/Engagement in 🗂 Taxonomy.</p>
 
             <div class="rte-block">
               <div class="rte-block-title">Reactions</div>
               <div class="rte-assigned-list" id="alt-rte-reactions-list"></div>
               <div class="rte-add-row">
                 <select id="alt-rte-add-reaction-select"><option value="">+ Add a Reaction…</option></select>
-                <input type="number" id="alt-rte-add-reaction-score" min="0" max="10" step="0.1" value="5" />
                 <button type="button" class="btn btn-ghost btn-sm" id="alt-rte-add-reaction-btn">Add</button>
               </div>
             </div>
@@ -660,7 +745,6 @@
               <div class="rte-assigned-list" id="alt-rte-engagements-list"></div>
               <div class="rte-add-row">
                 <select id="alt-rte-add-engagement-select"><option value="">+ Add an Engagement…</option></select>
-                <input type="number" id="alt-rte-add-engagement-score" min="0" max="10" step="0.1" value="5" />
                 <button type="button" class="btn btn-ghost btn-sm" id="alt-rte-add-engagement-btn">Add</button>
               </div>
             </div>
@@ -669,13 +753,14 @@
       </div>
 
       <!-- Reactions & Engagements assignment (Rebuild Spec Section 5.3) —
-           attaches existing library items (Section 5.1/5.2) to this hero
-           with a per-hero 0–10 score. Never free-typed; always picked from
-           the shared taxonomy so renaming/re-tagging stays in sync. -->
+           attaches existing library items (Section 5.1/5.2) to this hero.
+           Each item's score/value is fixed in the Taxonomy Manager, not
+           set per-hero — assigning it here just links the hero to it. -->
       <div class="form-group rte-section">
         <label>Reactions &amp; Engagements
           <button type="button" class="stat-info-btn slider-trigger-btn" id="btn-open-h-slider" title="View Reaction/Engage breakdown" style="position:static;margin-left:6px">⇔</button>
         </label>
+        <p class="rte-fixed-value-note">Values are fixed per Reaction/Engagement in 🗂 Taxonomy — pick which ones this hero has below.</p>
         <div class="rte-score-badges">
           <span class="rte-score-badge" id="rte-reaction-score-badge">Reaction Score: —</span>
           <span class="rte-score-badge" id="rte-engage-score-badge">Engage Score: —</span>
@@ -686,7 +771,6 @@
           <div class="rte-assigned-list" id="rte-reactions-list"></div>
           <div class="rte-add-row">
             <select id="rte-add-reaction-select"><option value="">+ Add a Reaction…</option></select>
-            <input type="number" id="rte-add-reaction-score" min="0" max="10" step="0.1" value="5" />
             <button type="button" class="btn btn-ghost btn-sm" id="rte-add-reaction-btn">Add</button>
           </div>
         </div>
@@ -696,7 +780,6 @@
           <div class="rte-assigned-list" id="rte-engagements-list"></div>
           <div class="rte-add-row">
             <select id="rte-add-engagement-select"><option value="">+ Add an Engagement…</option></select>
-            <input type="number" id="rte-add-engagement-score" min="0" max="10" step="0.1" value="5" />
             <button type="button" class="btn btn-ghost btn-sm" id="rte-add-engagement-btn">Add</button>
           </div>
         </div>
@@ -954,35 +1037,39 @@
        individual hero's edit screen (Section 5.1/5.2). -->
   <div class="overlay" id="taxonomy-overlay">
     <div class="modal taxonomy-modal" id="taxonomy-modal">
-      <div class="details-modal-header">
-        <div class="modal-title" style="margin:0;padding:0;border:none">REACTIONS · ENGAGEMENTS · FACTORS</div>
-        <button class="det-close-btn" id="taxonomy-close">×</button>
-      </div>
+      <div class="taxonomy-modal-sticky">
+        <div class="details-modal-header">
+          <div class="modal-title" style="margin:0;padding:0;border:none">REACTIONS · ENGAGEMENTS · FACTORS</div>
+          <button class="det-close-btn" id="taxonomy-close">×</button>
+        </div>
 
-      <div class="taxonomy-tabs">
-        <button type="button" class="taxonomy-tab active" data-tab="reactions">Reactions</button>
-        <button type="button" class="taxonomy-tab" data-tab="engagements">Engagements</button>
-        <button type="button" class="taxonomy-tab" data-tab="factors">Factors</button>
+        <div class="taxonomy-tabs">
+          <button type="button" class="taxonomy-tab active" data-tab="reactions">Reactions</button>
+          <button type="button" class="taxonomy-tab" data-tab="engagements">Engagements</button>
+          <button type="button" class="taxonomy-tab" data-tab="factors">Factors</button>
+        </div>
       </div>
 
       <div class="taxonomy-body">
         <!-- Reactions manager (5.1) -->
         <div class="taxonomy-panel" id="taxonomy-panel-reactions">
-          <p class="taxonomy-panel-hint">Named, reusable tags a hero can hold (e.g. "Reacts to Counterattack"). Tag Factors here — every hero holding this Reaction inherits the tag automatically.</p>
+          <p class="taxonomy-panel-hint">Named, reusable tags a hero can hold (e.g. "Reacts to Counterattack"). Each Reaction's score (0–10) is fixed here and used everywhere it's assigned. Tag Factors here — every hero holding this Reaction inherits the tag automatically.</p>
           <div class="taxonomy-add-row">
             <input type="text" id="taxonomy-new-reaction" placeholder="New Reaction name…" />
             <button type="button" class="btn btn-gold btn-sm" id="taxonomy-add-reaction">+ Add</button>
           </div>
+          <input type="text" class="taxonomy-search" id="taxonomy-search-reactions" placeholder="🔍 Search Reactions…" />
           <div class="taxonomy-list" id="taxonomy-list-reactions"></div>
         </div>
 
         <!-- Engagements manager (5.1) -->
         <div class="taxonomy-panel" id="taxonomy-panel-engagements" style="display:none">
-          <p class="taxonomy-panel-hint">Things a hero proactively does or provides (e.g. "Stops all counterattacks"). Tag Factors here the same way as Reactions.</p>
+          <p class="taxonomy-panel-hint">Things a hero proactively does or provides (e.g. "Stops all counterattacks"). Each Engagement's score (0–10) is fixed here and used everywhere it's assigned. Tag Factors here the same way as Reactions.</p>
           <div class="taxonomy-add-row">
             <input type="text" id="taxonomy-new-engagement" placeholder="New Engagement name…" />
             <button type="button" class="btn btn-gold btn-sm" id="taxonomy-add-engagement">+ Add</button>
           </div>
+          <input type="text" class="taxonomy-search" id="taxonomy-search-engagements" placeholder="🔍 Search Engagements…" />
           <div class="taxonomy-list" id="taxonomy-list-engagements"></div>
         </div>
 
@@ -993,6 +1080,7 @@
             <input type="text" id="taxonomy-new-factor" placeholder="New Factor name…" />
             <button type="button" class="btn btn-gold btn-sm" id="taxonomy-add-factor">+ Add</button>
           </div>
+          <input type="text" class="taxonomy-search" id="taxonomy-search-factors" placeholder="🔍 Search Factors…" />
           <div class="taxonomy-list" id="taxonomy-list-factors"></div>
         </div>
       </div>

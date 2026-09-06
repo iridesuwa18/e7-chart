@@ -56,12 +56,13 @@ function normalizeTaxonomy(t) {
     ? list.filter(x => x && typeof x === "object" && x.id !== undefined).map(x => ({
         id: x.id,
         name: typeof x.name === "string" ? x.name : "",
+        value: Math.max(0, Math.min(10, Number(x.value) || 0)),
         ...(Array.isArray(x.factorIds) ? { factorIds: x.factorIds.slice() } : { factorIds: [] }),
       }))
     : [];
   return {
-    reactions:   cleanList(t.reactions).map(x => ({ id: x.id, name: x.name, factorIds: x.factorIds })),
-    engagements: cleanList(t.engagements).map(x => ({ id: x.id, name: x.name, factorIds: x.factorIds })),
+    reactions:   cleanList(t.reactions).map(x => ({ id: x.id, name: x.name, value: x.value, factorIds: x.factorIds })),
+    engagements: cleanList(t.engagements).map(x => ({ id: x.id, name: x.name, value: x.value, factorIds: x.factorIds })),
     factors:     (Array.isArray(t.factors) ? t.factors : [])
       .filter(x => x && typeof x === "object" && x.id !== undefined)
       .map(x => ({ id: x.id, name: typeof x.name === "string" ? x.name : "" })),
@@ -69,9 +70,14 @@ function normalizeTaxonomy(t) {
 }
 
 /* ── Reactions / Engagements CRUD ──
-   `kind` is "reactions" or "engagements". */
+   `kind` is "reactions" or "engagements". Each item carries its own fixed
+   `value` (0-10) — this is the ONE place that value is set. Heroes only
+   ever reference the item by id; assigning a Reaction/Engagement to a
+   hero never lets them override this value (see setHeroTaxonomyScore's
+   removal and the RTE assignment UI further down, which is read-only
+   with respect to value). */
 function addTaxonomyItem(kind, name) {
-  const item = { id: newTaxonomyId(), name: String(name || "").trim(), factorIds: [] };
+  const item = { id: newTaxonomyId(), name: String(name || "").trim(), value: 0, factorIds: [] };
   taxonomy = { ...taxonomy, [kind]: [...taxonomy[kind], item] };
   saveLocal();
   return item;
@@ -85,14 +91,26 @@ function renameTaxonomyItem(kind, id, name) {
   saveLocal();
 }
 
+// Sets a Reaction/Engagement's fixed value (0-10) — the single source of
+// truth for its score everywhere it's used (chart axes, Quick Draft
+// ranking, etc.). This is the ONLY place the value is ever set.
+function setTaxonomyItemValue(kind, id, value) {
+  const clamped = Math.max(0, Math.min(10, Number(value) || 0));
+  taxonomy = {
+    ...taxonomy,
+    [kind]: taxonomy[kind].map(x => x.id === id ? { ...x, value: clamped } : x),
+  };
+  saveLocal();
+}
+
 // Deleting a Reaction/Engagement also strips it from every hero that
 // referenced it (Section 5 DoD: "cleanly un-links from all heroes").
 function deleteTaxonomyItem(kind, id) {
   taxonomy = { ...taxonomy, [kind]: taxonomy[kind].filter(x => x.id !== id) };
   const heroField = kind === "reactions" ? "reactions" : "engagements";
   heroes = heroes.map(h => {
-    if (!Array.isArray(h[heroField]) || !h[heroField].some(r => r.refId === id)) return h;
-    return { ...h, [heroField]: h[heroField].filter(r => r.refId !== id) };
+    if (!Array.isArray(h[heroField]) || !h[heroField].some(r => (r.refId ?? r) === id)) return h;
+    return { ...h, [heroField]: h[heroField].filter(r => (r.refId ?? r) !== id) };
   });
   saveLocal();
 }
@@ -141,18 +159,16 @@ function deleteFactor(id) {
 }
 
 /* ── Per-hero assignment ──
-   Attaches/updates/removes a hero's link to a library Reaction or
-   Engagement. Removing a link never touches the library item itself. */
-function setHeroTaxonomyScore(heroId, kind, refId, score) {
-  const clamped = Math.max(0, Math.min(10, Number(score) || 0));
+   Links a hero to a library Reaction/Engagement by refId only — the
+   score/value itself lives on the taxonomy item (set via
+   setTaxonomyItemValue above), never per-hero. Removing a link never
+   touches the library item itself. */
+function addHeroTaxonomyLink(heroId, kind, refId) {
   heroes = heroes.map(h => {
     if (h.id !== heroId) return h;
     const list = Array.isArray(h[kind]) ? h[kind] : [];
-    const exists = list.some(x => x.refId === refId);
-    const nextList = exists
-      ? list.map(x => x.refId === refId ? { ...x, score: clamped } : x)
-      : [...list, { refId, score: clamped }];
-    return { ...h, [kind]: nextList };
+    if (list.some(x => (x.refId ?? x) === refId)) return h; // already linked
+    return { ...h, [kind]: [...list, { refId }] };
   });
   saveLocal();
 }
@@ -160,28 +176,37 @@ function setHeroTaxonomyScore(heroId, kind, refId, score) {
 function removeHeroTaxonomyLink(heroId, kind, refId) {
   heroes = heroes.map(h => {
     if (h.id !== heroId) return h;
-    return { ...h, [kind]: (Array.isArray(h[kind]) ? h[kind] : []).filter(x => x.refId !== refId) };
+    return { ...h, [kind]: (Array.isArray(h[kind]) ? h[kind] : []).filter(x => (x.refId ?? x) !== refId) };
   });
   saveLocal();
 }
 
+// Look up a Reaction/Engagement's fixed value (0-10) from the taxonomy
+// library by id — the single source of truth for its score, used
+// wherever a hero's linked reactions/engagements need scoring.
+function taxonomyValue(kind, id) {
+  const item = taxonomy[kind]?.find(x => x.id === id);
+  return item ? item.value : 0;
+}
+
 /* ── Derived scores (Section 1.2) ──
    Live averages — never stored redundantly, always computed off the
-   hero's current reactions[]/engagements[] so they can't drift out of
-   sync with the underlying per-item scores. Returns null when the
-   hero holds none of that kind (0 would be indistinguishable from a
-   genuinely bad score). */
+   hero's current reactions[]/engagements[] refs against each item's
+   fixed taxonomy value, so they can't drift out of sync. Returns null
+   when the hero holds none of that kind (0 would be indistinguishable
+   from a genuinely bad score). Each entry may be either { refId } or a
+   bare refId number (older exports) — `r.refId ?? r` handles both. */
 function computeReactionScore(h) {
   const list = Array.isArray(h?.reactions) ? h.reactions : [];
   if (list.length === 0) return null;
-  const sum = list.reduce((acc, r) => acc + (Math.max(0, Math.min(10, Number(r.score) || 0))), 0);
+  const sum = list.reduce((acc, r) => acc + taxonomyValue("reactions", r?.refId ?? r), 0);
   return +(sum / list.length).toFixed(1);
 }
 
 function computeEngageScore(h) {
   const list = Array.isArray(h?.engagements) ? h.engagements : [];
   if (list.length === 0) return null;
-  const sum = list.reduce((acc, e) => acc + (Math.max(0, Math.min(10, Number(e.score) || 0))), 0);
+  const sum = list.reduce((acc, e) => acc + taxonomyValue("engagements", e?.refId ?? e), 0);
   return +(sum / list.length).toFixed(1);
 }
 
@@ -608,6 +633,19 @@ const fSsScore     = document.getElementById("f-ss-score");
   document.getElementById("taxonomy-new-factor").addEventListener("keydown", e => {
     if (e.key === "Enter") document.getElementById("taxonomy-add-factor").click();
   });
+
+  // Search boxes for each Taxonomy tab — filters that tab's list by name.
+  const wireTaxonomySearch = (inputId, kind, renderFn) => {
+    const input = document.getElementById(inputId);
+    if (!input) return;
+    input.addEventListener("input", () => {
+      taxonomySearchQuery[kind] = input.value;
+      renderFn(kind === "factors" ? undefined : kind);
+    });
+  };
+  wireTaxonomySearch("taxonomy-search-reactions", "reactions", renderTaxonomyPanel);
+  wireTaxonomySearch("taxonomy-search-engagements", "engagements", renderTaxonomyPanel);
+  wireTaxonomySearch("taxonomy-search-factors", "factors", renderFactorsPanel);
 
   // Per-hero Reaction/Engagement assignment (Section 5.3), inside the hero edit modal
   document.getElementById("rte-add-reaction-btn").addEventListener("click", () => addRteItem("reactions", "main"));
@@ -1508,10 +1546,13 @@ function qdRequiredSideForDraft(draftArr) {
 function qdOverallKitScore(h, variant) {
   const reactions   = variant === "ghost" ? (h.altStats?.reactions   || []) : (h.reactions   || []);
   const engagements = variant === "ghost" ? (h.altStats?.engagements || []) : (h.engagements || []);
-  const all = [...reactions, ...engagements];
-  if (all.length === 0) return 0;
-  const sum = all.reduce((acc, r) => acc + Math.max(0, Math.min(10, Number(r.score) || 0)), 0);
-  return +(sum / all.length).toFixed(1);
+  const values = [
+    ...reactions.map(r => taxonomyValue("reactions", r?.refId ?? r)),
+    ...engagements.map(e => taxonomyValue("engagements", e?.refId ?? e)),
+  ];
+  if (values.length === 0) return 0;
+  const sum = values.reduce((acc, v) => acc + v, 0);
+  return +(sum / values.length).toFixed(1);
 }
 
 // One candidate hero+variant, scored for the CURRENT ranking mode
@@ -1621,17 +1662,20 @@ function qdFactorEntryForHero(h, variant) {
     // only the single best-scoring one per Factor, so a hero isn't
     // rewarded twice for overlapping coverage of one ticked item. This
     // is what "ranked by their Reaction/Engage score for that specific
-    // item (not their overall average)" (8.2) means in practice.
+    // item (not their overall average)" (8.2) means in practice. Score
+    // comes from the taxonomy item's fixed value, not anything per-hero.
     let best = null;
     reactions.forEach(r => {
-      if (!taggedRIds.has(r.refId)) return;
-      const s = Math.max(0, Math.min(10, Number(r.score) || 0));
-      if (!best || s > best.s) best = { s, name: taxonomyName("reactions", r.refId) };
+      const refId = r?.refId ?? r;
+      if (!taggedRIds.has(refId)) return;
+      const s = taxonomyValue("reactions", refId);
+      if (!best || s > best.s) best = { s, name: taxonomyName("reactions", refId) };
     });
     engagements.forEach(e => {
-      if (!taggedEIds.has(e.refId)) return;
-      const s = Math.max(0, Math.min(10, Number(e.score) || 0));
-      if (!best || s > best.s) best = { s, name: taxonomyName("engagements", e.refId) };
+      const refId = e?.refId ?? e;
+      if (!taggedEIds.has(refId)) return;
+      const s = taxonomyValue("engagements", refId);
+      if (!best || s > best.s) best = { s, name: taxonomyName("engagements", refId) };
     });
 
     if (best) {
@@ -3227,15 +3271,15 @@ function openEditModal(h) {
   updateSelfishSelflessDisplay();
   // Reactions/Engagements (Section 5.3) — clone so editing in the modal
   // never mutates the hero's array directly until Save Changes commits it.
-  modalReactions   = Array.isArray(h.reactions)   ? h.reactions.map(x => ({ ...x }))   : [];
-  modalEngagements = Array.isArray(h.engagements) ? h.engagements.map(x => ({ ...x })) : [];
+  modalReactions   = Array.isArray(h.reactions)   ? h.reactions.map(x => ({ refId: x?.refId ?? x }))   : [];
+  modalEngagements = Array.isArray(h.engagements) ? h.engagements.map(x => ({ refId: x?.refId ?? x })) : [];
   renderRteSection("main");
   // Ghost Selfish/Selfless + Reactions/Engagements
   modalAltSelfishScore  = typeof h.altStats?.selfishScore === "number" ? h.altStats.selfishScore : 0;
   modalAltSelflessScore = typeof h.altStats?.selflessScore === "number" ? h.altStats.selflessScore : 0;
   updateAltSelfishSelflessDisplay();
-  modalAltReactions   = Array.isArray(h.altStats?.reactions)   ? h.altStats.reactions.map(x => ({ ...x }))   : [];
-  modalAltEngagements = Array.isArray(h.altStats?.engagements) ? h.altStats.engagements.map(x => ({ ...x })) : [];
+  modalAltReactions   = Array.isArray(h.altStats?.reactions)   ? h.altStats.reactions.map(x => ({ refId: x?.refId ?? x }))   : [];
+  modalAltEngagements = Array.isArray(h.altStats?.engagements) ? h.altStats.engagements.map(x => ({ refId: x?.refId ?? x })) : [];
   renderRteSection("alt");
   overlay.classList.add("open");
   fName.focus();
@@ -3586,15 +3630,17 @@ function confirmQuestionnaire() {
 
    Lives inside the hero edit modal. Reads/writes modalReactions /
    modalEngagements (declared alongside modalSelfishScore above) — never
-   free text, always a { refId, score } pointing into the shared
-   taxonomy library managed by the Section 5.1/5.2 Taxonomy Manager
-   further down this file. Removing an assignment here only drops this
-   hero's link; it never touches the library item itself.
+   free text, always a { refId } pointing into the shared taxonomy
+   library managed by the Section 5.1/5.2 Taxonomy Manager further down
+   this file. The score/value itself is fixed on the taxonomy item, not
+   set here — this UI only links/unlinks the hero to it and displays
+   whatever value the library currently has. Removing an assignment here
+   only drops this hero's link; it never touches the library item itself.
 ═══════════════════════════════════════ */
 
 // Re-renders both assigned lists, both "add" dropdowns, and the live
 // Reaction/Engage score badges. Called on modal open and after every
-// add/remove/score-edit so the three stay in sync with each other.
+// add/remove so everything stays in sync.
 // target: "main" (default, primary hero — modalReactions/modalEngagements)
 // or "alt" (ghost build — modalAltReactions/modalAltEngagements, Section 6
 // open-decision "extend ghost mode to the new axes"). Same DOM structure,
@@ -3625,6 +3671,9 @@ function setRteModalArray(kind, target, newArr) {
   }
 }
 
+// Each row shows the item's name and its fixed value (read-only badge —
+// see the taxonomy-panel value input further down for the only place
+// that value can actually be changed), plus a remove button.
 function renderRteAssignedList(kind, target) {
   const list = rteModalArray(kind, target);
   const box = rteListEl(kind, target);
@@ -3632,18 +3681,16 @@ function renderRteAssignedList(kind, target) {
     box.innerHTML = `<div class="rte-empty-note">No ${kind} assigned yet.</div>`;
     return;
   }
-  box.innerHTML = list.map(item => `
-    <div class="rte-assigned-row" data-ref-id="${item.refId}">
-      <span class="rte-assigned-name">${taxonomyName(kind, item.refId)}</span>
-      <input type="number" class="rte-assigned-score" min="0" max="10" step="0.1" value="${item.score}" data-kind="${kind}" data-ref-id="${item.refId}" data-target="${target}" />
-      <button type="button" class="rte-assigned-remove" data-kind="${kind}" data-ref-id="${item.refId}" data-target="${target}" title="Remove — does not delete the ${kind === "reactions" ? "Reaction" : "Engagement"} from the library">✕</button>
-    </div>
-  `).join("");
-  box.querySelectorAll(".rte-assigned-score").forEach(input => {
-    input.addEventListener("change", () => {
-      updateRteScore(input.dataset.kind, Number(input.dataset.refId), input.value, input.dataset.target);
-    });
-  });
+  box.innerHTML = list.map(item => {
+    const refId = item?.refId ?? item;
+    const value = taxonomyValue(kind, refId);
+    return `
+    <div class="rte-assigned-row" data-ref-id="${refId}">
+      <span class="rte-assigned-name">${taxonomyName(kind, refId)}</span>
+      <span class="rte-assigned-value" title="Fixed value — set in 🗂 Taxonomy">${value.toFixed(1)}</span>
+      <button type="button" class="rte-assigned-remove" data-kind="${kind}" data-ref-id="${refId}" data-target="${target}" title="Remove — does not delete the ${kind === "reactions" ? "Reaction" : "Engagement"} from the library">✕</button>
+    </div>`;
+  }).join("");
   box.querySelectorAll(".rte-assigned-remove").forEach(btn => {
     btn.addEventListener("click", () => {
       removeRteItem(btn.dataset.kind, Number(btn.dataset.refId), btn.dataset.target);
@@ -3653,42 +3700,37 @@ function renderRteAssignedList(kind, target) {
 
 // Populates the "+ Add a Reaction/Engagement…" dropdown with whatever's
 // in the library that this hero doesn't already hold, so the same item
-// can't be added twice from here.
+// can't be added twice from here. Shows each item's fixed value in the
+// option label so it's clear what picking it will contribute.
 function renderRteAddSelect(kind, target) {
   const prefix = rteIdPrefix(target);
   const select = document.getElementById(kind === "reactions" ? prefix + "add-reaction-select" : prefix + "add-engagement-select");
-  const assignedIds = new Set(rteModalArray(kind, target).map(x => x.refId));
+  const assignedIds = new Set(rteModalArray(kind, target).map(x => x?.refId ?? x));
   const available = taxonomy[kind].filter(item => !assignedIds.has(item.id));
   const placeholder = `<option value="">+ Add ${kind === "reactions" ? "a Reaction" : "an Engagement"}…</option>`;
-  select.innerHTML = placeholder + available.map(item => `<option value="${item.id}">${escAttr(item.name)}</option>`).join("");
+  select.innerHTML = placeholder + available.map(item =>
+    `<option value="${item.id}">${escAttr(item.name)} (${item.value.toFixed(1)})</option>`
+  ).join("");
 }
 
 function addRteItem(kind, target) {
   target = target || "main";
   const prefix = rteIdPrefix(target);
   const select = document.getElementById(kind === "reactions" ? prefix + "add-reaction-select" : prefix + "add-engagement-select");
-  const scoreInput = document.getElementById(kind === "reactions" ? prefix + "add-reaction-score" : prefix + "add-engagement-score");
   const refId = Number(select.value);
   if (!select.value) return;
-  const score = Math.max(0, Math.min(10, parseFloat(scoreInput.value) || 0));
-  setRteModalArray(kind, target, [...rteModalArray(kind, target), { refId, score }]);
-  scoreInput.value = "5";
+  setRteModalArray(kind, target, [...rteModalArray(kind, target), { refId }]);
   renderRteSection(target);
 }
 
 function removeRteItem(kind, refId, target) {
-  setRteModalArray(kind, target, rteModalArray(kind, target).filter(x => x.refId !== refId));
+  setRteModalArray(kind, target, rteModalArray(kind, target).filter(x => (x?.refId ?? x) !== refId));
   renderRteSection(target);
 }
 
-function updateRteScore(kind, refId, value, target) {
-  const clamped = Math.max(0, Math.min(10, parseFloat(value) || 0));
-  setRteModalArray(kind, target, rteModalArray(kind, target).map(x => x.refId === refId ? { ...x, score: clamped } : x));
-  updateRteScoreBadges(target);
-}
-
 // Live preview of the derived Reaction/Engage Score (Section 1.2) —
-// computed off whatever's currently in the modal, not yet saved.
+// computed off whatever's currently linked in the modal (against each
+// item's fixed taxonomy value), not yet saved.
 function updateRteScoreBadges(target) {
   target = target || "main";
   const prefix = rteIdPrefix(target);
@@ -3714,6 +3756,9 @@ function updateRteScoreBadges(target) {
 ═══════════════════════════════════════ */
 
 let taxonomyActiveTab = "reactions"; // "reactions" | "engagements" | "factors"
+// Search query per tab — kept independently so switching tabs doesn't
+// clear what you'd typed in another one.
+let taxonomySearchQuery = { reactions: "", engagements: "", factors: "" };
 
 // Taxonomy names are free text; a stray double-quote would otherwise
 // break the `value="..."` attribute of the rename inputs below.
@@ -3738,22 +3783,43 @@ function switchTaxonomyTab(tab) {
   document.getElementById("taxonomy-panel-reactions").style.display   = tab === "reactions"   ? "block" : "none";
   document.getElementById("taxonomy-panel-engagements").style.display = tab === "engagements" ? "block" : "none";
   document.getElementById("taxonomy-panel-factors").style.display     = tab === "factors"     ? "block" : "none";
+  // Scroll the (now-visible) panel's own scroll container back to the
+  // top — otherwise switching tabs can land you mid-scroll on the new
+  // list if the previous tab was scrolled down.
+  const body = document.querySelector(".taxonomy-modal .taxonomy-body");
+  if (body) body.scrollTop = 0;
   if (tab === "factors") renderFactorsPanel();
   else renderTaxonomyPanel(tab);
 }
 
-// Shared renderer for the Reactions and Engagements panels (5.1).
+// Case-insensitive substring match against the current tab's search box.
+function taxonomyMatchesSearch(kind, name) {
+  const q = (taxonomySearchQuery[kind] || "").trim().toLowerCase();
+  if (!q) return true;
+  return (name || "").toLowerCase().includes(q);
+}
+
+// Shared renderer for the Reactions and Engagements panels (5.1). Each
+// row includes a fixed 0–10 value input — this IS the score used
+// everywhere the item is assigned (chart axes, Quick Draft ranking);
+// it is never editable from a hero's own edit screen.
 function renderTaxonomyPanel(kind) {
   const box = document.getElementById(kind === "reactions" ? "taxonomy-list-reactions" : "taxonomy-list-engagements");
-  const items = taxonomy[kind];
+  const items = taxonomy[kind].filter(item => taxonomyMatchesSearch(kind, item.name));
   if (!items.length) {
-    box.innerHTML = `<div class="taxonomy-empty-note">No ${kind} yet — add one above.</div>`;
+    box.innerHTML = taxonomy[kind].length
+      ? `<div class="taxonomy-empty-note">No ${kind} match your search.</div>`
+      : `<div class="taxonomy-empty-note">No ${kind} yet — add one above.</div>`;
     return;
   }
   box.innerHTML = items.map(item => `
     <div class="taxonomy-row" data-id="${item.id}">
       <div class="taxonomy-row-main">
         <input type="text" class="taxonomy-row-name" value="${escAttr(item.name)}" data-kind="${kind}" data-id="${item.id}" />
+        <div class="taxonomy-row-value">
+          <label for="taxonomy-value-${kind}-${item.id}">Value</label>
+          <input type="number" id="taxonomy-value-${kind}-${item.id}" class="taxonomy-row-value-input" min="0" max="10" step="0.1" value="${item.value.toFixed(1)}" data-kind="${kind}" data-id="${item.id}" title="Fixed score (0-10) used everywhere this ${kind === "reactions" ? "Reaction" : "Engagement"} is assigned" />
+        </div>
         <button type="button" class="btn btn-ghost btn-xs taxonomy-row-tagbtn" data-kind="${kind}" data-id="${item.id}">🏷 Factors (${item.factorIds.length})</button>
         <button type="button" class="taxonomy-row-delete" data-kind="${kind}" data-id="${item.id}" title="Delete — un-links from every hero that holds it">✕</button>
       </div>
@@ -3765,6 +3831,14 @@ function renderTaxonomyPanel(kind) {
     input.addEventListener("change", () => {
       renameTaxonomyItem(input.dataset.kind, Number(input.dataset.id), input.value);
       renderRteSection(); // reflects a rename immediately if the hero modal is open behind this one
+    });
+  });
+  box.querySelectorAll(".taxonomy-row-value-input").forEach(input => {
+    input.addEventListener("change", () => {
+      setTaxonomyItemValue(input.dataset.kind, Number(input.dataset.id), input.value);
+      input.value = taxonomyValue(input.dataset.kind, Number(input.dataset.id)).toFixed(1);
+      renderRteSection(); // any hero currently open needs its live score badges refreshed
+      if (quickDraftSuggestOpen) renderQuickDraftSuggestions(); // scores feed Quick Draft too
     });
   });
   box.querySelectorAll(".taxonomy-row-delete").forEach(btn => {
@@ -3819,11 +3893,14 @@ function renderTaxonomyFactorChips(kind, id) {
 // Factors panel (5.2) — plain create/rename/delete, no tagging UI here.
 function renderFactorsPanel() {
   const box = document.getElementById("taxonomy-list-factors");
-  if (!taxonomy.factors.length) {
-    box.innerHTML = `<div class="taxonomy-empty-note">No Factors yet — add one above.</div>`;
+  const items = taxonomy.factors.filter(f => taxonomyMatchesSearch("factors", f.name));
+  if (!items.length) {
+    box.innerHTML = taxonomy.factors.length
+      ? `<div class="taxonomy-empty-note">No Factors match your search.</div>`
+      : `<div class="taxonomy-empty-note">No Factors yet — add one above.</div>`;
     return;
   }
-  box.innerHTML = taxonomy.factors.map(f => `
+  box.innerHTML = items.map(f => `
     <div class="taxonomy-row" data-id="${f.id}">
       <div class="taxonomy-row-main">
         <input type="text" class="taxonomy-row-name" value="${escAttr(f.name)}" data-id="${f.id}" />
@@ -4046,12 +4123,18 @@ function renderXSlider() {
 
   const reactionList = document.getElementById("xslider-reaction-list");
   reactionList.innerHTML = reactions.length
-    ? reactions.map(item => `<div style="display:flex;justify-content:space-between;color:var(--text-dim)"><span>${taxonomyName("reactions", item.refId)}</span><span>${item.score}</span></div>`).join("")
+    ? reactions.map(item => {
+        const refId = item?.refId ?? item;
+        return `<div style="display:flex;justify-content:space-between;color:var(--text-dim)"><span>${taxonomyName("reactions", refId)}</span><span>${taxonomyValue("reactions", refId).toFixed(1)}</span></div>`;
+      }).join("")
     : `<div style="color:var(--text-dim);font-style:italic">None assigned.</div>`;
 
   const engageList = document.getElementById("xslider-engage-list");
   engageList.innerHTML = engagements.length
-    ? engagements.map(item => `<div style="display:flex;justify-content:space-between;color:var(--text-dim)"><span>${taxonomyName("engagements", item.refId)}</span><span>${item.score}</span></div>`).join("")
+    ? engagements.map(item => {
+        const refId = item?.refId ?? item;
+        return `<div style="display:flex;justify-content:space-between;color:var(--text-dim)"><span>${taxonomyName("engagements", refId)}</span><span>${taxonomyValue("engagements", refId).toFixed(1)}</span></div>`;
+      }).join("")
     : `<div style="color:var(--text-dim);font-style:italic">None assigned.</div>`;
 }
 
@@ -4393,8 +4476,14 @@ function cleanDanglingTaxonomyRefs(list, tax) {
   return list.map(h => {
     const origReactions   = Array.isArray(h.reactions)   ? h.reactions   : [];
     const origEngagements = Array.isArray(h.engagements) ? h.engagements : [];
-    const reactions   = origReactions.filter(r => reactionIds.has(r.refId));
-    const engagements = origEngagements.filter(e => engagementIds.has(e.refId));
+    // Normalize each entry to { refId } as we go — accepts older exports
+    // that stored a bare refId number or a { refId, score } object.
+    const reactions   = origReactions
+      .filter(r => reactionIds.has(r?.refId ?? r))
+      .map(r => ({ refId: r?.refId ?? r }));
+    const engagements = origEngagements
+      .filter(e => engagementIds.has(e?.refId ?? e))
+      .map(e => ({ refId: e?.refId ?? e }));
     if (reactions.length === origReactions.length && engagements.length === origEngagements.length) return h;
     return { ...h, reactions, engagements, needsRerating: true };
   });
