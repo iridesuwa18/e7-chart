@@ -273,7 +273,13 @@
                  is needed once Factors are driving recommendations. -->
             <div class="qd-ban-protect-row qd-factor-row">
               <span class="qd-enemy-el-label">🎯 Enemy Factors:</span>
-              <div class="qd-factor-chips" id="qd-factor-chips"><!-- populated from the taxonomy Factors library --></div>
+              <!-- The dropdown itself (search box + Factor grid) is built
+                   by app.js (ensureQdFactorMenu) and appended to <body>
+                   as position:fixed, so it can float above the drawer
+                   instead of being clipped by it — see app.js Section 8.1. -->
+              <button type="button" class="btn btn-ghost btn-sm qd-factor-menu-btn" id="qd-factor-menu-btn">
+                <span id="qd-factor-menu-btn-label">🎯 Enemy Factors ▾</span>
+              </button>
             </div>
 
             <div class="qd-ban-protect-row">

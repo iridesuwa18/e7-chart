@@ -482,37 +482,99 @@ main {
   box-shadow: 0 0 0 2px rgba(201,162,39,.55);
 }
 
-/* Section 8.1 — Enemy Factor checklist. Pill-shaped (not the round
-   element dots above) since Factor names are free text of varying
-   length, not fixed single icons. Built for fast mid-match tapping:
-   generous hit target, no confirm step, toggles instantly. */
+/* Section 8.1 — Enemy Factor checklist. Built for fast mid-match
+   tapping: generous hit targets, no confirm step, toggles instantly.
+   The trigger button below sits inline in the row; the dropdown menu
+   itself (.qd-factor-menu and children) is built once by app.js and
+   appended directly to <body>, positioned with `position:fixed` —
+   see ensureQdFactorMenu()/positionQdFactorMenu() in app.js for why:
+   it needs to escape the Quick Draft drawer's `overflow:hidden`
+   (used for its open/close animation) so the menu can never be
+   clipped or buried underneath the drawer's own content again. */
 .qd-factor-row { margin-top: 6px; }
-.qd-factor-chips {
+.qd-factor-menu-btn { white-space: nowrap; }
+
+.qd-factor-menu {
+  position: fixed;
+  z-index: 300;
+  width: min(480px, 94vw);
+  background: #0b1a2e;
+  border: 1px solid rgba(201,162,39,0.35);
+  border-radius: 8px;
+  padding: 10px;
+  box-shadow: 0 10px 32px rgba(0,0,0,0.55);
+}
+.qd-factor-menu-searchbar {
+  position: relative;
+  margin: 0 0 8px;
+}
+.qd-factor-menu-searchbar .qd-factor-menu-search {
+  margin: 0;
+  padding-right: 28px;
+}
+.qd-factor-menu-clear {
+  display: none;
+  position: absolute;
+  top: 50%;
+  right: 6px;
+  transform: translateY(-50%);
+  align-items: center;
+  justify-content: center;
+  width: 20px;
+  height: 20px;
+  padding: 0;
+  border: none;
+  border-radius: 50%;
+  background: rgba(255,255,255,0.1);
+  color: #9fb4c7;
+  font-size: 11px;
+  line-height: 1;
+  cursor: pointer;
+  transition: background .15s, color .15s;
+}
+.qd-factor-menu-clear:hover { background: rgba(255,255,255,0.2); color: #dce8f5; }
+
+/* A wrapping grid of pills — several rows of Factors visible (and
+   quickly tappable) at once, rather than one narrow vertical list. */
+.qd-factor-menu-list {
+  max-height: min(46vh, 320px);
+  overflow-y: auto;
   display: flex;
   flex-wrap: wrap;
+  align-content: flex-start;
   gap: 6px;
 }
-.qd-factor-chip {
-  padding: 4px 10px;
+.qd-factor-menu-item {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 12px;
   border-radius: 999px;
-  border: 1.5px solid var(--border);
-  background: rgba(255,255,255,.04);
-  color: var(--text-dim);
-  font-size: 11px;
+  border: 1.5px solid rgba(255,255,255,0.12);
+  background: rgba(255,255,255,0.04);
+  color: #b9c9d8;
+  font-size: 12.5px;
   font-family: 'Crimson Pro', serif;
+  white-space: nowrap;
   cursor: pointer;
-  opacity: .6;
-  transition: opacity .15s, border-color .15s, background .15s, color .15s, transform .1s;
+  transition: background .15s, border-color .15s, color .15s;
 }
-.qd-factor-chip:active { transform: scale(.94); }
-.qd-factor-chip.active {
-  opacity: 1;
+.qd-factor-menu-item:hover { background: rgba(255,255,255,0.09); }
+.qd-factor-menu-item.active {
   border-color: #4ade80;
   background: rgba(74,222,128,.16);
   color: #eafff2;
 }
+.qd-factor-menu-item input[type="checkbox"] {
+  width: 13px;
+  height: 13px;
+  flex-shrink: 0;
+  accent-color: #4ade80;
+  cursor: pointer;
+}
 .qd-factor-empty {
-  font-size: 10.5px;
+  padding: 6px 2px;
+  font-size: 11px;
   font-style: italic;
   color: var(--text-dim);
 }

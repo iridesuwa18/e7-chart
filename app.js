@@ -506,6 +506,16 @@ let qdCompetitiveMode = false; // when on: 3★ heroes (chained or support) are 
 // state — resets on Clear, same as qdBanProtectElement.
 let qdTickedFactorIds = new Set();
 
+// Enemy Factor dropdown menu state (Section 8.1) — declared up here,
+// ahead of renderQdFactorChips()'s definition further down, because
+// that function is invoked from top-level init code (not deferred
+// inside another function) earlier in this same script. `let` isn't
+// hoisted with a value the way `function` is, so if these lived next
+// to the rest of the Factor-menu code below instead, that early call
+// would hit them mid-TDZ and throw "Cannot access before initialization".
+let qdFactorMenuSearch = "";
+let qdFactorMenuEl = null;
+
 // Shared by every Quick Draft pick source (Randomize, Suggest, Autofill —
 // Autofill just calls into Suggest under the hood) so the ban is applied
 // consistently everywhere a hero could be chosen, whether as a chain
@@ -2095,18 +2105,119 @@ function renderQuickDraft() {
    Rendered fresh from the taxonomy library every time: on init,
    whenever the taxonomy Factors panel changes something (add/rename/
    delete — see renderFactorsPanel), and after Suggest re-renders so a
-   freshly-ticked item's state never drifts from qdTickedFactorIds. */
-let qdFactorMenuSearch = "";
+   freshly-ticked item's state never drifts from qdTickedFactorIds.
+
+   [Overlap fix] The menu is built once here and appended straight to
+   <body>, then positioned with `position:fixed` from the trigger
+   button's own bounding box. Previously it lived inline next to the
+   button as `position:absolute`, which put it at the mercy of every
+   ancestor between it and the button: the Quick Draft drawer clips
+   its contents to animate open/closed (`overflow:hidden`), so
+   anything that visually extended past the drawer's current box —
+   exactly what a popped-open dropdown does — got silently cut off or
+   buried behind whatever came next in the drawer (this is what showed
+   up as "the menu is hidden underneath the quickdraft box"). A
+   fixed-position node appended to <body> has no such ancestor to be
+   clipped or out-stacked by, on either index.html or quickdraft.html,
+   independent of drawer state or qd-companion mode. (qdFactorMenuSearch
+   and qdFactorMenuEl are declared up near qdTickedFactorIds, not here —
+   see the comment there for why.) */
 
 function qdFactorMenuLabel() {
   const n = qdTickedFactorIds.size;
   return n === 0 ? "🎯 Enemy Factors ▾" : `🎯 Enemy Factors (${n} ticked) ▾`;
 }
 
-function renderQdFactorChips() {
+// Builds the floating menu the first time it's needed and reuses it after.
+function ensureQdFactorMenu() {
+  if (qdFactorMenuEl) return qdFactorMenuEl;
+
+  const menu = document.createElement("div");
+  menu.className = "qd-factor-menu";
+  menu.id = "qd-factor-menu";
+  menu.style.display = "none";
+  menu.innerHTML = `
+    <div class="qd-factor-menu-searchbar">
+      <input type="text" class="taxonomy-search qd-factor-menu-search" id="qd-factor-menu-search" placeholder="🔍 Search Factors…" />
+      <button type="button" class="qd-factor-menu-clear" id="qd-factor-menu-clear" title="Clear search" aria-label="Clear search">✕</button>
+    </div>
+    <div class="qd-factor-menu-list" id="qd-factor-menu-list"><!-- populated from the taxonomy Factors library --></div>
+  `;
+  document.body.appendChild(menu);
+  qdFactorMenuEl = menu;
+
+  const searchInput = menu.querySelector("#qd-factor-menu-search");
+  const clearBtn    = menu.querySelector("#qd-factor-menu-clear");
+
+  searchInput.addEventListener("input", e => {
+    qdFactorMenuSearch = e.target.value;
+    clearBtn.style.display = qdFactorMenuSearch ? "flex" : "none";
+    renderQdFactorMenuList();
+  });
+  // Fast X-to-clear next to the search box — wipes the text and hands
+  // focus straight back so the next word can be typed immediately,
+  // instead of needing a click-then-select-all-then-type round trip.
+  clearBtn.addEventListener("click", () => {
+    qdFactorMenuSearch = "";
+    searchInput.value = "";
+    clearBtn.style.display = "none";
+    renderQdFactorMenuList();
+    searchInput.focus();
+  });
+
+  const reposition = () => { if (menu.style.display !== "none") positionQdFactorMenu(); };
+  window.addEventListener("resize", reposition);
+  window.addEventListener("scroll", reposition, true);
+
+  document.addEventListener("click", e => {
+    if (menu.style.display === "none") return;
+    const btn = document.getElementById("qd-factor-menu-btn");
+    if (menu.contains(e.target) || (btn && btn.contains(e.target))) return;
+    menu.style.display = "none";
+  });
+  document.addEventListener("keydown", e => {
+    if (e.key === "Escape" && menu.style.display !== "none") menu.style.display = "none";
+  });
+
+  return menu;
+}
+
+// Anchors the floating menu directly under (or, if it wouldn't fit,
+// above) whichever trigger button exists on the current page. Fixed
+// coordinates are relative to the viewport, so this is re-run on
+// scroll/resize while the menu is open to keep it glued to the button.
+function positionQdFactorMenu() {
   const btn  = document.getElementById("qd-factor-menu-btn");
-  const menu = document.getElementById("qd-factor-menu");
+  const menu = qdFactorMenuEl;
   if (!btn || !menu) return;
+
+  const r = btn.getBoundingClientRect();
+  const menuWidth  = menu.offsetWidth  || 340;
+  const menuHeight = menu.offsetHeight || 260;
+
+  let left = r.left;
+  if (left + menuWidth > window.innerWidth - 8) {
+    left = Math.max(8, window.innerWidth - menuWidth - 8);
+  }
+
+  const spaceBelow = window.innerHeight - r.bottom;
+  const spaceAbove = r.top;
+  let top;
+  if (spaceBelow < menuHeight + 10 && spaceAbove > spaceBelow) {
+    top = Math.max(8, r.top - menuHeight - 6);
+  } else {
+    top = r.bottom + 6;
+  }
+
+  menu.style.left = `${left}px`;
+  menu.style.top  = `${top}px`;
+}
+
+function renderQdFactorChips() {
+  const btn = document.getElementById("qd-factor-menu-btn");
+  if (!btn) return; // this page doesn't have an Enemy Factors control
+
+  const menu = ensureQdFactorMenu();
 
   // Prune ticks pointing at a Factor that's since been deleted, so a
   // stale id can't silently keep affecting recommendations forever.
@@ -2117,29 +2228,22 @@ function renderQdFactorChips() {
   document.getElementById("qd-factor-menu-btn-label").textContent = qdFactorMenuLabel();
   renderQdFactorMenuList();
 
-  // Wire the trigger/search/outside-click just once — every other call
-  // just refreshes the label and list content above, so re-adding a
-  // Factor or re-opening the menu never touches these listeners twice.
+  // Wire the trigger just once — every other call just refreshes the
+  // label and list content above, so re-adding a Factor or re-opening
+  // the menu never touches this listener twice.
   if (btn.dataset.wired) return;
   btn.dataset.wired = "1";
 
   btn.addEventListener("click", e => {
     e.stopPropagation();
     const opening = menu.style.display === "none";
-    menu.style.display = opening ? "block" : "none";
-    if (opening) document.getElementById("qd-factor-menu-search")?.focus();
-  });
-  document.addEventListener("click", e => {
-    if (menu.style.display === "none") return;
-    if (menu.contains(e.target) || btn.contains(e.target)) return;
-    menu.style.display = "none";
-  });
-  document.addEventListener("keydown", e => {
-    if (e.key === "Escape" && menu.style.display !== "none") menu.style.display = "none";
-  });
-  document.getElementById("qd-factor-menu-search").addEventListener("input", e => {
-    qdFactorMenuSearch = e.target.value;
-    renderQdFactorMenuList();
+    if (opening) {
+      menu.style.display = "block";
+      positionQdFactorMenu(); // real width/height only known once visible
+      document.getElementById("qd-factor-menu-search")?.focus();
+    } else {
+      menu.style.display = "none";
+    }
   });
 }
 
@@ -2164,8 +2268,11 @@ function renderQdFactorMenuList() {
     return;
   }
 
+  // Pills that wrap into a grid of several rows (rather than one
+  // vertical list) so many Factors are visible — and quickly tappable
+  // — at once instead of requiring scrolling to see more than a few.
   list.innerHTML = filtered.map(f => `
-    <label class="qd-factor-menu-item">
+    <label class="qd-factor-menu-item${qdTickedFactorIds.has(f.id) ? " active" : ""}">
       <input type="checkbox" data-factor-id="${f.id}" ${qdTickedFactorIds.has(f.id) ? "checked" : ""} />
       <span>${f.name || "(unnamed)"}</span>
     </label>
@@ -2176,6 +2283,7 @@ function renderQdFactorMenuList() {
       const factorId = taxonomy.factors.find(f => String(f.id) === cb.dataset.factorId)?.id;
       if (factorId === undefined) return;
       if (cb.checked) qdTickedFactorIds.add(factorId); else qdTickedFactorIds.delete(factorId);
+      cb.closest(".qd-factor-menu-item")?.classList.toggle("active", cb.checked);
       document.getElementById("qd-factor-menu-btn-label").textContent = qdFactorMenuLabel();
       saveQuickDraftModeLocal();
       if (quickDraftSuggestOpen) renderQuickDraftSuggestions();

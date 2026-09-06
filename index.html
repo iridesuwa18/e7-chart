@@ -222,44 +222,11 @@
       overflow-y: auto;
     }
 
-    /* Enemy Factors — searchable checklist menu (Section 8.1), popped
-       open from a trigger button instead of a flat inline chip row */
-    .qd-factor-menu-btn { white-space: nowrap; }
-    .qd-factor-menu {
-      position: absolute;
-      top: 100%;
-      left: 0;
-      z-index: 50;
-      margin-top: 4px;
-      width: 280px;
-      max-width: 90vw;
-      background: #0b1a2e;
-      border: 1px solid rgba(201,162,39,0.35);
-      border-radius: 6px;
-      padding: 8px;
-      box-shadow: 0 8px 24px rgba(0,0,0,0.5);
-    }
-    .qd-factor-menu-search { margin: 0 0 6px; }
-    .qd-factor-menu-list {
-      max-height: 220px;
-      overflow-y: auto;
-      display: flex;
-      flex-direction: column;
-      gap: 2px;
-    }
-    .qd-factor-menu-item {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      padding: 5px 6px;
-      border-radius: 4px;
-      cursor: pointer;
-      font-size: 13px;
-      color: #dce8f5;
-    }
-    .qd-factor-menu-item:hover { background: rgba(255,255,255,0.06); }
-    .qd-factor-menu-item input[type="checkbox"] { accent-color: #c9a227; cursor: pointer; }
   </style>
+  <!-- Enemy Factors dropdown (Section 8.1) styling now lives in
+       style.css alongside the rest of the Quick Draft panel rules —
+       the menu itself is built by app.js and appended to <body> as a
+       position:fixed element, so it isn't scoped to this page. -->
 
   <!-- PWA / installable-app support -->
   <link rel="manifest" href="manifest.json" />
@@ -354,15 +321,15 @@
                  A searchable checklist menu, not a flat chip row —
                  Factors are user-defined and can grow past what fits
                  inline, same reasoning as the Taxonomy row search. -->
-            <div class="qd-ban-protect-row qd-factor-row" style="position:relative">
+            <div class="qd-ban-protect-row qd-factor-row">
               <span class="qd-enemy-el-label">🎯 Enemy Factors:</span>
+              <!-- The dropdown itself (search box + Factor grid) is built
+                   by app.js (ensureQdFactorMenu) and appended to <body>
+                   as position:fixed, so it can float above the drawer
+                   instead of being clipped by it — see app.js Section 8.1. -->
               <button type="button" class="btn btn-ghost btn-sm qd-factor-menu-btn" id="qd-factor-menu-btn">
                 <span id="qd-factor-menu-btn-label">🎯 Enemy Factors ▾</span>
               </button>
-              <div class="qd-factor-menu" id="qd-factor-menu" style="display:none">
-                <input type="text" class="taxonomy-search qd-factor-menu-search" id="qd-factor-menu-search" placeholder="🔍 Search Factors…" />
-                <div class="qd-factor-menu-list" id="qd-factor-menu-list"><!-- populated from the taxonomy Factors library --></div>
-              </div>
             </div>
 
             <div class="qd-ban-protect-row">
