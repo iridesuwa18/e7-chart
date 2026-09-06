@@ -30,6 +30,12 @@
       "engagements": [
         {
           "refId": 1788697411172
+        },
+        {
+          "refId": 1788698917413
+        },
+        {
+          "refId": 1788698529505
         }
       ],
       "selfishScore": 0,
@@ -9219,6 +9225,22 @@
         "factorIds": [
           1788694866469
         ]
+      },
+      {
+        "id": 1788698917413,
+        "name": "Invincibility to allies",
+        "value": 8,
+        "factorIds": [
+          1788694866469
+        ]
+      },
+      {
+        "id": 1788698529505,
+        "name": "Damage limit to allies",
+        "value": 7,
+        "factorIds": [
+          1788694866469
+        ]
       }
     ],
     "factors": [
@@ -9229,5 +9251,5 @@
     ]
   },
   "schemaVersion": 2,
-  "savedAt": "2026-09-06T12:35:47.854Z"
+  "savedAt": "2026-09-06T12:42:05.766Z"
 }
