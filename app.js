@@ -266,46 +266,36 @@ function computeSelfishScore(checkedSkillIds) {
   return Math.max(0, Math.min(10, checked.size));
 }
 
-// 3.2 — Selfless score table: how many other heroes this hero
-// supports × how many of the three support types (healing / buff /
-// passive) apply. The spec's table only gives whole-number rows for
-// 1/2/3 support types per ally count; row 1 (1 ally) skips a value for
-// 2 types, which is interpolated here (0.5 → 0.75 → 1.0).
-//
-// Open decision (Section 11): the table caps at 4 allies supported as
-// the practical ceiling (score 10). If 5-target/AoE support ends up
-// needing its own row, extend SELFLESS_SCORE_TABLE and
-// SELFLESS_MAX_ALLIES together — everything else here is generic.
-const SELFLESS_SCORE_TABLE = {
-  1: { 1: 0.5, 2: 0.75, 3: 1 },
-  2: { 1: 2,   2: 3,    3: 4 },
-  3: { 1: 5,   2: 6,    3: 7 },
-  4: { 1: 8,   2: 9,    3: 10 },
-};
+// 3.2 — Selfless score: a unit-based system. Each ally can contribute up
+// to 3 "units" of support — one each for Healing, Passive, and Buff:
+//   Healing %  (0-100) → unit = healing / 100
+//   Passive %  (0-100) → unit = passive / 100   (e.g. dmg reduction, evasion)
+//   Buff count (0-10)  → unit = buffCount / 10
+// With up to SELFLESS_MAX_ALLIES (4) allies × 3 units each, the maximum
+// is SELFLESS_MAX_UNITS (12), which maps to a score of 10 — each unit is
+// worth 10/12 points. This is what makes "100% healing to 1 ally" and
+// "25% healing to 4 allies" score identically (1 total unit either way):
+// both represent the same total amount of support delivered to the team.
 const SELFLESS_MAX_ALLIES = 4;
+const SELFLESS_UNITS_PER_ALLY = 3; // healing + passive + buff
+const SELFLESS_MAX_UNITS = SELFLESS_MAX_ALLIES * SELFLESS_UNITS_PER_ALLY; // 12
 
-// `supportedAllies` — array of { healing, buff, passive } booleans,
-// one entry per ally this hero supports. An ally with none of the
-// three types checked isn't "supported" and is dropped before
-// counting. When the number of types varies ally-to-ally, this
-// averages them and interpolates between the table's integer rows.
+// `supportedAllies` — array of { healing, passive, buffCount }, one entry
+// per ally this hero supports. healing/passive are 0-100 (%), buffCount
+// is 0-10 (number of buffs granted). Only the first SELFLESS_MAX_ALLIES
+// entries count, matching the questionnaire's 0-4 ally-count selector.
 function computeSelflessScore(supportedAllies) {
-  const list = Array.isArray(supportedAllies) ? supportedAllies : [];
-  const typeCounts = list
-    .map(a => (a?.healing ? 1 : 0) + (a?.buff ? 1 : 0) + (a?.passive ? 1 : 0))
-    .filter(count => count > 0);
+  const list = (Array.isArray(supportedAllies) ? supportedAllies : []).slice(0, SELFLESS_MAX_ALLIES);
 
-  if (typeCounts.length === 0) return 0;
+  const totalUnits = list.reduce((sum, a) => {
+    const healing = Math.max(0, Math.min(100, Number(a?.healing) || 0)) / 100;
+    const passive = Math.max(0, Math.min(100, Number(a?.passive) || 0)) / 100;
+    const buff    = Math.max(0, Math.min(10,  Number(a?.buffCount) || 0)) / 10;
+    return sum + healing + passive + buff;
+  }, 0);
 
-  const n = Math.min(typeCounts.length, SELFLESS_MAX_ALLIES);
-  const avgTypes = typeCounts.slice(0, n).reduce((sum, t) => sum + t, 0) / n;
-
-  const row = SELFLESS_SCORE_TABLE[n];
-  const lo = Math.max(1, Math.min(3, Math.floor(avgTypes)));
-  const hi = Math.max(1, Math.min(3, Math.ceil(avgTypes)));
-  if (lo === hi) return row[lo];
-  const frac = avgTypes - lo;
-  return +(row[lo] + (row[hi] - row[lo]) * frac).toFixed(2);
+  if (totalUnits <= 0) return 0;
+  return +Math.min(10, (totalUnits / SELFLESS_MAX_UNITS) * 10).toFixed(2);
 }
 
 // Setting one score always zeros the other — one continuous scale,
@@ -3516,6 +3506,20 @@ function ssSetAllyCount(count) {
   updateSsSelflessPreview();
 }
 
+// One ally row's markup: Healing and Passive are 0-100% sliders (dmg
+// reduction, evasion, etc. all read as "how much"), Buff is a 0-10
+// count of distinct buffs granted (buffs are discrete, not a %).
+// Each slider is paired with a live numeric readout since range inputs
+// don't show their own value.
+function ssAllyTypeRowHTML(type, label, max, unit) {
+  return `
+    <div class="ss-ally-type-row">
+      <label class="ss-ally-type-label">${label}</label>
+      <input type="range" class="ss-ally-type" data-type="${type}" min="0" max="${max}" step="1" value="0" />
+      <span class="ss-ally-type-readout" data-readout-for="${type}">0${unit}</span>
+    </div>`;
+}
+
 function renderSsAllyRows() {
   const box = document.getElementById("ss-ally-rows");
   const rows = [];
@@ -3524,24 +3528,30 @@ function renderSsAllyRows() {
       <div class="ss-ally-row" data-ally="${i}">
         <div class="ss-ally-row-label">Ally ${i}</div>
         <div class="ss-ally-row-types">
-          <label><input type="checkbox" class="ss-ally-type" data-type="healing" /> Healing</label>
-          <label><input type="checkbox" class="ss-ally-type" data-type="buff" /> Buff</label>
-          <label><input type="checkbox" class="ss-ally-type" data-type="passive" /> Passive</label>
+          ${ssAllyTypeRowHTML("healing", "Healing", 100, "%")}
+          ${ssAllyTypeRowHTML("passive", "Passive", 100, "%")}
+          ${ssAllyTypeRowHTML("buff", "Buffs", 10, "")}
         </div>
       </div>
     `);
   }
   box.innerHTML = rows.join("");
-  box.querySelectorAll(".ss-ally-type").forEach(cb =>
-    cb.addEventListener("change", updateSsSelflessPreview)
-  );
+  box.querySelectorAll(".ss-ally-type").forEach(input => {
+    input.addEventListener("input", () => {
+      const row = input.closest(".ss-ally-row");
+      const readout = row.querySelector(`[data-readout-for="${input.dataset.type}"]`);
+      const unit = input.dataset.type === "buff" ? "" : "%";
+      readout.textContent = input.value + unit;
+      updateSsSelflessPreview();
+    });
+  });
 }
 
 function ssCollectSupportedAllies() {
   return Array.from(document.querySelectorAll("#ss-ally-rows .ss-ally-row")).map(row => ({
-    healing: row.querySelector('[data-type="healing"]').checked,
-    buff:    row.querySelector('[data-type="buff"]').checked,
-    passive: row.querySelector('[data-type="passive"]').checked,
+    healing:   Number(row.querySelector('[data-type="healing"]').value) || 0,
+    passive:   Number(row.querySelector('[data-type="passive"]').value) || 0,
+    buffCount: Number(row.querySelector('[data-type="buff"]').value) || 0,
   }));
 }
 

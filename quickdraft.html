@@ -7,6 +7,37 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700;900&family=Crimson+Pro:ital,wght@0,300;0,400;0,600;1,400&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="style.css" />
+  <style>
+    /* Selfless questionnaire — % / count sliders per ally (replaces the
+       old healing/buff/passive checkboxes) */
+    .ss-ally-type-row {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 4px 0;
+    }
+    .ss-ally-type-label {
+      width: 62px;
+      flex-shrink: 0;
+      font-family: 'Cinzel', serif;
+      font-size: 10px;
+      letter-spacing: .08em;
+      color: var(--text-dim, #8aa0b5);
+    }
+    .ss-ally-type-row input[type="range"].ss-ally-type {
+      flex: 1;
+      accent-color: #c9a227;
+      cursor: pointer;
+    }
+    .ss-ally-type-readout {
+      width: 38px;
+      text-align: right;
+      flex-shrink: 0;
+      font-variant-numeric: tabular-nums;
+      color: #e8c84a;
+      font-size: 12px;
+    }
+  </style>
 
   <!-- PWA / installable-app support — a SEPARATE manifest from index.html
        so "Add to Home Screen" on THIS page installs its own distinct app
