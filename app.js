@@ -3515,7 +3515,7 @@ function ssAllyTypeRowHTML(type, label, max, unit) {
   return `
     <div class="ss-ally-type-row">
       <label class="ss-ally-type-label">${label}</label>
-      <input type="range" class="ss-ally-type" data-type="${type}" min="0" max="${max}" step="1" value="0" />
+      <input type="range" class="ss-ally-range" data-type="${type}" min="0" max="${max}" step="1" value="0" />
       <span class="ss-ally-type-readout" data-readout-for="${type}">0${unit}</span>
     </div>`;
 }
@@ -3536,7 +3536,7 @@ function renderSsAllyRows() {
     `);
   }
   box.innerHTML = rows.join("");
-  box.querySelectorAll(".ss-ally-type").forEach(input => {
+  box.querySelectorAll(".ss-ally-range").forEach(input => {
     input.addEventListener("input", () => {
       const row = input.closest(".ss-ally-row");
       const readout = row.querySelector(`[data-readout-for="${input.dataset.type}"]`);
