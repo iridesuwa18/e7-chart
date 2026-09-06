@@ -9,7 +9,7 @@
       "notes": "",
       "iconData": "https://raw.githubusercontent.com/iridesuwa18/e7-chart/main/assets/heroes/ruele-of-light.webp",
       "locked": true,
-      "_x": 50,
+      "_x": 5,
       "_y": 57.5,
       "hidden": false,
       "vType_legacy": "TNK",
@@ -22,7 +22,11 @@
         "hType": "SUR",
         "hScore": 6
       },
-      "reactions": [],
+      "reactions": [
+        {
+          "refId": 1788693701095
+        }
+      ],
       "engagements": [],
       "selfishScore": 0,
       "selflessScore": 1.5,
@@ -9189,17 +9193,20 @@
       {
         "id": 1788693701095,
         "name": "Revives upon death",
-        "factorIds": []
-      },
-      {
-        "id": 1788693685769,
-        "name": "x",
-        "factorIds": []
+        "value": 9,
+        "factorIds": [
+          1788694866469
+        ]
       }
     ],
     "engagements": [],
-    "factors": []
+    "factors": [
+      {
+        "id": 1788694866469,
+        "name": "High Damage Units"
+      }
+    ]
   },
   "schemaVersion": 2,
-  "savedAt": "2026-09-06T11:21:06.360Z"
+  "savedAt": "2026-09-06T11:42:59.870Z"
 }
