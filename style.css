@@ -415,6 +415,28 @@ main {
 }
 .qd-stat.good { color: #81c784; border-color: rgba(129,199,132,.35); background: rgba(129,199,132,.08); }
 .qd-stat.warn { color: #ffb74d; border-color: rgba(255,183,77,.35); background: rgba(255,183,77,.08); }
+
+/* Section 9.4 — Selfless/Selfish priority indicator + switch, shown
+   next to the Avg badge. The badge itself uses the same .qd-stat shape
+   as its neighbors; the switch is a distinct small gold control since
+   (unlike the other stats) it's actually clickable. */
+.qd-side-badge { color: var(--gold2); border-color: var(--gold-dim); background: rgba(201,162,39,.1); }
+.qd-side-switch-btn {
+  flex-shrink: 0;
+  width: 20px; height: 20px;
+  padding: 0;
+  border-radius: 50%;
+  border: 1px solid var(--gold-dim);
+  background: rgba(201,162,39,.1);
+  color: var(--gold2);
+  font-size: 11px;
+  line-height: 1;
+  cursor: pointer;
+  transition: background .15s, border-color .15s, transform .1s;
+}
+.qd-side-switch-btn:hover { background: rgba(201,162,39,.25); border-color: var(--gold); }
+.qd-side-switch-btn:active { transform: scale(.9); }
+
 .quickdraft-toolbar-actions { display: flex; gap: 6px; flex-wrap: wrap; }
 
 /* Rule 1: only the Ban Protect element is tracked now. */
@@ -2086,6 +2108,91 @@ body.dot-mode .origin-dot:hover {
   font-size: 12px;
   color: var(--text-dim);
   padding: 6px 2px;
+}
+
+/* Section 5.3 — quick "Add to Hero" search under a Reaction/Engagement
+   row. Reuses .taxonomy-row-factors' spacing rhythm (border-top, gap)
+   since it's the same "expandable strip under the row" shape, just
+   listing heroes with a portrait + add button instead of Factor chips. */
+.taxonomy-row-heroes {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 8px;
+  padding-top: 8px;
+  border-top: 1px solid var(--border);
+}
+.taxonomy-row-heroes .taxonomy-search { width: 100%; margin: 0; }
+.taxonomy-hero-chip {
+  font-family: 'Cinzel', serif;
+  font-size: 9px;
+  letter-spacing: .06em;
+  padding: 4px 9px;
+  border-radius: 12px;
+  border: 1px solid var(--gold);
+  background: rgba(201,162,39,.15);
+  color: var(--gold2);
+}
+.taxonomy-hero-row-results {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  width: 100%;
+  max-height: 220px;
+  overflow-y: auto;
+}
+.taxonomy-hero-result {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 5px 8px;
+  border-radius: 6px;
+  border: 1px solid var(--border);
+  background: rgba(255,255,255,.02);
+}
+.taxonomy-hero-result.already { opacity: .6; }
+.taxonomy-hero-result-portrait {
+  width: 24px; height: 24px;
+  border-radius: 50%;
+  overflow: hidden;
+  flex-shrink: 0;
+  display: flex; align-items: center; justify-content: center;
+  background: var(--bg3);
+  border: 1px solid var(--border);
+  font-size: 11px;
+}
+.taxonomy-hero-result-portrait img { width: 100%; height: 100%; object-fit: cover; }
+.taxonomy-hero-result-name {
+  flex: 1;
+  min-width: 0;
+  font-family: 'Crimson Pro', serif;
+  font-size: 12.5px;
+  color: var(--text);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.taxonomy-hero-add-btn {
+  flex-shrink: 0;
+  font-family: 'Cinzel', serif;
+  font-size: 9px;
+  letter-spacing: .06em;
+  padding: 4px 10px;
+  border-radius: 12px;
+  border: 1px solid var(--gold-dim);
+  background: rgba(201,162,39,.1);
+  color: var(--gold2);
+  cursor: pointer;
+  transition: background .15s, border-color .15s;
+}
+.taxonomy-hero-add-btn:hover { background: rgba(201,162,39,.22); border-color: var(--gold); }
+.taxonomy-hero-added-badge {
+  flex-shrink: 0;
+  font-family: 'Cinzel', serif;
+  font-size: 9px;
+  letter-spacing: .06em;
+  color: #4ade80;
+  white-space: nowrap;
 }
 
 /* ══════════════════════════════════════════════════════════

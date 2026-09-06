@@ -230,6 +230,14 @@ function taxonomyItemsForFactor(factorId) {
   };
 }
 
+// Every hero currently holding a given Reaction/Engagement — backs both
+// the "(N)" count badge on its Taxonomy row and the already-added check
+// in the quick "Add to Hero" search (Section 5.3), so a hero can never
+// end up linked twice from that panel.
+function heroesLinkedToTaxonomyItem(kind, id) {
+  return heroes.filter(h => (Array.isArray(h[kind]) ? h[kind] : []).some(x => (x.refId ?? x) === id));
+}
+
 // Ensures a hero object has the new Section 1 fields, without
 // touching anything else on it (including the existing vType/vScore/
 // hType/hScore axis fields, which still drive the chart plot until
@@ -483,6 +491,12 @@ const QD_SIZE = 5;
 const QD_SELFLESS_TARGET = 3;
 const QD_SELFISH_TARGET  = 2;
 let quickDraft = [null, null, null, null, null];
+// Section 9.4 — manual override for which side (Selfless/Selfish) Suggest,
+// Next Best, and Autofill prioritize for the next open slot. null = follow
+// the automatic 3-Selfless/2-Selfish quota (qdRequiredSideForDraft); set to
+// "selfless"/"selfish" once the ⇄ switch next to the Avg badge is tapped,
+// overriding that quota until Clear resets it (see clearQuickDraft).
+let qdManualSideOverride = null;
 let quickDraftOpen = false;
 let quickDraftSuggestOpen = false;
 
@@ -1548,6 +1562,28 @@ function qdRequiredSideForDraft(draftArr) {
   return selflessNeeded >= selfishNeeded ? "selfless" : "selfish";
 }
 
+// Section 9.4 — what actually drives Suggest/Next Best/Autofill for the
+// live in-progress draft: the manual override if the person has tapped
+// the ⇄ switch, otherwise the automatic quota calculation above. Kept
+// separate from qdRequiredSideForDraft itself so the "mould examples"
+// simulation (qdSimulateChain) can stay purely automatic — it's a
+// hypothetical illustration, not the real draft, and shouldn't be
+// steered by an override the person set for their actual picks.
+function qdEffectiveRequiredSide(draftArr) {
+  return qdManualSideOverride || qdRequiredSideForDraft(draftArr);
+}
+
+// Flips the manual override — always to whichever side ISN'T currently
+// in effect, so tapping ⇄ visibly swaps the indicator every time rather
+// than sometimes doing nothing (which a plain null→"selfless" step
+// could do, if the automatic calculation already happened to agree).
+function qdToggleSideOverride() {
+  const current = qdEffectiveRequiredSide(quickDraft) || "selfless"; // default starting side if genuinely unrestricted
+  qdManualSideOverride = current === "selfless" ? "selfish" : "selfless";
+  renderQuickDraft();
+  if (quickDraftSuggestOpen) renderQuickDraftSuggestions();
+}
+
 /* ═══════════════════════════════════════
    QUICK DRAFT — SIMPLIFIED SCORING ENGINE
    Replaces the old quadrant/tier/chain system entirely. A slot's ranked
@@ -1629,10 +1665,11 @@ function qdSimpleSuggestForSlot(nextIdx, draftArr, banProtectEl) {
   // of a quadrant-filtered one.
   entries.sort((a, b) => a._bucket - b._bucket || b.score - a.score);
 
-  // Selfish/Selfless quota filter (Section 9 engine, unchanged) — same
-  // "filter down, but relax back to the full list if that would empty
-  // it" pattern the old Autofill/mould code already used.
-  const requiredSide = qdRequiredSideForDraft(draftArr);
+  // Selfish/Selfless quota filter (Section 9 engine, now override-aware
+  // via qdEffectiveRequiredSide — see Section 9.4) — same "filter down,
+  // but relax back to the full list if that would empty it" pattern the
+  // old Autofill/mould code already used.
+  const requiredSide = qdEffectiveRequiredSide(draftArr);
   if (requiredSide) {
     const sideMatches = entries.filter(e => qdHeroSide(e.hero, e.variant) === requiredSide);
     if (sideMatches.length) entries = sideMatches;
@@ -1922,7 +1959,7 @@ function autofillTopQuickDraftPick() {
   }
   if (scored.length === 0) { setStatus("⚠️ No more heroes left in your Roster."); return; }
 
-  const requiredSide = qdRequiredSideForDraft(quickDraft);
+  const requiredSide = qdEffectiveRequiredSide(quickDraft);
   let pool = scored;
   if (requiredSide) {
     const sideMatches = scored.filter(e => qdHeroSide(e.hero, e.variant) === requiredSide);
@@ -1977,6 +2014,11 @@ function clearQuickDraft() {
   qdTickedFactorIds.clear();
   renderQdFactorChips();
   saveQuickDraftModeLocal();
+
+  // Reset the manual Selfish/Selfless override too (Section 9.4) — same
+  // "new draft, new enemy" reasoning as Ban Protect element and Enemy
+  // Factors above: start the next draft back on the automatic quota.
+  qdManualSideOverride = null;
 
   renderQuickDraft();
   renderRoster();
@@ -2077,9 +2119,28 @@ function renderQuickDraft() {
 
   const statsEl = document.getElementById("quickdraft-stats");
   const avgTxt = filledCount ? (perSlot.reduce((s, p) => s + p.score, 0) / filledCount).toFixed(1) : "—";
+
+  // Section 9.4 — indicator + switch for which side (Selfless/Selfish)
+  // Suggest/Next Best/Autofill will prioritize for the next open slot.
+  // Hidden once the team is full since there's no "next slot" left to
+  // steer. Reflects the manual override the moment one is set, so the
+  // badge and the actual picks Autofill makes can never disagree.
+  let sideBadgeHtml = "";
+  if (filledCount < QD_SIZE) {
+    const effSide = qdEffectiveRequiredSide(quickDraft);
+    const sideLabel = effSide === "selfish" ? "⚔ Selfish" : effSide === "selfless" ? "🛡 Selfless" : "⚖ Either";
+    const modeNote = qdManualSideOverride ? "Manually set" : "Auto — needed to hit the default 3 Selfless + 2 Selfish split";
+    sideBadgeHtml = `
+      <span class="qd-stat qd-side-badge" title="${modeNote}. This is what Suggest/Next Best/Autofill will prioritize for the next open slot.">${sideLabel}</span>
+      <button type="button" class="qd-side-switch-btn" id="qd-side-switch-btn" title="Switch which side (Selfless/Selfish) is prioritized for the next open slot">⇄</button>`;
+  }
+
   statsEl.innerHTML = `
     <span class="qd-stat">${filledCount}/5 Picked</span>
-    <span class="qd-stat">Avg ${avgTxt}</span>`;
+    <span class="qd-stat">Avg ${avgTxt}</span>${sideBadgeHtml}`;
+
+  const sideSwitchBtn = document.getElementById("qd-side-switch-btn");
+  if (sideSwitchBtn) sideSwitchBtn.addEventListener("click", qdToggleSideOverride);
 
   document.getElementById("btn-quickdraft-suggest").disabled = filledCount >= QD_SIZE;
   document.getElementById("btn-quickdraft-random").disabled = filledCount >= QD_SIZE;
@@ -4091,6 +4152,11 @@ let taxonomySearchQuery = { reactions: "", engagements: "", factors: "" };
 // above. Kept separate so typing in one row's search doesn't touch another.
 let taxonomyFactorRowSearch = {};
 
+// Same idea, one level up: per-row search text for the "Add to Hero"
+// quick-assign search under a Reaction/Engagement row (Section 5.3),
+// keyed by "kind-id" so each row's typing stays independent.
+let taxonomyHeroRowSearch = {};
+
 // Taxonomy names are free text; a stray double-quote would otherwise
 // break the `value="..."` attribute of the rename inputs below.
 function escAttr(s) {
@@ -4143,20 +4209,26 @@ function renderTaxonomyPanel(kind) {
       : `<div class="taxonomy-empty-note">No ${kind} yet — add one above.</div>`;
     return;
   }
-  box.innerHTML = items.map(item => `
+  const label = kind === "reactions" ? "Reaction" : "Engagement";
+  box.innerHTML = items.map(item => {
+    const heroCount = heroesLinkedToTaxonomyItem(kind, item.id).length;
+    return `
     <div class="taxonomy-row" data-id="${item.id}">
       <div class="taxonomy-row-main">
         <input type="text" class="taxonomy-row-name" value="${escAttr(item.name)}" data-kind="${kind}" data-id="${item.id}" />
         <div class="taxonomy-row-value">
           <label for="taxonomy-value-${kind}-${item.id}">Value</label>
-          <input type="number" id="taxonomy-value-${kind}-${item.id}" class="taxonomy-row-value-input" min="0" max="10" step="0.1" value="${item.value.toFixed(1)}" data-kind="${kind}" data-id="${item.id}" title="Fixed score (0-10) used everywhere this ${kind === "reactions" ? "Reaction" : "Engagement"} is assigned" />
+          <input type="number" id="taxonomy-value-${kind}-${item.id}" class="taxonomy-row-value-input" min="0" max="10" step="0.1" value="${item.value.toFixed(1)}" data-kind="${kind}" data-id="${item.id}" title="Fixed score (0-10) used everywhere this ${label} is assigned" />
         </div>
         <button type="button" class="btn btn-ghost btn-xs taxonomy-row-tagbtn" data-kind="${kind}" data-id="${item.id}">🏷 Factors (${item.factorIds.length})</button>
+        <button type="button" class="btn btn-ghost btn-xs taxonomy-row-herobtn" data-kind="${kind}" data-id="${item.id}" title="Search a hero and add this ${label} to them instantly, without opening their edit screen">➕ Add to Hero${heroCount ? ` (${heroCount})` : ""}</button>
         <button type="button" class="taxonomy-row-delete" data-kind="${kind}" data-id="${item.id}" title="Delete — un-links from every hero that holds it">✕</button>
       </div>
       <div class="taxonomy-row-factors" id="taxonomy-factors-${kind}-${item.id}" style="display:none"></div>
+      <div class="taxonomy-row-heroes" id="taxonomy-heroes-${kind}-${item.id}" style="display:none"></div>
     </div>
-  `).join("");
+  `;
+  }).join("");
 
   box.querySelectorAll(".taxonomy-row-name").forEach(input => {
     input.addEventListener("change", () => {
@@ -4184,6 +4256,9 @@ function renderTaxonomyPanel(kind) {
   });
   box.querySelectorAll(".taxonomy-row-tagbtn").forEach(btn => {
     btn.addEventListener("click", () => toggleTaxonomyRowFactors(btn.dataset.kind, Number(btn.dataset.id)));
+  });
+  box.querySelectorAll(".taxonomy-row-herobtn").forEach(btn => {
+    btn.addEventListener("click", () => toggleTaxonomyRowHeroes(btn.dataset.kind, Number(btn.dataset.id)));
   });
 }
 
@@ -4271,6 +4346,101 @@ function renderTaxonomyFactorChips(kind, id) {
     e.preventDefault();
     const firstResult = resultsBox.querySelector(".taxonomy-factor-chip");
     if (firstResult) firstResult.click(); // Enter adds the top match
+  });
+
+  renderResults();
+  if (query) searchInput.focus({ preventScroll: true }); // restore focus/cursor after a re-render
+}
+
+/* ── Section 5.3: quick "Add to Hero" search ──
+   Lets a Reaction/Engagement be assigned straight to a hero from this
+   list — search their name, tap +, done — instead of opening that
+   hero's own edit screen just to link one item. Saves immediately
+   (addHeroTaxonomyLink already calls saveLocal()) and refuses to
+   double-add: a hero that already holds this item shows a disabled
+   "✓ Added" badge instead of a clickable + button, and the lookup
+   itself is keyed off the hero's actual current links every render,
+   so it can't drift out of sync with what's really assigned. */
+function toggleTaxonomyRowHeroes(kind, id) {
+  const row = document.getElementById(`taxonomy-heroes-${kind}-${id}`);
+  if (!row) return;
+  const isOpen = row.style.display !== "none";
+  if (isOpen) { row.style.display = "none"; return; }
+  row.style.display = "flex";
+  renderTaxonomyHeroSearch(kind, id);
+}
+
+function renderTaxonomyHeroSearch(kind, id) {
+  const row  = document.getElementById(`taxonomy-heroes-${kind}-${id}`);
+  const item = taxonomy[kind].find(x => x.id === id);
+  if (!item || !row) return;
+
+  const label = kind === "reactions" ? "Reaction" : "Engagement";
+  const rowKey = `${kind}-${id}`;
+  const query = taxonomyHeroRowSearch[rowKey] || "";
+  const linkedHeroes = heroesLinkedToTaxonomyItem(kind, id);
+
+  row.innerHTML = `
+    <div class="taxonomy-tagged-chips">
+      ${linkedHeroes.length
+        ? linkedHeroes.map(h => `<span class="taxonomy-hero-chip" title="Already has this ${label}">✅ ${h.name || "Unnamed"}</span>`).join("")
+        : `<div class="taxonomy-empty-note">Not assigned to any hero yet — search below to add one.</div>`}
+    </div>
+    <input type="text" class="taxonomy-search taxonomy-hero-row-search" placeholder="🔍 Search a hero to add…" value="${escAttr(query)}" />
+    <div class="taxonomy-hero-row-results"></div>
+  `;
+
+  const searchInput = row.querySelector(".taxonomy-hero-row-search");
+  const resultsBox  = row.querySelector(".taxonomy-hero-row-results");
+
+  const renderResults = () => {
+    const q = (taxonomyHeroRowSearch[rowKey] || "").trim().toLowerCase();
+    if (!q) {
+      resultsBox.innerHTML = `<div class="taxonomy-empty-note">Type a hero's name…</div>`;
+      return;
+    }
+    const matches = heroes
+      .filter(h => (h.name || "").toLowerCase().includes(q))
+      .slice(0, 12);
+    if (!matches.length) {
+      resultsBox.innerHTML = `<div class="taxonomy-empty-note">No matching heroes.</div>`;
+      return;
+    }
+    resultsBox.innerHTML = matches.map(h => {
+      const already = (Array.isArray(h[kind]) ? h[kind] : []).some(x => (x.refId ?? x) === id);
+      const portrait = h.iconData ? `<img src="${h.iconData}">` : "⚔️";
+      return `
+        <div class="taxonomy-hero-result${already ? " already" : ""}" data-hero-id="${h.id}">
+          <div class="taxonomy-hero-result-portrait">${portrait}</div>
+          <div class="taxonomy-hero-result-name">${h.name || "Unnamed"}</div>
+          ${already
+            ? `<span class="taxonomy-hero-added-badge">✓ Added</span>`
+            : `<button type="button" class="taxonomy-hero-add-btn" data-hero-id="${h.id}">+ Add</button>`}
+        </div>`;
+    }).join("");
+
+    resultsBox.querySelectorAll(".taxonomy-hero-add-btn").forEach(addBtn => {
+      addBtn.addEventListener("click", () => {
+        const heroId = Number(addBtn.dataset.heroId);
+        addHeroTaxonomyLink(heroId, kind, id); // no-ops harmlessly if somehow already linked
+        taxonomyHeroRowSearch[rowKey] = ""; // clear search after a successful add, ready for the next hero
+        renderTaxonomyPanel(kind); // refresh the "Add to Hero (N)" badge too
+        toggleTaxonomyRowHeroes(kind, id); // reopen it, expanded, post-refresh
+        renderRteSection(); // reflect the new link immediately if that hero's edit screen is open behind this one
+        if (quickDraftSuggestOpen) renderQuickDraftSuggestions(); // scores/factors feed Quick Draft too
+      });
+    });
+  };
+
+  searchInput.addEventListener("input", () => {
+    taxonomyHeroRowSearch[rowKey] = searchInput.value;
+    renderResults();
+  });
+  searchInput.addEventListener("keydown", e => {
+    if (e.key !== "Enter") return;
+    e.preventDefault();
+    const firstAddable = resultsBox.querySelector(".taxonomy-hero-add-btn");
+    if (firstAddable) firstAddable.click(); // Enter adds the top matching, not-yet-added hero
   });
 
   renderResults();
