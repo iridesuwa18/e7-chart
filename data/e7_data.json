@@ -147,6 +147,12 @@
         },
         {
           "refId": 1788780327120
+        },
+        {
+          "refId": 1788784106518
+        },
+        {
+          "refId": 1788780122184
         }
       ],
       "engagements": [
@@ -220,6 +226,12 @@
         },
         {
           "refId": 1788775147348
+        },
+        {
+          "refId": 1788784106518
+        },
+        {
+          "refId": 1788784272848
         }
       ],
       "engagements": [
@@ -9534,6 +9546,22 @@
           1788783127095,
           1788772401653
         ]
+      },
+      {
+        "id": 1788784106518,
+        "name": "Soul Production",
+        "value": 8.5,
+        "factorIds": [
+          1788784362484
+        ]
+      },
+      {
+        "id": 1788784272848,
+        "name": "Resource increase",
+        "value": 9,
+        "factorIds": [
+          1788783972533
+        ]
       }
     ],
     "engagements": [
@@ -9818,9 +9846,17 @@
       {
         "id": 1788783127095,
         "name": "Evasion units"
+      },
+      {
+        "id": 1788784362484,
+        "name": "Low soulburn teams"
+      },
+      {
+        "id": 1788783972533,
+        "name": "Low / no resource units"
       }
     ]
   },
   "schemaVersion": 2,
-  "savedAt": "2026-09-07T12:15:25.265Z"
+  "savedAt": "2026-09-07T12:19:55.816Z"
 }
