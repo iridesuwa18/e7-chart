@@ -61,7 +61,7 @@
       "notes": "",
       "iconData": "https://raw.githubusercontent.com/iridesuwa18/e7-chart/main/assets/heroes/genesis-ras.webp",
       "locked": true,
-      "_x": 5,
+      "_x": 2.5,
       "_y": 30,
       "hidden": false,
       "vType_legacy": "SPD",
@@ -72,9 +72,22 @@
       "reactions": [
         {
           "refId": 1788693701095
+        },
+        {
+          "refId": 1788700730226
         }
       ],
-      "engagements": [],
+      "engagements": [
+        {
+          "refId": 1788700305259
+        },
+        {
+          "refId": 1788700311844
+        },
+        {
+          "refId": 1788700350538
+        }
+      ],
       "selfishScore": 4,
       "selflessScore": 0,
       "needsRerating": false,
@@ -9312,5 +9325,5 @@
     ]
   },
   "schemaVersion": 2,
-  "savedAt": "2026-09-06T13:13:36.467Z"
+  "savedAt": "2026-09-07T08:54:24.411Z"
 }
