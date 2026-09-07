@@ -311,7 +311,7 @@
       "notes": "",
       "iconData": "https://raw.githubusercontent.com/iridesuwa18/e7-chart/main/assets/heroes/setsuka.webp",
       "locked": true,
-      "_x": 50,
+      "_x": 95,
       "_y": 55,
       "hidden": false,
       "vType_legacy": "SPD",
@@ -335,7 +335,14 @@
           "refId": 1788775147348
         }
       ],
-      "engagements": [],
+      "engagements": [
+        {
+          "refId": 1788773067411
+        },
+        {
+          "refId": 1788776410212
+        }
+      ],
       "selfishScore": 0,
       "selflessScore": 1,
       "needsRerating": false,
@@ -9594,6 +9601,17 @@
         "factorIds": [
           1788773731924
         ]
+      },
+      {
+        "id": 1788776410212,
+        "name": "Decrease Hit Chance debuff",
+        "value": 8.5,
+        "factorIds": [
+          1788694866469,
+          1788774099692,
+          1788774921178,
+          1788776450947
+        ]
       }
     ],
     "factors": [
@@ -9672,9 +9690,13 @@
       {
         "id": 1788775427431,
         "name": "Counterattacks"
+      },
+      {
+        "id": 1788776450947,
+        "name": "High Hit Chance units"
       }
     ]
   },
   "schemaVersion": 2,
-  "savedAt": "2026-09-07T09:58:52.103Z"
+  "savedAt": "2026-09-07T10:15:49.886Z"
 }
