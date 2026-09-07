@@ -339,6 +339,9 @@
         },
         {
           "refId": 1788780327120
+        },
+        {
+          "refId": 1788780122184
         }
       ],
       "engagements": [
@@ -9524,6 +9527,16 @@
         "factorIds": [
           1788780483075
         ]
+      },
+      {
+        "id": 1788780122184,
+        "name": "Fighting Spirit (React)",
+        "value": 6,
+        "factorIds": [
+          1788773895734,
+          1788772861638,
+          1788775944046
+        ]
       }
     ],
     "engagements": [
@@ -9655,6 +9668,12 @@
         "factorIds": [
           1788779877239
         ]
+      },
+      {
+        "id": 1788780430787,
+        "name": "Fighting Spirit (Engage)",
+        "value": 5,
+        "factorIds": []
       }
     ],
     "factors": [
@@ -9745,9 +9764,13 @@
       {
         "id": 1788780483075,
         "name": "Decrease Attack"
+      },
+      {
+        "id": 1788780896026,
+        "name": "Fighting Spirit"
       }
     ]
   },
   "schemaVersion": 2,
-  "savedAt": "2026-09-07T11:19:32.301Z"
+  "savedAt": "2026-09-07T11:23:54.574Z"
 }
