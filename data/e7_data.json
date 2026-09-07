@@ -95,6 +95,9 @@
         },
         {
           "refId": 1788773060667
+        },
+        {
+          "refId": 1788783245423
         }
       ],
       "selfishScore": 4,
@@ -263,6 +266,9 @@
       "reactions": [
         {
           "refId": 1788774616004
+        },
+        {
+          "refId": 1788783157740
         }
       ],
       "engagements": [
@@ -274,6 +280,9 @@
         },
         {
           "refId": 1788783486720
+        },
+        {
+          "refId": 1788783359037
         }
       ],
       "selfishScore": 0,
@@ -9513,6 +9522,15 @@
           1788772861638,
           1788775944046
         ]
+      },
+      {
+        "id": 1788783157740,
+        "name": "Damage prop to defense",
+        "value": 7,
+        "factorIds": [
+          1788783127095,
+          1788772401653
+        ]
       }
     ],
     "engagements": [
@@ -9677,6 +9695,24 @@
           1788694866469,
           1788774099692
         ]
+      },
+      {
+        "id": 1788783245423,
+        "name": "Damage increase with fewer enemies",
+        "value": 7,
+        "factorIds": [
+          1788772992919,
+          1788783430365,
+          1788773130306
+        ]
+      },
+      {
+        "id": 1788783359037,
+        "name": "Decrease defense to enemies",
+        "value": 7.5,
+        "factorIds": [
+          1788701036557
+        ]
       }
     ],
     "factors": [
@@ -9771,9 +9807,17 @@
       {
         "id": 1788780896026,
         "name": "Fighting Spirit"
+      },
+      {
+        "id": 1788783430365,
+        "name": "No tank team"
+      },
+      {
+        "id": 1788783127095,
+        "name": "Evasion units"
       }
     ]
   },
   "schemaVersion": 2,
-  "savedAt": "2026-09-07T12:06:35.523Z"
+  "savedAt": "2026-09-07T12:14:56.121Z"
 }
