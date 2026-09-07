@@ -110,8 +110,8 @@
       "notes": "",
       "iconData": "https://raw.githubusercontent.com/iridesuwa18/e7-chart/main/assets/heroes/estelle.webp",
       "locked": true,
-      "_x": 50,
-      "_y": 50,
+      "_x": 5.999999999999993,
+      "_y": 56.25,
       "hidden": false,
       "vType_legacy": "TNK",
       "vScore_legacy": 10,
@@ -123,11 +123,47 @@
         "hType": "SST",
         "hScore": 8
       },
-      "reactions": [],
-      "engagements": [],
+      "reactions": [
+        {
+          "refId": 1788771595382
+        },
+        {
+          "refId": 1788771831892
+        }
+      ],
+      "engagements": [
+        {
+          "refId": 1788771803084
+        }
+      ],
       "selfishScore": 0,
-      "selflessScore": 0,
-      "needsRerating": true
+      "selflessScore": 1.25,
+      "needsRerating": false,
+      "pvpTag": false,
+      "altStats": null,
+      "selfSkillIds": [],
+      "allySupport": [
+        {
+          "healing": 20,
+          "passive": 0,
+          "buffCount": 1
+        },
+        {
+          "healing": 0,
+          "passive": 30,
+          "buffCount": 1
+        },
+        {
+          "healing": 0,
+          "passive": 30,
+          "buffCount": 1
+        },
+        {
+          "healing": 0,
+          "passive": 30,
+          "buffCount": 1
+        }
+      ]
     },
     {
       "id": 1779354031169,
@@ -9249,6 +9285,25 @@
         "factorIds": [
           1788700781693
         ]
+      },
+      {
+        "id": 1788771595382,
+        "name": "Shields to allies",
+        "value": 8,
+        "factorIds": [
+          1788694866469,
+          1788772401653
+        ]
+      },
+      {
+        "id": 1788771831892,
+        "name": "Damage sharing",
+        "value": 9.5,
+        "factorIds": [
+          1788772019318,
+          1788694866469,
+          1788772214825
+        ]
       }
     ],
     "engagements": [
@@ -9299,6 +9354,14 @@
         "factorIds": [
           1788700420912
         ]
+      },
+      {
+        "id": 1788771803084,
+        "name": "Inflict injuries",
+        "value": 8.5,
+        "factorIds": [
+          1788700420912
+        ]
       }
     ],
     "factors": [
@@ -9321,9 +9384,21 @@
       {
         "id": 1788700420912,
         "name": "High HP units"
+      },
+      {
+        "id": 1788772401653,
+        "name": "Injuries"
+      },
+      {
+        "id": 1788772019318,
+        "name": "Additional damage"
+      },
+      {
+        "id": 1788772214825,
+        "name": "Single target attacks"
       }
     ]
   },
   "schemaVersion": 2,
-  "savedAt": "2026-09-07T08:54:24.411Z"
+  "savedAt": "2026-09-07T09:02:19.157Z"
 }
