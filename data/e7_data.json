@@ -138,6 +138,9 @@
         },
         {
           "refId": 1788772502540
+        },
+        {
+          "refId": 1788775147348
         }
       ],
       "engagements": [
@@ -149,9 +152,6 @@
         },
         {
           "refId": 1788772268160
-        },
-        {
-          "refId": 1788774105472
         }
       ],
       "selfishScore": 0,
@@ -211,6 +211,9 @@
         },
         {
           "refId": 1788773362914
+        },
+        {
+          "refId": 1788775147348
         }
       ],
       "engagements": [
@@ -222,9 +225,6 @@
         },
         {
           "refId": 1788773067411
-        },
-        {
-          "refId": 1788774105472
         }
       ],
       "selfishScore": 4,
@@ -249,7 +249,7 @@
       "notes": "",
       "iconData": "https://raw.githubusercontent.com/iridesuwa18/e7-chart/main/assets/heroes/boss-arunka.webp",
       "locked": true,
-      "_x": 7.5,
+      "_x": 95,
       "_y": 66.65,
       "hidden": false,
       "vType_legacy": "TNK",
@@ -312,7 +312,7 @@
       "iconData": "https://raw.githubusercontent.com/iridesuwa18/e7-chart/main/assets/heroes/setsuka.webp",
       "locked": true,
       "_x": 50,
-      "_y": 50,
+      "_y": 55,
       "hidden": false,
       "vType_legacy": "SPD",
       "vScore_legacy": 7,
@@ -324,11 +324,46 @@
         "hType": "SST",
         "hScore": 8
       },
-      "reactions": [],
+      "reactions": [
+        {
+          "refId": 1788775037126
+        },
+        {
+          "refId": 1788772502540
+        },
+        {
+          "refId": 1788775147348
+        }
+      ],
       "engagements": [],
       "selfishScore": 0,
-      "selflessScore": 0,
-      "needsRerating": true
+      "selflessScore": 1,
+      "needsRerating": false,
+      "pvpTag": false,
+      "altStats": null,
+      "selfSkillIds": [],
+      "allySupport": [
+        {
+          "healing": 0,
+          "passive": 30,
+          "buffCount": 0
+        },
+        {
+          "healing": 0,
+          "passive": 30,
+          "buffCount": 0
+        },
+        {
+          "healing": 0,
+          "passive": 30,
+          "buffCount": 0
+        },
+        {
+          "healing": 0,
+          "passive": 30,
+          "buffCount": 0
+        }
+      ]
     },
     {
       "id": 1786457038338,
@@ -9436,6 +9471,26 @@
           1788694866469,
           1788774099692
         ]
+      },
+      {
+        "id": 1788775037126,
+        "name": "Evasion to allies",
+        "value": 9,
+        "factorIds": [
+          1788774921178,
+          1788700781693
+        ]
+      },
+      {
+        "id": 1788775147348,
+        "name": "CR Passives",
+        "value": 8,
+        "factorIds": [
+          1788772861638,
+          1788773895734,
+          1788775944046,
+          1788775427431
+        ]
       }
     ],
     "engagements": [
@@ -9539,15 +9594,6 @@
         "factorIds": [
           1788773731924
         ]
-      },
-      {
-        "id": 1788774105472,
-        "name": "CR Passives",
-        "value": 8,
-        "factorIds": [
-          1788772861638,
-          1788773895734
-        ]
       }
     ],
     "factors": [
@@ -9614,9 +9660,21 @@
       {
         "id": 1788774099692,
         "name": "High Single Damage attacks"
+      },
+      {
+        "id": 1788774921178,
+        "name": "Critical attacks"
+      },
+      {
+        "id": 1788775944046,
+        "name": "Extra attacks"
+      },
+      {
+        "id": 1788775427431,
+        "name": "Counterattacks"
       }
     ]
   },
   "schemaVersion": 2,
-  "savedAt": "2026-09-07T09:43:49.641Z"
+  "savedAt": "2026-09-07T09:58:47.396Z"
 }
