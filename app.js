@@ -2349,35 +2349,29 @@ function ensureQdFactorMenu() {
   return menu;
 }
 
-// Anchors the floating menu directly under (or, if it wouldn't fit,
-// above) whichever trigger button exists on the current page. Fixed
-// coordinates are relative to the viewport, so this is re-run on
-// scroll/resize while the menu is open to keep it glued to the button.
+// Anchors the floating menu directly under whichever trigger button
+// exists on the current page — always downward, never flipped above
+// it, so it can't end up covering the draft slots sitting right above
+// the button. Fixed coordinates are relative to the viewport, so this
+// is re-run on scroll/resize while the menu is open to keep it glued
+// to the button. The menu's own list scrolls internally (see its
+// max-height in CSS) if there isn't enough room below on a very short
+// viewport, rather than flipping upward to "fit" by covering the slots.
 function positionQdFactorMenu() {
   const btn  = document.getElementById("qd-factor-menu-btn");
   const menu = qdFactorMenuEl;
   if (!btn || !menu) return;
 
   const r = btn.getBoundingClientRect();
-  const menuWidth  = menu.offsetWidth  || 340;
-  const menuHeight = menu.offsetHeight || 260;
+  const menuWidth = menu.offsetWidth || 340;
 
   let left = r.left;
   if (left + menuWidth > window.innerWidth - 8) {
     left = Math.max(8, window.innerWidth - menuWidth - 8);
   }
 
-  const spaceBelow = window.innerHeight - r.bottom;
-  const spaceAbove = r.top;
-  let top;
-  if (spaceBelow < menuHeight + 10 && spaceAbove > spaceBelow) {
-    top = Math.max(8, r.top - menuHeight - 6);
-  } else {
-    top = r.bottom + 6;
-  }
-
   menu.style.left = `${left}px`;
-  menu.style.top  = `${top}px`;
+  menu.style.top  = `${r.bottom + 6}px`;
 }
 
 function renderQdFactorChips() {
