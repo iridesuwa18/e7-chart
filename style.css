@@ -2048,6 +2048,14 @@ body.dot-mode .origin-dot:hover {
   display: flex;
   align-items: center;
   gap: 6px;
+  /* Wrap instead of squeezing: without this, the flex:1 name input was
+     the only shrinkable item in the row (Value/Factors/Add to
+     Hero/delete all sit at their nowrap content width), so on a narrow
+     phone screen it got crushed down to just a few visible characters
+     — this is what made Reaction/Engagement names unreadable on
+     mobile. Wrapping lets the trailing controls drop to their own
+     line instead, so the name always gets real width to render in. */
+  flex-wrap: wrap;
 }
 .taxonomy-row-name {
   flex: 1;
@@ -2727,6 +2735,20 @@ body.dot-mode .origin-dot:hover {
 }
 @media (max-width: 380px) {
   .form-row { grid-template-columns: 1fr; }
+}
+
+@media (max-width: 600px) {
+  /* Reactions/Engagements rows (Taxonomy panel) — force the name onto
+     its own full-width line rather than letting the flex-wrap above
+     decide item-by-item where the break falls (which could still land
+     mid-way, e.g. Value awkwardly sharing the first line with the
+     name). Giving the first flex child a 100% basis in a wrapping flex
+     row pushes every following sibling (Value, Factors, Add to Hero,
+     delete) onto the next line as a group, no markup changes needed. */
+  .taxonomy-row-name { flex-basis: 100%; }
+  .taxonomy-row-value,
+  .taxonomy-row-tagbtn,
+  .taxonomy-row-herobtn { font-size: 9.5px; }
 }
 
 
