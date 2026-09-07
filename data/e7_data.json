@@ -338,6 +338,9 @@
       "engagements": [
         {
           "refId": 1788779840121
+        },
+        {
+          "refId": 1788780377530
         }
       ],
       "selfishScore": 0,
@@ -9607,6 +9610,17 @@
           1788700420912,
           1788701036557
         ]
+      },
+      {
+        "id": 1788780377530,
+        "name": "Decrease hit chance debuff",
+        "value": 6.5,
+        "factorIds": [
+          1788774921178,
+          1788694866469,
+          1788774099692,
+          1788780324713
+        ]
       }
     ],
     "factors": [
@@ -9685,9 +9699,13 @@
       {
         "id": 1788775427431,
         "name": "Counterattacks"
+      },
+      {
+        "id": 1788780324713,
+        "name": "High Hit chance units"
       }
     ]
   },
   "schemaVersion": 2,
-  "savedAt": "2026-09-07T11:10:43.526Z"
+  "savedAt": "2026-09-07T11:14:20.672Z"
 }
