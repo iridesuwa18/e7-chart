@@ -25,9 +25,6 @@
       "reactions": [
         {
           "refId": 1788693701095
-        },
-        {
-          "refId": 1788771595382
         }
       ],
       "engagements": [
@@ -42,6 +39,9 @@
         },
         {
           "refId": 1788772268160
+        },
+        {
+          "refId": 1788782920388
         }
       ],
       "selfishScore": 0,
@@ -134,9 +134,6 @@
       },
       "reactions": [
         {
-          "refId": 1788771595382
-        },
-        {
           "refId": 1788771831892
         },
         {
@@ -155,6 +152,9 @@
         },
         {
           "refId": 1788772268160
+        },
+        {
+          "refId": 1788782920388
         }
       ],
       "selfishScore": 0,
@@ -210,9 +210,6 @@
       },
       "reactions": [
         {
-          "refId": 1788773321555
-        },
-        {
           "refId": 1788773362914
         },
         {
@@ -228,6 +225,9 @@
         },
         {
           "refId": 1788773067411
+        },
+        {
+          "refId": 1788783099100
         }
       ],
       "selfishScore": 4,
@@ -263,17 +263,17 @@
       "reactions": [
         {
           "refId": 1788774616004
-        },
-        {
-          "refId": 1788771595382
-        },
-        {
-          "refId": 1788774536295
         }
       ],
       "engagements": [
         {
           "refId": 1788773067411
+        },
+        {
+          "refId": 1788782920388
+        },
+        {
+          "refId": 1788783486720
         }
       ],
       "selfishScore": 0,
@@ -9430,16 +9430,6 @@
         ]
       },
       {
-        "id": 1788771595382,
-        "name": "Shields to allies",
-        "value": 8,
-        "factorIds": [
-          1788694866469,
-          1788772401653,
-          1788774099692
-        ]
-      },
-      {
         "id": 1788771831892,
         "name": "Damage sharing",
         "value": 9.5,
@@ -9459,14 +9449,6 @@
         ]
       },
       {
-        "id": 1788773321555,
-        "name": "Immunity Buff",
-        "value": 6,
-        "factorIds": [
-          1788700781693
-        ]
-      },
-      {
         "id": 1788773362914,
         "name": "Damage Negation",
         "value": 10,
@@ -9483,15 +9465,6 @@
         "factorIds": [
           1788774099692,
           1788694866469
-        ]
-      },
-      {
-        "id": 1788774536295,
-        "name": "Increase Defense buff",
-        "value": 7,
-        "factorIds": [
-          1788694866469,
-          1788774099692
         ]
       },
       {
@@ -9677,6 +9650,33 @@
         "name": "Fighting Spirit (Engage)",
         "value": 5,
         "factorIds": []
+      },
+      {
+        "id": 1788782920388,
+        "name": "Shields to allies",
+        "value": 8,
+        "factorIds": [
+          1788694866469,
+          1788774099692,
+          1788772401653
+        ]
+      },
+      {
+        "id": 1788783099100,
+        "name": "Immunity Buff",
+        "value": 8,
+        "factorIds": [
+          1788700781693
+        ]
+      },
+      {
+        "id": 1788783486720,
+        "name": "Increase Defense Buff",
+        "value": 7,
+        "factorIds": [
+          1788694866469,
+          1788774099692
+        ]
       }
     ],
     "factors": [
@@ -9775,5 +9775,5 @@
     ]
   },
   "schemaVersion": 2,
-  "savedAt": "2026-09-07T11:32:09.306Z"
+  "savedAt": "2026-09-07T12:06:35.523Z"
 }
