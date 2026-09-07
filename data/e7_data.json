@@ -645,6 +645,9 @@
         },
         {
           "refId": 1788783157740
+        },
+        {
+          "refId": 1788786348512
         }
       ],
       "engagements": [
@@ -9771,6 +9774,15 @@
         "factorIds": [
           1788775944046
         ]
+      },
+      {
+        "id": 1788786348512,
+        "name": "Damage reduction",
+        "value": 9.5,
+        "factorIds": [
+          1788694866469,
+          1788774099692
+        ]
       }
     ],
     "engagements": [
@@ -9965,13 +9977,15 @@
       },
       {
         "id": 1788785021751,
-        "name": "Additional damage",
+        "name": "Additional / fixed damage",
         "value": 10,
         "factorIds": [
           1788700420912,
           1788701036557,
           1788783127095,
-          1788772992919
+          1788772992919,
+          1788786248167,
+          1788786571272
         ]
       },
       {
@@ -10172,9 +10186,17 @@
       {
         "id": 1788786300042,
         "name": "Dual attacks"
+      },
+      {
+        "id": 1788786248167,
+        "name": "Damage reduction"
+      },
+      {
+        "id": 1788786571272,
+        "name": "Critical Hit Resistance"
       }
     ]
   },
   "schemaVersion": 2,
-  "savedAt": "2026-09-07T13:00:51.175Z"
+  "savedAt": "2026-09-07T13:03:18.539Z"
 }
