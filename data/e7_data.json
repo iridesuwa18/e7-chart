@@ -89,6 +89,9 @@
         },
         {
           "refId": 1788700350538
+        },
+        {
+          "refId": 1788773060667
         }
       ],
       "selfishScore": 4,
@@ -146,6 +149,9 @@
         },
         {
           "refId": 1788772268160
+        },
+        {
+          "refId": 1788774105472
         }
       ],
       "selfishScore": 0,
@@ -187,7 +193,7 @@
       "iconData": "https://raw.githubusercontent.com/iridesuwa18/e7-chart/main/assets/heroes/frieren.webp",
       "locked": true,
       "_x": 50,
-      "_y": 50,
+      "_y": 30,
       "hidden": false,
       "vType_legacy": "TNK",
       "vScore_legacy": 5,
@@ -199,11 +205,40 @@
         "hType": "SUR",
         "hScore": 10
       },
-      "reactions": [],
-      "engagements": [],
-      "selfishScore": 0,
+      "reactions": [
+        {
+          "refId": 1788773321555
+        },
+        {
+          "refId": 1788773362914
+        }
+      ],
+      "engagements": [
+        {
+          "refId": 1788773476896
+        },
+        {
+          "refId": 1788773060667
+        },
+        {
+          "refId": 1788773067411
+        },
+        {
+          "refId": 1788774105472
+        }
+      ],
+      "selfishScore": 4,
       "selflessScore": 0,
-      "needsRerating": true
+      "needsRerating": false,
+      "pvpTag": false,
+      "altStats": null,
+      "selfSkillIds": [
+        "spdCr",
+        "selfPassive",
+        "immunity",
+        "shields"
+      ],
+      "allySupport": []
     },
     {
       "id": 1779355319814,
@@ -9322,7 +9357,25 @@
         "name": "Counterattacks",
         "value": 6.5,
         "factorIds": [
-          1788772861638
+          1788772861638,
+          1788773895734
+        ]
+      },
+      {
+        "id": 1788773321555,
+        "name": "Immunity Buff",
+        "value": 6,
+        "factorIds": [
+          1788700781693
+        ]
+      },
+      {
+        "id": 1788773362914,
+        "name": "Damage Negation",
+        "value": 10,
+        "factorIds": [
+          1788694866469,
+          1788772401653
         ]
       }
     ],
@@ -9399,6 +9452,40 @@
           1788694866469,
           1788772019318
         ]
+      },
+      {
+        "id": 1788773476896,
+        "name": "Extra attack",
+        "value": 6.5,
+        "factorIds": [
+          1788772992919
+        ]
+      },
+      {
+        "id": 1788773060667,
+        "name": "AOE attack",
+        "value": 5,
+        "factorIds": [
+          1788773130306,
+          1788773216100
+        ]
+      },
+      {
+        "id": 1788773067411,
+        "name": "Dispel buffs",
+        "value": 9,
+        "factorIds": [
+          1788773731924
+        ]
+      },
+      {
+        "id": 1788774105472,
+        "name": "CR Passives",
+        "value": 8,
+        "factorIds": [
+          1788772861638,
+          1788773895734
+        ]
       }
     ],
     "factors": [
@@ -9437,9 +9524,29 @@
       {
         "id": 1788772861638,
         "name": "Extra turns"
+      },
+      {
+        "id": 1788772992919,
+        "name": "Low HP units"
+      },
+      {
+        "id": 1788773216100,
+        "name": "Stealth units"
+      },
+      {
+        "id": 1788773130306,
+        "name": "Front Defenders"
+      },
+      {
+        "id": 1788773731924,
+        "name": "Buffers"
+      },
+      {
+        "id": 1788773895734,
+        "name": "Speed units"
       }
     ]
   },
   "schemaVersion": 2,
-  "savedAt": "2026-09-07T09:10:34.804Z"
+  "savedAt": "2026-09-07T09:28:11.128Z"
 }
