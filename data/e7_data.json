@@ -9,7 +9,7 @@
       "notes": "",
       "iconData": "https://raw.githubusercontent.com/iridesuwa18/e7-chart/main/assets/heroes/ruele-of-light.webp",
       "locked": true,
-      "_x": 7.5,
+      "_x": 5,
       "_y": 57.5,
       "hidden": false,
       "vType_legacy": "TNK",
@@ -122,7 +122,7 @@
       "notes": "",
       "iconData": "https://raw.githubusercontent.com/iridesuwa18/e7-chart/main/assets/heroes/estelle.webp",
       "locked": true,
-      "_x": 10,
+      "_x": 89.5,
       "_y": 56.25,
       "hidden": false,
       "vType_legacy": "TNK",
@@ -207,7 +207,7 @@
       "notes": "Her shield makes her a \"tank\"",
       "iconData": "https://raw.githubusercontent.com/iridesuwa18/e7-chart/main/assets/heroes/frieren.webp",
       "locked": true,
-      "_x": 10,
+      "_x": 5.5,
       "_y": 30,
       "hidden": false,
       "vType_legacy": "TNK",
@@ -273,7 +273,7 @@
       "notes": "",
       "iconData": "https://raw.githubusercontent.com/iridesuwa18/e7-chart/main/assets/heroes/boss-arunka.webp",
       "locked": true,
-      "_x": 95,
+      "_x": 89.5,
       "_y": 66.65,
       "hidden": false,
       "vType_legacy": "TNK",
@@ -424,18 +424,53 @@
       "iconData": "https://raw.githubusercontent.com/iridesuwa18/e7-chart/main/assets/heroes/monarch-of-the-sword-iseria.webp",
       "locked": true,
       "_x": 50,
-      "_y": 50,
+      "_y": 30,
       "hidden": false,
       "vType_legacy": "SPD",
       "vScore_legacy": 7,
       "hType_legacy": "SUR",
       "hScore_legacy": 8,
       "altStats_legacy": null,
-      "reactions": [],
-      "engagements": [],
-      "selfishScore": 0,
+      "reactions": [
+        {
+          "refId": 1788785002027
+        },
+        {
+          "refId": 1788775147348
+        },
+        {
+          "refId": 1788772502540
+        }
+      ],
+      "engagements": [
+        {
+          "refId": 1788700311844
+        },
+        {
+          "refId": 1788785021751
+        },
+        {
+          "refId": 1788771803084
+        },
+        {
+          "refId": 1788782920388
+        },
+        {
+          "refId": 1788772163166
+        }
+      ],
+      "selfishScore": 4,
       "selflessScore": 0,
-      "needsRerating": true
+      "needsRerating": false,
+      "pvpTag": false,
+      "altStats": null,
+      "selfSkillIds": [
+        "spdCr",
+        "selfPassive",
+        "shields",
+        "injuries"
+      ],
+      "allySupport": []
     },
     {
       "id": 1786457224246,
@@ -9565,6 +9600,16 @@
         "factorIds": [
           1788783972533
         ]
+      },
+      {
+        "id": 1788785002027,
+        "name": "Damage scaling Passive",
+        "value": 8,
+        "factorIds": [
+          1788772992919,
+          1788701036557,
+          1788700420912
+        ]
       }
     ],
     "engagements": [
@@ -9755,6 +9800,17 @@
         "factorIds": [
           1788772992919
         ]
+      },
+      {
+        "id": 1788785021751,
+        "name": "Additional damage",
+        "value": 10,
+        "factorIds": [
+          1788700420912,
+          1788701036557,
+          1788783127095,
+          1788772992919
+        ]
       }
     ],
     "factors": [
@@ -9869,5 +9925,5 @@
     ]
   },
   "schemaVersion": 2,
-  "savedAt": "2026-09-07T12:23:03.341Z"
+  "savedAt": "2026-09-07T12:32:21.899Z"
 }
