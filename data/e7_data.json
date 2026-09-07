@@ -113,7 +113,7 @@
       "notes": "",
       "iconData": "https://raw.githubusercontent.com/iridesuwa18/e7-chart/main/assets/heroes/estelle.webp",
       "locked": true,
-      "_x": 5.999999999999993,
+      "_x": 10,
       "_y": 56.25,
       "hidden": false,
       "vType_legacy": "TNK",
@@ -9394,7 +9394,7 @@
       {
         "id": 1788772268160,
         "name": "Healing allies",
-        "value": 0,
+        "value": 8,
         "factorIds": [
           1788694866469,
           1788772019318
@@ -9441,5 +9441,5 @@
     ]
   },
   "schemaVersion": 2,
-  "savedAt": "2026-09-07T09:08:34.865Z"
+  "savedAt": "2026-09-07T09:09:50.492Z"
 }
