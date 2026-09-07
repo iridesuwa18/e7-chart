@@ -333,6 +333,12 @@
         },
         {
           "refId": 1788775147348
+        },
+        {
+          "refId": 1788780217783
+        },
+        {
+          "refId": 1788780327120
         }
       ],
       "engagements": [
@@ -341,6 +347,9 @@
         },
         {
           "refId": 1788780377530
+        },
+        {
+          "refId": 1788780605209
         }
       ],
       "selfishScore": 0,
@@ -9498,6 +9507,23 @@
           1788775944046,
           1788775427431
         ]
+      },
+      {
+        "id": 1788780217783,
+        "name": "Damage prop to lost health",
+        "value": 7,
+        "factorIds": [
+          1788694866469,
+          1788774099692
+        ]
+      },
+      {
+        "id": 1788780327120,
+        "name": "Damage prop to max health",
+        "value": 6.8,
+        "factorIds": [
+          1788780483075
+        ]
       }
     ],
     "engagements": [
@@ -9621,6 +9647,14 @@
           1788774099692,
           1788780324713
         ]
+      },
+      {
+        "id": 1788780605209,
+        "name": "Ignore Effect Resistance",
+        "value": 9.5,
+        "factorIds": [
+          1788779877239
+        ]
       }
     ],
     "factors": [
@@ -9703,9 +9737,17 @@
       {
         "id": 1788780324713,
         "name": "High Hit chance units"
+      },
+      {
+        "id": 1788779877239,
+        "name": "High Effect Resistance units"
+      },
+      {
+        "id": 1788780483075,
+        "name": "Decrease Attack"
       }
     ]
   },
   "schemaVersion": 2,
-  "savedAt": "2026-09-07T11:14:22.746Z"
+  "savedAt": "2026-09-07T11:19:32.301Z"
 }
