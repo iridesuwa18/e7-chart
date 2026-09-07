@@ -36,6 +36,9 @@
         },
         {
           "refId": 1788698529505
+        },
+        {
+          "refId": 1788772268160
         }
       ],
       "selfishScore": 0,
@@ -129,11 +132,20 @@
         },
         {
           "refId": 1788771831892
+        },
+        {
+          "refId": 1788772502540
         }
       ],
       "engagements": [
         {
           "refId": 1788771803084
+        },
+        {
+          "refId": 1788772163166
+        },
+        {
+          "refId": 1788772268160
         }
       ],
       "selfishScore": 0,
@@ -9304,6 +9316,14 @@
           1788694866469,
           1788772214825
         ]
+      },
+      {
+        "id": 1788772502540,
+        "name": "Counterattacks",
+        "value": 6.5,
+        "factorIds": [
+          1788772861638
+        ]
       }
     ],
     "engagements": [
@@ -9362,6 +9382,23 @@
         "factorIds": [
           1788700420912
         ]
+      },
+      {
+        "id": 1788772163166,
+        "name": "Dispel debuffs",
+        "value": 7.2,
+        "factorIds": [
+          1788700781693
+        ]
+      },
+      {
+        "id": 1788772268160,
+        "name": "Healing allies",
+        "value": 0,
+        "factorIds": [
+          1788694866469,
+          1788772019318
+        ]
       }
     ],
     "factors": [
@@ -9396,9 +9433,13 @@
       {
         "id": 1788772214825,
         "name": "Single target attacks"
+      },
+      {
+        "id": 1788772861638,
+        "name": "Extra turns"
       }
     ]
   },
   "schemaVersion": 2,
-  "savedAt": "2026-09-07T09:02:19.157Z"
+  "savedAt": "2026-09-07T09:08:31.449Z"
 }
