@@ -9,7 +9,7 @@
       "notes": "",
       "iconData": "https://raw.githubusercontent.com/iridesuwa18/e7-chart/main/assets/heroes/ruele-of-light.webp",
       "locked": true,
-      "_x": 5,
+      "_x": 7.5,
       "_y": 57.5,
       "hidden": false,
       "vType_legacy": "TNK",
@@ -25,6 +25,9 @@
       "reactions": [
         {
           "refId": 1788693701095
+        },
+        {
+          "refId": 1788771595382
         }
       ],
       "engagements": [
@@ -311,7 +314,7 @@
       "notes": "",
       "iconData": "https://raw.githubusercontent.com/iridesuwa18/e7-chart/main/assets/heroes/setsuka.webp",
       "locked": true,
-      "_x": 11,
+      "_x": 14,
       "_y": 55,
       "hidden": false,
       "vType_legacy": "SPD",
@@ -9772,5 +9775,5 @@
     ]
   },
   "schemaVersion": 2,
-  "savedAt": "2026-09-07T11:25:00.717Z"
+  "savedAt": "2026-09-07T11:32:09.306Z"
 }
