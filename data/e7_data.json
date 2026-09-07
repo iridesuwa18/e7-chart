@@ -426,7 +426,7 @@
       "notes": "",
       "iconData": "https://raw.githubusercontent.com/iridesuwa18/e7-chart/main/assets/heroes/monarch-of-the-sword-iseria.webp",
       "locked": true,
-      "_x": 50,
+      "_x": 89,
       "_y": 30,
       "hidden": false,
       "vType_legacy": "SPD",
@@ -488,7 +488,7 @@
       "iconData": "https://raw.githubusercontent.com/iridesuwa18/e7-chart/main/assets/heroes/conqueror-lilias.webp",
       "locked": true,
       "_x": 50,
-      "_y": 50,
+      "_y": 52.5,
       "hidden": false,
       "vType_legacy": "SPD",
       "vScore_legacy": 6,
@@ -501,10 +501,54 @@
         "hScore": 3
       },
       "reactions": [],
-      "engagements": [],
+      "engagements": [
+        {
+          "refId": 1788785505206
+        },
+        {
+          "refId": 1788785181579
+        },
+        {
+          "refId": 1788782920388
+        },
+        {
+          "refId": 1788783359037
+        },
+        {
+          "refId": 1788785733011
+        },
+        {
+          "refId": 1788785736229
+        }
+      ],
       "selfishScore": 0,
-      "selflessScore": 0,
-      "needsRerating": true
+      "selflessScore": 0.5,
+      "needsRerating": false,
+      "pvpTag": false,
+      "altStats": null,
+      "selfSkillIds": [],
+      "allySupport": [
+        {
+          "healing": 0,
+          "passive": 0,
+          "buffCount": 2
+        },
+        {
+          "healing": 0,
+          "passive": 0,
+          "buffCount": 2
+        },
+        {
+          "healing": 0,
+          "passive": 0,
+          "buffCount": 1
+        },
+        {
+          "healing": 0,
+          "passive": 0,
+          "buffCount": 1
+        }
+      ]
     },
     {
       "id": 1786457413395,
@@ -9700,7 +9744,8 @@
         "name": "Extra attack",
         "value": 6.5,
         "factorIds": [
-          1788772992919
+          1788772992919,
+          1788773130306
         ]
       },
       {
@@ -9817,6 +9862,46 @@
           1788783127095,
           1788772992919
         ]
+      },
+      {
+        "id": 1788785505206,
+        "name": "Dual attack",
+        "value": 7.5,
+        "factorIds": [
+          1788772992919,
+          1788773130306
+        ]
+      },
+      {
+        "id": 1788785181579,
+        "name": "Redirected Provoke to enemies",
+        "value": 7.5,
+        "factorIds": [
+          1788694866469,
+          1788774099692,
+          1788773895734,
+          1788772861638
+        ]
+      },
+      {
+        "id": 1788785733011,
+        "name": "Vigor (Undispellable) Buff",
+        "value": 9.5,
+        "factorIds": [
+          1788772992919,
+          1788694866469,
+          1788774099692,
+          1788700781693
+        ]
+      },
+      {
+        "id": 1788785736229,
+        "name": "Decrease Attack to enemies",
+        "value": 5,
+        "factorIds": [
+          1788694866469,
+          1788774099692
+        ]
       }
     ],
     "factors": [
@@ -9931,5 +10016,5 @@
     ]
   },
   "schemaVersion": 2,
-  "savedAt": "2026-09-07T12:33:02.737Z"
+  "savedAt": "2026-09-07T12:44:43.016Z"
 }
