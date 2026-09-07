@@ -40,6 +40,18 @@ let taxonomy = {
   factors:     [], // [{ id, name }]
 };
 
+// Sort order per Taxonomy tab (Reactions/Engagements/Factors) —
+// "oldest"/"newest" by id (which encodes creation time, see
+// newTaxonomyId further down), "az"/"za" by name. Declared all the way
+// up here, not next to the rest of the Taxonomy sort code further
+// down, because wireTaxonomySort() (in init(), called near the top of
+// this script) reads it synchronously while wiring the sort dropdowns
+// — not deferred inside an event-listener callback the way the search
+// boxes' query state is. A `let` down by the rest of that code would
+// still be in its temporal-dead-zone at that point and throw, aborting
+// the rest of init() before it ever finishes setting up the page.
+let taxonomySortMode = { reactions: "oldest", engagements: "oldest", factors: "oldest" };
+
 function newTaxonomyId() {
   return Date.now() + Math.floor(Math.random() * 1e6);
 }
@@ -112,6 +124,37 @@ function deleteTaxonomyItem(kind, id) {
     if (!Array.isArray(h[heroField]) || !h[heroField].some(r => (r.refId ?? r) === id)) return h;
     return { ...h, [heroField]: h[heroField].filter(r => (r.refId ?? r) !== id) };
   });
+  saveLocal();
+}
+
+// Moves a Reaction to Engagements or vice versa — keeps the same id
+// (so oldest/newest sort still reflects when it was actually created),
+// name, fixed value, and Factor tags, and re-links every hero that
+// held it under the OTHER field so nothing has to be manually
+// re-assigned. Purely a re-categorization, never touches scores.
+function convertTaxonomyItemKind(fromKind, id) {
+  const toKind = fromKind === "reactions" ? "engagements" : "reactions";
+  const item = taxonomy[fromKind].find(x => x.id === id);
+  if (!item) return;
+
+  taxonomy = {
+    ...taxonomy,
+    [fromKind]: taxonomy[fromKind].filter(x => x.id !== id),
+    [toKind]: [...taxonomy[toKind], item],
+  };
+
+  heroes = heroes.map(h => {
+    const fromList = Array.isArray(h[fromKind]) ? h[fromKind] : [];
+    if (!fromList.some(x => (x.refId ?? x) === id)) return h; // hero never held it — nothing to move
+    const toList = Array.isArray(h[toKind]) ? h[toKind] : [];
+    const alreadyInTo = toList.some(x => (x.refId ?? x) === id); // shouldn't happen, but stay duplicate-safe
+    return {
+      ...h,
+      [fromKind]: fromList.filter(x => (x.refId ?? x) !== id),
+      [toKind]: alreadyInTo ? toList : [...toList, { refId: id }],
+    };
+  });
+
   saveLocal();
 }
 
@@ -228,6 +271,26 @@ function taxonomyItemsForFactor(factorId) {
     reactions:   taxonomy.reactions.filter(r => r.factorIds.includes(factorId)),
     engagements: taxonomy.engagements.filter(e => e.factorIds.includes(factorId)),
   };
+}
+
+// Wires an "X" clear button next to a search input — shared by every
+// Taxonomy search box (the 3 tab searches, and the two per-row ones:
+// Tag Factors / Add to Hero) so clearing old text to search for
+// something else never requires selecting-and-deleting it by hand.
+// `onChange` is called both on typing and on clear, with the input's
+// current value, so each caller's own filter/re-render logic runs the
+// same way either way.
+function wireTaxonomySearchClear(input, clearBtn, onChange) {
+  if (!input || !clearBtn) return;
+  const sync = () => { clearBtn.style.display = input.value ? "flex" : "none"; };
+  sync();
+  input.addEventListener("input", sync);
+  clearBtn.addEventListener("click", () => {
+    input.value = "";
+    sync();
+    onChange();
+    input.focus();
+  });
 }
 
 // Every hero currently holding a given Reaction/Engagement — backs both
@@ -629,9 +692,11 @@ const fSsScore     = document.getElementById("f-ss-score");
     });
   }
   document.getElementById("taxonomy-close").addEventListener("click", closeTaxonomyManager);
-  document.getElementById("taxonomy-overlay").addEventListener("click", e => {
-    if (e.target === document.getElementById("taxonomy-overlay")) closeTaxonomyManager();
-  });
+  // Deliberately no click-outside-to-close on the overlay: a stray tap
+  // while scrolling/reaching for a row (this modal has a lot of dense,
+  // tappable controls — search, sort, tag, Add to Hero, delete, ⇄) was
+  // closing the whole manager and discarding whatever the person was
+  // mid-way through. The ✕ button above is the only way out now.
   document.querySelectorAll(".taxonomy-tab").forEach(btn => {
     btn.addEventListener("click", () => switchTaxonomyTab(btn.dataset.tab));
   });
@@ -669,18 +734,37 @@ const fSsScore     = document.getElementById("f-ss-score");
     if (e.key === "Enter") document.getElementById("taxonomy-add-factor").click();
   });
 
-  // Search boxes for each Taxonomy tab — filters that tab's list by name.
+  // Search boxes for each Taxonomy tab — filters that tab's list by
+  // name. Each has a matching "-clear" X button in the markup.
   const wireTaxonomySearch = (inputId, kind, renderFn) => {
     const input = document.getElementById(inputId);
+    const clearBtn = document.getElementById(inputId + "-clear");
     if (!input) return;
-    input.addEventListener("input", () => {
+    const apply = () => {
       taxonomySearchQuery[kind] = input.value;
       renderFn(kind === "factors" ? undefined : kind);
-    });
+    };
+    input.addEventListener("input", apply);
+    wireTaxonomySearchClear(input, clearBtn, apply);
   };
   wireTaxonomySearch("taxonomy-search-reactions", "reactions", renderTaxonomyPanel);
   wireTaxonomySearch("taxonomy-search-engagements", "engagements", renderTaxonomyPanel);
   wireTaxonomySearch("taxonomy-search-factors", "factors", renderFactorsPanel);
+
+  // Sort dropdowns for each Taxonomy tab (oldest/newest by creation,
+  // or A→Z / Z→A by name) — same independent-per-tab pattern as search.
+  const wireTaxonomySort = (selectId, kind, renderFn) => {
+    const select = document.getElementById(selectId);
+    if (!select) return;
+    select.value = taxonomySortMode[kind];
+    select.addEventListener("change", () => {
+      taxonomySortMode[kind] = select.value;
+      renderFn(kind === "factors" ? undefined : kind);
+    });
+  };
+  wireTaxonomySort("taxonomy-sort-reactions", "reactions", renderTaxonomyPanel);
+  wireTaxonomySort("taxonomy-sort-engagements", "engagements", renderTaxonomyPanel);
+  wireTaxonomySort("taxonomy-sort-factors", "factors", renderFactorsPanel);
 
   // Per-hero Reaction/Engagement assignment (Section 5.3), inside the hero
   // edit modal — search-to-add is wired lazily from renderRteAddSearch()
@@ -1658,6 +1742,28 @@ function qdSimpleSuggestForSlot(nextIdx, draftArr, banProtectEl) {
       entries.push({ ...entry, _bucket: elBucket, _elNote: elNoteFor(elBucket) });
     });
   });
+
+  // Fallback when Factor mode leaves nothing to suggest — a handful of
+  // ticked Factors against a small (or niche) roster can genuinely
+  // exclude every remaining hero once enough of them are already
+  // drafted, which would otherwise stall the draft short of a full
+  // team of 5. Rather than leaving the slot impossible to fill, drop
+  // back to plain overall kit score for just this slot, same as
+  // Factor mode being off — the ticked Factors simply couldn't steer
+  // this particular pick, so it falls through to the next-best thing.
+  if (qdTickedFactorIds.size > 0 && entries.length === 0) {
+    candidateHeroes.forEach(h => {
+      ["primary", ...(h.altStats ? ["ghost"] : [])].forEach(variant => {
+        const elBucket = qdElementBucket(h, counterEl, avoidEl);
+        entries.push({
+          heroId: h.id, hero: h, variant,
+          score: qdOverallKitScore(h, variant),
+          reasons: ["⚠️ No Enemy Factor match left in the pool — showing overall kit score instead"],
+          _bucket: elBucket, _elNote: elNoteFor(elBucket),
+        });
+      });
+    });
+  }
 
   // Ban Protect bucket first (0 = counters it, 1 = neutral, 2 = the
   // element Ban Protect itself beats), best score second — exactly
@@ -4147,6 +4253,23 @@ let taxonomyActiveTab = "reactions"; // "reactions" | "engagements" | "factors"
 // clear what you'd typed in another one.
 let taxonomySearchQuery = { reactions: "", engagements: "", factors: "" };
 
+// Applies the current tab's sort mode (taxonomySortMode, declared up
+// near the top of this file — see the comment there for why) to an
+// already-search-filtered list, without mutating it. Sorting by id
+// rather than array position means it stays accurate even for an item
+// that just moved from Reactions to Engagements (or back) via
+// convertTaxonomyItemKind — its id (and so its place in an
+// oldest/newest ordering) never changes.
+function applyTaxonomySort(kind, items) {
+  const mode = taxonomySortMode[kind] || "oldest";
+  const sorted = [...items];
+  if (mode === "az") sorted.sort((a, b) => (a.name || "").localeCompare(b.name || "", undefined, { sensitivity: "base" }));
+  else if (mode === "za") sorted.sort((a, b) => (b.name || "").localeCompare(a.name || "", undefined, { sensitivity: "base" }));
+  else if (mode === "newest") sorted.sort((a, b) => b.id - a.id);
+  else sorted.sort((a, b) => a.id - b.id); // "oldest" (default)
+  return sorted;
+}
+
 // Per-row search text for the Factor-tagging search box under a Reaction/
 // Engagement row (keyed by "kind-id"), session-only like the tab search
 // above. Kept separate so typing in one row's search doesn't touch another.
@@ -4202,7 +4325,7 @@ function taxonomyMatchesSearch(kind, name) {
 // it is never editable from a hero's own edit screen.
 function renderTaxonomyPanel(kind) {
   const box = document.getElementById(kind === "reactions" ? "taxonomy-list-reactions" : "taxonomy-list-engagements");
-  const items = taxonomy[kind].filter(item => taxonomyMatchesSearch(kind, item.name));
+  const items = applyTaxonomySort(kind, taxonomy[kind].filter(item => taxonomyMatchesSearch(kind, item.name)));
   if (!items.length) {
     box.innerHTML = taxonomy[kind].length
       ? `<div class="taxonomy-empty-note">No ${kind} match your search.</div>`
@@ -4210,6 +4333,8 @@ function renderTaxonomyPanel(kind) {
     return;
   }
   const label = kind === "reactions" ? "Reaction" : "Engagement";
+  const otherKind = kind === "reactions" ? "engagements" : "reactions";
+  const otherLabel = kind === "reactions" ? "Engagement" : "Reaction";
   box.innerHTML = items.map(item => {
     const heroCount = heroesLinkedToTaxonomyItem(kind, item.id).length;
     return `
@@ -4222,6 +4347,7 @@ function renderTaxonomyPanel(kind) {
         </div>
         <button type="button" class="btn btn-ghost btn-xs taxonomy-row-tagbtn" data-kind="${kind}" data-id="${item.id}">🏷 Factors (${item.factorIds.length})</button>
         <button type="button" class="btn btn-ghost btn-xs taxonomy-row-herobtn" data-kind="${kind}" data-id="${item.id}" title="Search a hero and add this ${label} to them instantly, without opening their edit screen">➕ Add to Hero${heroCount ? ` (${heroCount})` : ""}</button>
+        <button type="button" class="btn btn-ghost btn-xs taxonomy-row-convertbtn" data-kind="${kind}" data-id="${item.id}" title="Move this ${label} to ${otherLabel}s — keeps its value, Factor tags, and every hero it's linked to">⇄ Make ${otherLabel}</button>
         <button type="button" class="taxonomy-row-delete" data-kind="${kind}" data-id="${item.id}" title="Delete — un-links from every hero that holds it">✕</button>
       </div>
       <div class="taxonomy-row-factors" id="taxonomy-factors-${kind}-${item.id}" style="display:none"></div>
@@ -4260,6 +4386,20 @@ function renderTaxonomyPanel(kind) {
   box.querySelectorAll(".taxonomy-row-herobtn").forEach(btn => {
     btn.addEventListener("click", () => toggleTaxonomyRowHeroes(btn.dataset.kind, Number(btn.dataset.id)));
   });
+  box.querySelectorAll(".taxonomy-row-convertbtn").forEach(btn => {
+    btn.addEventListener("click", () => {
+      const fromKind = btn.dataset.kind;
+      const id = Number(btn.dataset.id);
+      const item = taxonomy[fromKind].find(x => x.id === id);
+      const toLabel = fromKind === "reactions" ? "Engagements" : "Reactions";
+      if (!confirm(`Move "${item?.name || ""}" to ${toLabel}? It keeps its value, Factor tags, and every hero it's linked to.`)) return;
+      convertTaxonomyItemKind(fromKind, id);
+      renderTaxonomyPanel("reactions");
+      renderTaxonomyPanel("engagements");
+      renderRteSection(); // reflects the move immediately if the hero modal is open behind this one
+      if (quickDraftSuggestOpen) renderQuickDraftSuggestions(); // scores/factors feed Quick Draft too
+    });
+  });
 }
 
 // Expands/collapses the Factor-tagging chip row under a Reaction or
@@ -4297,7 +4437,10 @@ function renderTaxonomyFactorChips(kind, id) {
         ? taggedFactors.map(f => `<button type="button" class="taxonomy-factor-chip tagged" data-factor-id="${f.id}" title="Remove">${f.name} ✕</button>`).join("")
         : `<div class="taxonomy-empty-note">No Factors tagged yet — search below to add one.</div>`}
     </div>
-    <input type="text" class="taxonomy-search taxonomy-factor-search" placeholder="🔍 Search Factors to add…" value="${escAttr(query)}" />
+    <div class="taxonomy-search-wrap">
+      <input type="text" class="taxonomy-search taxonomy-factor-search" placeholder="🔍 Search Factors to add…" value="${escAttr(query)}" />
+      <button type="button" class="taxonomy-search-clear" title="Clear search" aria-label="Clear search">✕</button>
+    </div>
     <div class="taxonomy-factor-search-results"></div>
   `;
 
@@ -4347,6 +4490,10 @@ function renderTaxonomyFactorChips(kind, id) {
     const firstResult = resultsBox.querySelector(".taxonomy-factor-chip");
     if (firstResult) firstResult.click(); // Enter adds the top match
   });
+  wireTaxonomySearchClear(searchInput, row.querySelector(".taxonomy-search-clear"), () => {
+    taxonomyFactorRowSearch[rowKey] = "";
+    renderResults();
+  });
 
   renderResults();
   if (query) searchInput.focus({ preventScroll: true }); // restore focus/cursor after a re-render
@@ -4386,7 +4533,10 @@ function renderTaxonomyHeroSearch(kind, id) {
         ? linkedHeroes.map(h => `<span class="taxonomy-hero-chip" title="Already has this ${label}">✅ ${h.name || "Unnamed"}</span>`).join("")
         : `<div class="taxonomy-empty-note">Not assigned to any hero yet — search below to add one.</div>`}
     </div>
-    <input type="text" class="taxonomy-search taxonomy-hero-row-search" placeholder="🔍 Search a hero to add…" value="${escAttr(query)}" />
+    <div class="taxonomy-search-wrap">
+      <input type="text" class="taxonomy-search taxonomy-hero-row-search" placeholder="🔍 Search a hero to add…" value="${escAttr(query)}" />
+      <button type="button" class="taxonomy-search-clear" title="Clear search" aria-label="Clear search">✕</button>
+    </div>
     <div class="taxonomy-hero-row-results"></div>
   `;
 
@@ -4442,6 +4592,10 @@ function renderTaxonomyHeroSearch(kind, id) {
     const firstAddable = resultsBox.querySelector(".taxonomy-hero-add-btn");
     if (firstAddable) firstAddable.click(); // Enter adds the top matching, not-yet-added hero
   });
+  wireTaxonomySearchClear(searchInput, row.querySelector(".taxonomy-search-clear"), () => {
+    taxonomyHeroRowSearch[rowKey] = "";
+    renderResults();
+  });
 
   renderResults();
   if (query) searchInput.focus({ preventScroll: true }); // restore focus/cursor after a re-render
@@ -4450,7 +4604,7 @@ function renderTaxonomyHeroSearch(kind, id) {
 // Factors panel (5.2) — plain create/rename/delete, no tagging UI here.
 function renderFactorsPanel() {
   const box = document.getElementById("taxonomy-list-factors");
-  const items = taxonomy.factors.filter(f => taxonomyMatchesSearch("factors", f.name));
+  const items = applyTaxonomySort("factors", taxonomy.factors.filter(f => taxonomyMatchesSearch("factors", f.name)));
   if (!items.length) {
     box.innerHTML = taxonomy.factors.length
       ? `<div class="taxonomy-empty-note">No Factors match your search.</div>`

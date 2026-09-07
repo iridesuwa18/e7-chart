@@ -2071,6 +2071,7 @@ body.dot-mode .origin-dot:hover {
 .taxonomy-row-name:hover { border-color: var(--border); }
 .taxonomy-row-name:focus { border-color: var(--gold-dim); background: rgba(255,255,255,.03); outline: none; }
 .taxonomy-row-tagbtn { flex-shrink: 0; white-space: nowrap; }
+.taxonomy-row-convertbtn { flex-shrink: 0; white-space: nowrap; }
 .taxonomy-row-delete {
   flex-shrink: 0;
   width: 24px; height: 24px;
@@ -2117,6 +2118,37 @@ body.dot-mode .origin-dot:hover {
   color: var(--text-dim);
   padding: 6px 2px;
 }
+
+/* Shared "X to clear" affordance for every Taxonomy search box (the 3
+   tab searches, Tag Factors, and Add to Hero) — wraps the input so the
+   button can sit inside it on the right edge, the same pattern used
+   for the Enemy Factors dropdown search in Quick Draft. Existing
+   `.taxonomy-search-row .taxonomy-search` / `.taxonomy-row-heroes
+   .taxonomy-search` width/margin resets still apply through the extra
+   wrap div fine, since descendant selectors match at any depth. */
+.taxonomy-search-wrap { position: relative; width: 100%; }
+.taxonomy-search-wrap .taxonomy-search { padding-right: 28px; }
+.taxonomy-search-clear {
+  display: none;
+  position: absolute;
+  top: 50%;
+  right: 6px;
+  transform: translateY(-50%);
+  align-items: center;
+  justify-content: center;
+  width: 20px;
+  height: 20px;
+  padding: 0;
+  border: none;
+  border-radius: 50%;
+  background: rgba(255,255,255,0.1);
+  color: #9fb4c7;
+  font-size: 11px;
+  line-height: 1;
+  cursor: pointer;
+  transition: background .15s, color .15s;
+}
+.taxonomy-search-clear:hover { background: rgba(255,255,255,0.2); color: #dce8f5; }
 
 /* Section 5.3 — quick "Add to Hero" search under a Reaction/Engagement
    row. Reuses .taxonomy-row-factors' spacing rhythm (border-top, gap)

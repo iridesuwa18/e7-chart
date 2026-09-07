@@ -119,6 +119,30 @@
     }
     .taxonomy-search::placeholder { color: #607a90; }
 
+    /* Sort dropdown sits beside the tab search box (5.1/5.2 A-Z/Oldest-
+       Newest filter) — scoped to .taxonomy-search-row's own child so the
+       shared .taxonomy-search rule above (used by several other search
+       boxes: factor-tagging, Add to Hero, RTE) is untouched elsewhere. */
+    .taxonomy-search-row {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      margin: 8px 0 10px;
+    }
+    .taxonomy-search-row .taxonomy-search { margin: 0; }
+    .taxonomy-sort-select {
+      flex-shrink: 0;
+      max-width: 40%;
+      box-sizing: border-box;
+      padding: 7px 6px;
+      background: rgba(255,255,255,0.04);
+      border: 1px solid rgba(201,162,39,0.3);
+      border-radius: 5px;
+      color: #dce8f5;
+      font-size: 11px;
+      font-family: 'Cinzel', serif;
+    }
+
     /* Fixed taxonomy value shown/edited per Reaction/Engagement row */
     .taxonomy-row-value {
       display: flex;
@@ -1064,7 +1088,18 @@
             <input type="text" id="taxonomy-new-reaction" placeholder="New Reaction name…" />
             <button type="button" class="btn btn-gold btn-sm" id="taxonomy-add-reaction">+ Add</button>
           </div>
-          <input type="text" class="taxonomy-search" id="taxonomy-search-reactions" placeholder="🔍 Search Reactions…" />
+          <div class="taxonomy-search-row">
+            <div class="taxonomy-search-wrap">
+              <input type="text" class="taxonomy-search" id="taxonomy-search-reactions" placeholder="🔍 Search Reactions…" />
+              <button type="button" class="taxonomy-search-clear" id="taxonomy-search-reactions-clear" title="Clear search" aria-label="Clear search">✕</button>
+            </div>
+            <select class="taxonomy-sort-select" id="taxonomy-sort-reactions" title="Sort order">
+              <option value="oldest">Oldest first</option>
+              <option value="newest">Newest first</option>
+              <option value="az">A → Z</option>
+              <option value="za">Z → A</option>
+            </select>
+          </div>
           <div class="taxonomy-list" id="taxonomy-list-reactions"></div>
         </div>
 
@@ -1075,7 +1110,18 @@
             <input type="text" id="taxonomy-new-engagement" placeholder="New Engagement name…" />
             <button type="button" class="btn btn-gold btn-sm" id="taxonomy-add-engagement">+ Add</button>
           </div>
-          <input type="text" class="taxonomy-search" id="taxonomy-search-engagements" placeholder="🔍 Search Engagements…" />
+          <div class="taxonomy-search-row">
+            <div class="taxonomy-search-wrap">
+              <input type="text" class="taxonomy-search" id="taxonomy-search-engagements" placeholder="🔍 Search Engagements…" />
+              <button type="button" class="taxonomy-search-clear" id="taxonomy-search-engagements-clear" title="Clear search" aria-label="Clear search">✕</button>
+            </div>
+            <select class="taxonomy-sort-select" id="taxonomy-sort-engagements" title="Sort order">
+              <option value="oldest">Oldest first</option>
+              <option value="newest">Newest first</option>
+              <option value="az">A → Z</option>
+              <option value="za">Z → A</option>
+            </select>
+          </div>
           <div class="taxonomy-list" id="taxonomy-list-engagements"></div>
         </div>
 
@@ -1086,7 +1132,18 @@
             <input type="text" id="taxonomy-new-factor" placeholder="New Factor name…" />
             <button type="button" class="btn btn-gold btn-sm" id="taxonomy-add-factor">+ Add</button>
           </div>
-          <input type="text" class="taxonomy-search" id="taxonomy-search-factors" placeholder="🔍 Search Factors…" />
+          <div class="taxonomy-search-row">
+            <div class="taxonomy-search-wrap">
+              <input type="text" class="taxonomy-search" id="taxonomy-search-factors" placeholder="🔍 Search Factors…" />
+              <button type="button" class="taxonomy-search-clear" id="taxonomy-search-factors-clear" title="Clear search" aria-label="Clear search">✕</button>
+            </div>
+            <select class="taxonomy-sort-select" id="taxonomy-sort-factors" title="Sort order">
+              <option value="oldest">Oldest first</option>
+              <option value="newest">Newest first</option>
+              <option value="az">A → Z</option>
+              <option value="za">Z → A</option>
+            </select>
+          </div>
           <div class="taxonomy-list" id="taxonomy-list-factors"></div>
         </div>
       </div>
