@@ -192,7 +192,7 @@
       "notes": "Her shield makes her a \"tank\"",
       "iconData": "https://raw.githubusercontent.com/iridesuwa18/e7-chart/main/assets/heroes/frieren.webp",
       "locked": true,
-      "_x": 50,
+      "_x": 10,
       "_y": 30,
       "hidden": false,
       "vType_legacy": "TNK",
@@ -9548,5 +9548,5 @@
     ]
   },
   "schemaVersion": 2,
-  "savedAt": "2026-09-07T09:28:14.292Z"
+  "savedAt": "2026-09-07T09:29:22.146Z"
 }
