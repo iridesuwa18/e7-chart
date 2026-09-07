@@ -487,7 +487,7 @@
       "notes": "",
       "iconData": "https://raw.githubusercontent.com/iridesuwa18/e7-chart/main/assets/heroes/conqueror-lilias.webp",
       "locked": true,
-      "_x": 50,
+      "_x": 87.5,
       "_y": 52.5,
       "hidden": false,
       "vType_legacy": "SPD",
@@ -519,6 +519,12 @@
         },
         {
           "refId": 1788785736229
+        },
+        {
+          "refId": 1788785377663
+        },
+        {
+          "refId": 1788785954933
         }
       ],
       "selfishScore": 0,
@@ -9902,6 +9908,22 @@
           1788694866469,
           1788774099692
         ]
+      },
+      {
+        "id": 1788785377663,
+        "name": "Decrease buff durations",
+        "value": 7,
+        "factorIds": [
+          1788773731924
+        ]
+      },
+      {
+        "id": 1788785954933,
+        "name": "Extra turn",
+        "value": 9.8,
+        "factorIds": [
+          1788785891810
+        ]
       }
     ],
     "factors": [
@@ -10012,9 +10034,13 @@
       {
         "id": 1788783972533,
         "name": "Low / no resource units"
+      },
+      {
+        "id": 1788785891810,
+        "name": "Slow units"
       }
     ]
   },
   "schemaVersion": 2,
-  "savedAt": "2026-09-07T12:44:43.016Z"
+  "savedAt": "2026-09-07T12:47:09.476Z"
 }
