@@ -700,6 +700,20 @@ const fSsScore     = document.getElementById("f-ss-score");
   document.querySelectorAll(".taxonomy-tab").forEach(btn => {
     btn.addEventListener("click", () => switchTaxonomyTab(btn.dataset.tab));
   });
+
+  // Rename modal (opened by each row's ✏️ button) — this one's a single
+  // small field, so unlike the Taxonomy manager above it's fine to
+  // close it on an outside click/Escape, same as the rest of the app's
+  // modals (Admin, Details, etc.).
+  document.getElementById("rename-modal-save").addEventListener("click", saveRenameModal);
+  document.getElementById("rename-modal-cancel").addEventListener("click", closeRenameModal);
+  document.getElementById("rename-modal-overlay").addEventListener("click", e => {
+    if (e.target === document.getElementById("rename-modal-overlay")) closeRenameModal();
+  });
+  document.getElementById("rename-modal-input").addEventListener("keydown", e => {
+    if (e.key === "Enter") { e.preventDefault(); saveRenameModal(); }
+    else if (e.key === "Escape") { e.preventDefault(); closeRenameModal(); }
+  });
   document.getElementById("taxonomy-add-reaction").addEventListener("click", () => {
     const input = document.getElementById("taxonomy-new-reaction");
     if (!input.value.trim()) return;
@@ -4280,6 +4294,47 @@ function escAttr(s) {
   return String(s ?? "").replace(/"/g, "&quot;");
 }
 
+/* ── Rename modal ──
+   Reactions/Engagements/Factors show their name as wrapped, read-only
+   text now (not an input) so the full name is always visible instead
+   of being squeezed into a tiny box — this modal is where the actual
+   editing happens instead, via the row's ✏️ button. Reuses the app's
+   existing .overlay/.modal shell (same one Admin/Details/etc. use) for
+   visual consistency rather than introducing a bespoke dialog style. */
+let renameModalTarget = null; // { kind, id } while open, else null
+
+function openRenameModal(kind, id, currentName) {
+  renameModalTarget = { kind, id };
+  const label = kind === "reactions" ? "Reaction" : kind === "engagements" ? "Engagement" : "Factor";
+  document.getElementById("rename-modal-title").textContent = `Rename ${label}`;
+  const input = document.getElementById("rename-modal-input");
+  input.value = currentName || "";
+  document.getElementById("rename-modal-overlay").classList.add("open");
+  input.focus();
+  input.select();
+}
+
+function closeRenameModal() {
+  document.getElementById("rename-modal-overlay").classList.remove("open");
+  renameModalTarget = null;
+}
+
+function saveRenameModal() {
+  if (!renameModalTarget) return;
+  const { kind, id } = renameModalTarget;
+  const newName = document.getElementById("rename-modal-input").value;
+  if (kind === "factors") {
+    renameFactor(id, newName);
+    renderFactorsPanel();
+    renderQdFactorChips(); // Factor names show in the Quick Draft dropdown too
+  } else {
+    renameTaxonomyItem(kind, id, newName);
+    renderTaxonomyPanel(kind);
+  }
+  renderRteSection(); // reflects the rename immediately if the hero modal is open behind this one
+  closeRenameModal();
+}
+
 function openTaxonomyManager() {
   switchTaxonomyTab(taxonomyActiveTab);
   document.getElementById("taxonomy-overlay").classList.add("open");
@@ -4334,7 +4389,10 @@ function renderTaxonomyPanel(kind) {
     return `
     <div class="taxonomy-row" data-id="${item.id}">
       <div class="taxonomy-row-main">
-        <input type="text" class="taxonomy-row-name" value="${escAttr(item.name)}" data-kind="${kind}" data-id="${item.id}" />
+        <div class="taxonomy-row-name-wrap">
+          <div class="taxonomy-row-name-text">${item.name || "(unnamed)"}</div>
+          <button type="button" class="taxonomy-row-editbtn" data-kind="${kind}" data-id="${item.id}" title="Edit name">✏️</button>
+        </div>
         <div class="taxonomy-row-value">
           <label for="taxonomy-value-${kind}-${item.id}">Value</label>
           <input type="number" id="taxonomy-value-${kind}-${item.id}" class="taxonomy-row-value-input" min="0" max="10" step="0.1" value="${item.value.toFixed(1)}" data-kind="${kind}" data-id="${item.id}" title="Fixed score (0-10) used everywhere this ${label} is assigned" />
@@ -4350,10 +4408,10 @@ function renderTaxonomyPanel(kind) {
   `;
   }).join("");
 
-  box.querySelectorAll(".taxonomy-row-name").forEach(input => {
-    input.addEventListener("change", () => {
-      renameTaxonomyItem(input.dataset.kind, Number(input.dataset.id), input.value);
-      renderRteSection(); // reflects a rename immediately if the hero modal is open behind this one
+  box.querySelectorAll(".taxonomy-row-editbtn").forEach(btn => {
+    btn.addEventListener("click", () => {
+      const item = taxonomy[btn.dataset.kind].find(x => x.id === Number(btn.dataset.id));
+      openRenameModal(btn.dataset.kind, Number(btn.dataset.id), item?.name || "");
     });
   });
   box.querySelectorAll(".taxonomy-row-value-input").forEach(input => {
@@ -4608,13 +4666,19 @@ function renderFactorsPanel() {
   box.innerHTML = items.map(f => `
     <div class="taxonomy-row" data-id="${f.id}">
       <div class="taxonomy-row-main">
-        <input type="text" class="taxonomy-row-name" value="${escAttr(f.name)}" data-id="${f.id}" />
+        <div class="taxonomy-row-name-wrap">
+          <div class="taxonomy-row-name-text">${f.name || "(unnamed)"}</div>
+          <button type="button" class="taxonomy-row-editbtn" data-id="${f.id}" title="Edit name">✏️</button>
+        </div>
         <button type="button" class="taxonomy-row-delete" data-id="${f.id}" title="Delete — un-tags it from every Reaction/Engagement">✕</button>
       </div>
     </div>
   `).join("");
-  box.querySelectorAll(".taxonomy-row-name").forEach(input => {
-    input.addEventListener("change", () => { renameFactor(Number(input.dataset.id), input.value); renderQdFactorChips(); });
+  box.querySelectorAll(".taxonomy-row-editbtn").forEach(btn => {
+    btn.addEventListener("click", () => {
+      const f = taxonomy.factors.find(x => x.id === Number(btn.dataset.id));
+      openRenameModal("factors", Number(btn.dataset.id), f?.name || "");
+    });
   });
   box.querySelectorAll(".taxonomy-row-delete").forEach(btn => {
     btn.addEventListener("click", () => {

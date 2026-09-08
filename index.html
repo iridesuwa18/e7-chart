@@ -1224,6 +1224,24 @@
     </div>
   </div>
 
+  <!-- Rename modal (Taxonomy 5.1/5.2's ✏️ edit button) — Reaction,
+       Engagement, and Factor names all show as wrapped read-only text
+       in their row now instead of a cramped inline input; this is
+       where the actual text entry happens. -->
+  <div class="overlay" id="rename-modal-overlay">
+    <div class="modal" id="rename-modal" style="max-width:380px">
+      <div class="modal-title" id="rename-modal-title">Rename</div>
+      <div class="form-group">
+        <label>Name</label>
+        <input type="text" id="rename-modal-input" autocomplete="off" spellcheck="false" />
+      </div>
+      <div class="modal-btns">
+        <button class="btn btn-gold" id="rename-modal-save">Save</button>
+        <button class="btn btn-ghost" id="rename-modal-cancel">Cancel</button>
+      </div>
+    </div>
+  </div>
+
   <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
   <script src="app.js"></script>
 

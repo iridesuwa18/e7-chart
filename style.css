@@ -2046,30 +2046,53 @@ body.dot-mode .origin-dot:hover {
 }
 .taxonomy-row-main {
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   gap: 6px;
-  /* Wrap instead of squeezing: without this, the flex:1 name input was
-     the only shrinkable item in the row (Value/Factors/Add to
-     Hero/delete all sit at their nowrap content width), so on a narrow
-     phone screen it got crushed down to just a few visible characters
-     — this is what made Reaction/Engagement names unreadable on
-     mobile. Wrapping lets the trailing controls drop to their own
-     line instead, so the name always gets real width to render in. */
+  /* Wrap instead of squeezing: without this, the name was the only
+     shrinkable item in the row (Value/Factors/Add to Hero/etc. all sit
+     at their nowrap content width), so on a narrow phone screen it got
+     crushed down to just a few visible characters. Wrapping lets the
+     trailing controls drop to their own line(s) instead. */
   flex-wrap: wrap;
 }
-.taxonomy-row-name {
+/* Name shows as wrapped, read-only text now — not an input — so the
+   full name is always visible (multi-line if needed) instead of being
+   squeezed into a single-line box. Always its own full-width line
+   (flex-basis:100%, not just on mobile) so this looks and behaves the
+   same on every screen size; the ✏️ button opens the rename modal
+   where the actual editing happens. */
+.taxonomy-row-name-wrap {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  flex-basis: 100%;
+  width: 100%;
+}
+.taxonomy-row-name-text {
   flex: 1;
   min-width: 0;
-  background: transparent;
-  border: 1px solid transparent;
   color: var(--text);
   font-family: 'Crimson Pro', serif;
   font-size: 13px;
-  padding: 5px 6px;
-  border-radius: 3px;
+  line-height: 1.4;
+  padding: 5px 0;
+  white-space: normal;
+  word-break: break-word;
 }
-.taxonomy-row-name:hover { border-color: var(--border); }
-.taxonomy-row-name:focus { border-color: var(--gold-dim); background: rgba(255,255,255,.03); outline: none; }
+.taxonomy-row-editbtn {
+  flex-shrink: 0;
+  width: 26px; height: 26px;
+  margin-top: 2px;
+  padding: 0;
+  border-radius: 50%;
+  border: 1px solid var(--border);
+  background: rgba(255,255,255,.03);
+  color: var(--text-dim);
+  font-size: 12px;
+  cursor: pointer;
+  transition: background .15s, border-color .15s, color .15s;
+}
+.taxonomy-row-editbtn:hover { background: rgba(201,162,39,.12); border-color: var(--gold-dim); color: var(--gold2); }
 .taxonomy-row-tagbtn { flex-shrink: 0; white-space: nowrap; }
 .taxonomy-row-convertbtn { flex-shrink: 0; white-space: nowrap; }
 .taxonomy-row-delete {
@@ -2770,14 +2793,10 @@ body.dot-mode .origin-dot:hover {
 }
 
 @media (max-width: 600px) {
-  /* Reactions/Engagements rows (Taxonomy panel) — force the name onto
-     its own full-width line rather than letting the flex-wrap above
-     decide item-by-item where the break falls (which could still land
-     mid-way, e.g. Value awkwardly sharing the first line with the
-     name). Giving the first flex child a 100% basis in a wrapping flex
-     row pushes every following sibling (Value, Factors, Add to Hero,
-     delete) onto the next line as a group, no markup changes needed. */
-  .taxonomy-row-name { flex-basis: 100%; }
+  /* Value/Factors/Add to Hero already wrap onto their own line below
+     the name (see .taxonomy-row-name-wrap's flex-basis:100%, which
+     applies at every width now, not just here) — just tighten their
+     font size a bit further on a narrow phone screen. */
   .taxonomy-row-value,
   .taxonomy-row-tagbtn,
   .taxonomy-row-herobtn { font-size: 9.5px; }
