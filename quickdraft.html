@@ -750,7 +750,10 @@
             <button type="button" class="btn btn-ghost btn-sm" id="btn-open-alt-questionnaire">📋 Ghost Questionnaire</button>
           </div>
 
-          <!-- Ghost Reactions & Engagements -->
+          <!-- Ghost Reactions & Engagements — shares the main build's
+               list exactly now (only Selfish/Selfless differs between
+               the two), so this is a read-only pointer, not its own
+               editable section like it used to be. -->
           <div class="form-group rte-section" style="margin-top:10px">
             <label>Ghost Reactions &amp; Engagements
               <button type="button" class="stat-info-btn slider-trigger-btn ghost-trigger-btn" id="btn-open-alt-h-slider" title="View Reaction/Engage breakdown (ghost)" style="position:static;margin-left:6px">⇔</button>
@@ -759,25 +762,7 @@
               <span class="rte-score-badge" id="alt-rte-reaction-score-badge">Reaction Score: —</span>
               <span class="rte-score-badge" id="alt-rte-engage-score-badge">Engage Score: —</span>
             </div>
-            <p class="rte-fixed-value-note">Values are fixed per Reaction/Engagement in 🗂 Taxonomy.</p>
-
-            <div class="rte-block">
-              <div class="rte-block-title">Reactions</div>
-              <div class="rte-assigned-list" id="alt-rte-reactions-list"></div>
-              <div class="rte-add-row">
-                <select id="alt-rte-add-reaction-select"><option value="">+ Add a Reaction…</option></select>
-                <button type="button" class="btn btn-ghost btn-sm" id="alt-rte-add-reaction-btn">Add</button>
-              </div>
-            </div>
-
-            <div class="rte-block">
-              <div class="rte-block-title">Engagements</div>
-              <div class="rte-assigned-list" id="alt-rte-engagements-list"></div>
-              <div class="rte-add-row">
-                <select id="alt-rte-add-engagement-select"><option value="">+ Add an Engagement…</option></select>
-                <button type="button" class="btn btn-ghost btn-sm" id="alt-rte-add-engagement-btn">Add</button>
-              </div>
-            </div>
+            <p class="rte-fixed-value-note">Ghost shares the exact same Reactions &amp; Engagements as the main build above — only Selfish/Selfless differs between the two. Edit them in the Reactions &amp; Engagements section above.</p>
           </div>
         </div>
       </div>

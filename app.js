@@ -455,11 +455,12 @@ let modalAltAllySupport  = [];
 // The hero edit modal's in-progress Reactions/Engagements assignment
 // (Rebuild Spec Section 5.3) — same batching pattern as the Selfish/
 // Selfless state above: arrays of { refId, score }, local to the modal
-// session until Add/Save Changes commits them onto the hero.
+// session until Add/Save Changes commits them onto the hero. Ghost no
+// longer keeps its own copy of these — it shares modalReactions/
+// modalEngagements exactly (only Selfish/Selfless stays independent
+// per build) — see rteModalArray further down.
 let modalReactions   = [];
 let modalEngagements = [];
-let modalAltReactions   = [];
-let modalAltEngagements = [];
 
 /* ── Grid snap ── */
 let snapEnabled = false;
@@ -1385,15 +1386,12 @@ function heroToXY(h) {
   const y = ya.side === "SELFISH"  ? 50 - (ya.value / 10) * 50 : 50 + (ya.value / 10) * 50;
   return { x, y };
 }
-// Ghost/alt-stat equivalents — open-decision answer was "extend ghost
-// mode to the new axes", so altStats now also carries its own
-// selfishScore/selflessScore/reactions/engagements, independent of the
-// primary build's (see modalAltSelfishScore etc. further down).
+// Ghost/alt-stat equivalents — Ghost shares the exact same
+// Reactions/Engagements as the main build (only Selfish/Selfless
+// differs between them), so the X axis is now just heroXAxis itself;
+// heroAltYAxis below is the only one still reading from h.altStats.
 function heroAltXAxis(h) {
-  const src = h.altStats || {};
-  const r = Math.max(0, Math.min(10, computeReactionScore(src) || 0));
-  const e = Math.max(0, Math.min(10, computeEngageScore(src) || 0));
-  return r >= e ? { side: "REACTION", value: r } : { side: "ENGAGE", value: e };
+  return heroXAxis(h);
 }
 function heroAltYAxis(h) {
   const src = h.altStats || {};
@@ -1697,9 +1695,18 @@ function qdToggleSideOverride() {
 // entry the build has. A hero with no rated Reactions/Engagements yet
 // scores 0 and simply sorts to the bottom (same "needs rating" outcome
 // the old system had for unrated heroes).
+// Overall "how good is this kit" fallback score used when no Enemy
+// Factor is ticked — plain average across every Reaction + Engagement
+// entry the build has. A hero with no rated Reactions/Engagements yet
+// scores 0 and simply sorts to the bottom (same "needs rating" outcome
+// the old system had for unrated heroes). Ghost shares the exact same
+// Reactions/Engagements as the main build (only Selfish/Selfless
+// differs between them — see heroAltYAxis), so `variant` no longer
+// changes which list this reads; kept as a parameter since callers
+// still pass it for the Selfish/Selfless side of scoring elsewhere.
 function qdOverallKitScore(h, variant) {
-  const reactions   = variant === "ghost" ? (h.altStats?.reactions   || []) : (h.reactions   || []);
-  const engagements = variant === "ghost" ? (h.altStats?.engagements || []) : (h.engagements || []);
+  const reactions   = h.reactions   || [];
+  const engagements = h.engagements || [];
   const values = [
     ...reactions.map(r => taxonomyValue("reactions", r?.refId ?? r)),
     ...engagements.map(e => taxonomyValue("engagements", e?.refId ?? e)),
@@ -1820,9 +1827,14 @@ function qdSuggestForNextIdx(nextIdx, draftArr, banProtectEl) {
 // One candidate hero+variant pair, scored against every ticked Factor.
 // Returns null when the hero/variant matches none of them, so callers
 // can filter losers out with a simple `.filter(Boolean)`.
+// One candidate hero+variant pair, scored against every ticked Factor.
+// Returns null when the hero/variant matches none of them, so callers
+// can filter losers out with a simple `.filter(Boolean)`. Ghost shares
+// the main build's Reactions/Engagements (see qdOverallKitScore above),
+// so both variants read the same h.reactions/h.engagements here too.
 function qdFactorEntryForHero(h, variant) {
-  const reactions   = variant === "ghost" ? (h.altStats?.reactions   || []) : (h.reactions   || []);
-  const engagements = variant === "ghost" ? (h.altStats?.engagements || []) : (h.engagements || []);
+  const reactions   = h.reactions   || [];
+  const engagements = h.engagements || [];
   if (reactions.length === 0 && engagements.length === 0) return null;
 
   let score = 0;
@@ -3650,14 +3662,13 @@ function openAddModal() {
   modalEngagements = [];
   rteAddSearchQuery = {}; // fresh search boxes for a new hero session
   renderRteSection("main");
-  // Ghost Selfish/Selfless + Reactions/Engagements
+  // Ghost Selfish/Selfless (Reactions/Engagements are shared with main —
+  // see rteModalArray — so there's nothing Ghost-specific to reset here)
   modalAltSelfishScore  = 0;
   modalAltSelflessScore = 0;
   modalAltSelfSkillIds  = [];
   modalAltAllySupport   = [];
   updateAltSelfishSelflessDisplay();
-  modalAltReactions   = [];
-  modalAltEngagements = [];
   renderRteSection("alt");
   overlay.classList.add("open");
   fName.focus();
@@ -3694,14 +3705,13 @@ function openEditModal(h) {
   modalEngagements = Array.isArray(h.engagements) ? h.engagements.map(x => ({ refId: x?.refId ?? x })) : [];
   rteAddSearchQuery = {}; // fresh search boxes for this hero's edit session
   renderRteSection("main");
-  // Ghost Selfish/Selfless + Reactions/Engagements
+  // Ghost Selfish/Selfless (Reactions/Engagements are shared with main —
+  // see rteModalArray — so there's nothing Ghost-specific to load here)
   modalAltSelfishScore  = typeof h.altStats?.selfishScore === "number" ? h.altStats.selfishScore : 0;
   modalAltSelflessScore = typeof h.altStats?.selflessScore === "number" ? h.altStats.selflessScore : 0;
   modalAltSelfSkillIds  = Array.isArray(h.altStats?.selfSkillIds) ? h.altStats.selfSkillIds.slice() : [];
   modalAltAllySupport   = Array.isArray(h.altStats?.allySupport)  ? h.altStats.allySupport.map(a => ({ ...a })) : [];
   updateAltSelfishSelflessDisplay();
-  modalAltReactions   = Array.isArray(h.altStats?.reactions)   ? h.altStats.reactions.map(x => ({ refId: x?.refId ?? x }))   : [];
-  modalAltEngagements = Array.isArray(h.altStats?.engagements) ? h.altStats.engagements.map(x => ({ refId: x?.refId ?? x })) : [];
   renderRteSection("alt");
   overlay.classList.add("open");
   fName.focus();
@@ -3769,18 +3779,17 @@ async function onModalConfirm() {
     setStatus("✅ Icon uploaded");
   }
 
-  // Alt / ghost stats — selfishScore/selflessScore/reactions/engagements
-  // drive the ghost dot's chart position and Quick Draft's ghost-build
-  // ranking alike now that the legacy vType/vScore/hType/hScore fields
-  // are gone (Rebuild Spec Section 1 cleanup).
+  // Alt / ghost stats — selfishScore/selflessScore drive the ghost dot's
+  // vertical position and its Selfish/Selfless side in Quick Draft.
+  // Reactions/Engagements are NOT stored here anymore — Ghost shares
+  // the main build's list exactly (see qdOverallKitScore/heroAltXAxis),
+  // so there's nothing build-specific left to save for them.
   const altEnabled = document.getElementById("f-alt-enabled").checked;
   const altStats = altEnabled ? {
     selfishScore:  modalAltSelfishScore,
     selflessScore: modalAltSelflessScore,
     selfSkillIds:  modalAltSelfSkillIds.slice(),
     allySupport:   modalAltAllySupport.map(a => ({ ...a })),
-    reactions:   modalAltReactions.map(x => ({ ...x })),
-    engagements: modalAltEngagements.map(x => ({ ...x })),
   } : null;
 
   // Selfish/Selfless (Section 3/4) — whatever the slider/Questionnaire
@@ -4101,20 +4110,29 @@ function confirmQuestionnaire() {
    only drops this hero's link; it never touches the library item itself.
 ═══════════════════════════════════════ */
 
-// Re-renders both assigned lists, both "add" dropdowns, and the live
-// Reaction/Engage score badges. Called on modal open and after every
-// add/remove so everything stays in sync.
-// target: "main" (default, primary hero — modalReactions/modalEngagements)
-// or "alt" (ghost build — modalAltReactions/modalAltEngagements, Section 6
-// open-decision "extend ghost mode to the new axes"). Same DOM structure,
-// alt- prefixed ids (see the alt-rte-section markup in index.html).
+// Re-renders the assigned lists, "add" dropdowns, and live Reaction/
+// Engage score badges for the main build; for the ghost ("alt") build
+// it only refreshes the score badges, since Ghost no longer has its
+// own assigned list to show — it shares the main build's exactly (see
+// rteModalArray below), so its badges are just a mirror of main's.
+// target: "main" (default, primary hero) or "alt" (ghost build).
 function renderRteSection(target) {
   target = target || "main";
+  if (target === "alt") {
+    updateRteScoreBadges("alt");
+    return;
+  }
   renderRteAssignedList("reactions", target);
   renderRteAssignedList("engagements", target);
   renderRteAddSearch("reactions", target);
   renderRteAddSearch("engagements", target);
   updateRteScoreBadges(target);
+  // Ghost mirrors main's Reactions/Engagements exactly now, so any
+  // change made here needs to refresh Ghost's (identical) score
+  // badges too, even though nothing else in its section needs to
+  // re-render — otherwise Ghost's badges would go stale the moment
+  // main's list changes, even though the underlying data is the same.
+  updateRteScoreBadges("alt");
 }
 
 function rteIdPrefix(target) { return target === "alt" ? "alt-rte-" : "rte-"; }
@@ -4122,16 +4140,16 @@ function rteIdPrefix(target) { return target === "alt" ? "alt-rte-" : "rte-"; }
 function rteListEl(kind, target) {
   return document.getElementById(rteIdPrefix(target) + (kind === "reactions" ? "reactions-list" : "engagements-list"));
 }
+// Ghost no longer keeps its own Reactions/Engagements — both targets
+// read/write the same (main) list now; only Selfish/Selfless stays
+// independent per build. `target` stays a parameter so callers (like
+// updateRteScoreBadges, still used for Ghost's now-mirrored badges)
+// don't need special-casing.
 function rteModalArray(kind, target) {
-  if (target === "alt") return kind === "reactions" ? modalAltReactions : modalAltEngagements;
   return kind === "reactions" ? modalReactions : modalEngagements;
 }
 function setRteModalArray(kind, target, newArr) {
-  if (target === "alt") {
-    if (kind === "reactions") modalAltReactions = newArr; else modalAltEngagements = newArr;
-  } else {
-    if (kind === "reactions") modalReactions = newArr; else modalEngagements = newArr;
-  }
+  if (kind === "reactions") modalReactions = newArr; else modalEngagements = newArr;
 }
 
 // Each row shows the item's name and its fixed value (read-only badge —
@@ -4876,13 +4894,14 @@ function pulseNode(el) {
 
 /* ── X (horizontal) viewer — read-only (Section 6 open-decision) ──
    Reaction/Engage is a derived live average, so there's nothing to drag;
-   this just renders the current breakdown for whichever mode it's opened
-   in ("main" = modalReactions/modalEngagements, "alt" = the ghost
-   build's modalAltReactions/modalAltEngagements). */
+   this just renders the current breakdown. Ghost shares the exact same
+   Reactions/Engagements as the main build now, so both "main" and "alt"
+   modes read modalReactions/modalEngagements — this viewer still exists
+   in "alt" mode for its ghost-specific neighbor comparison, even though
+   the underlying Reaction/Engage numbers are now identical either way. */
 function renderXSlider() {
-  const isAlt = xSliderState.mode === "alt";
-  const reactions   = isAlt ? modalAltReactions   : modalReactions;
-  const engagements = isAlt ? modalAltEngagements : modalEngagements;
+  const reactions   = modalReactions;
+  const engagements = modalEngagements;
 
   const reactionScore = computeReactionScore({ reactions });
   const engageScore   = computeEngageScore({ engagements });
