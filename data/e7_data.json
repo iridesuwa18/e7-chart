@@ -695,7 +695,7 @@
       "notes": "",
       "iconData": "https://raw.githubusercontent.com/iridesuwa18/e7-chart/main/assets/heroes/little-queen-charlotte.webp",
       "locked": true,
-      "_x": 50,
+      "_x": 5.999999999999993,
       "_y": 30,
       "hidden": false,
       "vType_legacy": "SPD",
@@ -762,18 +762,61 @@
       "iconData": "https://raw.githubusercontent.com/iridesuwa18/e7-chart/main/assets/heroes/successor-taeyou.webp",
       "locked": true,
       "_x": 50,
-      "_y": 50,
+      "_y": 35,
       "hidden": false,
       "vType_legacy": "SPD",
       "vScore_legacy": 8,
       "hType_legacy": "SUR",
       "hScore_legacy": 8,
       "altStats_legacy": null,
-      "reactions": [],
-      "engagements": [],
-      "selfishScore": 0,
+      "reactions": [
+        {
+          "refId": 1788775147348
+        },
+        {
+          "refId": 1788780122184
+        },
+        {
+          "refId": 1788772502540
+        }
+      ],
+      "engagements": [
+        {
+          "refId": 1788786428743
+        },
+        {
+          "refId": 1788783734183
+        },
+        {
+          "refId": 1788912251007
+        },
+        {
+          "refId": 1788773067411
+        },
+        {
+          "refId": 1788698917413
+        },
+        {
+          "refId": 1788783359037
+        },
+        {
+          "refId": 1788785954933
+        },
+        {
+          "refId": 1788912738063
+        }
+      ],
+      "selfishScore": 3,
       "selflessScore": 0,
-      "needsRerating": true
+      "needsRerating": false,
+      "pvpTag": false,
+      "altStats": null,
+      "selfSkillIds": [
+        "spdCr",
+        "extraTurns",
+        "decCr"
+      ],
+      "allySupport": []
     },
     {
       "id": 1786494103758,
@@ -10057,7 +10100,8 @@
           1788772992919,
           1788694866469,
           1788774099692,
-          1788700781693
+          1788700781693,
+          1788912649792
         ]
       },
       {
@@ -10132,6 +10176,23 @@
         "value": 8,
         "factorIds": [
           1788787028808
+        ]
+      },
+      {
+        "id": 1788912251007,
+        "name": "Undispellable Buffs (Not Unique)",
+        "value": 9,
+        "factorIds": [
+          1788912649792,
+          1788700781693
+        ]
+      },
+      {
+        "id": 1788912738063,
+        "name": "Extend buff durations",
+        "value": 7,
+        "factorIds": [
+          1788912501579
         ]
       }
     ],
@@ -10267,9 +10328,17 @@
       {
         "id": 1788787028808,
         "name": "Dark units"
+      },
+      {
+        "id": 1788912649792,
+        "name": "Buff dispellers"
+      },
+      {
+        "id": 1788912501579,
+        "name": "Decrease buff duration effects"
       }
     ]
   },
   "schemaVersion": 2,
-  "savedAt": "2026-09-07T13:13:11.409Z"
+  "savedAt": "2026-09-09T00:08:23.092Z"
 }
