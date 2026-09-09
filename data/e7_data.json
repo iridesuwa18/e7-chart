@@ -761,7 +761,7 @@
       "notes": "",
       "iconData": "https://raw.githubusercontent.com/iridesuwa18/e7-chart/main/assets/heroes/successor-taeyou.webp",
       "locked": true,
-      "_x": 50,
+      "_x": 91.5,
       "_y": 35,
       "hidden": false,
       "vType_legacy": "SPD",
@@ -828,7 +828,7 @@
       "iconData": "https://raw.githubusercontent.com/iridesuwa18/e7-chart/main/assets/heroes/ambitious-tywin.webp",
       "locked": true,
       "_x": 50,
-      "_y": 50,
+      "_y": 45,
       "hidden": false,
       "vType_legacy": "TNK",
       "vScore_legacy": 1,
@@ -840,11 +840,34 @@
         "hType": "SUR",
         "hScore": 2.8
       },
-      "reactions": [],
-      "engagements": [],
-      "selfishScore": 0,
+      "reactions": [
+        {
+          "refId": 1788780327120
+        }
+      ],
+      "engagements": [
+        {
+          "refId": 1788914238894
+        },
+        {
+          "refId": 1788913999604
+        },
+        {
+          "refId": 1788780605209
+        },
+        {
+          "refId": 1788914604468
+        }
+      ],
+      "selfishScore": 1,
       "selflessScore": 0,
-      "needsRerating": true
+      "needsRerating": false,
+      "pvpTag": false,
+      "altStats": null,
+      "selfSkillIds": [
+        "immobDebuff"
+      ],
+      "allySupport": []
     },
     {
       "id": 1786494323094,
@@ -10194,6 +10217,35 @@
         "factorIds": [
           1788912501579
         ]
+      },
+      {
+        "id": 1788914238894,
+        "name": "Provoke enemies",
+        "value": 6,
+        "factorIds": [
+          1788694866469,
+          1788774099692
+        ]
+      },
+      {
+        "id": 1788913999604,
+        "name": "Soul removal",
+        "value": 6.5,
+        "factorIds": [
+          1788913836890
+        ]
+      },
+      {
+        "id": 1788914604468,
+        "name": "Rage (Undispellable) Buff",
+        "value": 7.2,
+        "factorIds": [
+          1788785891810,
+          1788700420912,
+          1788701036557,
+          1788700781693,
+          1788912649792
+        ]
       }
     ],
     "factors": [
@@ -10336,9 +10388,17 @@
       {
         "id": 1788912501579,
         "name": "Decrease buff duration effects"
+      },
+      {
+        "id": 1788913802940,
+        "name": "AOE attacks"
+      },
+      {
+        "id": 1788913836890,
+        "name": "High Soulburn teams"
       }
     ]
   },
   "schemaVersion": 2,
-  "savedAt": "2026-09-09T00:08:49.354Z"
+  "savedAt": "2026-09-09T00:32:52.883Z"
 }
