@@ -827,7 +827,7 @@
       "notes": "",
       "iconData": "https://raw.githubusercontent.com/iridesuwa18/e7-chart/main/assets/heroes/ambitious-tywin.webp",
       "locked": true,
-      "_x": 50,
+      "_x": 88,
       "_y": 45,
       "hidden": false,
       "vType_legacy": "TNK",
@@ -885,7 +885,7 @@
       "iconData": "https://raw.githubusercontent.com/iridesuwa18/e7-chart/main/assets/heroes/belian.webp",
       "locked": true,
       "_x": 50,
-      "_y": 50,
+      "_y": 35,
       "hidden": false,
       "vType_legacy": "TNK",
       "vScore_legacy": 6,
@@ -894,9 +894,17 @@
       "altStats_legacy": null,
       "reactions": [],
       "engagements": [],
-      "selfishScore": 0,
+      "selfishScore": 3,
       "selflessScore": 0,
-      "needsRerating": true
+      "needsRerating": false,
+      "pvpTag": false,
+      "altStats": null,
+      "selfSkillIds": [
+        "decSpd",
+        "decCr",
+        "selfPassive"
+      ],
+      "allySupport": []
     },
     {
       "id": 1786494420941,
@@ -10416,5 +10424,5 @@
     ]
   },
   "schemaVersion": 2,
-  "savedAt": "2026-09-09T03:22:50.345Z"
+  "savedAt": "2026-09-09T03:25:49.162Z"
 }
