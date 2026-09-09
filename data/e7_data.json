@@ -863,6 +863,9 @@
         },
         {
           "refId": 1788924109560
+        },
+        {
+          "refId": 1788773060667
         }
       ],
       "selfishScore": 1,
@@ -893,7 +896,11 @@
       "hScore_legacy": 6.5,
       "altStats_legacy": null,
       "reactions": [],
-      "engagements": [],
+      "engagements": [
+        {
+          "refId": 1788773060667
+        }
+      ],
       "selfishScore": 3,
       "selflessScore": 0,
       "needsRerating": false,
@@ -10424,5 +10431,5 @@
     ]
   },
   "schemaVersion": 2,
-  "savedAt": "2026-09-09T03:25:49.162Z"
+  "savedAt": "2026-09-09T04:09:49.122Z"
 }
