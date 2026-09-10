@@ -901,7 +901,11 @@
       "hType_legacy": "SUR",
       "hScore_legacy": 6.5,
       "altStats_legacy": null,
-      "reactions": [],
+      "reactions": [
+        {
+          "refId": 1788780327120
+        }
+      ],
       "engagements": [
         {
           "refId": 1788773060667
@@ -917,6 +921,12 @@
         },
         {
           "refId": 1788913999604
+        },
+        {
+          "refId": 1789014762306
+        },
+        {
+          "refId": 1789015241813
         }
       ],
       "selfishScore": 3,
@@ -10303,6 +10313,22 @@
         "factorIds": [
           1788773895734
         ]
+      },
+      {
+        "id": 1789014762306,
+        "name": "Increase crit chance buff",
+        "value": 5,
+        "factorIds": [
+          1788772992919
+        ]
+      },
+      {
+        "id": 1789015241813,
+        "name": "Increase effectiveness buff",
+        "value": 6.5,
+        "factorIds": [
+          1789014978867
+        ]
       }
     ],
     "factors": [
@@ -10453,9 +10479,13 @@
       {
         "id": 1788913836890,
         "name": "High Soulburn teams"
+      },
+      {
+        "id": 1789014978867,
+        "name": "Low effect resistance team"
       }
     ]
   },
   "schemaVersion": 2,
-  "savedAt": "2026-09-10T04:22:04.489Z"
+  "savedAt": "2026-09-10T04:33:05.177Z"
 }
