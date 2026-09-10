@@ -32,6 +32,13 @@ export default async function handler(req, res) {
   if (!Array.isArray(heroes))
     return res.status(400).json({ error: "heroes must be an array" });
 
+  // Generated once and reused in both the stored content and the
+  // response below, so the client's "last saved" indicator can trust
+  // this exact value instead of guessing its own timestamp (which
+  // could drift from what's actually stored by however long the
+  // request took in flight).
+  const savedAt = new Date().toISOString();
+
   const content = JSON.stringify({
     heroes,
     draftData: draftData || null,
@@ -41,7 +48,7 @@ export default async function handler(req, res) {
     // always send its current in-memory taxonomy, not just diffs.
     taxonomy: taxonomy || { reactions: [], engagements: [], factors: [] },
     schemaVersion: 2,
-    savedAt: new Date().toISOString(),
+    savedAt,
   }, null, 2);
 
   // Base64-encode the JSON content for the GitHub API
@@ -73,7 +80,10 @@ export default async function handler(req, res) {
     );
     const data = await apiRes.json();
     if (!apiRes.ok) return res.status(apiRes.status).json({ error: data.message || "GitHub API error" });
-    return res.status(200).json({ ok: true });
+    // "Last saved"/sync-status indicator (app.js) — returns the exact
+    // timestamp just written to GitHub so the client can treat it as
+    // authoritative instead of relying on its own pre-request guess.
+    return res.status(200).json({ ok: true, savedAt });
   } catch (err) {
     return res.status(500).json({ error: err.message });
   }
