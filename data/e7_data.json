@@ -833,7 +833,7 @@
       "notes": "",
       "iconData": "https://raw.githubusercontent.com/iridesuwa18/e7-chart/main/assets/heroes/ambitious-tywin.webp",
       "locked": true,
-      "_x": 88,
+      "_x": 86.5,
       "_y": 45,
       "hidden": false,
       "vType_legacy": "TNK",
@@ -893,7 +893,7 @@
       "notes": "",
       "iconData": "https://raw.githubusercontent.com/iridesuwa18/e7-chart/main/assets/heroes/belian.webp",
       "locked": true,
-      "_x": 50,
+      "_x": 82,
       "_y": 35,
       "hidden": false,
       "vType_legacy": "TNK",
@@ -914,6 +914,9 @@
         },
         {
           "refId": 1788927609636
+        },
+        {
+          "refId": 1788913999604
         }
       ],
       "selfishScore": 3,
@@ -10454,5 +10457,5 @@
     ]
   },
   "schemaVersion": 2,
-  "savedAt": "2026-09-09T05:54:49.678Z"
+  "savedAt": "2026-09-10T04:20:02.742Z"
 }
