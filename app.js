@@ -839,6 +839,15 @@ const fSsScore     = document.getElementById("f-ss-score");
     if (popup.contains(e.target) || (btn && btn.contains(e.target))) return;
     popup.style.display = "none";
   });
+  // Keep it glued to the button while open, same reasoning as the
+  // Enemy Factors dropdown: fixed-position coordinates don't update
+  // themselves on their own if the page scrolls or the window resizes.
+  const repositionLastSavedPopup = () => {
+    const popup = document.getElementById("last-saved-popup");
+    if (popup && popup.style.display === "block") positionLastSavedPopup();
+  };
+  window.addEventListener("resize", repositionLastSavedPopup);
+  window.addEventListener("scroll", repositionLastSavedPopup, true);
 
   // Background sync check — catches a save made from a *different*
   // browser/device while this tab stayed open and unrefreshed (the
@@ -5493,9 +5502,13 @@ function updateLastSavedIndicator() {
 
   // If the popup happens to already be open (e.g. a background sync
   // check just resolved while someone was looking at it), refresh its
-  // text live instead of leaving it showing an outdated status.
+  // text — and reposition, in case the text length/window size changed
+  // since it opened — instead of leaving it stale or possibly misaligned.
   const popup = document.getElementById("last-saved-popup");
-  if (popup && popup.style.display === "block") renderLastSavedPopup(popup);
+  if (popup && popup.style.display === "block") {
+    renderLastSavedPopup(popup);
+    positionLastSavedPopup();
+  }
 }
 
 // True once we've actually confirmed GitHub has something newer than
@@ -5578,6 +5591,29 @@ async function checkSyncStatus() {
   }
 }
 
+// Anchors the popup under the ⓘ button using fixed viewport coordinates
+// (not CSS position:absolute) so it can never run off the left/right
+// edge of the screen regardless of where the button ends up sitting in
+// the header's flex-wrap — it used to be pinned to the wrap's right
+// edge, which pushed it past the left edge of a narrow phone screen
+// once the button moved further right, next to Save.
+function positionLastSavedPopup() {
+  const btn = document.getElementById("last-saved-info-btn");
+  const popup = document.getElementById("last-saved-popup");
+  if (!btn || !popup) return;
+
+  const r = btn.getBoundingClientRect();
+  const popupWidth = popup.offsetWidth || 220;
+
+  // Prefer right-aligned under the button (its usual look), but clamp
+  // both edges so it always stays fully on-screen either way.
+  let left = r.right - popupWidth;
+  left = Math.max(8, Math.min(left, window.innerWidth - popupWidth - 8));
+
+  popup.style.left = `${left}px`;
+  popup.style.top  = `${r.bottom + 6}px`;
+}
+
 function toggleLastSavedPopup() {
   const popup = document.getElementById("last-saved-popup");
   if (!popup) return;
@@ -5585,6 +5621,7 @@ function toggleLastSavedPopup() {
   if (!opening) { popup.style.display = "none"; return; }
   renderLastSavedPopup(popup);
   popup.style.display = "block";
+  positionLastSavedPopup(); // real width only known once it's actually visible
   checkSyncStatus(); // opening the popup is also a good moment to double-check
 }
 

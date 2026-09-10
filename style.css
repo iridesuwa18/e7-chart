@@ -177,11 +177,16 @@ header {
 }
 .last-saved-popup {
   display: none;
-  position: absolute;
-  top: 100%;
-  right: 0;
-  margin-top: 6px;
+  /* Fixed + JS-computed coordinates (positionLastSavedPopup in app.js),
+     not CSS position:absolute/right:0 — the ⓘ can sit anywhere along a
+     wrapping header row, and a right-anchored absolute box with
+     nowrap text was running off the left edge of narrow phone screens
+     once the button ended up further right, next to Save. Wrapping
+     text within a capped width (rather than nowrap) is the other half
+     of that fix, for whichever line is longest. */
+  position: fixed;
   z-index: 300;
+  max-width: min(260px, 90vw);
   background: #0b1a2e;
   border: 1px solid rgba(201,162,39,0.35);
   border-radius: 6px;
@@ -189,7 +194,8 @@ header {
   font-size: 11px;
   line-height: 1.4;
   color: #dce8f5;
-  white-space: nowrap;
+  white-space: normal;
+  word-break: break-word;
   box-shadow: 0 8px 24px rgba(0,0,0,0.5);
 }
 .last-saved-date-line { color: #dce8f5; }
