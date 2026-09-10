@@ -276,14 +276,14 @@
       </div>
       <div class="header-actions">
         <span id="save-status" class="save-status"></span>
-        <span class="last-saved-wrap">
-          <button type="button" class="last-saved-info-btn" id="last-saved-info-btn" title="When this was last saved" aria-label="Last saved info">ⓘ</button>
-          <div class="last-saved-popup" id="last-saved-popup"></div>
-        </span>
         <!-- Admin-only controls: hidden until unlocked via brand emblem double-click -->
         <div id="admin-controls" style="display:none;align-items:center;gap:7px;flex-wrap:wrap">
           <button class="btn btn-ghost btn-sm" id="btn-load">↓ Load</button>
           <button class="btn btn-gold btn-sm" id="btn-save">↑ Save</button>
+          <span class="last-saved-wrap">
+            <button type="button" class="last-saved-info-btn" id="last-saved-info-btn" title="When this was last saved" aria-label="Last saved info">ⓘ</button>
+            <div class="last-saved-popup" id="last-saved-popup"></div>
+          </span>
           <button class="btn btn-ghost btn-sm" id="btn-import" title="Import a save file — only adds heroes you don't already have, never overwrites">⇪ Import</button>
           <input type="file" id="import-file-input" accept=".json,application/json" style="display:none">
           <button class="btn btn-ghost btn-sm" id="btn-export" title="Download your current roster + Reaction/Engagement/Factor library as a Schema v2 JSON file">⇩ Export</button>
