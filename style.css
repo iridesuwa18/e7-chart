@@ -138,13 +138,16 @@ header {
   text-align: right;
 }
 
-/* "Last saved" indicator — the ⓘ next to the save status. Click (not
+/* "Last saved" indicator — the ⓘ next to the Save button. Click (not
    hover, so it works the same on touch and desktop) toggles a small
-   popup with the actual date/time of the last successful Save this
-   session (see lastSavedAt in app.js). Positioned absolute relative to
-   this wrap since header has no overflow:hidden ancestor to clip it. */
+   popup with the actual date/time of the last save (see lastSavedAt in
+   app.js), plus a sync-status line comparing it against what's
+   actually on GitHub right now (serverSavedAt, refreshed periodically
+   by checkSyncStatus). Positioned absolute relative to this wrap since
+   header has no overflow:hidden ancestor to clip it. */
 .last-saved-wrap { position: relative; display: inline-flex; align-items: center; flex-shrink: 0; }
 .last-saved-info-btn {
+  position: relative;
   width: 17px; height: 17px;
   padding: 0;
   border-radius: 50%;
@@ -157,6 +160,21 @@ header {
   transition: background .15s, border-color .15s, color .15s;
 }
 .last-saved-info-btn:hover { border-color: var(--gold-dim); color: var(--gold2); background: rgba(201,162,39,.1); }
+/* A small dot flags out-of-sync data even before the popup is opened —
+   that's the state someone actually needs to notice and act on. */
+.last-saved-info-btn.stale {
+  border-color: #e05a4e;
+  color: #ffb3a8;
+}
+.last-saved-info-btn.stale::after {
+  content: "";
+  position: absolute;
+  top: -2px; right: -2px;
+  width: 7px; height: 7px;
+  border-radius: 50%;
+  background: #e05a4e;
+  border: 1px solid #0b1a2e;
+}
 .last-saved-popup {
   display: none;
   position: absolute;
@@ -174,6 +192,10 @@ header {
   white-space: nowrap;
   box-shadow: 0 8px 24px rgba(0,0,0,0.5);
 }
+.last-saved-date-line { color: #dce8f5; }
+.last-saved-status-line { margin-top: 4px; font-weight: 600; }
+.last-saved-status-line.stale  { color: #ff8a7a; }
+.last-saved-status-line.synced { color: #81c784; }
 
 /* ══════════════════════════════════════
    BUTTONS

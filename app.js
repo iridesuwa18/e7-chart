@@ -17,6 +17,14 @@
 // a `let` living further down would still be in its temporal-dead-zone
 // at that point and throw the moment the button is clicked.
 let lastSavedAt = null;
+// The most recently confirmed savedAt actually stored on GitHub right
+// now — set alongside lastSavedAt whenever this tab loads or saves
+// (since in both cases we just confirmed the two match), and refreshed
+// independently by periodic background checks (checkSyncStatus) so a
+// save made from a *different* browser/device while this tab stays
+// open still gets noticed. Comparing this against lastSavedAt is what
+// drives the "refresh browser" vs "in sync" message in the popup.
+let serverSavedAt = null;
 
 const RARITY_META = {
   "5ml": { label: "5★ ML / Limited",      color: "#e8c84a",              border: "#c9a227" },
@@ -830,6 +838,17 @@ const fSsScore     = document.getElementById("f-ss-score");
     if (!popup || popup.style.display === "none" || !popup.style.display) return;
     if (popup.contains(e.target) || (btn && btn.contains(e.target))) return;
     popup.style.display = "none";
+  });
+
+  // Background sync check — catches a save made from a *different*
+  // browser/device while this tab stayed open and unrefreshed (the
+  // exact scenario "I have it open on my phone but didn't refresh
+  // after saving from my laptop"). Runs on an interval while the tab
+  // is visible, and again the moment it becomes visible after being
+  // backgrounded — checkSyncStatus() itself no-ops while hidden.
+  setInterval(checkSyncStatus, 45000);
+  document.addEventListener("visibilitychange", () => {
+    if (!document.hidden) checkSyncStatus();
   });
 
   // Import a save file — merges in only heroes you don't already have;
@@ -5459,14 +5478,60 @@ function handleImportedFile(parsed) {
 }
 
 /* ── "Last saved" indicator (header ⓘ) ──
-   lastSavedAt is declared at the very top of this file (see the
-   comment there for why) — this is just its display logic. Click
-   toggles a small popup showing the actual date/time, rather than
-   relying on hover (which doesn't work on touch devices at all). */
+   lastSavedAt/serverSavedAt are declared at the very top of this file
+   (see the comment there for why) — this is just their display logic.
+   Click toggles a small popup showing the actual date/time, rather
+   than relying on hover (which doesn't work on touch devices at all).
+   A small dot on the ⓘ itself flags out-of-sync data even before the
+   popup is opened, since that's the state someone actually needs to
+   notice and act on. */
 function updateLastSavedIndicator() {
   const btn = document.getElementById("last-saved-info-btn");
   if (!btn) return;
   btn.title = lastSavedAt ? `Last saved ${lastSavedAt.toLocaleString()}` : "Not saved yet this session";
+  btn.classList.toggle("stale", isDataStale());
+
+  // If the popup happens to already be open (e.g. a background sync
+  // check just resolved while someone was looking at it), refresh its
+  // text live instead of leaving it showing an outdated status.
+  const popup = document.getElementById("last-saved-popup");
+  if (popup && popup.style.display === "block") renderLastSavedPopup(popup);
+}
+
+// True once we've actually confirmed GitHub has something newer than
+// what this tab loaded/saved — i.e. someone saved from elsewhere (a
+// different browser/device) while this tab stayed open and unrefreshed.
+// A ~2s tolerance absorbs normal network round-trip slack between the
+// client's and server's clocks for the "we just saved/loaded this
+// exact version" case, without being loose enough to miss a real
+// external change (which will always differ by far more than 2s).
+function isDataStale() {
+  if (!lastSavedAt || !serverSavedAt) return false; // nothing to compare yet
+  return serverSavedAt.getTime() - lastSavedAt.getTime() > 2000;
+}
+
+function renderLastSavedPopup(popup) {
+  const dateLine = lastSavedAt
+    ? `Last saved: ${lastSavedAt.toLocaleString()}`
+    : "Not saved yet this session.";
+
+  let statusLine = "";
+  let statusClass = "";
+  if (isDataStale()) {
+    statusLine = "⚠️ Refresh browser — updates have been made.";
+    statusClass = "stale";
+  } else if (lastSavedAt && serverSavedAt) {
+    statusLine = "✅ Latest data is in sync. Free to save over.";
+    statusClass = "synced";
+  }
+  // If we simply haven't checked the server yet (serverSavedAt still
+  // null — e.g. offline, or the very first paint before autoLoad
+  // resolves), show only the date line rather than guessing.
+
+  popup.innerHTML = `
+    <div class="last-saved-date-line">${dateLine}</div>
+    ${statusLine ? `<div class="last-saved-status-line ${statusClass}">${statusLine}</div>` : ""}
+  `;
 }
 
 // Pulls the persisted savedAt timestamp (see saveToServer's payload)
@@ -5480,7 +5545,37 @@ function applyLoadedSavedAt(data) {
   const d = new Date(data.savedAt);
   if (isNaN(d.getTime())) return; // malformed/missing — leave lastSavedAt as-is
   lastSavedAt = d;
+  // Whatever we just loaded IS, by definition, what's currently on
+  // GitHub — so this also answers the sync-status question with
+  // certainty, no need to wait for the next periodic check.
+  serverSavedAt = d;
   updateLastSavedIndicator();
+}
+
+// Background check: is GitHub's stored data still what this tab has
+// loaded/saved, or has someone saved a newer version from elsewhere
+// (a different browser/device) while this tab stayed open? Read-only —
+// deliberately never applies the fetched heroes/taxonomy/draftData to
+// the live app state, since that would silently discard any
+// in-progress unsaved edits. Only the timestamp is used.
+let syncCheckInFlight = false;
+async function checkSyncStatus() {
+  if (syncCheckInFlight || document.hidden) return; // skip while backgrounded — nothing to show anyone right now
+  syncCheckInFlight = true;
+  try {
+    const res = await fetch("https://e7-chart.vercel.app/api/saved-at");
+    const data = await res.json();
+    if (data && data.savedAt) {
+      const d = new Date(data.savedAt);
+      if (!isNaN(d.getTime())) serverSavedAt = d;
+    }
+  } catch {
+    // Offline/network hiccup — leave serverSavedAt as it was rather
+    // than falsely flagging "out of sync" from a failed check.
+  } finally {
+    syncCheckInFlight = false;
+    updateLastSavedIndicator();
+  }
 }
 
 function toggleLastSavedPopup() {
@@ -5488,23 +5583,14 @@ function toggleLastSavedPopup() {
   if (!popup) return;
   const opening = popup.style.display === "none" || !popup.style.display;
   if (!opening) { popup.style.display = "none"; return; }
-  popup.textContent = lastSavedAt
-    ? `Last saved: ${lastSavedAt.toLocaleString()}`
-    : "Not saved yet this session.";
+  renderLastSavedPopup(popup);
   popup.style.display = "block";
+  checkSyncStatus(); // opening the popup is also a good moment to double-check
 }
 
 async function saveToServer(password) {
   setStatus("⏳ Saving…", 0);
   try {
-    // savedAt rides along inside the same blob as heroes/draftData/
-    // taxonomy (not a separate mechanism) specifically so it survives
-    // a page refresh: it comes back out of GitHub on the next Load/
-    // auto-load exactly like everything else, instead of living only
-    // in memory for the current tab — see the "Last saved" indicator's
-    // whole point being to answer "did I actually save this, or is
-    // that just leftover from earlier in this same tab?".
-    const savedAt = new Date().toISOString();
     // Always include the current draftData too — the server overwrites
     // whatever's on GitHub with exactly what's sent, so leaving this out
     // would silently wipe your buffs/debuffs/roles/etc every time you hit
@@ -5516,7 +5602,6 @@ async function saveToServer(password) {
         heroes,
         draftData: window.chartDraftData || null,
         taxonomy,
-        savedAt,
         password,
       }),
     });
@@ -5533,7 +5618,15 @@ async function saveToServer(password) {
       throw new Error(data.error || "Save failed");
     }
     setCachedAdminPassword(password);
-    lastSavedAt = new Date(savedAt);
+    // save.js returns the exact timestamp it just wrote to GitHub —
+    // trust that over any client-side guess, since a guess taken before
+    // the request went out could drift from what's actually stored by
+    // however long the round trip took.
+    lastSavedAt = data.savedAt ? new Date(data.savedAt) : new Date();
+    // We just wrote this exact value ourselves, so there's no need to
+    // wait for the next periodic sync check to confirm it — we already
+    // know with certainty that GitHub now matches what this tab has.
+    serverSavedAt = lastSavedAt;
     updateLastSavedIndicator();
     setStatus("✅ Saved to GitHub");
   } catch (e) {
