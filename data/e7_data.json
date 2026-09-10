@@ -10268,7 +10268,7 @@
       },
       {
         "id": 1788913999604,
-        "name": "Soul removal",
+        "name": "Soul removal / decrease",
         "value": 6.5,
         "factorIds": [
           1788913836890
@@ -10457,5 +10457,5 @@
     ]
   },
   "schemaVersion": 2,
-  "savedAt": "2026-09-10T04:20:12.099Z"
+  "savedAt": "2026-09-10T04:22:04.489Z"
 }
