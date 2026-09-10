@@ -893,7 +893,7 @@
       "notes": "",
       "iconData": "https://raw.githubusercontent.com/iridesuwa18/e7-chart/main/assets/heroes/belian.webp",
       "locked": true,
-      "_x": 82,
+      "_x": 16,
       "_y": 35,
       "hidden": false,
       "vType_legacy": "TNK",
@@ -10508,5 +10508,5 @@
     ]
   },
   "schemaVersion": 2,
-  "savedAt": "2026-09-10T04:39:13.924Z"
+  "savedAt": "2026-09-10T04:54:52.271Z"
 }
