@@ -9,6 +9,15 @@
    F) Credits in footer (HTML)
 ═══════════════════════════════════════ */
 
+// "Last saved" indicator (header ⓘ) — a Date set the moment a Save to
+// GitHub succeeds (see saveToServer), or null if nothing's been saved
+// yet this session. Declared all the way up here, not next to
+// saveToServer/updateLastSavedIndicator further down, because the ⓘ
+// click handler gets wired during init() near the top of this script —
+// a `let` living further down would still be in its temporal-dead-zone
+// at that point and throw the moment the button is clicked.
+let lastSavedAt = null;
+
 const RARITY_META = {
   "5ml": { label: "5★ ML / Limited",      color: "#e8c84a",              border: "#c9a227" },
   "5r":  { label: "5★ Regular",           color: "rgba(232,200,74,0.65)", border: "rgba(201,162,39,0.65)" },
@@ -808,6 +817,20 @@ const fSsScore     = document.getElementById("f-ss-score");
   });
   document.getElementById("btn-save").addEventListener("click", () => openAdminGate("save"));
   document.getElementById("btn-load").addEventListener("click", () => openAdminGate("load"));
+
+  // "Last saved" ⓘ — click toggles the popup; click anywhere else closes it.
+  updateLastSavedIndicator();
+  document.getElementById("last-saved-info-btn").addEventListener("click", e => {
+    e.stopPropagation();
+    toggleLastSavedPopup();
+  });
+  document.addEventListener("click", e => {
+    const popup = document.getElementById("last-saved-popup");
+    const btn = document.getElementById("last-saved-info-btn");
+    if (!popup || popup.style.display === "none" || !popup.style.display) return;
+    if (popup.contains(e.target) || (btn && btn.contains(e.target))) return;
+    popup.style.display = "none";
+  });
 
   // Import a save file — merges in only heroes you don't already have;
   // never overwrites or touches any hero already in the current roster.
@@ -5208,6 +5231,8 @@ async function autoLoadFromServer() {
       window.chartDraftData = data.draftData;
     }
 
+    applyLoadedSavedAt(data); // "Last saved" reflects the true GitHub timestamp on page open, not "not saved this session"
+
     if (isLegacySchema(data)) {
       console.info("[e7-chart] Loaded a pre-Schema-v2 save (Rebuild Spec Section 10) — heroes were migrated through the Section 2 legacy path and flagged \u201cneeds re-rating\u201d where applicable.");
     }
@@ -5433,9 +5458,53 @@ function handleImportedFile(parsed) {
   }
 }
 
+/* ── "Last saved" indicator (header ⓘ) ──
+   lastSavedAt is declared at the very top of this file (see the
+   comment there for why) — this is just its display logic. Click
+   toggles a small popup showing the actual date/time, rather than
+   relying on hover (which doesn't work on touch devices at all). */
+function updateLastSavedIndicator() {
+  const btn = document.getElementById("last-saved-info-btn");
+  if (!btn) return;
+  btn.title = lastSavedAt ? `Last saved ${lastSavedAt.toLocaleString()}` : "Not saved yet this session";
+}
+
+// Pulls the persisted savedAt timestamp (see saveToServer's payload)
+// out of a loaded blob, if present. Used by both the explicit Load
+// button and the automatic load-on-page-open, so "Last saved" reflects
+// when the data was truly last saved — even across a refresh or a
+// brand-new tab — rather than resetting to "not saved this session"
+// the moment the page reloads.
+function applyLoadedSavedAt(data) {
+  if (!data || !data.savedAt) return;
+  const d = new Date(data.savedAt);
+  if (isNaN(d.getTime())) return; // malformed/missing — leave lastSavedAt as-is
+  lastSavedAt = d;
+  updateLastSavedIndicator();
+}
+
+function toggleLastSavedPopup() {
+  const popup = document.getElementById("last-saved-popup");
+  if (!popup) return;
+  const opening = popup.style.display === "none" || !popup.style.display;
+  if (!opening) { popup.style.display = "none"; return; }
+  popup.textContent = lastSavedAt
+    ? `Last saved: ${lastSavedAt.toLocaleString()}`
+    : "Not saved yet this session.";
+  popup.style.display = "block";
+}
+
 async function saveToServer(password) {
   setStatus("⏳ Saving…", 0);
   try {
+    // savedAt rides along inside the same blob as heroes/draftData/
+    // taxonomy (not a separate mechanism) specifically so it survives
+    // a page refresh: it comes back out of GitHub on the next Load/
+    // auto-load exactly like everything else, instead of living only
+    // in memory for the current tab — see the "Last saved" indicator's
+    // whole point being to answer "did I actually save this, or is
+    // that just leftover from earlier in this same tab?".
+    const savedAt = new Date().toISOString();
     // Always include the current draftData too — the server overwrites
     // whatever's on GitHub with exactly what's sent, so leaving this out
     // would silently wipe your buffs/debuffs/roles/etc every time you hit
@@ -5447,6 +5516,7 @@ async function saveToServer(password) {
         heroes,
         draftData: window.chartDraftData || null,
         taxonomy,
+        savedAt,
         password,
       }),
     });
@@ -5463,6 +5533,8 @@ async function saveToServer(password) {
       throw new Error(data.error || "Save failed");
     }
     setCachedAdminPassword(password);
+    lastSavedAt = new Date(savedAt);
+    updateLastSavedIndicator();
     setStatus("✅ Saved to GitHub");
   } catch (e) {
     setStatus("❌ " + e.message);
@@ -5497,6 +5569,7 @@ async function loadFromServer(password) {
       saveLocal();
       renderAll();
       if (data.draftData) window.chartDraftData = data.draftData;
+      applyLoadedSavedAt(data); // the actual last-saved time, not "not saved this session"
       setStatus(isLegacySchema(data) ? "✅ Loaded from GitHub (legacy format — migrated)" : "✅ Loaded from GitHub");
     } else {
       setStatus("⚠️ No data found");

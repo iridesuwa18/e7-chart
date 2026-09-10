@@ -138,6 +138,43 @@ header {
   text-align: right;
 }
 
+/* "Last saved" indicator — the ⓘ next to the save status. Click (not
+   hover, so it works the same on touch and desktop) toggles a small
+   popup with the actual date/time of the last successful Save this
+   session (see lastSavedAt in app.js). Positioned absolute relative to
+   this wrap since header has no overflow:hidden ancestor to clip it. */
+.last-saved-wrap { position: relative; display: inline-flex; align-items: center; flex-shrink: 0; }
+.last-saved-info-btn {
+  width: 17px; height: 17px;
+  padding: 0;
+  border-radius: 50%;
+  border: 1px solid var(--border);
+  background: rgba(255,255,255,.04);
+  color: var(--text-dim);
+  font-size: 11px;
+  line-height: 1;
+  cursor: pointer;
+  transition: background .15s, border-color .15s, color .15s;
+}
+.last-saved-info-btn:hover { border-color: var(--gold-dim); color: var(--gold2); background: rgba(201,162,39,.1); }
+.last-saved-popup {
+  display: none;
+  position: absolute;
+  top: 100%;
+  right: 0;
+  margin-top: 6px;
+  z-index: 300;
+  background: #0b1a2e;
+  border: 1px solid rgba(201,162,39,0.35);
+  border-radius: 6px;
+  padding: 7px 11px;
+  font-size: 11px;
+  line-height: 1.4;
+  color: #dce8f5;
+  white-space: nowrap;
+  box-shadow: 0 8px 24px rgba(0,0,0,0.5);
+}
+
 /* ══════════════════════════════════════
    BUTTONS
 ══════════════════════════════════════ */
@@ -1993,6 +2030,14 @@ body.dot-mode .origin-dot:hover {
   overflow-y: auto;
   display: flex;
   flex-direction: column;
+}
+.taxonomy-cr-note {
+  margin: 10px 0 0;
+  font-family: 'Crimson Pro', serif;
+  font-style: italic;
+  font-size: 10.5px;
+  line-height: 1.4;
+  color: var(--text-dim);
 }
 .taxonomy-tabs {
   display: flex;

@@ -219,6 +219,10 @@
       </div>
       <div class="header-actions">
         <span id="save-status" class="save-status"></span>
+        <span class="last-saved-wrap">
+          <button type="button" class="last-saved-info-btn" id="last-saved-info-btn" title="When this was last saved" aria-label="Last saved info">ⓘ</button>
+          <div class="last-saved-popup" id="last-saved-popup"></div>
+        </span>
         <!-- Admin-only controls: hidden until unlocked via brand emblem double-click -->
         <div id="admin-controls" style="display:none;align-items:center;gap:7px;flex-wrap:wrap">
           <button class="btn btn-ghost btn-sm" id="btn-load">↓ Load</button>
@@ -1057,6 +1061,8 @@
           <div class="modal-title" style="margin:0;padding:0;border:none">REACTIONS · ENGAGEMENTS · FACTORS</div>
           <button class="det-close-btn" id="taxonomy-close">×</button>
         </div>
+
+        <p class="taxonomy-cr-note">Increase and Decrease of Combat Readiness through an attack or non-attack skills will not be listed here.</p>
 
         <div class="taxonomy-tabs">
           <button type="button" class="taxonomy-tab active" data-tab="reactions">Reactions</button>
