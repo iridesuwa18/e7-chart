@@ -927,6 +927,9 @@
         },
         {
           "refId": 1789015241813
+        },
+        {
+          "refId": 1789015361909
         }
       ],
       "selfishScore": 3,
@@ -10329,6 +10332,14 @@
         "factorIds": [
           1789014978867
         ]
+      },
+      {
+        "id": 1789015361909,
+        "name": "Continuous healing buff",
+        "value": 5,
+        "factorIds": [
+          1789015311206
+        ]
       }
     ],
     "factors": [
@@ -10483,9 +10494,13 @@
       {
         "id": 1789014978867,
         "name": "Low effect resistance team"
+      },
+      {
+        "id": 1789015311206,
+        "name": "Mid Damage units"
       }
     ]
   },
   "schemaVersion": 2,
-  "savedAt": "2026-09-10T04:33:05.177Z"
+  "savedAt": "2026-09-10T04:36:19.047Z"
 }
