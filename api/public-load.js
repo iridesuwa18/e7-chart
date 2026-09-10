@@ -35,6 +35,11 @@ export default async function handler(req, res) {
       // needed here too since this is the endpoint every visitor's
       // page load actually calls (autoLoadFromServer).
       schemaVersion: typeof parsed.schemaVersion === "number" ? parsed.schemaVersion : 0,
+      // "Last saved" indicator (app.js) — same fix as api/load.js: this
+      // was being silently dropped, so the app could never show the
+      // true last-saved time after a page load, only the current tab's
+      // own in-memory guess.
+      savedAt: parsed.savedAt || null,
     });
   } catch (err) {
     return res.status(500).json({ error: err.message });

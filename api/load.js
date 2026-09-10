@@ -46,6 +46,11 @@ export default async function handler(req, res) {
       // save.js always stamps schemaVersion, so its absence here means
       // the file predates Section 10 entirely.
       schemaVersion: typeof parsed.schemaVersion === "number" ? parsed.schemaVersion : 0,
+      // "Last saved" indicator (app.js) — save.js always stamps this on
+      // every save, but it was never being passed through here, so the
+      // app could never show the true last-saved time after a reload,
+      // only whatever it remembered from the current tab's own session.
+      savedAt: parsed.savedAt || null,
     });
   } catch (err) {
     return res.status(500).json({ error: err.message });
