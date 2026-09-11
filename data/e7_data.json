@@ -1096,11 +1096,65 @@
         "hType": "SUR",
         "hScore": 6
       },
-      "reactions": [],
-      "engagements": [],
+      "reactions": [
+        {
+          "refId": 1788780327120
+        },
+        {
+          "refId": 1789113568734
+        },
+        {
+          "refId": 1789115386205
+        },
+        {
+          "refId": 1789115481250
+        }
+      ],
+      "engagements": [
+        {
+          "refId": 1788786124368
+        },
+        {
+          "refId": 1789115108791
+        },
+        {
+          "refId": 1788782920388
+        },
+        {
+          "refId": 1788783099100
+        },
+        {
+          "refId": 1788700311844
+        }
+      ],
       "selfishScore": 0,
-      "selflessScore": 0,
-      "needsRerating": true
+      "selflessScore": 1.33,
+      "needsRerating": false,
+      "pvpTag": false,
+      "altStats": null,
+      "selfSkillIds": [],
+      "allySupport": [
+        {
+          "healing": 0,
+          "passive": 20,
+          "buffCount": 2
+        },
+        {
+          "healing": 0,
+          "passive": 20,
+          "buffCount": 2
+        },
+        {
+          "healing": 0,
+          "passive": 20,
+          "buffCount": 2
+        },
+        {
+          "healing": 0,
+          "passive": 20,
+          "buffCount": 2
+        }
+      ]
     },
     {
       "id": 1787306493076,
@@ -9963,7 +10017,9 @@
         "name": "Resource increase",
         "value": 9,
         "factorIds": [
-          1788783972533
+          1788783972533,
+          1788780896026,
+          1789114895603
         ]
       },
       {
@@ -10034,6 +10090,24 @@
           1788694866469,
           1788774099692,
           1789113473631
+        ]
+      },
+      {
+        "id": 1789115386205,
+        "name": "Damage prop to speed",
+        "value": 7,
+        "factorIds": [
+          1788785891810
+        ]
+      },
+      {
+        "id": 1789115481250,
+        "name": "Stackable Damage",
+        "value": 8.5,
+        "factorIds": [
+          1788785891810,
+          1788700420912,
+          1788701036557
         ]
       }
     ],
@@ -10445,6 +10519,14 @@
           1788700781693,
           1788912649792
         ]
+      },
+      {
+        "id": 1789115108791,
+        "name": "Decrease skill cooldown",
+        "value": 7.2,
+        "factorIds": [
+          1788785891810
+        ]
       }
     ],
     "factors": [
@@ -10611,9 +10693,13 @@
       {
         "id": 1789113473631,
         "name": "High Penetration units"
+      },
+      {
+        "id": 1789114895603,
+        "name": "Focus"
       }
     ]
   },
   "schemaVersion": 2,
-  "savedAt": "2026-09-11T08:00:52.688Z"
+  "savedAt": "2026-09-11T08:32:15.587Z"
 }
