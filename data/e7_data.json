@@ -2032,10 +2032,62 @@
       "hScore_legacy": 7,
       "altStats_legacy": null,
       "reactions": [],
-      "engagements": [],
-      "selfishScore": 0,
+      "engagements": [
+        {
+          "refId": 1789134890095
+        },
+        {
+          "refId": 1788927609636
+        },
+        {
+          "refId": 1788783359037
+        },
+        {
+          "refId": 1788785505206
+        },
+        {
+          "refId": 1788773060667
+        },
+        {
+          "refId": 1789132181142
+        },
+        {
+          "refId": 1789116663470
+        },
+        {
+          "refId": 1789118896007
+        },
+        {
+          "refId": 1788782920388
+        },
+        {
+          "refId": 1788773067411
+        },
+        {
+          "refId": 1789135161839
+        },
+        {
+          "refId": 1788924109560
+        },
+        {
+          "refId": 1789132668882
+        },
+        {
+          "refId": 1788785181579
+        }
+      ],
+      "selfishScore": 4,
       "selflessScore": 0,
-      "needsRerating": true
+      "needsRerating": false,
+      "pvpTag": false,
+      "altStats": null,
+      "selfSkillIds": [
+        "spdCr",
+        "decSpd",
+        "immobDebuff",
+        "shields"
+      ],
+      "allySupport": []
     },
     {
       "id": 1787448179695,
@@ -10892,12 +10944,12 @@
         "name": "Additional / fixed damage",
         "value": 10,
         "factorIds": [
-          1788700420912,
           1788701036557,
           1788783127095,
           1788772992919,
           1788786248167,
-          1788786571272
+          1788786571272,
+          1788700420912
         ]
       },
       {
@@ -11301,6 +11353,40 @@
           1788783972533,
           1788785891810
         ]
+      },
+      {
+        "id": 1789134890095,
+        "name": "Poison enemies",
+        "value": 7,
+        "factorIds": [
+          1788700420912,
+          1788772992919,
+          1788701036557,
+          1789014978867
+        ]
+      },
+      {
+        "id": 1789135004196,
+        "name": "Rupture to enemies",
+        "value": 0,
+        "factorIds": [
+          1788701036557,
+          1788783127095,
+          1788772992919,
+          1788786248167,
+          1788786571272,
+          1788700420912
+        ]
+      },
+      {
+        "id": 1789135161839,
+        "name": "Block on enemies",
+        "value": 9.3,
+        "factorIds": [
+          1788773731924,
+          1789014978867,
+          1788912649792
+        ]
       }
     ],
     "factors": [
@@ -11499,5 +11585,5 @@
     ]
   },
   "schemaVersion": 2,
-  "savedAt": "2026-09-11T13:53:03.431Z"
+  "savedAt": "2026-09-11T14:01:35.613Z"
 }
