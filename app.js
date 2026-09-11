@@ -69,8 +69,19 @@ let taxonomy = {
 // the rest of init() before it ever finishes setting up the page.
 let taxonomySortMode = { reactions: "oldest", engagements: "oldest", factors: "oldest" };
 
+// Strictly increasing, even for several items created within the same
+// millisecond (e.g. adding a handful of Reactions back to back) — this
+// used to be Date.now() + a large random offset for uniqueness, but
+// that random component (up to ~16 minutes' worth of "ms") completely
+// swamped real creation order, so Taxonomy's Oldest/Newest sort could
+// show items in an essentially random order whenever they were added
+// close together in time, which is the normal case, not an edge one.
+let _lastTaxonomyId = 0;
 function newTaxonomyId() {
-  return Date.now() + Math.floor(Math.random() * 1e6);
+  let id = Date.now();
+  if (id <= _lastTaxonomyId) id = _lastTaxonomyId + 1;
+  _lastTaxonomyId = id;
+  return id;
 }
 
 function emptyTaxonomy() {
@@ -4732,7 +4743,17 @@ function renderFactorsPanel() {
       : `<div class="taxonomy-empty-note">No Factors yet — add one above.</div>`;
     return;
   }
-  box.innerHTML = items.map(f => `
+  box.innerHTML = items.map(f => {
+    // Reverse lookup — which Reactions/Engagements actually carry this
+    // Factor's tag, straight from the same taxonomyItemsForFactor used
+    // by the tag-picker on those rows, so this can never drift out of
+    // sync with what's really assigned.
+    const tagged = taxonomyItemsForFactor(f.id);
+    const chips = [
+      ...tagged.reactions.map(r => `<span class="taxonomy-factor-tag reaction" title="Reaction">⚡ ${r.name || "(unnamed)"}</span>`),
+      ...tagged.engagements.map(e => `<span class="taxonomy-factor-tag engagement" title="Engagement">🛡 ${e.name || "(unnamed)"}</span>`),
+    ];
+    return `
     <div class="taxonomy-row" data-id="${f.id}">
       <div class="taxonomy-row-main">
         <div class="taxonomy-row-name-wrap">
@@ -4741,8 +4762,12 @@ function renderFactorsPanel() {
         </div>
         <button type="button" class="taxonomy-row-delete" data-id="${f.id}" title="Delete — un-tags it from every Reaction/Engagement">✕</button>
       </div>
+      <div class="taxonomy-factor-tags">
+        ${chips.length ? chips.join("") : `<div class="taxonomy-empty-note">Not tagged to any Reaction/Engagement yet.</div>`}
+      </div>
     </div>
-  `).join("");
+  `;
+  }).join("");
   box.querySelectorAll(".taxonomy-row-editbtn").forEach(btn => {
     btn.addEventListener("click", () => {
       const f = taxonomy.factors.find(x => x.id === Number(btn.dataset.id));

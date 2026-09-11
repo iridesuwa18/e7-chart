@@ -2189,6 +2189,44 @@ body.dot-mode .origin-dot:hover {
   padding-top: 8px;
   border-top: 1px solid var(--border);
 }
+/* Factors tab (5.2) — reverse lookup showing which Reactions/
+   Engagements actually carry each Factor's tag. Capped height with
+   its own scrollbar rather than growing the row indefinitely, since a
+   widely-used Factor could otherwise push everything below it far
+   down the (already scrollable) Taxonomy list. */
+.taxonomy-factor-tags {
+  display: flex;
+  flex-wrap: wrap;
+  align-content: flex-start;
+  gap: 5px;
+  margin-top: 8px;
+  padding-top: 8px;
+  padding-right: 2px;
+  border-top: 1px solid var(--border);
+  max-height: 84px;
+  overflow-y: auto;
+}
+.taxonomy-factor-tag {
+  font-family: 'Cinzel', serif;
+  font-size: 9px;
+  letter-spacing: .04em;
+  padding: 3px 8px;
+  border-radius: 10px;
+  border: 1px solid var(--border);
+  background: rgba(255,255,255,.03);
+  color: var(--text-dim);
+  white-space: nowrap;
+}
+.taxonomy-factor-tag.reaction {
+  border-color: rgba(100,181,246,.4);
+  color: #90caf9;
+  background: rgba(100,181,246,.08);
+}
+.taxonomy-factor-tag.engagement {
+  border-color: rgba(186,104,200,.4);
+  color: #ce93d8;
+  background: rgba(186,104,200,.08);
+}
 .taxonomy-factor-chip {
   font-family: 'Cinzel', serif;
   font-size: 9px;
