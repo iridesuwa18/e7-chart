@@ -9712,12 +9712,54 @@
         "hType": "SUR",
         "hScore": 8
       },
-      "reactions": [],
-      "engagements": [],
+      "reactions": [
+        {
+          "refId": 1789137120242
+        }
+      ],
+      "engagements": [
+        {
+          "refId": 1788772268160
+        },
+        {
+          "refId": 1788697411172
+        },
+        {
+          "refId": 1788786124368
+        },
+        {
+          "refId": 1789137274178
+        }
+      ],
       "selfishScore": 0,
-      "selflessScore": 0,
-      "needsRerating": true,
-      "hidden": true
+      "selflessScore": 7.17,
+      "needsRerating": false,
+      "hidden": true,
+      "pvpTag": false,
+      "altStats": null,
+      "selfSkillIds": [],
+      "allySupport": [
+        {
+          "healing": 100,
+          "passive": 80,
+          "buffCount": 2
+        },
+        {
+          "healing": 100,
+          "passive": 100,
+          "buffCount": 2
+        },
+        {
+          "healing": 100,
+          "passive": 100,
+          "buffCount": 2
+        },
+        {
+          "healing": 100,
+          "passive": 100,
+          "buffCount": 2
+        }
+      ]
     },
     {
       "id": 1787904229837,
@@ -10974,6 +11016,16 @@
         "factorIds": [
           1788772019318
         ]
+      },
+      {
+        "id": 1789137120242,
+        "name": "Stackable Health & / or Defense",
+        "value": 10,
+        "factorIds": [
+          1788694866469,
+          1788774099692,
+          1788785891810
+        ]
       }
     ],
     "engagements": [
@@ -11668,6 +11720,19 @@
           1788694866469,
           1788774099692
         ]
+      },
+      {
+        "id": 1789137274178,
+        "name": "Time reversal",
+        "value": 10,
+        "factorIds": [
+          1788785891810,
+          1788694866469,
+          1788774099692,
+          1789137334079,
+          1789137341208,
+          1788772401653
+        ]
       }
     ],
     "factors": [
@@ -11866,9 +11931,17 @@
       {
         "id": 1789135503443,
         "name": "Shield / barrier units"
+      },
+      {
+        "id": 1789137334079,
+        "name": "Increase cooldown units"
+      },
+      {
+        "id": 1789137341208,
+        "name": "Long cooldown units"
       }
     ]
   },
   "schemaVersion": 2,
-  "savedAt": "2026-09-11T14:28:52.735Z"
+  "savedAt": "2026-09-11T14:37:05.043Z"
 }
