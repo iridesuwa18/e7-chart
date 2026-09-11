@@ -1550,11 +1550,44 @@
         "hType": "SUR",
         "hScore": 6
       },
-      "reactions": [],
-      "engagements": [],
-      "selfishScore": 0,
+      "reactions": [
+        {
+          "refId": 1788780327120
+        },
+        {
+          "refId": 1789130715725
+        },
+        {
+          "refId": 1789130554431
+        },
+        {
+          "refId": 1788700730226
+        }
+      ],
+      "engagements": [
+        {
+          "refId": 1788783359037
+        },
+        {
+          "refId": 1788785021751
+        },
+        {
+          "refId": 1788700311844
+        },
+        {
+          "refId": 1788772268160
+        }
+      ],
+      "selfishScore": 2,
       "selflessScore": 0,
-      "needsRerating": true
+      "needsRerating": false,
+      "pvpTag": false,
+      "altStats": null,
+      "selfSkillIds": [
+        "selfPassive",
+        "immunity"
+      ],
+      "allySupport": []
     },
     {
       "id": 1787318417148,
@@ -10356,6 +10389,28 @@
           1789130156790,
           1788700781693
         ]
+      },
+      {
+        "id": 1789130554431,
+        "name": "Unaffected by Combat Readiness increase / decrease",
+        "value": 7,
+        "factorIds": [
+          1789130596970
+        ]
+      },
+      {
+        "id": 1789130715725,
+        "name": "Double stats (Unique)",
+        "value": 10,
+        "factorIds": [
+          1788694866469,
+          1788701036557,
+          1788700420912,
+          1788774099692,
+          1789113473631,
+          1788772992919,
+          1788785891810
+        ]
       }
     ],
     "engagements": [
@@ -11060,9 +11115,13 @@
       {
         "id": 1789130156790,
         "name": "Prevent movement debuffers (stun, sleep, fear)"
+      },
+      {
+        "id": 1789130596970,
+        "name": "Decrease combat readiness skills"
       }
     ]
   },
   "schemaVersion": 2,
-  "savedAt": "2026-09-11T12:38:29.299Z"
+  "savedAt": "2026-09-11T12:47:46.022Z"
 }
