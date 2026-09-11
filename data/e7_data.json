@@ -2185,11 +2185,65 @@
       "hType_legacy": "SUR",
       "hScore_legacy": 3,
       "altStats_legacy": null,
-      "reactions": [],
-      "engagements": [],
-      "selfishScore": 0,
+      "reactions": [
+        {
+          "refId": 1789130098781
+        }
+      ],
+      "engagements": [
+        {
+          "refId": 1788924109560
+        },
+        {
+          "refId": 1789135829243
+        },
+        {
+          "refId": 1788912251007
+        },
+        {
+          "refId": 1788772163166
+        },
+        {
+          "refId": 1789136009020
+        }
+      ],
+      "selfishScore": 3,
       "selflessScore": 0,
-      "needsRerating": true
+      "needsRerating": false,
+      "pvpTag": false,
+      "altStats": {
+        "selfishScore": 0,
+        "selflessScore": 0.67,
+        "selfSkillIds": [],
+        "allySupport": [
+          {
+            "healing": 0,
+            "passive": 40,
+            "buffCount": 1
+          },
+          {
+            "healing": 0,
+            "passive": 0,
+            "buffCount": 1
+          },
+          {
+            "healing": 0,
+            "passive": 0,
+            "buffCount": 1
+          },
+          {
+            "healing": 0,
+            "passive": 0,
+            "buffCount": 1
+          }
+        ]
+      },
+      "selfSkillIds": [
+        "spdCr",
+        "decCr",
+        "immobDebuff"
+      ],
+      "allySupport": []
     },
     {
       "id": 1787448924434,
@@ -11446,6 +11500,29 @@
         "factorIds": [
           1789135503443
         ]
+      },
+      {
+        "id": 1789135829243,
+        "name": "Cascade (Undispellable) Buff",
+        "value": 7,
+        "factorIds": [
+          1788701036557,
+          1788783127095,
+          1788772992919,
+          1788786248167,
+          1788786571272,
+          1788700420912,
+          1788700781693,
+          1788912649792
+        ]
+      },
+      {
+        "id": 1789136009020,
+        "name": "Dispel debuffs preventing movement (stun, sleep, fear)",
+        "value": 9,
+        "factorIds": [
+          1789130156790
+        ]
       }
     ],
     "factors": [
@@ -11648,5 +11725,5 @@
     ]
   },
   "schemaVersion": 2,
-  "savedAt": "2026-09-11T14:07:05.526Z"
+  "savedAt": "2026-09-11T14:14:16.620Z"
 }
