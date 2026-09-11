@@ -1970,11 +1970,49 @@
         "hType": "SST",
         "hScore": 7
       },
-      "reactions": [],
-      "engagements": [],
-      "selfishScore": 0,
+      "reactions": [
+        {
+          "refId": 1789115481250
+        },
+        {
+          "refId": 1789134378369
+        },
+        {
+          "refId": 1788700730226
+        },
+        {
+          "refId": 1788786348512
+        }
+      ],
+      "engagements": [
+        {
+          "refId": 1788773476896
+        },
+        {
+          "refId": 1789134498394
+        },
+        {
+          "refId": 1788773060667
+        },
+        {
+          "refId": 1788772268160
+        },
+        {
+          "refId": 1789115108791
+        }
+      ],
+      "selfishScore": 4,
       "selflessScore": 0,
-      "needsRerating": true
+      "needsRerating": false,
+      "pvpTag": false,
+      "altStats": null,
+      "selfSkillIds": [
+        "spdCr",
+        "selfPassive",
+        "immunity",
+        "lifesteal"
+      ],
+      "allySupport": []
     },
     {
       "id": 1787447994045,
@@ -10465,7 +10503,9 @@
         "factorIds": [
           1788773895734,
           1788772861638,
-          1788775944046
+          1788775944046,
+          1788775427431,
+          1788786300042
         ]
       },
       {
@@ -10640,6 +10680,18 @@
         "factorIds": [
           1789114895603
         ]
+      },
+      {
+        "id": 1789134378369,
+        "name": "Focus (React)",
+        "value": 8,
+        "factorIds": [
+          1788773895734,
+          1788772861638,
+          1788775944046,
+          1788775427431,
+          1788786300042
+        ]
       }
     ],
     "engagements": [
@@ -10777,7 +10829,10 @@
         "id": 1788780430787,
         "name": "Fighting Spirit (Engage)",
         "value": 5,
-        "factorIds": []
+        "factorIds": [
+          1788783972533,
+          1788785891810
+        ]
       },
       {
         "id": 1788782920388,
@@ -11237,6 +11292,15 @@
           1789014978867,
           1788701036557
         ]
+      },
+      {
+        "id": 1789134498394,
+        "name": "Focus (Engage)",
+        "value": 5,
+        "factorIds": [
+          1788783972533,
+          1788785891810
+        ]
       }
     ],
     "factors": [
@@ -11435,5 +11499,5 @@
     ]
   },
   "schemaVersion": 2,
-  "savedAt": "2026-09-11T13:43:42.395Z"
+  "savedAt": "2026-09-11T13:53:03.431Z"
 }
