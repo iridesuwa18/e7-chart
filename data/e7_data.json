@@ -1436,6 +1436,9 @@
         },
         {
           "refId": 1788772502540
+        },
+        {
+          "refId": 1789121061181
         }
       ],
       "engagements": [
@@ -2282,11 +2285,59 @@
         "hType": "SUR",
         "hScore": 7
       },
-      "reactions": [],
-      "engagements": [],
+      "reactions": [
+        {
+          "refId": 1788771831892
+        },
+        {
+          "refId": 1789121061181
+        },
+        {
+          "refId": 1788775147348
+        }
+      ],
+      "engagements": [
+        {
+          "refId": 1789136308091
+        },
+        {
+          "refId": 1788772268160
+        },
+        {
+          "refId": 1788785021751
+        },
+        {
+          "refId": 1788772163166
+        }
+      ],
       "selfishScore": 0,
-      "selflessScore": 0,
-      "needsRerating": true
+      "selflessScore": 4.33,
+      "needsRerating": false,
+      "pvpTag": false,
+      "altStats": null,
+      "selfSkillIds": [],
+      "allySupport": [
+        {
+          "healing": 65,
+          "passive": 0,
+          "buffCount": 2
+        },
+        {
+          "healing": 65,
+          "passive": 70,
+          "buffCount": 1
+        },
+        {
+          "healing": 65,
+          "passive": 70,
+          "buffCount": 1
+        },
+        {
+          "healing": 65,
+          "passive": 70,
+          "buffCount": 1
+        }
+      ]
     },
     {
       "id": 1787449100475,
@@ -11538,6 +11589,16 @@
         "factorIds": [
           1789130156790
         ]
+      },
+      {
+        "id": 1789136308091,
+        "name": "Fear on enemies",
+        "value": 9,
+        "factorIds": [
+          1788700862798,
+          1788775427431,
+          1788785891810
+        ]
       }
     ],
     "factors": [
@@ -11740,5 +11801,5 @@
     ]
   },
   "schemaVersion": 2,
-  "savedAt": "2026-09-11T14:15:47.994Z"
+  "savedAt": "2026-09-11T14:21:56.843Z"
 }
