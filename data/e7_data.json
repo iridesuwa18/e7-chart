@@ -1784,11 +1784,44 @@
       "hType_legacy": "SUR",
       "hScore_legacy": 4,
       "altStats_legacy": null,
-      "reactions": [],
-      "engagements": [],
-      "selfishScore": 0,
+      "reactions": [
+        {
+          "refId": 1788780327120
+        },
+        {
+          "refId": 1789113568734
+        }
+      ],
+      "engagements": [
+        {
+          "refId": 1789132668882
+        },
+        {
+          "refId": 1788773060667
+        },
+        {
+          "refId": 1788773067411
+        },
+        {
+          "refId": 1789132813412
+        },
+        {
+          "refId": 1788700311844
+        },
+        {
+          "refId": 1789115995455
+        }
+      ],
+      "selfishScore": 2,
       "selflessScore": 0,
-      "needsRerating": true
+      "needsRerating": false,
+      "pvpTag": false,
+      "altStats": null,
+      "selfSkillIds": [
+        "spdCr",
+        "immobDebuff"
+      ],
+      "allySupport": []
     },
     {
       "id": 1787447274073,
@@ -11075,6 +11108,27 @@
           1789130156790,
           1788912649792
         ]
+      },
+      {
+        "id": 1789132668882,
+        "name": "Sleep on enemies",
+        "value": 9,
+        "factorIds": [
+          1788700862798,
+          1788785891810,
+          1788775427431,
+          1788783127095,
+          1788786571272
+        ]
+      },
+      {
+        "id": 1789132813412,
+        "name": "Extend debuff durations",
+        "value": 8,
+        "factorIds": [
+          1789132845858,
+          1789014978867
+        ]
       }
     ],
     "factors": [
@@ -11265,9 +11319,13 @@
       {
         "id": 1789130596970,
         "name": "Decrease combat readiness skills"
+      },
+      {
+        "id": 1789132845858,
+        "name": "Decrease debuff duration effects"
       }
     ]
   },
   "schemaVersion": 2,
-  "savedAt": "2026-09-11T13:14:48.576Z"
+  "savedAt": "2026-09-11T13:23:14.346Z"
 }
