@@ -1387,6 +1387,9 @@
         },
         {
           "refId": 1788700311844
+        },
+        {
+          "refId": 1788773060667
         }
       ],
       "selfishScore": 4,
@@ -1424,11 +1427,42 @@
         "hType": "SUR",
         "hScore": 8
       },
-      "reactions": [],
-      "engagements": [],
-      "selfishScore": 0,
+      "reactions": [
+        {
+          "refId": 1789120795174
+        },
+        {
+          "refId": 1788784106518
+        },
+        {
+          "refId": 1788772502540
+        }
+      ],
+      "engagements": [
+        {
+          "refId": 1788783734183
+        },
+        {
+          "refId": 1788772268160
+        },
+        {
+          "refId": 1788700311844
+        },
+        {
+          "refId": 1789115108791
+        }
+      ],
+      "selfishScore": 3,
       "selflessScore": 0,
-      "needsRerating": true
+      "needsRerating": false,
+      "pvpTag": false,
+      "altStats": null,
+      "selfSkillIds": [
+        "extraTurns",
+        "selfPassive",
+        "lifesteal"
+      ],
+      "allySupport": []
     },
     {
       "id": 1787318177165,
@@ -10258,6 +10292,25 @@
           1788700420912,
           1788701036557
         ]
+      },
+      {
+        "id": 1789120795174,
+        "name": "Damage does not exceed % of HP",
+        "value": 9,
+        "factorIds": [
+          1788694866469,
+          1788774099692
+        ]
+      },
+      {
+        "id": 1789121061181,
+        "name": "Immortality buff",
+        "value": 9,
+        "factorIds": [
+          1788694866469,
+          1788774099692,
+          1788772401653
+        ]
       }
     ],
     "engagements": [
@@ -10952,5 +11005,5 @@
     ]
   },
   "schemaVersion": 2,
-  "savedAt": "2026-09-11T09:54:38.316Z"
+  "savedAt": "2026-09-11T10:06:01.886Z"
 }
