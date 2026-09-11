@@ -2111,11 +2111,62 @@
         "hType": "SUR",
         "hScore": 7
       },
-      "reactions": [],
-      "engagements": [],
+      "reactions": [
+        {
+          "refId": 1788786348512
+        }
+      ],
+      "engagements": [
+        {
+          "refId": 1788924109560
+        },
+        {
+          "refId": 1788772268160
+        },
+        {
+          "refId": 1789135466749
+        },
+        {
+          "refId": 1788773067411
+        },
+        {
+          "refId": 1788785954933
+        },
+        {
+          "refId": 1788772163166
+        },
+        {
+          "refId": 1788783099100
+        }
+      ],
       "selfishScore": 0,
-      "selflessScore": 0,
-      "needsRerating": true
+      "selflessScore": 1.33,
+      "needsRerating": false,
+      "pvpTag": false,
+      "altStats": null,
+      "selfSkillIds": [],
+      "allySupport": [
+        {
+          "healing": 20,
+          "passive": 0,
+          "buffCount": 2
+        },
+        {
+          "healing": 20,
+          "passive": 0,
+          "buffCount": 2
+        },
+        {
+          "healing": 20,
+          "passive": 0,
+          "buffCount": 2
+        },
+        {
+          "healing": 20,
+          "passive": 0,
+          "buffCount": 2
+        }
+      ]
     },
     {
       "id": 1787448503308,
@@ -11387,6 +11438,14 @@
           1789014978867,
           1788912649792
         ]
+      },
+      {
+        "id": 1789135466749,
+        "name": "Barrier inversion",
+        "value": 6.7,
+        "factorIds": [
+          1789135503443
+        ]
       }
     ],
     "factors": [
@@ -11581,9 +11640,13 @@
       {
         "id": 1789132845858,
         "name": "Decrease debuff duration effects"
+      },
+      {
+        "id": 1789135503443,
+        "name": "Shield / barrier units"
       }
     ]
   },
   "schemaVersion": 2,
-  "savedAt": "2026-09-11T14:01:35.613Z"
+  "savedAt": "2026-09-11T14:07:05.526Z"
 }
