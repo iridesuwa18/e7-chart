@@ -2364,11 +2364,59 @@
         "hType": "SST",
         "hScore": 6
       },
-      "reactions": [],
-      "engagements": [],
+      "reactions": [
+        {
+          "refId": 1789136659023
+        }
+      ],
+      "engagements": [
+        {
+          "refId": 1788924109560
+        },
+        {
+          "refId": 1788772268160
+        },
+        {
+          "refId": 1788783486720
+        },
+        {
+          "refId": 1789136781570
+        },
+        {
+          "refId": 1788772163166
+        },
+        {
+          "refId": 1788697411172
+        }
+      ],
       "selfishScore": 0,
-      "selflessScore": 0,
-      "needsRerating": true
+      "selflessScore": 3.33,
+      "needsRerating": false,
+      "pvpTag": false,
+      "altStats": null,
+      "selfSkillIds": [],
+      "allySupport": [
+        {
+          "healing": 30,
+          "passive": 50,
+          "buffCount": 2
+        },
+        {
+          "healing": 30,
+          "passive": 50,
+          "buffCount": 2
+        },
+        {
+          "healing": 30,
+          "passive": 50,
+          "buffCount": 2
+        },
+        {
+          "healing": 30,
+          "passive": 50,
+          "buffCount": 2
+        }
+      ]
     },
     {
       "id": 1787449475162,
@@ -10918,6 +10966,14 @@
           1788775427431,
           1788786300042
         ]
+      },
+      {
+        "id": 1789136659023,
+        "name": "Additional damage reduction",
+        "value": 9,
+        "factorIds": [
+          1788772019318
+        ]
       }
     ],
     "engagements": [
@@ -10926,7 +10982,8 @@
         "name": "Revives allies",
         "value": 9,
         "factorIds": [
-          1788694866469
+          1788694866469,
+          1788774099692
         ]
       },
       {
@@ -11602,6 +11659,15 @@
           1788775427431,
           1788785891810
         ]
+      },
+      {
+        "id": 1789136781570,
+        "name": "Revive buff",
+        "value": 9,
+        "factorIds": [
+          1788694866469,
+          1788774099692
+        ]
       }
     ],
     "factors": [
@@ -11631,7 +11697,7 @@
       },
       {
         "id": 1788772019318,
-        "name": "Additional damage"
+        "name": "Additional / fixed damage"
       },
       {
         "id": 1788772214825,
@@ -11804,5 +11870,5 @@
     ]
   },
   "schemaVersion": 2,
-  "savedAt": "2026-09-11T14:22:20.563Z"
+  "savedAt": "2026-09-11T14:28:52.735Z"
 }
