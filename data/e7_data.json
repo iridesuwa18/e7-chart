@@ -1044,8 +1044,28 @@
         "hType": "SST",
         "hScore": 4
       },
-      "reactions": [],
-      "engagements": [],
+      "reactions": [
+        {
+          "refId": 1788780327120
+        },
+        {
+          "refId": 1789113918721
+        },
+        {
+          "refId": 1788775147348
+        }
+      ],
+      "engagements": [
+        {
+          "refId": 1788772268160
+        },
+        {
+          "refId": 1788771803084
+        },
+        {
+          "refId": 1788772163166
+        }
+      ],
       "selfishScore": 0,
       "selflessScore": 0,
       "needsRerating": false,
@@ -10005,6 +10025,16 @@
           1788783127095,
           1789113605205
         ]
+      },
+      {
+        "id": 1789113918721,
+        "name": "Penetration Resistance",
+        "value": 9,
+        "factorIds": [
+          1788694866469,
+          1788774099692,
+          1789113473631
+        ]
       }
     ],
     "engagements": [
@@ -10403,6 +10433,18 @@
         "factorIds": [
           1789015311206
         ]
+      },
+      {
+        "id": 1789114206059,
+        "name": "Indomitable (Undispellable) Buff",
+        "value": 8.8,
+        "factorIds": [
+          1788694866469,
+          1788774099692,
+          1789113473631,
+          1788700781693,
+          1788912649792
+        ]
       }
     ],
     "factors": [
@@ -10565,9 +10607,13 @@
       {
         "id": 1789113605205,
         "name": "Reacts to crit (i.e counters)"
+      },
+      {
+        "id": 1789113473631,
+        "name": "High Penetration units"
       }
     ]
   },
   "schemaVersion": 2,
-  "savedAt": "2026-09-11T07:53:35.157Z"
+  "savedAt": "2026-09-11T08:00:52.688Z"
 }
