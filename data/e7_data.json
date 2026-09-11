@@ -1185,7 +1185,11 @@
       "hType_legacy": "SUR",
       "hScore_legacy": 4,
       "altStats_legacy": null,
-      "reactions": [],
+      "reactions": [
+        {
+          "refId": 1788775147348
+        }
+      ],
       "engagements": [
         {
           "refId": 1789115995455
@@ -1198,6 +1202,15 @@
         },
         {
           "refId": 1789116440535
+        },
+        {
+          "refId": 1788785377663
+        },
+        {
+          "refId": 1789116549901
+        },
+        {
+          "refId": 1789116663470
         }
       ],
       "selfishScore": 2,
@@ -10589,6 +10602,22 @@
         "factorIds": [
           1788775427431
         ]
+      },
+      {
+        "id": 1789116549901,
+        "name": "Unhealable to enemies",
+        "value": 6,
+        "factorIds": [
+          1789116584346
+        ]
+      },
+      {
+        "id": 1789116663470,
+        "name": "Restrict enemies",
+        "value": 7,
+        "factorIds": [
+          1789116681636
+        ]
       }
     ],
     "factors": [
@@ -10763,9 +10792,17 @@
       {
         "id": 1789116366949,
         "name": "Non-crit resistant units"
+      },
+      {
+        "id": 1789116584346,
+        "name": "Healers / Lifesteal / Absorb Damage"
+      },
+      {
+        "id": 1789116681636,
+        "name": "High / Increase Combat Readiness Units"
       }
     ]
   },
   "schemaVersion": 2,
-  "savedAt": "2026-09-11T08:48:03.615Z"
+  "savedAt": "2026-09-11T08:52:28.541Z"
 }
