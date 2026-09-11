@@ -1726,11 +1726,43 @@
       "hType_legacy": "SUR",
       "hScore_legacy": 4,
       "altStats_legacy": null,
-      "reactions": [],
-      "engagements": [],
-      "selfishScore": 0,
+      "reactions": [
+        {
+          "refId": 1788780327120
+        }
+      ],
+      "engagements": [
+        {
+          "refId": 1788783359037
+        },
+        {
+          "refId": 1788785021751
+        },
+        {
+          "refId": 1788773067411
+        },
+        {
+          "refId": 1788700305259
+        },
+        {
+          "refId": 1789132181142
+        },
+        {
+          "refId": 1789132233866
+        },
+        {
+          "refId": 1789132307453
+        }
+      ],
+      "selfishScore": 1,
       "selflessScore": 0,
-      "needsRerating": true
+      "needsRerating": false,
+      "pvpTag": false,
+      "altStats": null,
+      "selfSkillIds": [
+        "spdCr"
+      ],
+      "allySupport": []
     },
     {
       "id": 1787447162534,
@@ -11012,6 +11044,34 @@
           1788783127095,
           1788772992919
         ]
+      },
+      {
+        "id": 1789132181142,
+        "name": "AOE non-attack skills",
+        "value": 9,
+        "factorIds": [
+          1788783127095,
+          1788773216100,
+          1788773130306
+        ]
+      },
+      {
+        "id": 1789132233866,
+        "name": "Unable to be buffed on enemies",
+        "value": 9.5,
+        "factorIds": [
+          1788773731924
+        ]
+      },
+      {
+        "id": 1789132307453,
+        "name": "Skill effect nullifier on allies",
+        "value": 9,
+        "factorIds": [
+          1788700781693,
+          1789130156790,
+          1788912649792
+        ]
       }
     ],
     "factors": [
@@ -11206,5 +11266,5 @@
     ]
   },
   "schemaVersion": 2,
-  "savedAt": "2026-09-11T13:05:00.650Z"
+  "savedAt": "2026-09-11T13:14:09.463Z"
 }
