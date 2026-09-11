@@ -1361,11 +1361,46 @@
         "hType": "SUR",
         "hScore": 6.3
       },
-      "reactions": [],
-      "engagements": [],
-      "selfishScore": 0,
+      "reactions": [
+        {
+          "refId": 1788775037126
+        }
+      ],
+      "engagements": [
+        {
+          "refId": 1789119614792
+        },
+        {
+          "refId": 1788924109560
+        },
+        {
+          "refId": 1788783734183
+        },
+        {
+          "refId": 1788772268160
+        },
+        {
+          "refId": 1788787229175
+        },
+        {
+          "refId": 1788786336798
+        },
+        {
+          "refId": 1788700311844
+        }
+      ],
+      "selfishScore": 4,
       "selflessScore": 0,
-      "needsRerating": true
+      "needsRerating": false,
+      "pvpTag": false,
+      "altStats": null,
+      "selfSkillIds": [
+        "spdCr",
+        "immobDebuff",
+        "selfPassive",
+        "lifesteal"
+      ],
+      "allySupport": []
     },
     {
       "id": 1787317989913,
@@ -10723,6 +10758,14 @@
           1788774099692,
           1788772214825
         ]
+      },
+      {
+        "id": 1789119614792,
+        "name": "Increase effectiveness of attacks",
+        "value": 0,
+        "factorIds": [
+          1789014978867
+        ]
       }
     ],
     "factors": [
@@ -10909,5 +10952,5 @@
     ]
   },
   "schemaVersion": 2,
-  "savedAt": "2026-09-11T09:34:28.456Z"
+  "savedAt": "2026-09-11T09:43:28.779Z"
 }
