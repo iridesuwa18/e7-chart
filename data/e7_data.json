@@ -1174,10 +1174,21 @@
       "hScore_legacy": 4,
       "altStats_legacy": null,
       "reactions": [],
-      "engagements": [],
-      "selfishScore": 0,
+      "engagements": [
+        {
+          "refId": 1789115995455
+        }
+      ],
+      "selfishScore": 2,
       "selflessScore": 0,
-      "needsRerating": true
+      "needsRerating": false,
+      "pvpTag": false,
+      "altStats": null,
+      "selfSkillIds": [
+        "spdCr",
+        "immobDebuff"
+      ],
+      "allySupport": []
     },
     {
       "id": 1787306592684,
@@ -10527,6 +10538,15 @@
         "factorIds": [
           1788785891810
         ]
+      },
+      {
+        "id": 1789115995455,
+        "name": "Increase Damage against Debuffs",
+        "value": 7.2,
+        "factorIds": [
+          1789014978867,
+          1788772992919
+        ]
       }
     ],
     "factors": [
@@ -10701,5 +10721,5 @@
     ]
   },
   "schemaVersion": 2,
-  "savedAt": "2026-09-11T08:37:23.994Z"
+  "savedAt": "2026-09-11T08:42:05.754Z"
 }
