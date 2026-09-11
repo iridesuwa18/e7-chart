@@ -1666,11 +1666,48 @@
       "hType_legacy": "SUR",
       "hScore_legacy": 4,
       "altStats_legacy": null,
-      "reactions": [],
-      "engagements": [],
-      "selfishScore": 0,
+      "reactions": [
+        {
+          "refId": 1789115386205
+        }
+      ],
+      "engagements": [
+        {
+          "refId": 1789131692127
+        },
+        {
+          "refId": 1788773067411
+        },
+        {
+          "refId": 1788783734183
+        },
+        {
+          "refId": 1788783099100
+        },
+        {
+          "refId": 1788785954933
+        },
+        {
+          "refId": 1788773060667
+        },
+        {
+          "refId": 1788787229175
+        },
+        {
+          "refId": 1789117987794
+        }
+      ],
+      "selfishScore": 3,
       "selflessScore": 0,
-      "needsRerating": true
+      "needsRerating": false,
+      "pvpTag": false,
+      "altStats": null,
+      "selfSkillIds": [
+        "spdCr",
+        "extraTurns",
+        "immunity"
+      ],
+      "allySupport": []
     },
     {
       "id": 1787443483547,
@@ -10966,6 +11003,15 @@
           1788694866469,
           1788774099692
         ]
+      },
+      {
+        "id": 1789131692127,
+        "name": "Target on enemies",
+        "value": 9,
+        "factorIds": [
+          1788783127095,
+          1788772992919
+        ]
       }
     ],
     "factors": [
@@ -11160,5 +11206,5 @@
     ]
   },
   "schemaVersion": 2,
-  "savedAt": "2026-09-11T13:00:10.845Z"
+  "savedAt": "2026-09-11T13:05:00.650Z"
 }
