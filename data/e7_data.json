@@ -1026,7 +1026,7 @@
       "id": 1786494564456,
       "name": "Empyrean Ilynav",
       "rarity": "5ml",
-      "role": "",
+      "role": "Knight",
       "element": "Light",
       "notes": "",
       "iconData": "https://raw.githubusercontent.com/iridesuwa18/e7-chart/main/assets/heroes/empyrean-ilynav.webp",
@@ -1048,7 +1048,11 @@
       "engagements": [],
       "selfishScore": 0,
       "selflessScore": 0,
-      "needsRerating": true
+      "needsRerating": false,
+      "pvpTag": false,
+      "altStats": null,
+      "selfSkillIds": [],
+      "allySupport": []
     },
     {
       "id": 1787262710589,
@@ -10072,7 +10076,7 @@
       },
       {
         "id": 1788772268160,
-        "name": "Healing allies",
+        "name": "Healing allies / Lifesteal /Absorb damage",
         "value": 8,
         "factorIds": [
           1788694866469,
@@ -10565,5 +10569,5 @@
     ]
   },
   "schemaVersion": 2,
-  "savedAt": "2026-09-11T07:50:13.678Z"
+  "savedAt": "2026-09-11T07:53:08.607Z"
 }
