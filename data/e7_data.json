@@ -1840,11 +1840,36 @@
       "hType_legacy": "SUR",
       "hScore_legacy": 8,
       "altStats_legacy": null,
-      "reactions": [],
-      "engagements": [],
-      "selfishScore": 0,
+      "reactions": [
+        {
+          "refId": 1788785002027
+        }
+      ],
+      "engagements": [
+        {
+          "refId": 1789133085456
+        },
+        {
+          "refId": 1788773476896
+        },
+        {
+          "refId": 1788773060667
+        },
+        {
+          "refId": 1788924109560
+        }
+      ],
+      "selfishScore": 3,
       "selflessScore": 0,
-      "needsRerating": true
+      "needsRerating": false,
+      "pvpTag": false,
+      "altStats": null,
+      "selfSkillIds": [
+        "spdCr",
+        "decCr",
+        "immobDebuff"
+      ],
+      "allySupport": []
     },
     {
       "id": 1787447565605,
@@ -11129,6 +11154,27 @@
           1789132845858,
           1789014978867
         ]
+      },
+      {
+        "id": 1789133085456,
+        "name": "Burn enemies",
+        "value": 6.2,
+        "factorIds": [
+          1788701036557,
+          1788700420912,
+          1788772992919,
+          1789014978867
+        ]
+      },
+      {
+        "id": 1789133298898,
+        "name": "Detonation on debuffs (poison/venom/burn/bleed/bomb)",
+        "value": 7,
+        "factorIds": [
+          1788772992919,
+          1789014978867,
+          1788701036557
+        ]
       }
     ],
     "factors": [
@@ -11327,5 +11373,5 @@
     ]
   },
   "schemaVersion": 2,
-  "savedAt": "2026-09-11T13:23:20.000Z"
+  "savedAt": "2026-09-11T13:30:11.826Z"
 }
