@@ -3377,11 +3377,62 @@
       "hType_legacy": "SUR",
       "hScore_legacy": 2,
       "altStats_legacy": null,
-      "reactions": [],
-      "engagements": [],
+      "reactions": [
+        {
+          "refId": 1789136659023
+        },
+        {
+          "refId": 1788780327120
+        }
+      ],
+      "engagements": [
+        {
+          "refId": 1788914238894
+        },
+        {
+          "refId": 1788782920388
+        },
+        {
+          "refId": 1788773060667
+        },
+        {
+          "refId": 1788773067411
+        },
+        {
+          "refId": 1789194988679
+        },
+        {
+          "refId": 1789118795470
+        }
+      ],
       "selfishScore": 0,
-      "selflessScore": 0,
-      "needsRerating": true
+      "selflessScore": 2.42,
+      "needsRerating": false,
+      "pvpTag": false,
+      "altStats": null,
+      "selfSkillIds": [],
+      "allySupport": [
+        {
+          "healing": 0,
+          "passive": 50,
+          "buffCount": 3
+        },
+        {
+          "healing": 0,
+          "passive": 50,
+          "buffCount": 2
+        },
+        {
+          "healing": 0,
+          "passive": 50,
+          "buffCount": 2
+        },
+        {
+          "healing": 0,
+          "passive": 50,
+          "buffCount": 2
+        }
+      ]
     },
     {
       "id": 1787453874571,
@@ -11765,6 +11816,7 @@
         "id": 1789191471240,
         "name": "Increase Crit Hit Chance Passive",
         "value": 8,
+        "pinned": false,
         "factorIds": [
           1788786571272,
           1789116366949,
@@ -11776,6 +11828,7 @@
         "id": 1789192070531,
         "name": "Reduces the effect of Combat Readiness increases",
         "value": 9,
+        "pinned": false,
         "factorIds": [
           1789116681636
         ]
@@ -11784,6 +11837,7 @@
         "id": 1789192490318,
         "name": "Double attack and speed stats",
         "value": 7.5,
+        "pinned": false,
         "factorIds": [
           1788773895734,
           1788785891810,
@@ -12660,8 +12714,20 @@
         "id": 1789190654672,
         "name": "Clone allies / enemies",
         "value": 8,
+        "pinned": false,
         "factorIds": [
           1789190874660
+        ]
+      },
+      {
+        "id": 1789194988679,
+        "name": "Transfer debuffs",
+        "value": 8.7,
+        "factorIds": [
+          1788773731924,
+          1789014978867,
+          1788785891810,
+          1788700781693
         ]
       }
     ],
@@ -12933,14 +12999,16 @@
       },
       {
         "id": 1789190874660,
-        "name": "All rounder pick"
+        "name": "All rounder pick",
+        "pinned": false
       },
       {
         "id": 1789191623914,
-        "name": "No shield team"
+        "name": "No shield team",
+        "pinned": false
       }
     ]
   },
   "schemaVersion": 2,
-  "savedAt": "2026-09-12T06:00:12.630Z"
+  "savedAt": "2026-09-12T06:37:49.876Z"
 }
