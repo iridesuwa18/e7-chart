@@ -4507,11 +4507,48 @@
       "hType_legacy": "SUR",
       "hScore_legacy": 5,
       "altStats_legacy": null,
-      "reactions": [],
-      "engagements": [],
-      "selfishScore": 0,
+      "reactions": [
+        {
+          "refId": 1789115481250
+        },
+        {
+          "refId": 1789137120242
+        },
+        {
+          "refId": 1788786288554
+        }
+      ],
+      "engagements": [
+        {
+          "refId": 1789203050043
+        },
+        {
+          "refId": 1789134890095
+        },
+        {
+          "refId": 1788773060667
+        },
+        {
+          "refId": 1788785954933
+        },
+        {
+          "refId": 1788924109560
+        },
+        {
+          "refId": 1789203279550
+        }
+      ],
+      "selfishScore": 3,
       "selflessScore": 0,
-      "needsRerating": true
+      "needsRerating": false,
+      "pvpTag": false,
+      "altStats": null,
+      "selfSkillIds": [
+        "decCr",
+        "immobDebuff",
+        "selfPassive"
+      ],
+      "allySupport": []
     },
     {
       "id": 1787463784814,
@@ -13653,6 +13690,29 @@
         "factorIds": [
           1788775427431
         ]
+      },
+      {
+        "id": 1789203050043,
+        "name": "Illusion (Unique) Buff",
+        "value": 9,
+        "pinned": false,
+        "factorIds": [
+          1788694866469,
+          1788774099692,
+          1788772214825,
+          1788912649792,
+          1788700781693
+        ]
+      },
+      {
+        "id": 1789203279550,
+        "name": "Increase Damage prop to no.of debuffs",
+        "value": 8,
+        "pinned": false,
+        "factorIds": [
+          1789014978867,
+          1788772992919
+        ]
       }
     ],
     "factors": [
@@ -13942,5 +14002,5 @@
     ]
   },
   "schemaVersion": 2,
-  "savedAt": "2026-09-12T08:49:07.049Z"
+  "savedAt": "2026-09-12T08:55:13.557Z"
 }
