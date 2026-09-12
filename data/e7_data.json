@@ -4400,6 +4400,9 @@
         },
         {
           "refId": 1788700311844
+        },
+        {
+          "refId": 1788773060667
         }
       ],
       "selfishScore": 2,
@@ -4435,11 +4438,57 @@
         "hType": "SUR",
         "hScore": 6
       },
-      "reactions": [],
-      "engagements": [],
-      "selfishScore": 0,
+      "reactions": [
+        {
+          "refId": 1788780327120
+        },
+        {
+          "refId": 1789121061181
+        },
+        {
+          "refId": 1789177042422
+        },
+        {
+          "refId": 1789201975789
+        }
+      ],
+      "engagements": [
+        {
+          "refId": 1788773060667
+        },
+        {
+          "refId": 1789135004196
+        },
+        {
+          "refId": 1788786428743
+        },
+        {
+          "refId": 1788785505206
+        },
+        {
+          "refId": 1788772163166
+        },
+        {
+          "refId": 1788773067411
+        },
+        {
+          "refId": 1788700305259
+        },
+        {
+          "refId": 1788780605209
+        }
+      ],
+      "selfishScore": 3,
       "selflessScore": 0,
-      "needsRerating": true
+      "needsRerating": false,
+      "pvpTag": false,
+      "altStats": null,
+      "selfSkillIds": [
+        "decCr",
+        "selfPassive",
+        "immunity"
+      ],
+      "allySupport": []
     },
     {
       "id": 1787463364042,
@@ -13236,7 +13285,7 @@
       {
         "id": 1789135004196,
         "name": "Rupture to enemies",
-        "value": 0,
+        "value": 8,
         "pinned": false,
         "factorIds": [
           1788701036557,
@@ -13893,5 +13942,5 @@
     ]
   },
   "schemaVersion": 2,
-  "savedAt": "2026-09-12T08:44:55.139Z"
+  "savedAt": "2026-09-12T08:49:07.049Z"
 }
