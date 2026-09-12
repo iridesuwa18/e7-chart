@@ -12212,12 +12212,57 @@
       "hType_legacy": "SUR",
       "hScore_legacy": 4,
       "altStats_legacy": null,
-      "reactions": [],
-      "engagements": [],
-      "selfishScore": 0,
+      "reactions": [
+        {
+          "refId": 1788780122184
+        },
+        {
+          "refId": 1788775147348
+        },
+        {
+          "refId": 1789221069112
+        }
+      ],
+      "engagements": [
+        {
+          "refId": 1788780430787
+        },
+        {
+          "refId": 1789220911164
+        },
+        {
+          "refId": 1788912738063
+        },
+        {
+          "refId": 1788785954933
+        },
+        {
+          "refId": 1789201317168
+        },
+        {
+          "refId": 1788773067411
+        },
+        {
+          "refId": 1789132233866
+        },
+        {
+          "refId": 1788785021751
+        },
+        {
+          "refId": 1789221204007
+        }
+      ],
+      "selfishScore": 2,
       "selflessScore": 0,
-      "needsRerating": true,
-      "hidden": true
+      "needsRerating": false,
+      "hidden": true,
+      "pvpTag": false,
+      "altStats": null,
+      "selfSkillIds": [
+        "spdCr",
+        "extraTurns"
+      ],
+      "allySupport": []
     },
     {
       "id": 1787753281455,
@@ -13445,6 +13490,25 @@
         "factorIds": [
           1789209213432
         ]
+      },
+      {
+        "id": 1789221069112,
+        "name": "Reacts to AOE attacks",
+        "value": 8.6,
+        "pinned": false,
+        "factorIds": [
+          1788913802940
+        ]
+      },
+      {
+        "id": 1789221117694,
+        "name": "Damage prop to target's max health",
+        "value": 6.8,
+        "pinned": false,
+        "factorIds": [
+          1788700420912,
+          1788773130306
+        ]
       }
     ],
     "engagements": [
@@ -14668,6 +14732,29 @@
         "factorIds": [
           1788783127095
         ]
+      },
+      {
+        "id": 1789220911164,
+        "name": "Increase Damage against no buffs",
+        "value": 7.5,
+        "pinned": false,
+        "factorIds": [
+          1789220943266
+        ]
+      },
+      {
+        "id": 1789221204007,
+        "name": "Additional / fixed damage (regardless of hit)",
+        "value": 10,
+        "pinned": false,
+        "factorIds": [
+          1788701036557,
+          1788783127095,
+          1788772992919,
+          1788786248167,
+          1788786571272,
+          1788700420912
+        ]
       }
     ],
     "factors": [
@@ -14964,9 +15051,13 @@
       {
         "id": 1789218645455,
         "name": "Counter element units"
+      },
+      {
+        "id": 1789220943266,
+        "name": "Lack of buffers team"
       }
     ]
   },
   "schemaVersion": 2,
-  "savedAt": "2026-09-12T13:45:15.971Z"
+  "savedAt": "2026-09-12T13:53:41.403Z"
 }
