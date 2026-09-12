@@ -2745,7 +2745,33 @@
       "selflessScore": 0,
       "needsRerating": false,
       "pvpTag": false,
-      "altStats": null,
+      "altStats": {
+        "selfishScore": 0,
+        "selflessScore": 2.17,
+        "selfSkillIds": [],
+        "allySupport": [
+          {
+            "healing": 0,
+            "passive": 100,
+            "buffCount": 1
+          },
+          {
+            "healing": 0,
+            "passive": 40,
+            "buffCount": 1
+          },
+          {
+            "healing": 0,
+            "passive": 40,
+            "buffCount": 1
+          },
+          {
+            "healing": 0,
+            "passive": 40,
+            "buffCount": 1
+          }
+        ]
+      },
       "selfSkillIds": [
         "spdCr",
         "immunity",
@@ -2776,11 +2802,88 @@
         "hType": "SST",
         "hScore": 7
       },
-      "reactions": [],
-      "engagements": [],
-      "selfishScore": 0,
+      "reactions": [
+        {
+          "refId": 1788775037126
+        },
+        {
+          "refId": 1788775147348
+        },
+        {
+          "refId": 1788780122184
+        },
+        {
+          "refId": 1788785760659
+        },
+        {
+          "refId": 1788785866916
+        },
+        {
+          "refId": 1788786104653
+        },
+        {
+          "refId": 1789177637826
+        }
+      ],
+      "engagements": [
+        {
+          "refId": 1788773060667
+        },
+        {
+          "refId": 1788772268160
+        },
+        {
+          "refId": 1788771803084
+        },
+        {
+          "refId": 1788786428743
+        },
+        {
+          "refId": 1788785733011
+        },
+        {
+          "refId": 1788783099100
+        }
+      ],
+      "selfishScore": 5,
       "selflessScore": 0,
-      "needsRerating": true
+      "needsRerating": false,
+      "pvpTag": false,
+      "altStats": {
+        "selfishScore": 0,
+        "selflessScore": 0.67,
+        "selfSkillIds": [],
+        "allySupport": [
+          {
+            "healing": 0,
+            "passive": 15,
+            "buffCount": 2
+          },
+          {
+            "healing": 0,
+            "passive": 15,
+            "buffCount": 0
+          },
+          {
+            "healing": 0,
+            "passive": 15,
+            "buffCount": 0
+          },
+          {
+            "healing": 0,
+            "passive": 15,
+            "buffCount": 0
+          }
+        ]
+      },
+      "selfSkillIds": [
+        "spdCr",
+        "selfPassive",
+        "immunity",
+        "lifesteal",
+        "injuries"
+      ],
+      "allySupport": []
     },
     {
       "id": 1787450891923,
@@ -11308,6 +11411,34 @@
           1789132845858,
           1788912649792
         ]
+      },
+      {
+        "id": 1789177637826,
+        "name": "Reactive attack by passives (Not counter)",
+        "value": 9.6,
+        "factorIds": [
+          1789177680699,
+          1788773895734,
+          1788772861638,
+          1788775944046,
+          1788775427431,
+          1788786300042,
+          1788913802940,
+          1788772214825,
+          1788772992919
+        ]
+      },
+      {
+        "id": 1789177894231,
+        "name": "Damage prop to injuries",
+        "value": 8,
+        "pinned": false,
+        "factorIds": [
+          1788772992919,
+          1788701036557,
+          1788700420912,
+          1788773130306
+        ]
       }
     ],
     "engagements": [
@@ -12404,9 +12535,13 @@
         "id": 1789175114611,
         "name": "Light units",
         "pinned": false
+      },
+      {
+        "id": 1789177680699,
+        "name": "Cannot counter effects"
       }
     ]
   },
   "schemaVersion": 2,
-  "savedAt": "2026-09-12T01:39:46.111Z"
+  "savedAt": "2026-09-12T01:52:22.465Z"
 }
