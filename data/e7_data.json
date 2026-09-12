@@ -2509,11 +2509,42 @@
         "hType": "SUR",
         "hScore": 8
       },
-      "reactions": [],
-      "engagements": [],
-      "selfishScore": 0,
+      "reactions": [
+        {
+          "refId": 1788700730226
+        },
+        {
+          "refId": 1789137120242
+        },
+        {
+          "refId": 1789174803141
+        },
+        {
+          "refId": 1789174925004
+        }
+      ],
+      "engagements": [
+        {
+          "refId": 1788787229175
+        },
+        {
+          "refId": 1789175044412
+        },
+        {
+          "refId": 1789175151105
+        }
+      ],
+      "selfishScore": 3,
       "selflessScore": 0,
-      "needsRerating": true
+      "needsRerating": false,
+      "pvpTag": false,
+      "altStats": null,
+      "selfSkillIds": [
+        "spdCr",
+        "selfPassive",
+        "immunity"
+      ],
+      "allySupport": []
     },
     {
       "id": 1787449914285,
@@ -11112,6 +11143,24 @@
           1788774099692,
           1788785891810
         ]
+      },
+      {
+        "id": 1789174803141,
+        "name": "Defense scaling passive",
+        "value": 0,
+        "factorIds": [
+          1788694866469,
+          1788774099692
+        ]
+      },
+      {
+        "id": 1789174925004,
+        "name": "Reacts to damage done to allies",
+        "value": 8.6,
+        "factorIds": [
+          1788694866469,
+          1788774099692
+        ]
       }
     ],
     "engagements": [
@@ -11895,6 +11944,26 @@
           1789137341208,
           1788772401653
         ]
+      },
+      {
+        "id": 1789175044412,
+        "name": "Ignore damage reduction",
+        "value": 9,
+        "factorIds": [
+          1788786248167,
+          1788701036557,
+          1788700420912,
+          1788773130306
+        ]
+      },
+      {
+        "id": 1789175151105,
+        "name": "Elemental advantage (Dark > Light)",
+        "value": 8,
+        "pinned": false,
+        "factorIds": [
+          1789175114611
+        ]
       }
     ],
     "factors": [
@@ -12152,9 +12221,13 @@
         "id": 1789137341208,
         "name": "Long cooldown units",
         "pinned": false
+      },
+      {
+        "id": 1789175114611,
+        "name": "Light units"
       }
     ]
   },
   "schemaVersion": 2,
-  "savedAt": "2026-09-12T00:55:43.343Z"
+  "savedAt": "2026-09-12T01:06:33.910Z"
 }
