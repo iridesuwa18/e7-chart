@@ -4305,11 +4305,51 @@
       "hType_legacy": "SUR",
       "hScore_legacy": 5,
       "altStats_legacy": null,
-      "reactions": [],
-      "engagements": [],
-      "selfishScore": 0,
+      "reactions": [
+        {
+          "refId": 1789202101550
+        },
+        {
+          "refId": 1788780327120
+        }
+      ],
+      "engagements": [
+        {
+          "refId": 1788783359037
+        },
+        {
+          "refId": 1788785736229
+        },
+        {
+          "refId": 1788773476896
+        },
+        {
+          "refId": 1788785377663
+        },
+        {
+          "refId": 1789202259930
+        },
+        {
+          "refId": 1789132233866
+        },
+        {
+          "refId": 1788700311844
+        },
+        {
+          "refId": 1788773060667
+        }
+      ],
+      "selfishScore": 3,
       "selflessScore": 0,
-      "needsRerating": true
+      "needsRerating": false,
+      "pvpTag": false,
+      "altStats": null,
+      "selfSkillIds": [
+        "spdCr",
+        "decSpd",
+        "immobDebuff"
+      ],
+      "allySupport": []
     },
     {
       "id": 1787463090887,
@@ -12430,6 +12470,16 @@
         "factorIds": [
           1788913836890
         ]
+      },
+      {
+        "id": 1789202101550,
+        "name": "Cannot exceed caster's Speed passive",
+        "value": 10,
+        "factorIds": [
+          1788773895734,
+          1788694866469,
+          1788774099692
+        ]
       }
     ],
     "engagements": [
@@ -13490,6 +13540,14 @@
           1788783127095
         ],
         "pinned": false
+      },
+      {
+        "id": 1789202259930,
+        "name": "Unable to counterattack debuff",
+        "value": 9,
+        "factorIds": [
+          1788775427431
+        ]
       }
     ],
     "factors": [
@@ -13779,5 +13837,5 @@
     ]
   },
   "schemaVersion": 2,
-  "savedAt": "2026-09-12T08:33:16.671Z"
+  "savedAt": "2026-09-12T08:39:00.263Z"
 }
