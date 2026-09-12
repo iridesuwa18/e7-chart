@@ -2491,7 +2491,7 @@ function ensureQdFactorMenu() {
   menu.style.display = "none";
   menu.innerHTML = `
     <div class="qd-factor-menu-searchbar">
-      <input type="text" class="taxonomy-search qd-factor-menu-search" id="qd-factor-menu-search" placeholder="🔍 Search Factors…" />
+      <input type="text" class="taxonomy-search qd-factor-menu-search" id="qd-factor-menu-search" autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false" placeholder="🔍 Search Factors…" />
       <button type="button" class="qd-factor-menu-clear" id="qd-factor-menu-clear" title="Clear search" aria-label="Clear search">✕</button>
     </div>
     <div class="qd-factor-menu-list" id="qd-factor-menu-list"><!-- populated from the taxonomy Factors library --></div>
@@ -4780,7 +4780,7 @@ function renderTaxonomyFactorChips(kind, id) {
         : `<div class="taxonomy-empty-note">No Factors tagged yet — search below to add one.</div>`}
     </div>
     <div class="taxonomy-search-wrap">
-      <input type="text" class="taxonomy-search taxonomy-factor-search" placeholder="🔍 Search Factors to add…" value="${escAttr(query)}" />
+      <input type="text" class="taxonomy-search taxonomy-factor-search" autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false" placeholder="🔍 Search Factors to add…" value="${escAttr(query)}" />
       <button type="button" class="taxonomy-search-clear" title="Clear search" aria-label="Clear search">✕</button>
     </div>
     <div class="taxonomy-factor-search-results"></div>
@@ -4871,7 +4871,7 @@ function renderTaxonomyHeroSearch(kind, id) {
 
   row.innerHTML = `
     <div class="taxonomy-search-wrap">
-      <input type="text" class="taxonomy-search taxonomy-hero-row-search" placeholder="🔍 Search a hero to add…" value="${escAttr(query)}" />
+      <input type="text" class="taxonomy-search taxonomy-hero-row-search" autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false" placeholder="🔍 Search a hero to add…" value="${escAttr(query)}" />
       <button type="button" class="taxonomy-search-clear" title="Clear search" aria-label="Clear search">✕</button>
     </div>
     <div class="taxonomy-hero-row-results"></div>
