@@ -2294,6 +2294,9 @@
         },
         {
           "refId": 1788775147348
+        },
+        {
+          "refId": 1789178573773
         }
       ],
       "engagements": [
@@ -2843,6 +2846,9 @@
         },
         {
           "refId": 1788783099100
+        },
+        {
+          "refId": 1788912251007
         }
       ],
       "selfishScore": 5,
@@ -2902,11 +2908,65 @@
       "hType_legacy": "SUR",
       "hScore_legacy": 7,
       "altStats_legacy": null,
-      "reactions": [],
-      "engagements": [],
+      "reactions": [
+        {
+          "refId": 1789178160509
+        },
+        {
+          "refId": 1788775037126
+        },
+        {
+          "refId": 1789115481250
+        }
+      ],
+      "engagements": [
+        {
+          "refId": 1788783359037
+        },
+        {
+          "refId": 1788785021751
+        },
+        {
+          "refId": 1788772163166
+        },
+        {
+          "refId": 1789178324173
+        },
+        {
+          "refId": 1788912251007
+        },
+        {
+          "refId": 1789178467146
+        }
+      ],
       "selfishScore": 0,
-      "selflessScore": 0,
-      "needsRerating": true
+      "selflessScore": 0.92,
+      "needsRerating": false,
+      "pvpTag": false,
+      "altStats": null,
+      "selfSkillIds": [],
+      "allySupport": [
+        {
+          "healing": 0,
+          "passive": 10,
+          "buffCount": 1
+        },
+        {
+          "healing": 0,
+          "passive": 10,
+          "buffCount": 2
+        },
+        {
+          "healing": 0,
+          "passive": 10,
+          "buffCount": 2
+        },
+        {
+          "healing": 0,
+          "passive": 10,
+          "buffCount": 2
+        }
+      ]
     },
     {
       "id": 1787451132936,
@@ -11439,6 +11499,24 @@
           1788700420912,
           1788773130306
         ]
+      },
+      {
+        "id": 1789178160509,
+        "name": "Damage prop to attack",
+        "value": 8.5,
+        "factorIds": [
+          1788772992919,
+          1788700420912
+        ]
+      },
+      {
+        "id": 1789178573773,
+        "name": "Reacts to combat readiness",
+        "value": 9.8,
+        "factorIds": [
+          1789116681636,
+          1788785891810
+        ]
       }
     ],
     "engagements": [
@@ -12273,6 +12351,26 @@
           1788912649792
         ],
         "pinned": false
+      },
+      {
+        "id": 1789178324173,
+        "name": "Rampage (Undispellable) Buff",
+        "value": 7,
+        "factorIds": [
+          1788785891810,
+          1788694866469,
+          1788774099692,
+          1788700781693,
+          1788912649792
+        ]
+      },
+      {
+        "id": 1789178467146,
+        "name": "Swift attack buff",
+        "value": 8,
+        "factorIds": [
+          1788785891810
+        ]
       }
     ],
     "factors": [
@@ -12543,5 +12641,5 @@
     ]
   },
   "schemaVersion": 2,
-  "savedAt": "2026-09-12T01:53:41.192Z"
+  "savedAt": "2026-09-12T02:03:43.552Z"
 }
