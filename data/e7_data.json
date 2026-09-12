@@ -389,6 +389,9 @@
         },
         {
           "refId": 1788772268160
+        },
+        {
+          "refId": 1789132181142
         }
       ],
       "selfishScore": 0,
@@ -531,6 +534,12 @@
         },
         {
           "refId": 1788912251007
+        },
+        {
+          "refId": 1789132181142
+        },
+        {
+          "refId": 1789204085344
         }
       ],
       "selfishScore": 0,
@@ -813,6 +822,9 @@
         },
         {
           "refId": 1788912738063
+        },
+        {
+          "refId": 1789132181142
         }
       ],
       "selfishScore": 3,
@@ -1698,6 +1710,9 @@
         },
         {
           "refId": 1789117987794
+        },
+        {
+          "refId": 1789204085344
         }
       ],
       "selfishScore": 3,
@@ -2140,6 +2155,9 @@
         },
         {
           "refId": 1788783099100
+        },
+        {
+          "refId": 1789132181142
         }
       ],
       "selfishScore": 0,
@@ -3530,6 +3548,9 @@
         },
         {
           "refId": 1788786288554
+        },
+        {
+          "refId": 1789191471240
         }
       ],
       "engagements": [
@@ -13293,7 +13314,7 @@
         "id": 1789132181142,
         "name": "AOE non-attack skills",
         "value": 9,
-        "pinned": false,
+        "pinned": true,
         "factorIds": [
           1788783127095,
           1788773216100,
@@ -13803,7 +13824,7 @@
         "id": 1789204085344,
         "name": "Single (at enemy) non-attack skills",
         "value": 9,
-        "pinned": false,
+        "pinned": true,
         "factorIds": [
           1788783127095,
           1788773216100,
@@ -14098,5 +14119,5 @@
     ]
   },
   "schemaVersion": 2,
-  "savedAt": "2026-09-12T09:09:07.906Z"
+  "savedAt": "2026-09-12T10:24:13.512Z"
 }
