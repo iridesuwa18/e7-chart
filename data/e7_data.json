@@ -11473,12 +11473,35 @@
       "hType_legacy": "SUR",
       "hScore_legacy": 9,
       "altStats_legacy": null,
-      "reactions": [],
-      "engagements": [],
-      "selfishScore": 0,
+      "reactions": [
+        {
+          "refId": 1789120795174
+        }
+      ],
+      "engagements": [
+        {
+          "refId": 1789133085456
+        },
+        {
+          "refId": 1789133298898
+        },
+        {
+          "refId": 1788785954933
+        },
+        {
+          "refId": 1788783359037
+        }
+      ],
+      "selfishScore": 1,
       "selflessScore": 0,
-      "needsRerating": true,
-      "hidden": true
+      "needsRerating": false,
+      "hidden": true,
+      "pvpTag": false,
+      "altStats": null,
+      "selfSkillIds": [
+        "selfPassive"
+      ],
+      "allySupport": []
     },
     {
       "id": 1787751886655,
@@ -12982,6 +13005,19 @@
           1788772019318,
           1788774099692
         ]
+      },
+      {
+        "id": 1789217068833,
+        "name": "Incease Attack passive",
+        "value": 9,
+        "pinned": false,
+        "factorIds": [
+          1788783127095,
+          1788772992919,
+          1788700420912,
+          1788701036557,
+          1788773130306
+        ]
       }
     ],
     "engagements": [
@@ -14451,5 +14487,5 @@
     ]
   },
   "schemaVersion": 2,
-  "savedAt": "2026-09-12T12:40:51.122Z"
+  "savedAt": "2026-09-12T12:46:40.737Z"
 }
