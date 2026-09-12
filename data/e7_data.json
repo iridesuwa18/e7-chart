@@ -2847,6 +2847,9 @@
         },
         {
           "refId": 1789177894231
+        },
+        {
+          "refId": 1789221525475
         }
       ],
       "engagements": [
@@ -12280,12 +12283,44 @@
       "hType_legacy": "SUR",
       "hScore_legacy": 3,
       "altStats_legacy": null,
-      "reactions": [],
-      "engagements": [],
-      "selfishScore": 0,
+      "reactions": [
+        {
+          "refId": 1788780122184
+        },
+        {
+          "refId": 1788780327120
+        },
+        {
+          "refId": 1789221525475
+        },
+        {
+          "refId": 1789115481250
+        }
+      ],
+      "engagements": [
+        {
+          "refId": 1788914238894
+        },
+        {
+          "refId": 1788780430787
+        },
+        {
+          "refId": 1788786336798
+        },
+        {
+          "refId": 1788700311844
+        }
+      ],
+      "selfishScore": 1,
       "selflessScore": 0,
-      "needsRerating": true,
-      "hidden": true
+      "needsRerating": false,
+      "hidden": true,
+      "pvpTag": false,
+      "altStats": null,
+      "selfSkillIds": [
+        "spdCr"
+      ],
+      "allySupport": []
     },
     {
       "id": 1787753425901,
@@ -13508,6 +13543,19 @@
         "factorIds": [
           1788700420912,
           1788773130306
+        ]
+      },
+      {
+        "id": 1789221525475,
+        "name": "Reacts to attack done to allies",
+        "value": 8.6,
+        "pinned": false,
+        "factorIds": [
+          1788775427431,
+          1788786300042,
+          1788913802940,
+          1788775944046,
+          1788773895734
         ]
       }
     ],
@@ -15059,5 +15107,5 @@
     ]
   },
   "schemaVersion": 2,
-  "savedAt": "2026-09-12T13:56:55.981Z"
+  "savedAt": "2026-09-12T14:01:25.616Z"
 }
