@@ -2844,6 +2844,9 @@
         },
         {
           "refId": 1789177637826
+        },
+        {
+          "refId": 1789177894231
         }
       ],
       "engagements": [
@@ -4739,6 +4742,9 @@
         },
         {
           "refId": 1789209367308
+        },
+        {
+          "refId": 1789209408893
         }
       ],
       "engagements": [
@@ -11410,12 +11416,37 @@
         "hType": "SUR",
         "hScore": 6
       },
-      "reactions": [],
-      "engagements": [],
-      "selfishScore": 0,
+      "reactions": [
+        {
+          "refId": 1788780327120
+        },
+        {
+          "refId": 1789121061181
+        },
+        {
+          "refId": 1789216537415
+        }
+      ],
+      "engagements": [
+        {
+          "refId": 1789203922731
+        },
+        {
+          "refId": 1788772163166
+        }
+      ],
+      "selfishScore": 3,
       "selflessScore": 0,
-      "needsRerating": true,
-      "hidden": true
+      "needsRerating": false,
+      "hidden": true,
+      "pvpTag": false,
+      "altStats": null,
+      "selfSkillIds": [
+        "spdCr",
+        "selfPassive",
+        "injuries"
+      ],
+      "allySupport": []
     },
     {
       "id": 1787751852338,
@@ -12807,6 +12838,7 @@
         "id": 1789198617409,
         "name": "Attack scaling passive",
         "value": 9,
+        "pinned": false,
         "factorIds": [
           1788783127095,
           1788772992919,
@@ -12819,6 +12851,7 @@
         "id": 1789199188207,
         "name": "Increase hit chance passive",
         "value": 9,
+        "pinned": false,
         "factorIds": [
           1788783127095
         ]
@@ -12827,6 +12860,7 @@
         "id": 1789199290163,
         "name": "Cannot revive passive",
         "value": 10,
+        "pinned": false,
         "factorIds": [
           1788786928682
         ]
@@ -12846,6 +12880,7 @@
         "id": 1789201975789,
         "name": "Reacts to soulburns",
         "value": 8,
+        "pinned": false,
         "factorIds": [
           1788913836890
         ]
@@ -12854,6 +12889,7 @@
         "id": 1789202101550,
         "name": "Cannot exceed caster's Speed passive",
         "value": 10,
+        "pinned": false,
         "factorIds": [
           1788773895734,
           1788694866469,
@@ -12873,6 +12909,7 @@
         "id": 1789202634207,
         "name": "Reacts to allies' turns",
         "value": 8,
+        "pinned": false,
         "factorIds": [
           1788785891810
         ]
@@ -12881,6 +12918,7 @@
         "id": 1789203511668,
         "name": "Increase Effectiveness passive",
         "value": 9,
+        "pinned": false,
         "factorIds": [
           1789014978867,
           1788779877239
@@ -12890,6 +12928,7 @@
         "id": 1789203590553,
         "name": "Increase Crit Hit Resistance passive",
         "value": 9,
+        "pinned": false,
         "factorIds": [
           1788774921178,
           1788694866469,
@@ -12923,6 +12962,16 @@
         "factorIds": [
           1788772992919,
           1788783127095
+        ]
+      },
+      {
+        "id": 1789216537415,
+        "name": "Vampirism buff",
+        "value": 7,
+        "factorIds": [
+          1788694866469,
+          1788772019318,
+          1788774099692
         ]
       }
     ],
@@ -13901,6 +13950,7 @@
         "id": 1789198804604,
         "name": "Superhumanization (Undispellable) Buff",
         "value": 10,
+        "pinned": false,
         "factorIds": [
           1788772992919,
           1788694866469,
@@ -13915,6 +13965,7 @@
         "id": 1789199806462,
         "name": "Challenge (Undispellable) Buffs",
         "value": 6.5,
+        "pinned": false,
         "factorIds": [
           1788701036557,
           1788783127095,
@@ -13953,6 +14004,7 @@
         "id": 1789200533609,
         "name": "Stealing buffs",
         "value": 9,
+        "pinned": false,
         "factorIds": [
           1788773731924,
           1789014978867
@@ -13962,6 +14014,7 @@
         "id": 1789201180270,
         "name": "Death Sentence (Undispellable) on enemies",
         "value": 5,
+        "pinned": false,
         "factorIds": [
           1788701036557,
           1788700420912,
@@ -13972,6 +14025,7 @@
         "id": 1789201317168,
         "name": "Silence enemies",
         "value": 7.8,
+        "pinned": false,
         "factorIds": [
           1789201341223
         ]
@@ -13980,15 +14034,16 @@
         "id": 1789201902743,
         "name": "Increase hit chance buff",
         "value": 9,
+        "pinned": false,
         "factorIds": [
           1788783127095
-        ],
-        "pinned": false
+        ]
       },
       {
         "id": 1789202259930,
         "name": "Unable to counterattack debuff",
         "value": 9,
+        "pinned": false,
         "factorIds": [
           1788775427431
         ]
@@ -14047,6 +14102,7 @@
         "id": 1789209851847,
         "name": "Effectiveness (Undispellable) Buff",
         "value": 7.5,
+        "pinned": false,
         "factorIds": [
           1789014978867,
           1788700781693,
@@ -14057,6 +14113,7 @@
         "id": 1789209870815,
         "name": "Speed (Undispellable) Buff",
         "value": 7.8,
+        "pinned": false,
         "factorIds": [
           1788785891810,
           1788912649792,
@@ -14067,6 +14124,7 @@
         "id": 1789210263222,
         "name": "Pestilence (Undispellable) Buff",
         "value": 8,
+        "pinned": false,
         "factorIds": [
           1788700420912,
           1788701036557,
@@ -14368,18 +14426,21 @@
       },
       {
         "id": 1789200928831,
-        "name": "High resource units (Fighting Spirit/Focus)"
+        "name": "High resource units (Fighting Spirit/Focus)",
+        "pinned": false
       },
       {
         "id": 1789201341223,
-        "name": "Strong non-basic skills"
+        "name": "Strong non-basic skills",
+        "pinned": false
       },
       {
         "id": 1789209213432,
-        "name": "Prevention of combat readiness skills (e.g. restrict)"
+        "name": "Prevention of combat readiness skills (e.g. restrict)",
+        "pinned": false
       }
     ]
   },
   "schemaVersion": 2,
-  "savedAt": "2026-09-12T11:20:51.369Z"
+  "savedAt": "2026-09-12T12:38:50.552Z"
 }
