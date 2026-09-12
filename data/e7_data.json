@@ -3719,8 +3719,18 @@
       "reactions": [],
       "engagements": [],
       "selfishScore": 0,
-      "selflessScore": 0,
-      "needsRerating": true
+      "selflessScore": 1,
+      "needsRerating": false,
+      "pvpTag": false,
+      "altStats": null,
+      "selfSkillIds": [],
+      "allySupport": [
+        {
+          "healing": 100,
+          "passive": 0,
+          "buffCount": 2
+        }
+      ]
     },
     {
       "id": 1787460558755,
@@ -12009,6 +12019,7 @@
         "id": 1789198037209,
         "name": "Effectiveness passive",
         "value": 8,
+        "pinned": false,
         "factorIds": [
           1789014978867,
           1788779877239
@@ -12018,6 +12029,7 @@
         "id": 1789198095367,
         "name": "Critical Hit Damage passive",
         "value": 7.5,
+        "pinned": false,
         "factorIds": [
           1788772992919,
           1788700420912,
@@ -12903,6 +12915,7 @@
         "id": 1789194988679,
         "name": "Transfer debuffs",
         "value": 8.7,
+        "pinned": false,
         "factorIds": [
           1788773731924,
           1789014978867,
@@ -12914,6 +12927,7 @@
         "id": 1789195510119,
         "name": "Evasion (Undispellable) Buff",
         "value": 9,
+        "pinned": false,
         "factorIds": [
           1788700781693,
           1788912649792,
@@ -12925,18 +12939,19 @@
         "id": 1789195632311,
         "name": "Increase Evasion Buff",
         "value": 9,
+        "pinned": false,
         "factorIds": [
           1788700781693,
           1788912649792,
           1788694866469,
           1788774099692
-        ],
-        "pinned": false
+        ]
       },
       {
         "id": 1789195970804,
         "name": "Perception - Crit Chance and Dmg (Undispellable) Buff",
         "value": 7.8,
+        "pinned": false,
         "factorIds": [
           1788772992919,
           1788700781693,
@@ -12950,6 +12965,7 @@
         "id": 1789197410409,
         "name": "Erosion to enemies (dmg 5% of lost hp)",
         "value": 8,
+        "pinned": false,
         "factorIds": [
           1788700420912,
           1788772992919,
@@ -12973,6 +12989,7 @@
         "id": 1789198155998,
         "name": "Increase Critical Hit Damage Buff",
         "value": 7.5,
+        "pinned": false,
         "factorIds": [
           1788772992919,
           1788700420912,
@@ -12980,8 +12997,7 @@
           1788773130306,
           1788774033143,
           1788786248167
-        ],
-        "pinned": false
+        ]
       }
     ],
     "factors": [
@@ -13263,5 +13279,5 @@
     ]
   },
   "schemaVersion": 2,
-  "savedAt": "2026-09-12T07:29:51.235Z"
+  "savedAt": "2026-09-12T07:34:21.683Z"
 }
