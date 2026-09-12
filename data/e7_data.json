@@ -3306,11 +3306,50 @@
       "hType_legacy": "SUR",
       "hScore_legacy": 7,
       "altStats_legacy": null,
-      "reactions": [],
-      "engagements": [],
-      "selfishScore": 0,
+      "reactions": [
+        {
+          "refId": 1789192070531
+        },
+        {
+          "refId": 1788783157740
+        },
+        {
+          "refId": 1788780122184
+        },
+        {
+          "refId": 1788772502540
+        },
+        {
+          "refId": 1789130715725
+        }
+      ],
+      "engagements": [
+        {
+          "refId": 1788773060667
+        },
+        {
+          "refId": 1788785736229
+        },
+        {
+          "refId": 1788700311844
+        },
+        {
+          "refId": 1788780430787
+        },
+        {
+          "refId": 1788772163166
+        }
+      ],
+      "selfishScore": 2,
       "selflessScore": 0,
-      "needsRerating": true
+      "needsRerating": false,
+      "pvpTag": false,
+      "altStats": null,
+      "selfSkillIds": [
+        "decCr",
+        "selfPassive"
+      ],
+      "allySupport": []
     },
     {
       "id": 1787453649890,
@@ -11723,6 +11762,14 @@
           1788772992919,
           1789191623914
         ]
+      },
+      {
+        "id": 1789192070531,
+        "name": "Reduces the effect of Combat Readiness increases",
+        "value": 9,
+        "factorIds": [
+          1789116681636
+        ]
       }
     ],
     "engagements": [
@@ -12873,5 +12920,5 @@
     ]
   },
   "schemaVersion": 2,
-  "savedAt": "2026-09-12T05:44:30.384Z"
+  "savedAt": "2026-09-12T05:54:33.493Z"
 }
