@@ -4572,11 +4572,37 @@
         "hType": "SUR",
         "hScore": 8
       },
-      "reactions": [],
-      "engagements": [],
-      "selfishScore": 0,
+      "reactions": [
+        {
+          "refId": 1789191471240
+        },
+        {
+          "refId": 1789203511668
+        },
+        {
+          "refId": 1789203590553
+        }
+      ],
+      "engagements": [
+        {
+          "refId": 1789135829243
+        },
+        {
+          "refId": 1788912251007
+        }
+      ],
+      "selfishScore": 4,
       "selflessScore": 0,
-      "needsRerating": true
+      "needsRerating": false,
+      "pvpTag": false,
+      "altStats": null,
+      "selfSkillIds": [
+        "spdCr",
+        "immobDebuff",
+        "selfPassive",
+        "lifesteal"
+      ],
+      "allySupport": []
     },
     {
       "id": 1787463963854,
@@ -12622,6 +12648,25 @@
         "factorIds": [
           1788785891810
         ]
+      },
+      {
+        "id": 1789203511668,
+        "name": "Increase Effectiveness passive",
+        "value": 9,
+        "factorIds": [
+          1789014978867,
+          1788779877239
+        ]
+      },
+      {
+        "id": 1789203590553,
+        "name": "Increase Crit Hit Resistance passive",
+        "value": 9,
+        "factorIds": [
+          1788774921178,
+          1788694866469,
+          1788774099692
+        ]
       }
     ],
     "engagements": [
@@ -14002,5 +14047,5 @@
     ]
   },
   "schemaVersion": 2,
-  "savedAt": "2026-09-12T08:55:13.557Z"
+  "savedAt": "2026-09-12T09:02:42.467Z"
 }
