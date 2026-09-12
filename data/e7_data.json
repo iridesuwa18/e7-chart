@@ -12162,12 +12162,39 @@
       "hType_legacy": "SUR",
       "hScore_legacy": 7,
       "altStats_legacy": null,
-      "reactions": [],
-      "engagements": [],
-      "selfishScore": 0,
+      "reactions": [
+        {
+          "refId": 1789120795174
+        }
+      ],
+      "engagements": [
+        {
+          "refId": 1789220573364
+        },
+        {
+          "refId": 1788771803084
+        },
+        {
+          "refId": 1788783734183
+        },
+        {
+          "refId": 1789118896007
+        },
+        {
+          "refId": 1788780605209
+        }
+      ],
+      "selfishScore": 2,
       "selflessScore": 0,
-      "needsRerating": true,
-      "hidden": true
+      "needsRerating": false,
+      "hidden": true,
+      "pvpTag": false,
+      "altStats": null,
+      "selfSkillIds": [
+        "selfPassive",
+        "injuries"
+      ],
+      "allySupport": []
     },
     {
       "id": 1787753189328,
@@ -14632,6 +14659,15 @@
           1789014978867,
           1788912649792
         ]
+      },
+      {
+        "id": 1789220573364,
+        "name": "Increase hit chance attack",
+        "value": 9,
+        "pinned": false,
+        "factorIds": [
+          1788783127095
+        ]
       }
     ],
     "factors": [
@@ -14932,5 +14968,5 @@
     ]
   },
   "schemaVersion": 2,
-  "savedAt": "2026-09-12T13:40:43.189Z"
+  "savedAt": "2026-09-12T13:45:15.971Z"
 }
