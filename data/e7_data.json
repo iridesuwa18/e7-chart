@@ -4126,7 +4126,33 @@
       "selflessScore": 0,
       "needsRerating": false,
       "pvpTag": false,
-      "altStats": null,
+      "altStats": {
+        "selfishScore": 0,
+        "selflessScore": 0.42,
+        "selfSkillIds": [],
+        "allySupport": [
+          {
+            "healing": 0,
+            "passive": 0,
+            "buffCount": 2
+          },
+          {
+            "healing": 0,
+            "passive": 0,
+            "buffCount": 1
+          },
+          {
+            "healing": 0,
+            "passive": 0,
+            "buffCount": 1
+          },
+          {
+            "healing": 0,
+            "passive": 0,
+            "buffCount": 1
+          }
+        ]
+      },
       "selfSkillIds": [
         "immobDebuff",
         "shields"
@@ -4155,11 +4181,54 @@
         "hType": "SUR",
         "hScore": 6
       },
-      "reactions": [],
-      "engagements": [],
-      "selfishScore": 0,
+      "reactions": [
+        {
+          "refId": 1788786348512
+        },
+        {
+          "refId": 1788786288554
+        }
+      ],
+      "engagements": [
+        {
+          "refId": 1788773060667
+        },
+        {
+          "refId": 1788700305259
+        },
+        {
+          "refId": 1788773476896
+        },
+        {
+          "refId": 1789134498394
+        },
+        {
+          "refId": 1788785021751
+        },
+        {
+          "refId": 1788783359037
+        },
+        {
+          "refId": 1789133085456
+        },
+        {
+          "refId": 1788785954933
+        },
+        {
+          "refId": 1788785505206
+        }
+      ],
+      "selfishScore": 3,
       "selflessScore": 0,
-      "needsRerating": true
+      "needsRerating": false,
+      "pvpTag": false,
+      "altStats": null,
+      "selfSkillIds": [
+        "spdCr",
+        "extraTurns",
+        "selfPassive"
+      ],
+      "allySupport": []
     },
     {
       "id": 1787462828482,
@@ -13663,5 +13732,5 @@
     ]
   },
   "schemaVersion": 2,
-  "savedAt": "2026-09-12T08:23:39.807Z"
+  "savedAt": "2026-09-12T08:29:20.274Z"
 }
