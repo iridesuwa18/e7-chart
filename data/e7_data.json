@@ -4252,11 +4252,41 @@
         "hType": "SUR",
         "hScore": 6
       },
-      "reactions": [],
-      "engagements": [],
-      "selfishScore": 0,
+      "reactions": [
+        {
+          "refId": 1789201975789
+        }
+      ],
+      "engagements": [
+        {
+          "refId": 1788783734183
+        },
+        {
+          "refId": 1788912738063
+        },
+        {
+          "refId": 1789201902743
+        },
+        {
+          "refId": 1789118795470
+        },
+        {
+          "refId": 1788773060667
+        },
+        {
+          "refId": 1788700311844
+        }
+      ],
+      "selfishScore": 2,
       "selflessScore": 0,
-      "needsRerating": true
+      "needsRerating": false,
+      "pvpTag": false,
+      "altStats": null,
+      "selfSkillIds": [
+        "spdCr",
+        "extraTurns"
+      ],
+      "allySupport": []
     },
     {
       "id": 1787462957993,
@@ -12392,6 +12422,14 @@
           1789114895603,
           1789200928831
         ]
+      },
+      {
+        "id": 1789201975789,
+        "name": "Reacts to soulburns",
+        "value": 8,
+        "factorIds": [
+          1788913836890
+        ]
       }
     ],
     "engagements": [
@@ -13443,6 +13481,15 @@
         "factorIds": [
           1789201341223
         ]
+      },
+      {
+        "id": 1789201902743,
+        "name": "Increase hit chance buff",
+        "value": 9,
+        "factorIds": [
+          1788783127095
+        ],
+        "pinned": false
       }
     ],
     "factors": [
@@ -13732,5 +13779,5 @@
     ]
   },
   "schemaVersion": 2,
-  "savedAt": "2026-09-12T08:29:20.274Z"
+  "savedAt": "2026-09-12T08:33:16.671Z"
 }
