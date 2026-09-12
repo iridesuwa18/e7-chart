@@ -11585,11 +11585,33 @@
       "hScore_legacy": 3,
       "altStats_legacy": null,
       "reactions": [],
-      "engagements": [],
-      "selfishScore": 0,
+      "engagements": [
+        {
+          "refId": 1789116549901
+        },
+        {
+          "refId": 1789217623138
+        },
+        {
+          "refId": 1788786336798
+        },
+        {
+          "refId": 1788785954933
+        },
+        {
+          "refId": 1788700311844
+        }
+      ],
+      "selfishScore": 1,
       "selflessScore": 0,
-      "needsRerating": true,
-      "hidden": true
+      "needsRerating": false,
+      "hidden": true,
+      "pvpTag": false,
+      "altStats": null,
+      "selfSkillIds": [
+        "extraTurns"
+      ],
+      "allySupport": []
     },
     {
       "id": 1787752115765,
@@ -14252,6 +14274,18 @@
           1788700781693,
           1788912649792
         ]
+      },
+      {
+        "id": 1789217623138,
+        "name": "Increase Attack Greater Buff",
+        "value": 9,
+        "pinned": false,
+        "factorIds": [
+          1788772992919,
+          1788783127095,
+          1788700420912,
+          1788701036557
+        ]
       }
     ],
     "factors": [
@@ -14548,5 +14582,5 @@
     ]
   },
   "schemaVersion": 2,
-  "savedAt": "2026-09-12T12:52:05.112Z"
+  "savedAt": "2026-09-12T12:55:11.450Z"
 }
