@@ -12132,7 +12132,7 @@
           "refId": 1788924109560
         }
       ],
-      "selfishScore": 3,
+      "selfishScore": 4,
       "selflessScore": 0,
       "needsRerating": false,
       "hidden": true,
@@ -12141,7 +12141,8 @@
       "selfSkillIds": [
         "spdCr",
         "immobDebuff",
-        "lifesteal"
+        "lifesteal",
+        "injuries"
       ],
       "allySupport": []
     },
@@ -14931,5 +14932,5 @@
     ]
   },
   "schemaVersion": 2,
-  "savedAt": "2026-09-12T13:40:22.599Z"
+  "savedAt": "2026-09-12T13:40:43.189Z"
 }
