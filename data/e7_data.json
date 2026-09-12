@@ -3255,11 +3255,39 @@
         "hType": "SST",
         "hScore": 6
       },
-      "reactions": [],
-      "engagements": [],
-      "selfishScore": 0,
+      "reactions": [
+        {
+          "refId": 1788780327120
+        }
+      ],
+      "engagements": [
+        {
+          "refId": 1789134498394
+        },
+        {
+          "refId": 1788785021751
+        },
+        {
+          "refId": 1788786336798
+        },
+        {
+          "refId": 1788771803084
+        },
+        {
+          "refId": 1788772268160
+        }
+      ],
+      "selfishScore": 3,
       "selflessScore": 0,
-      "needsRerating": true
+      "needsRerating": false,
+      "pvpTag": false,
+      "altStats": null,
+      "selfSkillIds": [
+        "spdCr",
+        "selfPassive",
+        "injuries"
+      ],
+      "allySupport": []
     },
     {
       "id": 1787452547937,
@@ -11684,6 +11712,17 @@
           1789116681636,
           1788785891810
         ]
+      },
+      {
+        "id": 1789191471240,
+        "name": "Increase Crit Hit Chance Passive",
+        "value": 8,
+        "factorIds": [
+          1788786571272,
+          1789116366949,
+          1788772992919,
+          1789191623914
+        ]
       }
     ],
     "engagements": [
@@ -11750,7 +11789,8 @@
         "value": 8.5,
         "pinned": false,
         "factorIds": [
-          1788700420912
+          1788700420912,
+          1789191623914
         ]
       },
       {
@@ -12013,7 +12053,10 @@
         "value": 7,
         "pinned": false,
         "factorIds": [
-          1788786571272
+          1788786571272,
+          1788772992919,
+          1789116366949,
+          1789191623914
         ]
       },
       {
@@ -12111,7 +12154,10 @@
         "value": 5,
         "pinned": false,
         "factorIds": [
-          1788772992919
+          1788772992919,
+          1789116366949,
+          1788786571272,
+          1789191623914
         ]
       },
       {
@@ -12257,7 +12303,7 @@
       {
         "id": 1789129986550,
         "name": "Increase Critical Hit Resistance Buff",
-        "value": 0,
+        "value": 7,
         "pinned": false,
         "factorIds": [
           1788774921178,
@@ -12819,9 +12865,13 @@
       {
         "id": 1789190874660,
         "name": "All rounder pick"
+      },
+      {
+        "id": 1789191623914,
+        "name": "No shield team"
       }
     ]
   },
   "schemaVersion": 2,
-  "savedAt": "2026-09-12T05:35:00.644Z"
+  "savedAt": "2026-09-12T05:44:30.384Z"
 }
