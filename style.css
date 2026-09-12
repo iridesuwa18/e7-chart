@@ -1932,11 +1932,12 @@ body.dot-mode .origin-dot:hover {
   cursor: pointer;
   user-select: none;
 }
-.ss-ally-row-types input {
-  accent-color: var(--gold2);
-  width: 15px; height: 15px;
-  cursor: pointer;
-}
+/* Note: the old .ss-ally-row-types input rule (width/height:15px,
+   for the pre-rebuild healing/buff/passive checkboxes) was removed —
+   it no longer has any checkbox to target now that this section uses
+   sliders + number inputs (see index.html's <style> block for their
+   sizing), and was incidentally squashing the number inputs down to
+   15px, leaving no room for the digits to render. */
 .ss-modal-score-preview {
   font-family: 'Cinzel', serif;
   font-size: 11px;

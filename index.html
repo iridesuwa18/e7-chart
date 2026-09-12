@@ -68,30 +68,40 @@
       border: 1px solid #c9a227;
       cursor: pointer;
     }
-    .ss-ally-type-input {
+    /* Higher-specificity selector (row + type attr + class) needed here
+       because style.css's global `input[type=number]` rule — designed
+       for full-width text fields elsewhere in the app — otherwise wins
+       the cascade over a plain `.ss-ally-type-input` class rule and
+       forces width:100%/padding:7px 10px on this input. With
+       flex-shrink:0 that blew the box way past its intended 44px,
+       squeezing/clipping it (and its digits) out of the visible row
+       instead of just sizing it normally. */
+    .ss-ally-type-row input[type="number"].ss-ally-type-input {
       width: 44px;
       flex-shrink: 0;
       text-align: right;
       font-variant-numeric: tabular-nums;
       color: #e8c84a;
       font-size: 12px;
+      font-family: 'Crimson Pro', serif;
       background: rgba(255,255,255,.04);
       border: 1px solid rgba(201,162,39,.35);
       border-radius: 4px;
       padding: 2px 4px;
     }
-    .ss-ally-type-input:focus {
+    .ss-ally-type-row input[type="number"].ss-ally-type-input:focus {
       outline: none;
       border-color: #e8c84a;
+      box-shadow: none;
     }
     /* Chrome/Safari spinner arrows take up space in an already tight
        row — hide them, the range slider next to it is the drag control. */
-    .ss-ally-type-input::-webkit-inner-spin-button,
-    .ss-ally-type-input::-webkit-outer-spin-button {
+    .ss-ally-type-row input[type="number"].ss-ally-type-input::-webkit-inner-spin-button,
+    .ss-ally-type-row input[type="number"].ss-ally-type-input::-webkit-outer-spin-button {
       -webkit-appearance: none;
       margin: 0;
     }
-    .ss-ally-type-input[type="number"] {
+    .ss-ally-type-row input[type="number"].ss-ally-type-input {
       -moz-appearance: textfield;
     }
     .ss-ally-type-unit {
