@@ -2710,11 +2710,49 @@
       "hType_legacy": "SUR",
       "hScore_legacy": 5,
       "altStats_legacy": null,
-      "reactions": [],
-      "engagements": [],
-      "selfishScore": 0,
+      "reactions": [
+        {
+          "refId": 1788780327120
+        },
+        {
+          "refId": 1789177042422
+        }
+      ],
+      "engagements": [
+        {
+          "refId": 1788773476896
+        },
+        {
+          "refId": 1788771803084
+        },
+        {
+          "refId": 1788786428743
+        },
+        {
+          "refId": 1789176992477
+        },
+        {
+          "refId": 1788782920388
+        },
+        {
+          "refId": 1788700311844
+        },
+        {
+          "refId": 1788913999604
+        }
+      ],
+      "selfishScore": 4,
       "selflessScore": 0,
-      "needsRerating": true
+      "needsRerating": false,
+      "pvpTag": false,
+      "altStats": null,
+      "selfSkillIds": [
+        "spdCr",
+        "immunity",
+        "shields",
+        "injuries"
+      ],
+      "allySupport": []
     },
     {
       "id": 1787450689561,
@@ -11259,6 +11297,17 @@
           1788694866469,
           1788774099692
         ]
+      },
+      {
+        "id": 1789177042422,
+        "name": "Effect Resistance passive",
+        "value": 9.8,
+        "factorIds": [
+          1788700781693,
+          1789130156790,
+          1789132845858,
+          1788912649792
+        ]
       }
     ],
     "engagements": [
@@ -12072,6 +12121,27 @@
         "factorIds": [
           1788700781693
         ]
+      },
+      {
+        "id": 1789176992477,
+        "name": "Increase soul consumption",
+        "value": 6.5,
+        "pinned": false,
+        "factorIds": [
+          1788913836890
+        ]
+      },
+      {
+        "id": 1789177107595,
+        "name": "Increase Effect Resistance Buff",
+        "value": 9.8,
+        "factorIds": [
+          1788700781693,
+          1789130156790,
+          1789132845858,
+          1788912649792
+        ],
+        "pinned": false
       }
     ],
     "factors": [
@@ -12338,5 +12408,5 @@
     ]
   },
   "schemaVersion": 2,
-  "savedAt": "2026-09-12T01:27:57.247Z"
+  "savedAt": "2026-09-12T01:39:46.111Z"
 }
