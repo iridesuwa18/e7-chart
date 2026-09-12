@@ -97,15 +97,30 @@ function normalizeTaxonomy(t) {
         id: x.id,
         name: typeof x.name === "string" ? x.name : "",
         value: Math.max(0, Math.min(10, Number(x.value) || 0)),
+        pinned: !!x.pinned,
         ...(Array.isArray(x.factorIds) ? { factorIds: x.factorIds.slice() } : { factorIds: [] }),
       }))
     : [];
   return {
-    reactions:   cleanList(t.reactions).map(x => ({ id: x.id, name: x.name, value: x.value, factorIds: x.factorIds })),
-    engagements: cleanList(t.engagements).map(x => ({ id: x.id, name: x.name, value: x.value, factorIds: x.factorIds })),
+    reactions:   cleanList(t.reactions).map(x => ({ id: x.id, name: x.name, value: x.value, pinned: x.pinned, factorIds: x.factorIds })),
+    engagements: cleanList(t.engagements).map(x => ({ id: x.id, name: x.name, value: x.value, pinned: x.pinned, factorIds: x.factorIds })),
     factors:     (Array.isArray(t.factors) ? t.factors : [])
       .filter(x => x && typeof x === "object" && x.id !== undefined)
-      .map(x => ({ id: x.id, name: typeof x.name === "string" ? x.name : "" })),
+      .map(x => ({ id: x.id, name: typeof x.name === "string" ? x.name : "", pinned: !!x.pinned })),
+  };
+}
+
+// Pin/unpin a Reaction, Engagement, or Factor (`kind` is "reactions",
+// "engagements", or "factors") — pinned items always sort to the top
+// of their tab regardless of the active sort mode (see
+// applyTaxonomySort below). Pinned state lives on the taxonomy item
+// itself, so it round-trips through the same GitHub save/load path as
+// everything else in the taxonomy library — hitting Save pushes it,
+// and every session that loads from GitHub afterward gets it back.
+function toggleTaxonomyPin(kind, id) {
+  taxonomy = {
+    ...taxonomy,
+    [kind]: taxonomy[kind].map(x => x.id === id ? { ...x, pinned: !x.pinned } : x),
   };
 }
 
@@ -129,6 +144,20 @@ function renameTaxonomyItem(kind, id, name) {
     [kind]: taxonomy[kind].map(x => x.id === id ? { ...x, name: String(name || "").trim() } : x),
   };
   saveLocal();
+}
+
+// Duplicates a Reaction/Engagement under a new name — copies its fixed
+// value and Factor tags, but starts with no heroes linked (heroes hold
+// a link, not the item itself, so a copy can't silently attach itself
+// to whoever held the original). Gets its own fresh id, so it sorts as
+// newly-created regardless of where the original sits.
+function duplicateTaxonomyItem(kind, id, newName) {
+  const item = taxonomy[kind].find(x => x.id === id);
+  if (!item) return null;
+  const copy = { ...item, id: newTaxonomyId(), name: String(newName || "").trim(), pinned: false, factorIds: [...item.factorIds] };
+  taxonomy = { ...taxonomy, [kind]: [...taxonomy[kind], copy] };
+  saveLocal();
+  return copy;
 }
 
 // Sets a Reaction/Engagement's fixed value (0-10) — the single source of
@@ -217,6 +246,24 @@ function addFactor(name) {
 function renameFactor(id, name) {
   taxonomy = { ...taxonomy, factors: taxonomy.factors.map(f => f.id === id ? { ...f, name: String(name || "").trim() } : f) };
   saveLocal();
+}
+
+// Duplicates a Factor under a new name, carrying over its tags: any
+// Reaction/Engagement that had the original tagged also gets the new
+// copy tagged, so the duplicate behaves identically until you choose
+// to tag it differently.
+function duplicateFactor(id, newName) {
+  const original = taxonomy.factors.find(f => f.id === id);
+  if (!original) return null;
+  const copy = { id: newTaxonomyId(), name: String(newName || "").trim() };
+  taxonomy = {
+    ...taxonomy,
+    reactions:   taxonomy.reactions.map(r => r.factorIds.includes(id) ? { ...r, factorIds: [...r.factorIds, copy.id] } : r),
+    engagements: taxonomy.engagements.map(e => e.factorIds.includes(id) ? { ...e, factorIds: [...e.factorIds, copy.id] } : e),
+    factors:     [...taxonomy.factors, copy],
+  };
+  saveLocal();
+  return copy;
 }
 
 // Deleting a Factor also un-tags it from every Reaction/Engagement.
@@ -318,6 +365,58 @@ function wireTaxonomySearchClear(input, clearBtn, onChange) {
     sync();
     onChange();
     input.focus();
+  });
+}
+
+// Wires a Taxonomy tab's "New [X] name" add row. The input starts
+// locked (read-only, showing 'Press "+ Add" to add new [X] name.') so
+// it can never be mistaken for the search bar above it — the first tap
+// on "+ Add" just unlocks the field for typing; a second tap (or
+// Enter) with text in it actually calls `onAdd` and re-locks. Escape,
+// or blurring away with nothing typed, also re-locks without adding
+// anything.
+function wireTaxonomyAddRow(addBtnId, inputId, label, onAdd) {
+  const btn = document.getElementById(addBtnId);
+  const input = document.getElementById(inputId);
+  if (!btn || !input) return;
+  const lockedPlaceholder = `Press "+ Add" to add new ${label} name.`;
+  const editingPlaceholder = `Type new ${label} name…`;
+
+  const lock = () => {
+    input.value = "";
+    input.readOnly = true;
+    input.placeholder = lockedPlaceholder;
+    input.classList.add("taxonomy-new-locked");
+  };
+  const unlock = () => {
+    input.readOnly = false;
+    input.placeholder = editingPlaceholder;
+    input.classList.remove("taxonomy-new-locked");
+    input.focus();
+  };
+
+  lock();
+
+  btn.addEventListener("click", () => {
+    if (input.readOnly) { unlock(); return; }
+    const val = input.value.trim();
+    if (!val) { input.focus(); return; }
+    onAdd(val);
+    lock();
+  });
+
+  input.addEventListener("keydown", e => {
+    if (e.key === "Enter") { e.preventDefault(); btn.click(); }
+    else if (e.key === "Escape") { e.preventDefault(); lock(); }
+  });
+
+  // Clicking "+ Add" while the field is focused-but-empty fires this
+  // blur before the click's own listener runs; the timeout lets that
+  // click land first so it isn't cancelled out from under it.
+  input.addEventListener("blur", () => {
+    setTimeout(() => {
+      if (!input.readOnly && !input.value.trim()) lock();
+    }, 150);
   });
 }
 
@@ -743,38 +842,20 @@ const fSsScore     = document.getElementById("f-ss-score");
     if (e.key === "Enter") { e.preventDefault(); saveRenameModal(); }
     else if (e.key === "Escape") { e.preventDefault(); closeRenameModal(); }
   });
-  document.getElementById("taxonomy-add-reaction").addEventListener("click", () => {
-    const input = document.getElementById("taxonomy-new-reaction");
-    if (!input.value.trim()) return;
-    addTaxonomyItem("reactions", input.value);
-    input.value = "";
+  wireTaxonomyAddRow("taxonomy-add-reaction", "taxonomy-new-reaction", "Reaction", val => {
+    addTaxonomyItem("reactions", val);
     renderTaxonomyPanel("reactions");
     renderRteSection();
   });
-  document.getElementById("taxonomy-new-reaction").addEventListener("keydown", e => {
-    if (e.key === "Enter") document.getElementById("taxonomy-add-reaction").click();
-  });
-  document.getElementById("taxonomy-add-engagement").addEventListener("click", () => {
-    const input = document.getElementById("taxonomy-new-engagement");
-    if (!input.value.trim()) return;
-    addTaxonomyItem("engagements", input.value);
-    input.value = "";
+  wireTaxonomyAddRow("taxonomy-add-engagement", "taxonomy-new-engagement", "Engagement", val => {
+    addTaxonomyItem("engagements", val);
     renderTaxonomyPanel("engagements");
     renderRteSection();
   });
-  document.getElementById("taxonomy-new-engagement").addEventListener("keydown", e => {
-    if (e.key === "Enter") document.getElementById("taxonomy-add-engagement").click();
-  });
-  document.getElementById("taxonomy-add-factor").addEventListener("click", () => {
-    const input = document.getElementById("taxonomy-new-factor");
-    if (!input.value.trim()) return;
-    addFactor(input.value);
-    input.value = "";
+  wireTaxonomyAddRow("taxonomy-add-factor", "taxonomy-new-factor", "Factor", val => {
+    addFactor(val);
     renderFactorsPanel();
     renderQdFactorChips(); // Section 8.1 checklist — new Factor shows up immediately
-  });
-  document.getElementById("taxonomy-new-factor").addEventListener("keydown", e => {
-    if (e.key === "Enter") document.getElementById("taxonomy-add-factor").click();
   });
 
   // Search boxes for each Taxonomy tab — filters that tab's list by
@@ -4070,15 +4151,17 @@ function ssSetAllyCount(count) {
 
 // One ally row's markup: Healing and Passive are 0-100% sliders (dmg
 // reduction, evasion, etc. all read as "how much"), Buff is a 0-10
-// count of distinct buffs granted (buffs are discrete, not a %).
-// Each slider is paired with a live numeric readout since range inputs
-// don't show their own value.
+// count of distinct buffs granted (buffs are discrete, not a %). Each
+// slider is paired with a live numeric input (not just a read-only
+// readout) so an exact value can be typed directly instead of only
+// dragging the slider to it.
 function ssAllyTypeRowHTML(type, label, max, unit) {
   return `
     <div class="ss-ally-type-row">
       <label class="ss-ally-type-label">${label}</label>
       <input type="range" class="ss-ally-range" data-type="${type}" min="0" max="${max}" step="1" value="0" />
-      <span class="ss-ally-type-readout" data-readout-for="${type}">0${unit}</span>
+      <input type="number" class="ss-ally-type-input" data-type-input="${type}" min="0" max="${max}" step="1" value="0" inputmode="numeric" />
+      <span class="ss-ally-type-unit">${unit}</span>
     </div>`;
 }
 
@@ -4098,6 +4181,16 @@ function renderSsAllyRows(prefill) {
     `);
   }
   box.innerHTML = rows.join("");
+  // "Copy Ally 1 to all below" — only useful with 2+ allies on screen.
+  // Rendered here (not static markup) so it only appears/disappears as
+  // ssAllyCount changes, same lifecycle as the rows themselves.
+  const copyBtnHTML = ssAllyCount > 1
+    ? `<button type="button" class="btn btn-ghost btn-sm" id="ss-ally-copy-first">⧉ Copy Ally 1 to All Below</button>`
+    : "";
+  box.insertAdjacentHTML("beforeend", copyBtnHTML);
+  const copyBtn = document.getElementById("ss-ally-copy-first");
+  if (copyBtn) copyBtn.addEventListener("click", ssCopyFirstAllyToRest);
+
   // Restore any prior values for this ally slot (see the ssChooseSide
   // call site — keeps re-opening the Questionnaire non-destructive).
   box.querySelectorAll(".ss-ally-row").forEach(row => {
@@ -4107,28 +4200,69 @@ function renderSsAllyRows(prefill) {
     ["healing", "passive", "buff"].forEach(type => {
       const key = type === "buff" ? "buffCount" : type;
       const val = Number(prior[key]) || 0;
-      const input = row.querySelector(`[data-type="${type}"]`);
-      const readout = row.querySelector(`[data-readout-for="${type}"]`);
+      const range = row.querySelector(`[data-type="${type}"]`);
+      const input = row.querySelector(`[data-type-input="${type}"]`);
+      range.value = val;
       input.value = val;
-      readout.textContent = val + (type === "buff" ? "" : "%");
     });
   });
-  box.querySelectorAll(".ss-ally-range").forEach(input => {
-    input.addEventListener("input", () => {
-      const row = input.closest(".ss-ally-row");
-      const readout = row.querySelector(`[data-readout-for="${input.dataset.type}"]`);
-      const unit = input.dataset.type === "buff" ? "" : "%";
-      readout.textContent = input.value + unit;
+  ssWireAllyRowInputs(box);
+}
+
+// Wires the range↔number-input pairs for every ally row currently in
+// the DOM — dragging the slider updates the number, typing a number
+// (clamped to the same 0-max) updates the slider, and either one
+// updating refreshes the live Selfless score preview.
+function ssWireAllyRowInputs(box) {
+  box.querySelectorAll(".ss-ally-range").forEach(range => {
+    const row = range.closest(".ss-ally-row");
+    const input = row.querySelector(`[data-type-input="${range.dataset.type}"]`);
+    range.addEventListener("input", () => {
+      input.value = range.value;
       updateSsSelflessPreview();
+    });
+    input.addEventListener("input", () => {
+      const max = Number(input.max) || 0;
+      let val = input.value === "" ? "" : Math.max(0, Math.min(max, Math.round(Number(input.value) || 0)));
+      range.value = val === "" ? 0 : val;
+      updateSsSelflessPreview();
+    });
+    // On blur, snap a blank/out-of-range typed value back to something
+    // concrete so it doesn't linger empty or silently past its max.
+    input.addEventListener("blur", () => {
+      const max = Number(input.max) || 0;
+      input.value = Math.max(0, Math.min(max, Math.round(Number(input.value) || 0)));
+      range.value = input.value;
     });
   });
 }
 
+// Copies Ally 1's Healing/Passive/Buff values down to every other ally
+// row currently rendered, however many that is — Ally 2, 3, 4, etc.
+function ssCopyFirstAllyToRest() {
+  const firstRow = document.querySelector('#ss-ally-rows .ss-ally-row[data-ally="1"]');
+  if (!firstRow) return;
+  const values = {};
+  firstRow.querySelectorAll("[data-type-input]").forEach(input => {
+    values[input.dataset.typeInput] = input.value;
+  });
+  document.querySelectorAll('#ss-ally-rows .ss-ally-row').forEach(row => {
+    if (row.dataset.ally === "1") return;
+    Object.entries(values).forEach(([type, val]) => {
+      const range = row.querySelector(`[data-type="${type}"]`);
+      const input = row.querySelector(`[data-type-input="${type}"]`);
+      if (range) range.value = val;
+      if (input) input.value = val;
+    });
+  });
+  updateSsSelflessPreview();
+}
+
 function ssCollectSupportedAllies() {
   return Array.from(document.querySelectorAll("#ss-ally-rows .ss-ally-row")).map(row => ({
-    healing:   Number(row.querySelector('[data-type="healing"]').value) || 0,
-    passive:   Number(row.querySelector('[data-type="passive"]').value) || 0,
-    buffCount: Number(row.querySelector('[data-type="buff"]').value) || 0,
+    healing:   Number(row.querySelector('[data-type-input="healing"]').value) || 0,
+    passive:   Number(row.querySelector('[data-type-input="passive"]').value) || 0,
+    buffCount: Number(row.querySelector('[data-type-input="buff"]').value) || 0,
   }));
 }
 
@@ -4351,10 +4485,18 @@ let taxonomySearchQuery = { reactions: "", engagements: "", factors: "" };
 function applyTaxonomySort(kind, items) {
   const mode = taxonomySortMode[kind] || "oldest";
   const sorted = [...items];
-  if (mode === "az") sorted.sort((a, b) => (a.name || "").localeCompare(b.name || "", undefined, { sensitivity: "base" }));
-  else if (mode === "za") sorted.sort((a, b) => (b.name || "").localeCompare(a.name || "", undefined, { sensitivity: "base" }));
-  else if (mode === "newest") sorted.sort((a, b) => b.id - a.id);
-  else sorted.sort((a, b) => a.id - b.id); // "oldest" (default)
+  let cmp;
+  if (mode === "az") cmp = (a, b) => (a.name || "").localeCompare(b.name || "", undefined, { sensitivity: "base" });
+  else if (mode === "za") cmp = (a, b) => (b.name || "").localeCompare(a.name || "", undefined, { sensitivity: "base" });
+  else if (mode === "newest") cmp = (a, b) => b.id - a.id;
+  else cmp = (a, b) => a.id - b.id; // "oldest" (default)
+  // Pinned items always float to the top, ahead of the chosen sort
+  // mode — the mode still governs ordering *within* the pinned group
+  // and within the unpinned group.
+  sorted.sort((a, b) => {
+    const pinDiff = (b.pinned ? 1 : 0) - (a.pinned ? 1 : 0);
+    return pinDiff !== 0 ? pinDiff : cmp(a, b);
+  });
   return sorted;
 }
 
@@ -4381,12 +4523,16 @@ function escAttr(s) {
    editing happens instead, via the row's ✏️ button. Reuses the app's
    existing .overlay/.modal shell (same one Admin/Details/etc. use) for
    visual consistency rather than introducing a bespoke dialog style. */
-let renameModalTarget = null; // { kind, id } while open, else null
+function taxonomyKindLabel(kind) {
+  return kind === "reactions" ? "Reaction" : kind === "engagements" ? "Engagement" : "Factor";
+}
+
+let renameModalTarget = null; // { kind, id, mode: "rename"|"duplicate" } while open, else null
 
 function openRenameModal(kind, id, currentName) {
-  renameModalTarget = { kind, id };
-  const label = kind === "reactions" ? "Reaction" : kind === "engagements" ? "Engagement" : "Factor";
-  document.getElementById("rename-modal-title").textContent = `Rename ${label}`;
+  renameModalTarget = { kind, id, mode: "rename" };
+  document.getElementById("rename-modal-title").textContent = `Rename ${taxonomyKindLabel(kind)}`;
+  document.getElementById("rename-modal-save").textContent = "Save";
   const input = document.getElementById("rename-modal-input");
   input.value = currentName || "";
   document.getElementById("rename-modal-overlay").classList.add("open");
@@ -4394,24 +4540,57 @@ function openRenameModal(kind, id, currentName) {
   input.select();
 }
 
+// Opens the same modal in "duplicate" mode — pre-fills "<name> (copy)"
+// as a starting point for the new name rather than reusing the
+// original name outright, since Taxonomy names are otherwise free to
+// collide but a fresh duplicate having the exact same name as its
+// source would be confusing to pick apart in the list right away.
+function openDuplicateModal(kind, id, currentName) {
+  renameModalTarget = { kind, id, mode: "duplicate" };
+  document.getElementById("rename-modal-title").textContent = `Duplicate ${taxonomyKindLabel(kind)} As…`;
+  document.getElementById("rename-modal-save").textContent = "Duplicate";
+  const input = document.getElementById("rename-modal-input");
+  input.value = currentName ? `${currentName} (copy)` : "";
+  document.getElementById("rename-modal-overlay").classList.add("open");
+  input.focus();
+  input.select();
+}
+
 function closeRenameModal() {
   document.getElementById("rename-modal-overlay").classList.remove("open");
+  document.getElementById("rename-modal-save").textContent = "Save";
   renameModalTarget = null;
 }
 
 function saveRenameModal() {
   if (!renameModalTarget) return;
-  const { kind, id } = renameModalTarget;
+  const { kind, id, mode } = renameModalTarget;
   const newName = document.getElementById("rename-modal-input").value;
-  if (kind === "factors") {
-    renameFactor(id, newName);
-    renderFactorsPanel();
-    renderQdFactorChips(); // Factor names show in the Quick Draft dropdown too
+  // A duplicate with a blank name would be indistinguishable from any
+  // other unnamed item in the list — require actual text for that case
+  // only; plain rename keeps its existing (unnamed)-allowed behavior.
+  if (mode === "duplicate" && !String(newName || "").trim()) return;
+
+  if (mode === "duplicate") {
+    if (kind === "factors") {
+      duplicateFactor(id, newName);
+      renderFactorsPanel();
+      renderQdFactorChips();
+    } else {
+      duplicateTaxonomyItem(kind, id, newName);
+      renderTaxonomyPanel(kind);
+    }
   } else {
-    renameTaxonomyItem(kind, id, newName);
-    renderTaxonomyPanel(kind);
+    if (kind === "factors") {
+      renameFactor(id, newName);
+      renderFactorsPanel();
+      renderQdFactorChips(); // Factor names show in the Quick Draft dropdown too
+    } else {
+      renameTaxonomyItem(kind, id, newName);
+      renderTaxonomyPanel(kind);
+    }
   }
-  renderRteSection(); // reflects the rename immediately if the hero modal is open behind this one
+  renderRteSection(); // reflects the change immediately if the hero modal is open behind this one
   closeRenameModal();
 }
 
@@ -4467,11 +4646,13 @@ function renderTaxonomyPanel(kind) {
   box.innerHTML = items.map(item => {
     const heroCount = heroesLinkedToTaxonomyItem(kind, item.id).length;
     return `
-    <div class="taxonomy-row" data-id="${item.id}">
+    <div class="taxonomy-row${item.pinned ? " pinned" : ""}" data-id="${item.id}">
       <div class="taxonomy-row-main">
         <div class="taxonomy-row-name-wrap">
+          <button type="button" class="taxonomy-row-pinbtn${item.pinned ? " active" : ""}" data-kind="${kind}" data-id="${item.id}" title="${item.pinned ? "Unpin" : "Pin to top"}">📌</button>
           <div class="taxonomy-row-name-text">${item.name || "(unnamed)"}</div>
           <button type="button" class="taxonomy-row-editbtn" data-kind="${kind}" data-id="${item.id}" title="Edit name">✏️</button>
+          <button type="button" class="taxonomy-row-editbtn taxonomy-row-dupbtn" data-kind="${kind}" data-id="${item.id}" title="Duplicate as new ${label}">⎘</button>
         </div>
         <div class="taxonomy-row-value">
           <label for="taxonomy-value-${kind}-${item.id}">Value</label>
@@ -4488,10 +4669,22 @@ function renderTaxonomyPanel(kind) {
   `;
   }).join("");
 
-  box.querySelectorAll(".taxonomy-row-editbtn").forEach(btn => {
+  box.querySelectorAll(".taxonomy-row-editbtn:not(.taxonomy-row-dupbtn)").forEach(btn => {
     btn.addEventListener("click", () => {
       const item = taxonomy[btn.dataset.kind].find(x => x.id === Number(btn.dataset.id));
       openRenameModal(btn.dataset.kind, Number(btn.dataset.id), item?.name || "");
+    });
+  });
+  box.querySelectorAll(".taxonomy-row-dupbtn").forEach(btn => {
+    btn.addEventListener("click", () => {
+      const item = taxonomy[btn.dataset.kind].find(x => x.id === Number(btn.dataset.id));
+      openDuplicateModal(btn.dataset.kind, Number(btn.dataset.id), item?.name || "");
+    });
+  });
+  box.querySelectorAll(".taxonomy-row-pinbtn").forEach(btn => {
+    btn.addEventListener("click", () => {
+      toggleTaxonomyPin(btn.dataset.kind, Number(btn.dataset.id));
+      renderTaxonomyPanel(btn.dataset.kind);
     });
   });
   box.querySelectorAll(".taxonomy-row-value-input").forEach(input => {
@@ -4754,11 +4947,13 @@ function renderFactorsPanel() {
       ...tagged.engagements.map(e => `<span class="taxonomy-factor-tag engagement" title="Engagement">🛡 ${e.name || "(unnamed)"}</span>`),
     ];
     return `
-    <div class="taxonomy-row" data-id="${f.id}">
+    <div class="taxonomy-row${f.pinned ? " pinned" : ""}" data-id="${f.id}">
       <div class="taxonomy-row-main">
         <div class="taxonomy-row-name-wrap">
+          <button type="button" class="taxonomy-row-pinbtn${f.pinned ? " active" : ""}" data-id="${f.id}" title="${f.pinned ? "Unpin" : "Pin to top"}">📌</button>
           <div class="taxonomy-row-name-text">${f.name || "(unnamed)"}</div>
           <button type="button" class="taxonomy-row-editbtn" data-id="${f.id}" title="Edit name">✏️</button>
+          <button type="button" class="taxonomy-row-editbtn taxonomy-row-dupbtn" data-id="${f.id}" title="Duplicate as new Factor">⎘</button>
         </div>
         <button type="button" class="taxonomy-row-delete" data-id="${f.id}" title="Delete — un-tags it from every Reaction/Engagement">✕</button>
       </div>
@@ -4768,10 +4963,22 @@ function renderFactorsPanel() {
     </div>
   `;
   }).join("");
-  box.querySelectorAll(".taxonomy-row-editbtn").forEach(btn => {
+  box.querySelectorAll(".taxonomy-row-editbtn:not(.taxonomy-row-dupbtn)").forEach(btn => {
     btn.addEventListener("click", () => {
       const f = taxonomy.factors.find(x => x.id === Number(btn.dataset.id));
       openRenameModal("factors", Number(btn.dataset.id), f?.name || "");
+    });
+  });
+  box.querySelectorAll(".taxonomy-row-dupbtn").forEach(btn => {
+    btn.addEventListener("click", () => {
+      const f = taxonomy.factors.find(x => x.id === Number(btn.dataset.id));
+      openDuplicateModal("factors", Number(btn.dataset.id), f?.name || "");
+    });
+  });
+  box.querySelectorAll(".taxonomy-row-pinbtn").forEach(btn => {
+    btn.addEventListener("click", () => {
+      toggleTaxonomyPin("factors", Number(btn.dataset.id));
+      renderFactorsPanel();
     });
   });
   box.querySelectorAll(".taxonomy-row-delete").forEach(btn => {

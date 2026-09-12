@@ -68,13 +68,42 @@
       border: 1px solid #c9a227;
       cursor: pointer;
     }
-    .ss-ally-type-readout {
-      width: 38px;
-      text-align: right;
+    .ss-ally-type-input {
+      width: 44px;
       flex-shrink: 0;
+      text-align: right;
       font-variant-numeric: tabular-nums;
       color: #e8c84a;
       font-size: 12px;
+      background: rgba(255,255,255,.04);
+      border: 1px solid rgba(201,162,39,.35);
+      border-radius: 4px;
+      padding: 2px 4px;
+    }
+    .ss-ally-type-input:focus {
+      outline: none;
+      border-color: #e8c84a;
+    }
+    /* Chrome/Safari spinner arrows take up space in an already tight
+       row — hide them, the range slider next to it is the drag control. */
+    .ss-ally-type-input::-webkit-inner-spin-button,
+    .ss-ally-type-input::-webkit-outer-spin-button {
+      -webkit-appearance: none;
+      margin: 0;
+    }
+    .ss-ally-type-input[type="number"] {
+      -moz-appearance: textfield;
+    }
+    .ss-ally-type-unit {
+      width: 14px;
+      flex-shrink: 0;
+      color: var(--text-dim, #8aa0b5);
+      font-size: 11px;
+    }
+    #ss-ally-copy-first {
+      display: block;
+      margin: 8px 0 0;
+      width: 100%;
     }
 
     /* Taxonomy Manager — header + tabs stay fixed; only the panel content
@@ -1132,10 +1161,6 @@
         <!-- Reactions manager (5.1) -->
         <div class="taxonomy-panel" id="taxonomy-panel-reactions">
           <p class="taxonomy-panel-hint">Named, reusable tags a hero can hold (e.g. "Reacts to Counterattack"). Each Reaction's score (0–10) is fixed here and used everywhere it's assigned. Tag Factors here — every hero holding this Reaction inherits the tag automatically.</p>
-          <div class="taxonomy-add-row">
-            <input type="text" id="taxonomy-new-reaction" placeholder="New Reaction name…" />
-            <button type="button" class="btn btn-gold btn-sm" id="taxonomy-add-reaction">+ Add</button>
-          </div>
           <div class="taxonomy-search-row">
             <div class="taxonomy-search-wrap">
               <input type="text" class="taxonomy-search" id="taxonomy-search-reactions" placeholder="🔍 Search Reactions…" />
@@ -1148,16 +1173,16 @@
               <option value="za">Z → A</option>
             </select>
           </div>
+          <div class="taxonomy-add-row">
+            <input type="text" id="taxonomy-new-reaction" readonly placeholder="Press &quot;+ Add&quot; to add new Reaction name." />
+            <button type="button" class="btn btn-gold btn-sm" id="taxonomy-add-reaction">+ Add</button>
+          </div>
           <div class="taxonomy-list" id="taxonomy-list-reactions"></div>
         </div>
 
         <!-- Engagements manager (5.1) -->
         <div class="taxonomy-panel" id="taxonomy-panel-engagements" style="display:none">
           <p class="taxonomy-panel-hint">Things a hero proactively does or provides (e.g. "Stops all counterattacks"). Each Engagement's score (0–10) is fixed here and used everywhere it's assigned. Tag Factors here the same way as Reactions.</p>
-          <div class="taxonomy-add-row">
-            <input type="text" id="taxonomy-new-engagement" placeholder="New Engagement name…" />
-            <button type="button" class="btn btn-gold btn-sm" id="taxonomy-add-engagement">+ Add</button>
-          </div>
           <div class="taxonomy-search-row">
             <div class="taxonomy-search-wrap">
               <input type="text" class="taxonomy-search" id="taxonomy-search-engagements" placeholder="🔍 Search Engagements…" />
@@ -1170,16 +1195,16 @@
               <option value="za">Z → A</option>
             </select>
           </div>
+          <div class="taxonomy-add-row">
+            <input type="text" id="taxonomy-new-engagement" readonly placeholder="Press &quot;+ Add&quot; to add new Engagement name." />
+            <button type="button" class="btn btn-gold btn-sm" id="taxonomy-add-engagement">+ Add</button>
+          </div>
           <div class="taxonomy-list" id="taxonomy-list-engagements"></div>
         </div>
 
         <!-- Factors manager (5.2) -->
         <div class="taxonomy-panel" id="taxonomy-panel-factors" style="display:none">
           <p class="taxonomy-panel-hint">The checklist vocabulary used during Quick Draft (e.g. "Counterattack", "Speedy units"). Factors are just names — tag them onto a Reaction/Engagement from those tabs.</p>
-          <div class="taxonomy-add-row">
-            <input type="text" id="taxonomy-new-factor" placeholder="New Factor name…" />
-            <button type="button" class="btn btn-gold btn-sm" id="taxonomy-add-factor">+ Add</button>
-          </div>
           <div class="taxonomy-search-row">
             <div class="taxonomy-search-wrap">
               <input type="text" class="taxonomy-search" id="taxonomy-search-factors" placeholder="🔍 Search Factors…" />
@@ -1191,6 +1216,10 @@
               <option value="az">A → Z</option>
               <option value="za">Z → A</option>
             </select>
+          </div>
+          <div class="taxonomy-add-row">
+            <input type="text" id="taxonomy-new-factor" readonly placeholder="Press &quot;+ Add&quot; to add new Factor name." />
+            <button type="button" class="btn btn-gold btn-sm" id="taxonomy-add-factor">+ Add</button>
           </div>
           <div class="taxonomy-list" id="taxonomy-list-factors"></div>
         </div>
