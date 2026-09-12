@@ -3631,11 +3631,68 @@
         "hType": "SST",
         "hScore": 7
       },
-      "reactions": [],
-      "engagements": [],
-      "selfishScore": 0,
+      "reactions": [
+        {
+          "refId": 1788775037126
+        },
+        {
+          "refId": 1789198037209
+        },
+        {
+          "refId": 1789198095367
+        }
+      ],
+      "engagements": [
+        {
+          "refId": 1789197410409
+        },
+        {
+          "refId": 1789133298898
+        },
+        {
+          "refId": 1788772268160
+        },
+        {
+          "refId": 1788783734183
+        },
+        {
+          "refId": 1788773060667
+        },
+        {
+          "refId": 1788773067411
+        },
+        {
+          "refId": 1788783359037
+        },
+        {
+          "refId": 1788785954933
+        },
+        {
+          "refId": 1788773476896
+        },
+        {
+          "refId": 1789117987794
+        },
+        {
+          "refId": 1789136308091
+        },
+        {
+          "refId": 1788782920388
+        }
+      ],
+      "selfishScore": 5,
       "selflessScore": 0,
-      "needsRerating": true
+      "needsRerating": false,
+      "pvpTag": false,
+      "altStats": null,
+      "selfSkillIds": [
+        "spdCr",
+        "extraTurns",
+        "immobDebuff",
+        "shields",
+        "lifesteal"
+      ],
+      "allySupport": []
     },
     {
       "id": 1787460248038,
@@ -11947,6 +12004,28 @@
           1788700420912,
           1788783127095
         ]
+      },
+      {
+        "id": 1789198037209,
+        "name": "Effectiveness passive",
+        "value": 8,
+        "factorIds": [
+          1789014978867,
+          1788779877239
+        ]
+      },
+      {
+        "id": 1789198095367,
+        "name": "Critical Hit Damage passive",
+        "value": 7.5,
+        "factorIds": [
+          1788772992919,
+          1788700420912,
+          1788701036557,
+          1788773130306,
+          1788774033143,
+          1788786248167
+        ]
       }
     ],
     "engagements": [
@@ -12613,7 +12692,7 @@
       },
       {
         "id": 1789133298898,
-        "name": "Detonation on debuffs (poison/venom/burn/bleed/bomb)",
+        "name": "Detonation on debuffs (erosion/poison/venom/burn/bleed/bomb)",
         "value": 7,
         "pinned": false,
         "factorIds": [
@@ -12866,6 +12945,43 @@
           1789116366949,
           1789191623914
         ]
+      },
+      {
+        "id": 1789197410409,
+        "name": "Erosion to enemies (dmg 5% of lost hp)",
+        "value": 8,
+        "factorIds": [
+          1788700420912,
+          1788772992919,
+          1788701036557,
+          1789014978867
+        ]
+      },
+      {
+        "id": 1789197666694,
+        "name": "Bind on enemies",
+        "value": 9,
+        "pinned": false,
+        "factorIds": [
+          1788700862798,
+          1788775427431,
+          1788785891810,
+          1788786300042
+        ]
+      },
+      {
+        "id": 1789198155998,
+        "name": "Increase Critical Hit Damage Buff",
+        "value": 7.5,
+        "factorIds": [
+          1788772992919,
+          1788700420912,
+          1788701036557,
+          1788773130306,
+          1788774033143,
+          1788786248167
+        ],
+        "pinned": false
       }
     ],
     "factors": [
@@ -13147,5 +13263,5 @@
     ]
   },
   "schemaVersion": 2,
-  "savedAt": "2026-09-12T07:02:48.059Z"
+  "savedAt": "2026-09-12T07:29:32.785Z"
 }
