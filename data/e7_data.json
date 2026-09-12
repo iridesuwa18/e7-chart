@@ -3991,6 +3991,9 @@
         },
         {
           "refId": 1788783359037
+        },
+        {
+          "refId": 1788773060667
         }
       ],
       "selfishScore": 4,
@@ -4094,11 +4097,41 @@
       "hType_legacy": "SUR",
       "hScore_legacy": 3,
       "altStats_legacy": null,
-      "reactions": [],
-      "engagements": [],
-      "selfishScore": 0,
+      "reactions": [
+        {
+          "refId": 1788772502540
+        }
+      ],
+      "engagements": [
+        {
+          "refId": 1789201180270
+        },
+        {
+          "refId": 1788924109560
+        },
+        {
+          "refId": 1788782920388
+        },
+        {
+          "refId": 1788773067411
+        },
+        {
+          "refId": 1789201317168
+        },
+        {
+          "refId": 1788773060667
+        }
+      ],
+      "selfishScore": 2,
       "selflessScore": 0,
-      "needsRerating": true
+      "needsRerating": false,
+      "pvpTag": false,
+      "altStats": null,
+      "selfSkillIds": [
+        "immobDebuff",
+        "shields"
+      ],
+      "allySupport": []
     },
     {
       "id": 1787462525837,
@@ -13323,6 +13356,24 @@
           1788773731924,
           1789014978867
         ]
+      },
+      {
+        "id": 1789201180270,
+        "name": "Death Sentence (Undispellable) on enemies",
+        "value": 5,
+        "factorIds": [
+          1788701036557,
+          1788700420912,
+          1789014978867
+        ]
+      },
+      {
+        "id": 1789201317168,
+        "name": "Silence enemies",
+        "value": 7.8,
+        "factorIds": [
+          1789201341223
+        ]
       }
     ],
     "factors": [
@@ -13604,9 +13655,13 @@
       {
         "id": 1789200928831,
         "name": "High resource units (Fighting Spirit/Focus)"
+      },
+      {
+        "id": 1789201341223,
+        "name": "Strong non-basic skills"
       }
     ]
   },
   "schemaVersion": 2,
-  "savedAt": "2026-09-12T08:17:32.638Z"
+  "savedAt": "2026-09-12T08:23:39.807Z"
 }
