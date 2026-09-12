@@ -11707,10 +11707,38 @@
         "hType": "SUR",
         "hScore": 6
       },
-      "reactions": [],
+      "reactions": [
+        {
+          "refId": 1788783157740
+        },
+        {
+          "refId": 1789209367308
+        }
+      ],
       "engagements": [
         {
           "refId": 1788785021751
+        },
+        {
+          "refId": 1788924109560
+        },
+        {
+          "refId": 1788780605209
+        },
+        {
+          "refId": 1788785733011
+        },
+        {
+          "refId": 1788912251007
+        },
+        {
+          "refId": 1788773060667
+        },
+        {
+          "refId": 1788772268160
+        },
+        {
+          "refId": 1788700311844
         }
       ],
       "selfishScore": 3,
@@ -11747,12 +11775,42 @@
         "hType": "SUR",
         "hScore": 5
       },
-      "reactions": [],
-      "engagements": [],
-      "selfishScore": 0,
+      "reactions": [
+        {
+          "refId": 1789218520756
+        },
+        {
+          "refId": 1788775037126
+        }
+      ],
+      "engagements": [
+        {
+          "refId": 1789133085456
+        },
+        {
+          "refId": 1788773060667
+        },
+        {
+          "refId": 1789218602674
+        },
+        {
+          "refId": 1788772163166
+        },
+        {
+          "refId": 1788783734183
+        }
+      ],
+      "selfishScore": 2,
       "selflessScore": 0,
-      "needsRerating": true,
-      "hidden": true
+      "needsRerating": false,
+      "hidden": true,
+      "pvpTag": false,
+      "altStats": null,
+      "selfSkillIds": [
+        "spdCr",
+        "selfPassive"
+      ],
+      "allySupport": []
     },
     {
       "id": 1787752519542,
@@ -13147,6 +13205,15 @@
         "factorIds": [
           1788772861638
         ]
+      },
+      {
+        "id": 1789218520756,
+        "name": "Reduces the effect of decreased Combat Readiness debuffs inflicted on all allies",
+        "value": 8,
+        "pinned": false,
+        "factorIds": [
+          1789209213432
+        ]
       }
     ],
     "engagements": [
@@ -14343,6 +14410,14 @@
           1788700420912,
           1788701036557
         ]
+      },
+      {
+        "id": 1789218602674,
+        "name": "Unaffected by elemental disadvantage",
+        "value": 7.8,
+        "factorIds": [
+          1789218645455
+        ]
       }
     ],
     "factors": [
@@ -14635,9 +14710,13 @@
         "id": 1789209213432,
         "name": "Prevention of combat readiness skills (e.g. restrict)",
         "pinned": false
+      },
+      {
+        "id": 1789218645455,
+        "name": "Counter element units"
       }
     ]
   },
   "schemaVersion": 2,
-  "savedAt": "2026-09-12T13:03:45.396Z"
+  "savedAt": "2026-09-12T13:12:31.208Z"
 }
