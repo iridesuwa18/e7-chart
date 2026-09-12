@@ -3911,10 +3911,43 @@
         "hScore": 4
       },
       "reactions": [],
-      "engagements": [],
-      "selfishScore": 0,
+      "engagements": [
+        {
+          "refId": 1788772268160
+        },
+        {
+          "refId": 1788783734183
+        },
+        {
+          "refId": 1788785954933
+        },
+        {
+          "refId": 1788700311844
+        },
+        {
+          "refId": 1789200202866
+        },
+        {
+          "refId": 1788773060667
+        },
+        {
+          "refId": 1788785377663
+        },
+        {
+          "refId": 1788780605209
+        }
+      ],
+      "selfishScore": 3,
       "selflessScore": 0,
-      "needsRerating": true
+      "needsRerating": false,
+      "pvpTag": false,
+      "altStats": null,
+      "selfSkillIds": [
+        "extraTurns",
+        "decCr",
+        "lifesteal"
+      ],
+      "allySupport": []
     },
     {
       "id": 1787461305233,
@@ -13171,6 +13204,15 @@
           1788700420912,
           1788785891810
         ]
+      },
+      {
+        "id": 1789200202866,
+        "name": "Increase Damage against Shields",
+        "value": 7.5,
+        "pinned": false,
+        "factorIds": [
+          1789135503443
+        ]
       }
     ],
     "factors": [
@@ -13452,5 +13494,5 @@
     ]
   },
   "schemaVersion": 2,
-  "savedAt": "2026-09-12T07:59:24.513Z"
+  "savedAt": "2026-09-12T08:05:17.238Z"
 }
