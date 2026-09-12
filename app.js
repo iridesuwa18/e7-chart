@@ -427,7 +427,12 @@ function wireTaxonomyAddRow(addBtnId, inputId, label, onAdd) {
   // click land first so it isn't cancelled out from under it.
   input.addEventListener("blur", () => {
     setTimeout(() => {
-      if (!input.readOnly && !input.value.trim()) lock();
+      // Also bail if focus has already landed back on this input by
+      // the time this fires — a stray/transient blur (e.g. a mobile
+      // keyboard's predictive bar, or a browser suggestion popup that
+      // briefly steals focus) shouldn't be able to yank the field back
+      // to its locked state while it's actually still in use.
+      if (!input.readOnly && !input.value.trim() && document.activeElement !== input) lock();
     }, 150);
   });
 }
@@ -4865,16 +4870,19 @@ function renderTaxonomyHeroSearch(kind, id) {
   const linkedHeroes = heroesLinkedToTaxonomyItem(kind, id);
 
   row.innerHTML = `
-    <div class="taxonomy-tagged-chips">
-      ${linkedHeroes.length
-        ? linkedHeroes.map(h => `<span class="taxonomy-hero-chip" title="Already has this ${label}">✅ ${h.name || "Unnamed"}</span>`).join("")
-        : `<div class="taxonomy-empty-note">Not assigned to any hero yet — search below to add one.</div>`}
-    </div>
     <div class="taxonomy-search-wrap">
       <input type="text" class="taxonomy-search taxonomy-hero-row-search" placeholder="🔍 Search a hero to add…" value="${escAttr(query)}" />
       <button type="button" class="taxonomy-search-clear" title="Clear search" aria-label="Clear search">✕</button>
     </div>
     <div class="taxonomy-hero-row-results"></div>
+    <div class="taxonomy-tagged-chips">
+      ${linkedHeroes.length
+        // Newest-tagged first: there's no per-link timestamp stored, so
+        // this reverses roster order (heroes are always appended, so
+        // last-in-roster == most recently added) as the closest proxy.
+        ? [...linkedHeroes].reverse().map(h => `<span class="taxonomy-hero-chip" title="Already has this ${label}">✅ ${h.name || "Unnamed"}</span>`).join("")
+        : `<div class="taxonomy-empty-note">Not assigned to any hero yet — search above to add one.</div>`}
+    </div>
   `;
 
   const searchInput = row.querySelector(".taxonomy-hero-row-search");
