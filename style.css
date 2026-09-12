@@ -2357,6 +2357,10 @@ body.dot-mode .origin-dot:hover {
   background: rgba(255,255,255,.02);
 }
 .taxonomy-hero-result.already { opacity: .6; }
+.taxonomy-hero-result.pinned {
+  border-color: var(--gold-dim, #c9a227);
+  background: rgba(201,162,39,.08);
+}
 .taxonomy-hero-result-portrait {
   width: 24px; height: 24px;
   border-radius: 50%;

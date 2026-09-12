@@ -281,13 +281,25 @@ function deleteFactor(id) {
    score/value itself lives on the taxonomy item (set via
    setTaxonomyItemValue above), never per-hero. Removing a link never
    touches the library item itself. */
+// Tracks whichever hero most recently got linked to a Reaction or
+// Engagement via addHeroTaxonomyLink (the "+Add to Hero" quick-add
+// search under a Taxonomy row — see renderTaxonomyHeroSearch further
+// down). Session-only, like the search boxes it feeds: it exists so
+// that search box can pin your last pick at the top, letting you add
+// several heroes to different Reactions/Engagements back-to-back
+// without retyping their name each time.
+let lastHeroLinkedToTaxonomy = null;
+
 function addHeroTaxonomyLink(heroId, kind, refId) {
+  let didLink = false;
   heroes = heroes.map(h => {
     if (h.id !== heroId) return h;
     const list = Array.isArray(h[kind]) ? h[kind] : [];
     if (list.some(x => (x.refId ?? x) === refId)) return h; // already linked
+    didLink = true;
     return { ...h, [kind]: [...list, { refId }] };
   });
+  if (didLink) lastHeroLinkedToTaxonomy = heroId;
   saveLocal();
 }
 
@@ -4870,24 +4882,31 @@ function renderTaxonomyHeroSearch(kind, id) {
 
   const renderResults = () => {
     const q = (taxonomyHeroRowSearch[rowKey] || "").trim().toLowerCase();
-    if (!q) {
-      resultsBox.innerHTML = `<div class="taxonomy-empty-note">Type a hero's name…</div>`;
-      return;
-    }
-    const matches = heroes
-      .filter(h => (h.name || "").toLowerCase().includes(q))
-      .slice(0, 12);
+    // The most recently hero linked to any Reaction/Engagement (across
+    // the whole app, not just this row) is pinned as the first result
+    // — with or without a search typed — so adding several heroes in a
+    // row doesn't mean re-typing/re-finding your last one each time.
+    const pinnedHero = lastHeroLinkedToTaxonomy != null
+      ? heroes.find(h => h.id === lastHeroLinkedToTaxonomy)
+      : null;
+    const rest = heroes
+      .filter(h => (!pinnedHero || h.id !== pinnedHero.id) && (!q || (h.name || "").toLowerCase().includes(q)))
+      .slice(0, pinnedHero ? 11 : 12);
+    const matches = pinnedHero ? [pinnedHero, ...rest] : rest;
     if (!matches.length) {
-      resultsBox.innerHTML = `<div class="taxonomy-empty-note">No matching heroes.</div>`;
+      resultsBox.innerHTML = q
+        ? `<div class="taxonomy-empty-note">No matching heroes.</div>`
+        : `<div class="taxonomy-empty-note">Type a hero's name…</div>`;
       return;
     }
     resultsBox.innerHTML = matches.map(h => {
       const already = (Array.isArray(h[kind]) ? h[kind] : []).some(x => (x.refId ?? x) === id);
+      const isPinned = pinnedHero && h.id === pinnedHero.id;
       const portrait = h.iconData ? `<img src="${h.iconData}">` : "⚔️";
       return `
-        <div class="taxonomy-hero-result${already ? " already" : ""}" data-hero-id="${h.id}">
+        <div class="taxonomy-hero-result${already ? " already" : ""}${isPinned ? " pinned" : ""}" data-hero-id="${h.id}">
           <div class="taxonomy-hero-result-portrait">${portrait}</div>
-          <div class="taxonomy-hero-result-name">${h.name || "Unnamed"}</div>
+          <div class="taxonomy-hero-result-name">${isPinned ? "🕐 " : ""}${h.name || "Unnamed"}</div>
           ${already
             ? `<span class="taxonomy-hero-added-badge">✓ Added</span>`
             : `<button type="button" class="taxonomy-hero-add-btn" data-hero-id="${h.id}">+ Add</button>`}
