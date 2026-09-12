@@ -4876,10 +4876,63 @@
       "hScore_legacy": 6,
       "altStats_legacy": null,
       "reactions": [],
-      "engagements": [],
+      "engagements": [
+        {
+          "refId": 1789132181142
+        },
+        {
+          "refId": 1789132668882
+        },
+        {
+          "refId": 1788785021751
+        },
+        {
+          "refId": 1789015241813
+        },
+        {
+          "refId": 1788912251007
+        },
+        {
+          "refId": 1789210263222
+        },
+        {
+          "refId": 1788773067411
+        },
+        {
+          "refId": 1789210423124
+        },
+        {
+          "refId": 1788785954933
+        }
+      ],
       "selfishScore": 0,
-      "selflessScore": 0,
-      "needsRerating": true
+      "selflessScore": 0.67,
+      "needsRerating": false,
+      "pvpTag": false,
+      "altStats": null,
+      "selfSkillIds": [],
+      "allySupport": [
+        {
+          "healing": 0,
+          "passive": 0,
+          "buffCount": 2
+        },
+        {
+          "healing": 0,
+          "passive": 0,
+          "buffCount": 2
+        },
+        {
+          "healing": 0,
+          "passive": 0,
+          "buffCount": 2
+        },
+        {
+          "healing": 0,
+          "passive": 0,
+          "buffCount": 2
+        }
+      ]
     },
     {
       "id": 1787481229729,
@@ -14009,6 +14062,32 @@
           1788912649792,
           1788700781693
         ]
+      },
+      {
+        "id": 1789210263222,
+        "name": "Pestilence (Undispellable) Buff",
+        "value": 8,
+        "factorIds": [
+          1788700420912,
+          1788701036557,
+          1788773130306,
+          1789014978867,
+          1788700781693,
+          1788912649792
+        ]
+      },
+      {
+        "id": 1789210423124,
+        "name": "Venom on enemies",
+        "value": 7,
+        "pinned": false,
+        "factorIds": [
+          1788700420912,
+          1788772992919,
+          1788701036557,
+          1789014978867,
+          1789191623914
+        ]
       }
     ],
     "factors": [
@@ -14302,5 +14381,5 @@
     ]
   },
   "schemaVersion": 2,
-  "savedAt": "2026-09-12T10:47:28.921Z"
+  "savedAt": "2026-09-12T10:54:56.286Z"
 }
