@@ -6880,10 +6880,41 @@
       "hScore_legacy": 5,
       "altStats_legacy": null,
       "reactions": [],
-      "engagements": [],
-      "selfishScore": 0,
+      "engagements": [
+        {
+          "refId": 1788924109560
+        },
+        {
+          "refId": 1788773067411
+        },
+        {
+          "refId": 1788785954933
+        },
+        {
+          "refId": 1789298662125
+        },
+        {
+          "refId": 1789132181142
+        },
+        {
+          "refId": 1788782920388
+        },
+        {
+          "refId": 1789118896007
+        }
+      ],
+      "selfishScore": 4,
       "selflessScore": 0,
-      "needsRerating": true
+      "needsRerating": false,
+      "pvpTag": false,
+      "altStats": null,
+      "selfSkillIds": [
+        "decCr",
+        "extraTurns",
+        "immobDebuff",
+        "shields"
+      ],
+      "allySupport": []
     },
     {
       "id": 1787485506656,
@@ -17478,6 +17509,15 @@
           1788912649792
         ],
         "pinned": false
+      },
+      {
+        "id": 1789298662125,
+        "name": "Deterrence (Unique) Effect",
+        "value": 10,
+        "factorIds": [
+          1788773130306,
+          1788700420912
+        ]
       }
     ],
     "factors": [
@@ -17818,5 +17858,5 @@
     ]
   },
   "schemaVersion": 2,
-  "savedAt": "2026-09-13T11:21:06.003Z"
+  "savedAt": "2026-09-13T11:26:11.355Z"
 }
