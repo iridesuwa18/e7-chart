@@ -1223,6 +1223,9 @@
         },
         {
           "refId": 1789116663470
+        },
+        {
+          "refId": 1788773060667
         }
       ],
       "selfishScore": 2,
@@ -4974,8 +4977,37 @@
         "hType": "SUR",
         "hScore": 6
       },
-      "reactions": [],
-      "engagements": [],
+      "reactions": [
+        {
+          "refId": 1789217293880
+        },
+        {
+          "refId": 1788775147348
+        }
+      ],
+      "engagements": [
+        {
+          "refId": 1789132668882
+        },
+        {
+          "refId": 1788772163166
+        },
+        {
+          "refId": 1789118795470
+        },
+        {
+          "refId": 1789132307453
+        },
+        {
+          "refId": 1788912251007
+        },
+        {
+          "refId": 1788785733011
+        },
+        {
+          "refId": 1788782920388
+        }
+      ],
       "selfishScore": 0,
       "selflessScore": 0,
       "needsRerating": true
@@ -5921,6 +5953,9 @@
         },
         {
           "refId": 1789177107595
+        },
+        {
+          "refId": 1788773060667
         }
       ],
       "selfishScore": 0,
@@ -17388,5 +17423,5 @@
     ]
   },
   "schemaVersion": 2,
-  "savedAt": "2026-09-13T08:47:26.715Z"
+  "savedAt": "2026-09-13T08:55:10.969Z"
 }
