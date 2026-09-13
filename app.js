@@ -290,6 +290,13 @@ function deleteFactor(id) {
 // without retyping their name each time.
 let lastHeroLinkedToTaxonomy = null;
 
+// Tracks whichever hero was most recently opened via "Edit Hero" in
+// the roster. Session-only, same lifecycle as lastHeroLinkedToTaxonomy
+// above — pinned alongside it at the top of the "search a hero to add"
+// box so you can jump between reviewing a hero's roster card and
+// tagging it onto Reactions/Engagements without re-searching its name.
+let lastHeroViewedInEdit = null;
+
 function addHeroTaxonomyLink(heroId, kind, refId) {
   let didLink = false;
   heroes = heroes.map(h => {
@@ -3836,6 +3843,7 @@ function openAddModal() {
 
 function openEditModal(h) {
   editingId = h.id;
+  lastHeroViewedInEdit = h.id;
   modalTitle.textContent = "EDIT HERO";
   modalConfirm.textContent = "Save Changes";
   modalDelete.style.display = "inline-flex";
@@ -4890,17 +4898,26 @@ function renderTaxonomyHeroSearch(kind, id) {
 
   const renderResults = () => {
     const q = (taxonomyHeroRowSearch[rowKey] || "").trim().toLowerCase();
-    // The most recently hero linked to any Reaction/Engagement (across
-    // the whole app, not just this row) is pinned as the first result
-    // — with or without a search typed — so adding several heroes in a
-    // row doesn't mean re-typing/re-finding your last one each time.
-    const pinnedHero = lastHeroLinkedToTaxonomy != null
-      ? heroes.find(h => h.id === lastHeroLinkedToTaxonomy)
-      : null;
+    // Two heroes get pinned to the top of the list, with or without a
+    // search typed: whichever hero was last opened via "Edit Hero" in
+    // the roster (viewedHero), above whichever hero was last linked to
+    // any Reaction/Engagement (linkedHero) — that's the order the user
+    // asked for. If they're the same hero, it's only shown once, not
+    // duplicated.
+    const viewedHero = lastHeroViewedInEdit != null ? heroes.find(h => h.id === lastHeroViewedInEdit) : null;
+    const linkedHero = lastHeroLinkedToTaxonomy != null ? heroes.find(h => h.id === lastHeroLinkedToTaxonomy) : null;
+    const pinnedHeroes = [];
+    const pinReasons = {}; // heroId -> ["viewed"|"linked", ...], drives the label/icon below
+    if (viewedHero) { pinnedHeroes.push(viewedHero); pinReasons[viewedHero.id] = ["viewed"]; }
+    if (linkedHero) {
+      if (pinReasons[linkedHero.id]) pinReasons[linkedHero.id].push("linked");
+      else { pinnedHeroes.push(linkedHero); pinReasons[linkedHero.id] = ["linked"]; }
+    }
+    const pinnedIds = new Set(pinnedHeroes.map(h => h.id));
     const rest = heroes
-      .filter(h => (!pinnedHero || h.id !== pinnedHero.id) && (!q || (h.name || "").toLowerCase().includes(q)))
-      .slice(0, pinnedHero ? 11 : 12);
-    const matches = pinnedHero ? [pinnedHero, ...rest] : rest;
+      .filter(h => !pinnedIds.has(h.id) && (!q || (h.name || "").toLowerCase().includes(q)))
+      .slice(0, Math.max(0, 12 - pinnedHeroes.length));
+    const matches = [...pinnedHeroes, ...rest];
     if (!matches.length) {
       resultsBox.innerHTML = q
         ? `<div class="taxonomy-empty-note">No matching heroes.</div>`
@@ -4909,12 +4926,14 @@ function renderTaxonomyHeroSearch(kind, id) {
     }
     resultsBox.innerHTML = matches.map(h => {
       const already = (Array.isArray(h[kind]) ? h[kind] : []).some(x => (x.refId ?? x) === id);
-      const isPinned = pinnedHero && h.id === pinnedHero.id;
+      const reasons = pinReasons[h.id];
+      const isPinned = !!reasons;
+      const pinIcon = !reasons ? "" : reasons.includes("viewed") && reasons.includes("linked") ? "👁️🕐 " : reasons.includes("viewed") ? "👁️ " : "🕐 ";
       const portrait = h.iconData ? `<img src="${h.iconData}">` : "⚔️";
       return `
         <div class="taxonomy-hero-result${already ? " already" : ""}${isPinned ? " pinned" : ""}" data-hero-id="${h.id}">
           <div class="taxonomy-hero-result-portrait">${portrait}</div>
-          <div class="taxonomy-hero-result-name">${isPinned ? "🕐 " : ""}${h.name || "Unnamed"}</div>
+          <div class="taxonomy-hero-result-name">${pinIcon}${h.name || "Unnamed"}</div>
           ${already
             ? `<span class="taxonomy-hero-added-badge">✓ Added</span>`
             : `<button type="button" class="taxonomy-hero-add-btn" data-hero-id="${h.id}">+ Add</button>`}
