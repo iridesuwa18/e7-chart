@@ -1939,6 +1939,7 @@ function qdReplayDraft(uptoIdx, draftArr) {
       score: entry ? entry.score : 0,
       reasons: entry ? entry.reasons : [],
       elNote,
+      side: qdHeroSide(hero, parsed.variant),
     });
   }
   return { perSlot, activeMain: null, chain1: null, chain2: null };
@@ -2684,12 +2685,16 @@ function qdShowSlotInfo(btn, info) {
   const popup = ensureQdSlotInfoPopup();
   const h = info.hero;
   const nameSuffix = info.variant === "ghost" ? " (Ghost)" : "";
+  const sideLine = info.side === "selfish" ? "😈 Selfish"
+    : info.side === "selfless" ? "🙏 Selfless"
+    : "Unrated (no Selfish/Selfless score set)";
   const reasonLines = info.reasons.length
     ? info.reasons.map(r => `<div class="qd-slot-info-line">${r}</div>`).join("")
     : `<div class="qd-slot-info-line">Ranked by overall kit score — the average of every one of ${h.name || "this hero"}'s Reaction/Engagement scores. No Enemy Factors are currently ticked, so nothing more specific was being targeted.</div>`;
   const elLine = info.elNote ? `<div class="qd-slot-info-line">${info.elNote}</div>` : "";
   popup.innerHTML = `
     <div class="qd-slot-info-title">${h.name || "Unnamed"}${nameSuffix} — ${info.score.toFixed(1)}</div>
+    <div class="qd-slot-info-line">${sideLine}</div>
     ${reasonLines}
     ${elLine}
   `;
