@@ -1817,6 +1817,11 @@ function qdHeroInDraft(heroId) {
 function qdReplayDraft(uptoIdx, draftArr) {
   draftArr = draftArr || quickDraft;
   const perSlot = [];
+  // Same Ban Protect bucket used to rank live suggestions (Rule 1) —
+  // recomputed here too so the (i) "why was this hero picked" info
+  // popup can explain the elemental side of a pick, not just its score.
+  const counterEl = qdBanProtectElement ? QD_ELEMENT_COUNTER[qdBanProtectElement] : null;
+  const avoidEl   = qdBanProtectElement ? Object.keys(QD_ELEMENT_COUNTER).find(k => QD_ELEMENT_COUNTER[k] === qdBanProtectElement) : null;
   for (let i = 0; i < uptoIdx; i++) {
     const raw = draftArr[i];
     if (raw === null || raw === undefined) continue;
@@ -1824,9 +1829,16 @@ function qdReplayDraft(uptoIdx, draftArr) {
     const hero = heroes.find(h => h.id === parsed.heroId);
     if (!hero) continue;
     const entry = qdSimpleScoreEntry(hero, parsed.variant);
+    const elBucket = qdElementBucket(hero, counterEl, avoidEl);
+    const elNote = !qdBanProtectElement ? null
+      : elBucket === 0 ? `⚔️ Counters the enemy's ${qdBanProtectElement} Ban Protect`
+      : elBucket === 2 ? `⚠️ Same element the enemy's ${qdBanProtectElement} Ban Protect already beats`
+      : null;
     perSlot.push({
       index: i, heroId: parsed.heroId, hero, variant: parsed.variant,
       score: entry ? entry.score : 0,
+      reasons: entry ? entry.reasons : [],
+      elNote,
     });
   }
   return { perSlot, activeMain: null, chain1: null, chain2: null };
@@ -2084,19 +2096,31 @@ function qdSuggestForNextIdx(nextIdx, draftArr, banProtectEl) {
 
 // One candidate hero+variant pair, scored against every ticked Factor.
 // Returns null when the hero/variant matches none of them, so callers
-// can filter losers out with a simple `.filter(Boolean)`.
-// One candidate hero+variant pair, scored against every ticked Factor.
-// Returns null when the hero/variant matches none of them, so callers
 // can filter losers out with a simple `.filter(Boolean)`. Ghost shares
 // the main build's Reactions/Engagements (see qdOverallKitScore above),
 // so both variants read the same h.reactions/h.engagements here too.
+//
+// Two-level average, not a sum: a Factor can be tagged onto several
+// Reactions/Engagements, and a hero can hold several of the ones tagged
+// to any one ticked Factor. Step 1 — for each ticked Factor the hero
+// matches at all, average together EVERY one of the hero's own
+// Reaction/Engagement scores tagged to that Factor (not just the best
+// one) to get that hero's own average score for that one Factor. Step
+// 2 — average those per-Factor averages together across however many
+// ticked Factors the hero actually matched. This is deliberately NOT a
+// sum: summing would reward a hero purely for matching MORE of the
+// ticked Factors (breadth), even if each individual match were weak,
+// letting a shallow generalist outrank a sharp specialist. Averaging
+// at both levels means ticking fewer, more targeted Factors surfaces
+// whichever heroes are genuinely the best-suited answers to exactly
+// those threats, not just whichever heroes' kits happen to touch the
+// most tagged ground.
 function qdFactorEntryForHero(h, variant) {
   const reactions   = h.reactions   || [];
   const engagements = h.engagements || [];
   if (reactions.length === 0 && engagements.length === 0) return null;
 
-  let score = 0;
-  const matchedFactorIds = new Set();
+  const perFactorAverages = []; // one entry per ticked Factor this hero matches at all
   const matchReasons = [];
 
   qdTickedFactorIds.forEach(factorId => {
@@ -2104,45 +2128,44 @@ function qdFactorEntryForHero(h, variant) {
     const taggedRIds = new Set(taggedR.map(r => r.id));
     const taggedEIds = new Set(taggedE.map(e => e.id));
 
-    // A hero can hold more than one Reaction/Engagement tagged to the
-    // SAME Factor (e.g. two different counterattack answers) — take
-    // only the single best-scoring one per Factor, so a hero isn't
-    // rewarded twice for overlapping coverage of one ticked item. This
-    // is what "ranked by their Reaction/Engage score for that specific
-    // item (not their overall average)" (8.2) means in practice. Score
-    // comes from the taxonomy item's fixed value, not anything per-hero.
-    let best = null;
+    // Every one of the hero's own Reactions/Engagements tagged to this
+    // Factor counts toward its average — not just the single best one.
+    const matchedScores = [];
+    const matchedNames = [];
     reactions.forEach(r => {
       const refId = r?.refId ?? r;
       if (!taggedRIds.has(refId)) return;
-      const s = taxonomyValue("reactions", refId);
-      if (!best || s > best.s) best = { s, name: taxonomyName("reactions", refId) };
+      matchedScores.push(taxonomyValue("reactions", refId));
+      matchedNames.push(taxonomyName("reactions", refId));
     });
     engagements.forEach(e => {
       const refId = e?.refId ?? e;
       if (!taggedEIds.has(refId)) return;
-      const s = taxonomyValue("engagements", refId);
-      if (!best || s > best.s) best = { s, name: taxonomyName("engagements", refId) };
+      matchedScores.push(taxonomyValue("engagements", refId));
+      matchedNames.push(taxonomyName("engagements", refId));
     });
+    if (matchedScores.length === 0) return; // hero doesn't match this ticked Factor at all
 
-    if (best) {
-      matchedFactorIds.add(factorId);
-      score += best.s;
-      matchReasons.push(`🎯 ${taxonomyName("factors", factorId)} → ${best.name} (${best.s.toFixed(1)})`);
-    }
+    const factorAvg = matchedScores.reduce((a, b) => a + b, 0) / matchedScores.length;
+    perFactorAverages.push(factorAvg);
+    matchReasons.push(
+      `🎯 ${taxonomyName("factors", factorId)} → avg ${factorAvg.toFixed(1)} across ${matchedScores.length} match${matchedScores.length === 1 ? "" : "es"} (${matchedNames.join(", ")})`
+    );
   });
 
-  if (matchedFactorIds.size === 0) return null;
+  if (perFactorAverages.length === 0) return null;
+  const finalScore = perFactorAverages.reduce((a, b) => a + b, 0) / perFactorAverages.length;
   return {
     heroId: h.id, hero: h, variant,
-    matchedCount: matchedFactorIds.size,
-    score: +score.toFixed(1),
+    matchedCount: perFactorAverages.length,
+    score: +finalScore.toFixed(1),
     reasons: [
-      `Matches ${matchedFactorIds.size}/${qdTickedFactorIds.size} ticked Factor${qdTickedFactorIds.size === 1 ? "" : "s"}`,
+      `Matches ${perFactorAverages.length}/${qdTickedFactorIds.size} ticked Factor${qdTickedFactorIds.size === 1 ? "" : "s"}`,
       ...matchReasons,
     ],
   };
 }
+
 
 // Ranked candidate list for one slot, driven entirely by ticked
 // Factors — no quadrant/tier/chain concept enters into this at all.
@@ -2471,6 +2494,83 @@ function renderQdHeroSearchResults() {
   resultsEl.style.display = "block";
 }
 
+let qdSlotInfoPopupEl = null;
+
+// Single reusable floating popup (same "append to <body>, position via
+// getBoundingClientRect" pattern as the Enemy Factors menu and the
+// last-saved info popup above) that explains why a hero landed in a
+// given Quick Draft slot — its (i) button's content. One shared
+// element rather than one per slot, since only ever one can be open.
+function ensureQdSlotInfoPopup() {
+  if (qdSlotInfoPopupEl) return qdSlotInfoPopupEl;
+  const popup = document.createElement("div");
+  popup.className = "qd-slot-info-popup";
+  popup.id = "qd-slot-info-popup";
+  popup.style.display = "none";
+  document.body.appendChild(popup);
+  qdSlotInfoPopupEl = popup;
+
+  const reposition = () => {
+    if (popup.style.display !== "none" && popup.dataset.anchorIdx) {
+      const btn = document.querySelector(`.qd-slot-info-btn[data-idx="${popup.dataset.anchorIdx}"]`);
+      if (btn) positionQdSlotInfoPopup(btn);
+    }
+  };
+  window.addEventListener("resize", reposition);
+  window.addEventListener("scroll", reposition, true);
+
+  document.addEventListener("click", e => {
+    if (popup.style.display === "none") return;
+    if (popup.contains(e.target) || e.target.closest(".qd-slot-info-btn")) return;
+    popup.style.display = "none";
+  });
+  document.addEventListener("keydown", e => {
+    if (e.key === "Escape" && popup.style.display !== "none") popup.style.display = "none";
+  });
+
+  return popup;
+}
+
+// Same left-clamped, always-below-the-button placement as
+// positionQdFactorMenu — keeps it from running off the right edge on
+// a narrow phone screen, and never flips upward to cover the slot row.
+function positionQdSlotInfoPopup(btn) {
+  const popup = qdSlotInfoPopupEl;
+  if (!btn || !popup) return;
+  const r = btn.getBoundingClientRect();
+  const popupWidth = popup.offsetWidth || 260;
+  let left = r.left - popupWidth + 20; // right-align toward the button rather than left-align, since slots sit in a tight grid near the screen edge
+  left = Math.max(8, Math.min(left, window.innerWidth - popupWidth - 8));
+  popup.style.left = `${left}px`;
+  popup.style.top  = `${r.bottom + 6}px`;
+}
+
+// Explains one slot's pick using the exact same data the ranking itself
+// used: the Factor-match breakdown when Factor mode was on (or a note
+// that overall kit score was used when it wasn't), plus the Ban
+// Protect elemental note if one applies. `info` is one entry from
+// qdReplayDraft's perSlot array (score/reasons/elNote already computed
+// there against the CURRENT ticked Factors and Ban Protect element —
+// this is a live explanation of "why does this pick rank the way it
+// does right now", not a frozen snapshot from whenever it was drafted).
+function qdShowSlotInfo(btn, info) {
+  const popup = ensureQdSlotInfoPopup();
+  const h = info.hero;
+  const nameSuffix = info.variant === "ghost" ? " (Ghost)" : "";
+  const reasonLines = info.reasons.length
+    ? info.reasons.map(r => `<div class="qd-slot-info-line">${r}</div>`).join("")
+    : `<div class="qd-slot-info-line">Ranked by overall kit score — the average of every one of ${h.name || "this hero"}'s Reaction/Engagement scores. No Enemy Factors are currently ticked, so nothing more specific was being targeted.</div>`;
+  const elLine = info.elNote ? `<div class="qd-slot-info-line">${info.elNote}</div>` : "";
+  popup.innerHTML = `
+    <div class="qd-slot-info-title">${h.name || "Unnamed"}${nameSuffix} — ${info.score.toFixed(1)}</div>
+    ${reasonLines}
+    ${elLine}
+  `;
+  popup.dataset.anchorIdx = btn.dataset.idx;
+  popup.style.display = "block";
+  positionQdSlotInfoPopup(btn);
+}
+
 function renderQuickDraft() {
   const slotsWrap = document.getElementById("quickdraft-slots");
   slotsWrap.innerHTML = "";
@@ -2490,11 +2590,18 @@ function renderQuickDraft() {
       const ghostBadge = info.variant === "ghost" ? `<div class="qd-slot-ghost-badge" title="Drafted as its Ghost build">👻</div>` : "";
       slot.innerHTML = `
         ${ghostBadge}
+        <button type="button" class="qd-slot-info-btn" data-idx="${i}" title="Why was this hero picked?">ⓘ</button>
         <div class="qd-slot-portrait">${portrait}</div>
         <div class="qd-slot-name">${h.name || "Unnamed"}</div>
         <div class="qd-slot-score">${info.score.toFixed(1)}</div>`;
       slot.title = `Tap to remove ${h.name || "this hero"} from Quick Draft`;
       slot.addEventListener("click", () => removeFromQuickDraft(h.id));
+      // The (i) button sits inside the same clickable slot but must NOT
+      // trigger the remove-from-draft click above it.
+      slot.querySelector(".qd-slot-info-btn").addEventListener("click", e => {
+        e.stopPropagation();
+        qdShowSlotInfo(e.currentTarget, info);
+      });
     } else {
       slot.innerHTML = `
         <div class="qd-slot-placeholder">＋</div>
@@ -2741,6 +2848,7 @@ function renderQdFactorMenuList() {
       cb.closest(".qd-factor-menu-item")?.classList.toggle("active", cb.checked);
       document.getElementById("qd-factor-menu-btn-label").textContent = qdFactorMenuLabel();
       saveQuickDraftModeLocal();
+      renderQuickDraft(); // refresh already-filled slots' scores/(i) explanations too, not just the suggestion panel
       if (quickDraftSuggestOpen) renderQuickDraftSuggestions();
     });
   });
