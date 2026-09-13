@@ -174,6 +174,14 @@
       margin: 8px 0 10px;
     }
     .taxonomy-search-row .taxonomy-search { margin: 0; }
+    .taxonomy-quickadd-btn {
+      flex-shrink: 0;
+      width: 30px;
+      padding: 7px 0;
+      text-align: center;
+      font-size: 14px;
+      line-height: 1;
+    }
     .taxonomy-sort-select {
       flex-shrink: 0;
       max-width: 40%;
@@ -1183,6 +1191,7 @@
               <input type="text" class="taxonomy-search" id="taxonomy-search-reactions" autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false" placeholder="🔍 Search Reactions…" />
               <button type="button" class="taxonomy-search-clear" id="taxonomy-search-reactions-clear" title="Clear search" aria-label="Clear search">✕</button>
             </div>
+            <button type="button" class="btn btn-gold btn-sm taxonomy-quickadd-btn" id="taxonomy-quickadd-reactions" style="display:none" title="Add &quot;[search text]&quot; as a new Reaction">+</button>
             <select class="taxonomy-sort-select" id="taxonomy-sort-reactions" title="Sort order">
               <option value="oldest">Oldest first</option>
               <option value="newest">Newest first</option>
@@ -1193,6 +1202,14 @@
           <div class="taxonomy-add-row">
             <input type="text" id="taxonomy-new-reaction" readonly autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false" placeholder="Press &quot;+ Add&quot; to add new Reaction name." />
             <button type="button" class="btn btn-gold btn-sm" id="taxonomy-add-reaction">+ Add</button>
+          </div>
+          <div class="taxonomy-quickfill-row" id="taxonomy-new-reaction-quickfill">
+            <button type="button" class="taxonomy-quickfill-btn">Increase</button>
+            <button type="button" class="taxonomy-quickfill-btn">Decrease</button>
+            <button type="button" class="taxonomy-quickfill-btn">Passive</button>
+            <button type="button" class="taxonomy-quickfill-btn">Buff</button>
+            <button type="button" class="taxonomy-quickfill-btn">Debuff</button>
+            <button type="button" class="taxonomy-quickfill-btn">Dispel</button>
           </div>
           <div class="taxonomy-list" id="taxonomy-list-reactions"></div>
         </div>
@@ -1205,6 +1222,7 @@
               <input type="text" class="taxonomy-search" id="taxonomy-search-engagements" autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false" placeholder="🔍 Search Engagements…" />
               <button type="button" class="taxonomy-search-clear" id="taxonomy-search-engagements-clear" title="Clear search" aria-label="Clear search">✕</button>
             </div>
+            <button type="button" class="btn btn-gold btn-sm taxonomy-quickadd-btn" id="taxonomy-quickadd-engagements" style="display:none" title="Add &quot;[search text]&quot; as a new Engagement">+</button>
             <select class="taxonomy-sort-select" id="taxonomy-sort-engagements" title="Sort order">
               <option value="oldest">Oldest first</option>
               <option value="newest">Newest first</option>
@@ -1215,6 +1233,14 @@
           <div class="taxonomy-add-row">
             <input type="text" id="taxonomy-new-engagement" readonly autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false" placeholder="Press &quot;+ Add&quot; to add new Engagement name." />
             <button type="button" class="btn btn-gold btn-sm" id="taxonomy-add-engagement">+ Add</button>
+          </div>
+          <div class="taxonomy-quickfill-row" id="taxonomy-new-engagement-quickfill">
+            <button type="button" class="taxonomy-quickfill-btn">Increase</button>
+            <button type="button" class="taxonomy-quickfill-btn">Decrease</button>
+            <button type="button" class="taxonomy-quickfill-btn">Passive</button>
+            <button type="button" class="taxonomy-quickfill-btn">Buff</button>
+            <button type="button" class="taxonomy-quickfill-btn">Debuff</button>
+            <button type="button" class="taxonomy-quickfill-btn">Dispel</button>
           </div>
           <div class="taxonomy-list" id="taxonomy-list-engagements"></div>
         </div>
@@ -1227,6 +1253,7 @@
               <input type="text" class="taxonomy-search" id="taxonomy-search-factors" autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false" placeholder="🔍 Search Factors…" />
               <button type="button" class="taxonomy-search-clear" id="taxonomy-search-factors-clear" title="Clear search" aria-label="Clear search">✕</button>
             </div>
+            <button type="button" class="btn btn-gold btn-sm taxonomy-quickadd-btn" id="taxonomy-quickadd-factors" style="display:none" title="Add &quot;[search text]&quot; as a new Factor">+</button>
             <select class="taxonomy-sort-select" id="taxonomy-sort-factors" title="Sort order">
               <option value="oldest">Oldest first</option>
               <option value="newest">Newest first</option>
@@ -1237,6 +1264,14 @@
           <div class="taxonomy-add-row">
             <input type="text" id="taxonomy-new-factor" readonly autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false" placeholder="Press &quot;+ Add&quot; to add new Factor name." />
             <button type="button" class="btn btn-gold btn-sm" id="taxonomy-add-factor">+ Add</button>
+          </div>
+          <div class="taxonomy-quickfill-row" id="taxonomy-new-factor-quickfill">
+            <button type="button" class="taxonomy-quickfill-btn">Increase</button>
+            <button type="button" class="taxonomy-quickfill-btn">Decrease</button>
+            <button type="button" class="taxonomy-quickfill-btn">Passive</button>
+            <button type="button" class="taxonomy-quickfill-btn">Buff</button>
+            <button type="button" class="taxonomy-quickfill-btn">Debuff</button>
+            <button type="button" class="taxonomy-quickfill-btn">Dispel</button>
           </div>
           <div class="taxonomy-list" id="taxonomy-list-factors"></div>
         </div>

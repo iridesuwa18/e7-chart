@@ -2115,6 +2115,29 @@ body.dot-mode .origin-dot:hover {
   color: var(--text-dim);
   background: rgba(255,255,255,.015);
 }
+.taxonomy-quickfill-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin: -6px 0 14px;
+}
+.taxonomy-quickfill-btn {
+  flex-shrink: 0;
+  padding: 3px 10px;
+  border-radius: 12px;
+  border: 1px solid rgba(201,162,39,.3);
+  background: rgba(255,255,255,.03);
+  color: var(--text-dim);
+  font-size: 11px;
+  font-family: 'Cinzel', serif;
+  cursor: pointer;
+  transition: background .15s, border-color .15s, color .15s;
+}
+.taxonomy-quickfill-btn:hover {
+  background: rgba(201,162,39,.12);
+  border-color: var(--gold-dim, #c9a227);
+  color: var(--text);
+}
 .taxonomy-list {
   display: flex;
   flex-direction: column;

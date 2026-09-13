@@ -442,6 +442,25 @@ function wireTaxonomyAddRow(addBtnId, inputId, label, onAdd) {
       if (!input.readOnly && !input.value.trim() && document.activeElement !== input) lock();
     }, 150);
   });
+
+  // Quick-fill chips (Increase/Decrease/Passive/Buff/Debuff/Dispel) —
+  // common recurring first words for Reaction/Engagement/Factor names.
+  // Clicking one unlocks the field (same as the first "+ Add" tap) if
+  // it's still locked, then fills or appends the word so typing the
+  // rest of the name (e.g. "Increase" + " ATK") is all that's left.
+  const quickFillBox = document.getElementById(`${inputId}-quickfill`);
+  if (quickFillBox) {
+    quickFillBox.querySelectorAll(".taxonomy-quickfill-btn").forEach(chip => {
+      chip.addEventListener("click", () => {
+        if (input.readOnly) unlock();
+        const word = chip.textContent.trim();
+        const current = input.value.trim();
+        input.value = current ? `${current} ${word}` : word;
+        input.focus();
+        input.setSelectionRange(input.value.length, input.value.length);
+      });
+    });
+  }
 }
 
 // Every hero currently holding a given Reaction/Engagement — backs both
@@ -894,21 +913,63 @@ const fSsScore     = document.getElementById("f-ss-score");
   });
 
   // Search boxes for each Taxonomy tab — filters that tab's list by
-  // name. Each has a matching "-clear" X button in the markup.
-  const wireTaxonomySearch = (inputId, kind, renderFn) => {
+  // name. Each has a matching "-clear" X button in the markup, plus a
+  // "+" quick-add button (only shown once the typed text matches
+  // nothing currently in the list) that creates a brand-new item using
+  // that exact search text as its name — no need to scroll back up to
+  // the dedicated "add new" row for something you were just searching
+  // for and came up empty.
+  const wireTaxonomySearch = (inputId, kind, renderFn, onQuickAdd) => {
     const input = document.getElementById(inputId);
     const clearBtn = document.getElementById(inputId + "-clear");
+    const quickAddBtn = document.getElementById(`taxonomy-quickadd-${kind}`);
     if (!input) return;
+    const syncQuickAdd = () => {
+      if (!quickAddBtn) return;
+      const q = input.value.trim();
+      const hasMatch = taxonomy[kind].some(x => taxonomyMatchesSearch(kind, x.name));
+      quickAddBtn.style.display = (q && !hasMatch) ? "inline-flex" : "none";
+    };
     const apply = () => {
       taxonomySearchQuery[kind] = input.value;
       renderFn(kind === "factors" ? undefined : kind);
+      syncQuickAdd();
     };
     input.addEventListener("input", apply);
     wireTaxonomySearchClear(input, clearBtn, apply);
+    syncQuickAdd();
+    if (quickAddBtn && onQuickAdd) {
+      quickAddBtn.addEventListener("click", () => {
+        const val = input.value.trim();
+        if (!val) return;
+        onQuickAdd(val);
+        // onQuickAdd (Reactions/Engagements) already clears the filter
+        // itself via remindToAddHeroes's own stale-filter check; this
+        // just covers the Factors case, which has no such flow.
+        if (input.value.trim()) {
+          input.value = "";
+          if (clearBtn) clearBtn.style.display = "none";
+          taxonomySearchQuery[kind] = "";
+          renderFn(kind === "factors" ? undefined : kind);
+        }
+        syncQuickAdd();
+      });
+    }
   };
-  wireTaxonomySearch("taxonomy-search-reactions", "reactions", renderTaxonomyPanel);
-  wireTaxonomySearch("taxonomy-search-engagements", "engagements", renderTaxonomyPanel);
-  wireTaxonomySearch("taxonomy-search-factors", "factors", renderFactorsPanel);
+  wireTaxonomySearch("taxonomy-search-reactions", "reactions", renderTaxonomyPanel, val => {
+    const item = addTaxonomyItem("reactions", val);
+    renderRteSection();
+    remindToAddHeroes("reactions", item.id);
+  });
+  wireTaxonomySearch("taxonomy-search-engagements", "engagements", renderTaxonomyPanel, val => {
+    const item = addTaxonomyItem("engagements", val);
+    renderRteSection();
+    remindToAddHeroes("engagements", item.id);
+  });
+  wireTaxonomySearch("taxonomy-search-factors", "factors", renderFactorsPanel, val => {
+    addFactor(val);
+    renderQdFactorChips(); // Section 8.1 checklist — new Factor shows up immediately
+  });
 
   // Sort dropdowns for each Taxonomy tab (oldest/newest by creation,
   // or A→Z / Z→A by name) — same independent-per-tab pattern as search.
