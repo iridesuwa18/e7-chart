@@ -13681,7 +13681,7 @@
     },
     {
       "id": 1787755292381,
-      "name": "Kawerick",
+      "name": "Kawerik",
       "rarity": "5r",
       "role": "Mage",
       "element": "Fire",
@@ -13695,12 +13695,47 @@
       "hType_legacy": "SUR",
       "hScore_legacy": 4,
       "altStats_legacy": null,
-      "reactions": [],
-      "engagements": [],
-      "selfishScore": 0,
+      "reactions": [
+        {
+          "refId": 1789115386205
+        },
+        {
+          "refId": 1789274562028
+        }
+      ],
+      "engagements": [
+        {
+          "refId": 1788773060667
+        },
+        {
+          "refId": 1789201317168
+        },
+        {
+          "refId": 1788773067411
+        },
+        {
+          "refId": 1788785627002
+        },
+        {
+          "refId": 1789118896007
+        },
+        {
+          "refId": 1788786124368
+        },
+        {
+          "refId": 1788700311844
+        }
+      ],
+      "selfishScore": 1,
       "selflessScore": 0,
-      "needsRerating": true,
-      "hidden": true
+      "needsRerating": false,
+      "hidden": true,
+      "pvpTag": false,
+      "altStats": null,
+      "selfSkillIds": [
+        "spdCr"
+      ],
+      "allySupport": []
     },
     {
       "id": 1787755372046,
@@ -14566,6 +14601,15 @@
         "pinned": false,
         "factorIds": [
           1788785891810
+        ]
+      },
+      {
+        "id": 1789274562028,
+        "name": "Damage prop to target's speed",
+        "value": 7.8,
+        "pinned": false,
+        "factorIds": [
+          1788773895734
         ]
       }
     ],
@@ -16152,5 +16196,5 @@
     ]
   },
   "schemaVersion": 2,
-  "savedAt": "2026-09-13T04:38:08.435Z"
+  "savedAt": "2026-09-13T04:43:40.522Z"
 }
