@@ -4154,7 +4154,11 @@ function renderSsSelfishChecklist() {
   // Re-opening an already-Selfish hero comes back ticked the way it was
   // saved, instead of starting blank every time.
   const priorChecked = new Set((ssTarget === "alt" ? modalAltSelfSkillIds : modalSelfSkillIds) || []);
-  box.innerHTML = SELF_SKILLS.map(s => `
+  // Alphabetical by label for display only — SELF_SKILLS itself stays in
+  // its original order since computeSelfishScore/other lookups above key
+  // off `id`, not array position, so this can't affect scoring.
+  const sortedSkills = [...SELF_SKILLS].sort((a, b) => a.label.localeCompare(b.label, undefined, { sensitivity: "base" }));
+  box.innerHTML = sortedSkills.map(s => `
     <label class="ss-check-item">
       <input type="checkbox" class="ss-selfish-check" value="${s.id}" ${priorChecked.has(s.id) ? "checked" : ""} />
       ${s.label}
