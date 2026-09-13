@@ -13264,10 +13264,18 @@
       "altStats_legacy": null,
       "reactions": [],
       "engagements": [],
-      "selfishScore": 0,
+      "selfishScore": 3,
       "selflessScore": 0,
-      "needsRerating": true,
-      "hidden": true
+      "needsRerating": false,
+      "hidden": true,
+      "pvpTag": false,
+      "altStats": null,
+      "selfSkillIds": [
+        "spdCr",
+        "decCr",
+        "immobDebuff"
+      ],
+      "allySupport": []
     },
     {
       "id": 1787754738507,
@@ -13880,7 +13888,7 @@
         "id": 1789177637826,
         "name": "Reactive attack by passives (Not counter)",
         "value": 9.6,
-        "pinned": false,
+        "pinned": true,
         "factorIds": [
           1789177680699,
           1788773895734,
@@ -15831,5 +15839,5 @@
     ]
   },
   "schemaVersion": 2,
-  "savedAt": "2026-09-13T02:31:09.040Z"
+  "savedAt": "2026-09-13T02:33:35.965Z"
 }
