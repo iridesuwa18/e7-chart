@@ -11633,6 +11633,9 @@
       "reactions": [
         {
           "refId": 1789120795174
+        },
+        {
+          "refId": 1789217068833
         }
       ],
       "engagements": [
@@ -12378,6 +12381,9 @@
         },
         {
           "refId": 1789221069112
+        },
+        {
+          "refId": 1789221117694
         }
       ],
       "engagements": [
@@ -12880,6 +12886,9 @@
         },
         {
           "refId": 1788775147348
+        },
+        {
+          "refId": 1789262656055
         }
       ],
       "engagements": [
@@ -12995,12 +13004,41 @@
       "hType_legacy": "SUR",
       "hScore_legacy": 5,
       "altStats_legacy": null,
-      "reactions": [],
-      "engagements": [],
-      "selfishScore": 0,
+      "reactions": [
+        {
+          "refId": 1789217068833
+        },
+        {
+          "refId": 1789203511668
+        },
+        {
+          "refId": 1789209367308
+        },
+        {
+          "refId": 1789263239648
+        }
+      ],
+      "engagements": [
+        {
+          "refId": 1789133085456
+        },
+        {
+          "refId": 1789132181142
+        },
+        {
+          "refId": 1789133298898
+        }
+      ],
+      "selfishScore": 1,
       "selflessScore": 0,
-      "needsRerating": true,
-      "hidden": true
+      "needsRerating": false,
+      "hidden": true,
+      "pvpTag": false,
+      "altStats": null,
+      "selfSkillIds": [
+        "spdCr"
+      ],
+      "allySupport": []
     },
     {
       "id": 1787754409307,
@@ -13952,7 +13990,7 @@
       },
       {
         "id": 1789217068833,
-        "name": "Incease Attack passive",
+        "name": "Increase Attack passive",
         "value": 9,
         "pinned": false,
         "factorIds": [
@@ -14048,6 +14086,17 @@
           1788772992919,
           1788786248167,
           1788786571272
+        ]
+      },
+      {
+        "id": 1789263239648,
+        "name": "Increase burn damage passive",
+        "value": 8,
+        "factorIds": [
+          1789014978867,
+          1788701036557,
+          1788700420912,
+          1788783127095
         ]
       }
     ],
@@ -15624,5 +15673,5 @@
     ]
   },
   "schemaVersion": 2,
-  "savedAt": "2026-09-13T01:30:04.897Z"
+  "savedAt": "2026-09-13T01:38:08.909Z"
 }
