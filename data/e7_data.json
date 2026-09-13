@@ -13616,11 +13616,39 @@
       "hScore_legacy": 4,
       "altStats_legacy": null,
       "reactions": [],
-      "engagements": [],
-      "selfishScore": 0,
+      "engagements": [
+        {
+          "refId": 1789134890095
+        },
+        {
+          "refId": 1788773060667
+        },
+        {
+          "refId": 1789203279550
+        },
+        {
+          "refId": 1788786336798
+        },
+        {
+          "refId": 1788783359037
+        },
+        {
+          "refId": 1788927609636
+        },
+        {
+          "refId": 1789116549901
+        }
+      ],
+      "selfishScore": 1,
       "selflessScore": 0,
-      "needsRerating": true,
-      "hidden": true
+      "needsRerating": false,
+      "hidden": true,
+      "pvpTag": false,
+      "altStats": null,
+      "selfSkillIds": [
+        "decSpd"
+      ],
+      "allySupport": []
     },
     {
       "id": 1787755292381,
@@ -14456,6 +14484,7 @@
         "id": 1789264307766,
         "name": "Increase Dual Attack Passive",
         "value": 7.6,
+        "pinned": false,
         "factorIds": [
           1788772992919,
           1788773130306
@@ -14485,6 +14514,7 @@
         "id": 1789267911314,
         "name": "No Souls to activate first Soulburn",
         "value": 8,
+        "pinned": false,
         "factorIds": [
           1788784362484,
           1788785891810
@@ -14494,11 +14524,11 @@
         "id": 1789267956483,
         "name": "No Souls if have buff to activate Soulburn",
         "value": 8,
+        "pinned": false,
         "factorIds": [
           1788784362484,
           1788785891810
-        ],
-        "pinned": false
+        ]
       },
       {
         "id": 1789268154676,
@@ -15772,6 +15802,7 @@
         "id": 1789267591247,
         "name": "Spread debuffs",
         "value": 8,
+        "pinned": false,
         "factorIds": [
           1789014978867,
           1788773731924
@@ -16092,5 +16123,5 @@
     ]
   },
   "schemaVersion": 2,
-  "savedAt": "2026-09-13T03:00:22.683Z"
+  "savedAt": "2026-09-13T04:33:33.211Z"
 }
