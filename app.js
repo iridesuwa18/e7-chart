@@ -867,14 +867,16 @@ const fSsScore     = document.getElementById("f-ss-score");
     else if (e.key === "Escape") { e.preventDefault(); closeRenameModal(); }
   });
   wireTaxonomyAddRow("taxonomy-add-reaction", "taxonomy-new-reaction", "Reaction", val => {
-    addTaxonomyItem("reactions", val);
+    const item = addTaxonomyItem("reactions", val);
     renderTaxonomyPanel("reactions");
     renderRteSection();
+    remindToAddHeroes("reactions", item.id);
   });
   wireTaxonomyAddRow("taxonomy-add-engagement", "taxonomy-new-engagement", "Engagement", val => {
-    addTaxonomyItem("engagements", val);
+    const item = addTaxonomyItem("engagements", val);
     renderTaxonomyPanel("engagements");
     renderRteSection();
+    remindToAddHeroes("engagements", item.id);
   });
   wireTaxonomyAddRow("taxonomy-add-factor", "taxonomy-new-factor", "Factor", val => {
     addFactor(val);
@@ -4865,6 +4867,36 @@ function toggleTaxonomyRowHeroes(kind, id) {
   if (isOpen) { row.style.display = "none"; return; }
   row.style.display = "flex";
   renderTaxonomyHeroSearch(kind, id);
+}
+
+// Fires right after a brand-new Reaction/Engagement is created — this
+// is the "forgot to actually go add heroes to it" moment the user
+// asked to be reminded about. Instead of a passive banner, it forces
+// the point: auto-expands that item's "search a hero to add" panel,
+// focuses the search box, scrolls it into view, and gives the row a
+// brief gold pulse so it's unmistakable which one just got made.
+function remindToAddHeroes(kind, id) {
+  // An active search filter left over from earlier browsing could hide
+  // the new item entirely — clear it first so the reminder can never
+  // silently fail to show up.
+  if (taxonomySearchQuery[kind]) {
+    const clearBtn = document.getElementById(`taxonomy-search-${kind}-clear`);
+    if (clearBtn) clearBtn.click();
+    else { taxonomySearchQuery[kind] = ""; renderTaxonomyPanel(kind); }
+  }
+  const heroRow = document.getElementById(`taxonomy-heroes-${kind}-${id}`);
+  if (!heroRow) return; // shouldn't happen post-clear, but don't throw if it somehow does
+  heroRow.style.display = "flex";
+  renderTaxonomyHeroSearch(kind, id);
+  const searchInput = heroRow.querySelector(".taxonomy-hero-row-search");
+  if (searchInput) searchInput.focus();
+  const box = document.getElementById(kind === "reactions" ? "taxonomy-list-reactions" : "taxonomy-list-engagements");
+  const parentRow = box ? box.querySelector(`.taxonomy-row[data-id="${id}"]`) : null;
+  if (parentRow) {
+    parentRow.scrollIntoView({ behavior: "smooth", block: "center" });
+    parentRow.classList.add("just-created");
+    setTimeout(() => parentRow.classList.remove("just-created"), 2200);
+  }
 }
 
 function renderTaxonomyHeroSearch(kind, id) {

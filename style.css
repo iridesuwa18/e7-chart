@@ -2130,6 +2130,14 @@ body.dot-mode .origin-dot:hover {
   border-color: var(--gold-dim, #c9a227);
   background: rgba(201,162,39,.06);
 }
+@keyframes taxonomyJustCreatedPulse {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(232,200,74,0); }
+  50% { box-shadow: 0 0 0 4px rgba(232,200,74,.35); }
+}
+.taxonomy-row.just-created {
+  border-color: #e8c84a;
+  animation: taxonomyJustCreatedPulse 0.7s ease-in-out 3;
+}
 .taxonomy-row-pinbtn {
   flex-shrink: 0;
   width: 26px; height: 26px;
