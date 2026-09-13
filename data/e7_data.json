@@ -5970,10 +5970,51 @@
       "hScore_legacy": 2,
       "altStats_legacy": null,
       "reactions": [],
-      "engagements": [],
+      "engagements": [
+        {
+          "refId": 1789118795470
+        },
+        {
+          "refId": 1788785954933
+        },
+        {
+          "refId": 1788772163166
+        },
+        {
+          "refId": 1789178467146
+        },
+        {
+          "refId": 1788783734183
+        }
+      ],
       "selfishScore": 0,
-      "selflessScore": 0,
-      "needsRerating": true
+      "selflessScore": 0.5,
+      "needsRerating": false,
+      "pvpTag": false,
+      "altStats": null,
+      "selfSkillIds": [],
+      "allySupport": [
+        {
+          "healing": 0,
+          "passive": 0,
+          "buffCount": 3
+        },
+        {
+          "healing": 0,
+          "passive": 0,
+          "buffCount": 1
+        },
+        {
+          "healing": 0,
+          "passive": 0,
+          "buffCount": 1
+        },
+        {
+          "healing": 0,
+          "passive": 0,
+          "buffCount": 1
+        }
+      ]
     },
     {
       "id": 1787483700087,
@@ -15638,6 +15679,7 @@
         "id": 1789287024068,
         "name": "Decrease 100% Fighting Spirit",
         "value": 9,
+        "pinned": false,
         "factorIds": [
           1788780896026
         ]
@@ -15646,6 +15688,7 @@
         "id": 1789287371412,
         "name": "Increase Soul Acquired Passive",
         "value": 10,
+        "pinned": false,
         "factorIds": [
           1788784362484,
           1789287399739
@@ -15655,6 +15698,7 @@
         "id": 1789287545820,
         "name": "Increase Defense Passive",
         "value": 8.5,
+        "pinned": false,
         "factorIds": [
           1788694866469,
           1788774099692,
@@ -17001,6 +17045,7 @@
         "id": 1789288119002,
         "name": "Increase Penetration Resistance Buff",
         "value": 9,
+        "pinned": false,
         "factorIds": [
           1789113473631
         ]
@@ -17334,10 +17379,11 @@
       },
       {
         "id": 1789287399739,
-        "name": "Anti-soulburn teams"
+        "name": "Anti-soulburn teams",
+        "pinned": false
       }
     ]
   },
   "schemaVersion": 2,
-  "savedAt": "2026-09-13T08:41:08.761Z"
+  "savedAt": "2026-09-13T08:46:41.918Z"
 }
