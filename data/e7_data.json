@@ -5343,11 +5343,71 @@
         "hType": "SUR",
         "hScore": 4
       },
-      "reactions": [],
-      "engagements": [],
+      "reactions": [
+        {
+          "refId": 1788780327120
+        },
+        {
+          "refId": 1789221069112
+        }
+      ],
+      "engagements": [
+        {
+          "refId": 1788924109560
+        },
+        {
+          "refId": 1788772268160
+        },
+        {
+          "refId": 1788783099100
+        },
+        {
+          "refId": 1789015241813
+        },
+        {
+          "refId": 1788785733011
+        },
+        {
+          "refId": 1788912251007
+        },
+        {
+          "refId": 1788786124368
+        },
+        {
+          "refId": 1789276598548
+        },
+        {
+          "refId": 1788786336798
+        }
+      ],
       "selfishScore": 0,
-      "selflessScore": 0,
-      "needsRerating": true
+      "selflessScore": 2.75,
+      "needsRerating": false,
+      "pvpTag": false,
+      "altStats": null,
+      "selfSkillIds": [],
+      "allySupport": [
+        {
+          "healing": 20,
+          "passive": 100,
+          "buffCount": 6
+        },
+        {
+          "healing": 20,
+          "passive": 0,
+          "buffCount": 3
+        },
+        {
+          "healing": 20,
+          "passive": 0,
+          "buffCount": 3
+        },
+        {
+          "healing": 20,
+          "passive": 0,
+          "buffCount": 3
+        }
+      ]
     },
     {
       "id": 1787482639641,
@@ -14885,7 +14945,7 @@
       },
       {
         "id": 1788772268160,
-        "name": "Healing allies / Lifesteal /Absorb damage",
+        "name": "Recover / Healing allies / Lifesteal /Absorb damage",
         "value": 8,
         "pinned": false,
         "factorIds": [
@@ -16081,6 +16141,15 @@
         "factorIds": [
           1788783127095
         ]
+      },
+      {
+        "id": 1789276598548,
+        "name": "Exploiting weak points",
+        "value": 7,
+        "factorIds": [
+          1788772992919,
+          1788783127095
+        ]
       }
     ],
     "factors": [
@@ -16397,5 +16466,5 @@
     ]
   },
   "schemaVersion": 2,
-  "savedAt": "2026-09-13T05:10:34.690Z"
+  "savedAt": "2026-09-13T05:18:27.288Z"
 }
