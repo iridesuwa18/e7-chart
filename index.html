@@ -421,6 +421,12 @@
                  A searchable checklist menu, not a flat chip row —
                  Factors are user-defined and can grow past what fits
                  inline, same reasoning as the Taxonomy row search. -->
+            <!-- One chip per currently-ticked Factor, A→Z, sitting above
+                 the label/dropdown below — click a chip to prioritize it
+                 (1.5x score boost). Built/updated by app.js
+                 (renderQdFactorPriorityChips); hidden via style when no
+                 Factors are ticked yet. -->
+            <div class="qd-factor-priority-chips" id="qd-factor-priority-chips" style="display:none"></div>
             <div class="qd-ban-protect-row qd-factor-row">
               <span class="qd-enemy-el-label">🎯 Enemy Factors:</span>
               <!-- The dropdown itself (search box + Factor grid) is built

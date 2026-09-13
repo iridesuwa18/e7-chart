@@ -556,6 +556,30 @@ main {
   color: var(--text-dim);
 }
 
+.qd-factor-priority-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 5px;
+  margin-bottom: 6px;
+}
+.qd-factor-priority-chip {
+  font-family: 'Cinzel', serif;
+  font-size: 10px;
+  padding: 3px 9px;
+  border-radius: 12px;
+  border: 1px solid var(--border);
+  background: rgba(255,255,255,.03);
+  color: var(--text-dim);
+  cursor: pointer;
+  transition: background .15s, border-color .15s, color .15s;
+}
+.qd-factor-priority-chip:hover { border-color: var(--gold-dim); color: var(--text); }
+.qd-factor-priority-chip.active {
+  border-color: #e8c84a;
+  background: rgba(232,200,74,.15);
+  color: #e8c84a;
+}
+
 .quickdraft-toolbar {
   display: flex;
   align-items: center;

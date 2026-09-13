@@ -799,6 +799,14 @@ let qdCompetitiveMode = false; // when on: 3★ heroes (chained or support) are 
 // state — resets on Clear, same as qdBanProtectElement.
 let qdTickedFactorIds = new Set();
 
+// Which of the ticked Factors above are additionally "prioritized" —
+// each one's average score gets a 1.5x boost before being folded into
+// a hero's final Factor-mode score (see qdFactorEntryForHero). Always
+// a subset of qdTickedFactorIds; anything pruned from that Set (untick,
+// or the Factor itself gets deleted) is pruned from this one too.
+// Session-only, same as qdTickedFactorIds.
+let qdPrioritizedFactorIds = new Set();
+
 // Enemy Factor dropdown menu state (Section 8.1) — declared up here,
 // ahead of renderQdFactorChips()'s definition further down, because
 // that function is invoked from top-level init code (not deferred
@@ -2192,21 +2200,29 @@ function qdSuggestForNextIdx(nextIdx, draftArr, banProtectEl) {
 // the main build's Reactions/Engagements (see qdOverallKitScore above),
 // so both variants read the same h.reactions/h.engagements here too.
 //
-// Two-level average, not a sum: a Factor can be tagged onto several
-// Reactions/Engagements, and a hero can hold several of the ones tagged
-// to any one ticked Factor. Step 1 — for each ticked Factor the hero
-// matches at all, average together EVERY one of the hero's own
-// Reaction/Engagement scores tagged to that Factor (not just the best
-// one) to get that hero's own average score for that one Factor. Step
-// 2 — average those per-Factor averages together across however many
-// ticked Factors the hero actually matched. This is deliberately NOT a
-// sum: summing would reward a hero purely for matching MORE of the
-// ticked Factors (breadth), even if each individual match were weak,
-// letting a shallow generalist outrank a sharp specialist. Averaging
-// at both levels means ticking fewer, more targeted Factors surfaces
-// whichever heroes are genuinely the best-suited answers to exactly
-// those threats, not just whichever heroes' kits happen to touch the
-// most tagged ground.
+// Two-level average, not an uncapped sum: a Factor can be tagged onto
+// several Reactions/Engagements, and a hero can hold several of the
+// ones tagged to any one ticked Factor. Step 1 — for each ticked
+// Factor the hero matches at all, average together EVERY one of the
+// hero's own Reaction/Engagement scores tagged to that Factor (not
+// just the best one) to get that hero's own average score for that one
+// Factor. Step 2 — average those per-Factor averages together across
+// however many ticked Factors the hero actually matched. Averaging at
+// both levels (rather than summing raw matches) means a shallow
+// generalist who weakly touches many ticked Factors can't automatically
+// outrank a sharp specialist nailing just one — ticking fewer, more
+// targeted Factors surfaces whichever heroes are genuinely the
+// best-suited answers to exactly those threats.
+//
+// A small flat "breadth bonus" (+1 per matched Factor) is then added
+// AFTER that averaging, on top of the two-level average above — not
+// folded into it. Matching more ticked Factors fairly is still
+// generally more useful than nailing only one perfectly, so a hero
+// averaging a slightly lower score across three matches can and should
+// still edge out a hero with a single, higher-scoring match. This is a
+// deliberately modest, flat nudge (not a multiplier) precisely so it
+// only breaks that kind of close call rather than swamping the
+// specialist entirely.
 function qdFactorEntryForHero(h, variant) {
   const reactions   = h.reactions   || [];
   const engagements = h.engagements || [];
@@ -2239,14 +2255,32 @@ function qdFactorEntryForHero(h, variant) {
     if (matchedScores.length === 0) return; // hero doesn't match this ticked Factor at all
 
     const factorAvg = matchedScores.reduce((a, b) => a + b, 0) / matchedScores.length;
-    perFactorAverages.push(factorAvg);
+    // Prioritized Factors (see renderQdFactorPriorityChips) get a 1.5x
+    // boost applied right here, before this Factor's average gets
+    // folded into the hero's overall Factor-mode score below — so a
+    // hero's best answer to a Factor you've flagged as the top threat
+    // outweighs an equally-matched but unprioritized one.
+    const boosted = qdPrioritizedFactorIds.has(factorId) ? factorAvg * 1.5 : factorAvg;
+    perFactorAverages.push(boosted);
+    const boostNote = qdPrioritizedFactorIds.has(factorId) ? ` ⭐×1.5 = ${boosted.toFixed(1)}` : "";
     matchReasons.push(
-      `🎯 ${taxonomyName("factors", factorId)} → avg ${factorAvg.toFixed(1)} across ${matchedScores.length} match${matchedScores.length === 1 ? "" : "es"} (${matchedNames.join(", ")})`
+      `🎯 ${taxonomyName("factors", factorId)} → avg ${factorAvg.toFixed(1)}${boostNote} across ${matchedScores.length} match${matchedScores.length === 1 ? "" : "es"} (${matchedNames.join(", ")})`
     );
   });
 
   if (perFactorAverages.length === 0) return null;
-  const finalScore = perFactorAverages.reduce((a, b) => a + b, 0) / perFactorAverages.length;
+  const avgScore = perFactorAverages.reduce((a, b) => a + b, 0) / perFactorAverages.length;
+  // Breadth bonus: a hero matching MORE ticked Factors should still come
+  // out ahead of one matching fewer, even when the fewer-but-sharper
+  // hero's average is a bit higher — a flat +1 per matched Factor, added
+  // after averaging (not before), so it can't distort the per-Factor
+  // averages or the 1.5x priority boost above, only nudge the final
+  // ranking. E.g. one match at a perfect 10 vs. three matches averaging
+  // 8.6 (10, 9, 7) — without this, 10 > 8.6 and the narrower match wins;
+  // with it, 8.6 + 3 = 11.6 pulls ahead, since matching three separate
+  // threats fairly is generally the more useful pick than nailing just one.
+  const breadthBonus = perFactorAverages.length;
+  const finalScore = avgScore + breadthBonus;
   return {
     heroId: h.id, hero: h, variant,
     matchedCount: perFactorAverages.length,
@@ -2254,6 +2288,7 @@ function qdFactorEntryForHero(h, variant) {
     reasons: [
       `Matches ${perFactorAverages.length}/${qdTickedFactorIds.size} ticked Factor${qdTickedFactorIds.size === 1 ? "" : "s"}`,
       ...matchReasons,
+      `Averaged ${avgScore.toFixed(1)} + ${breadthBonus} matched-Factor bonus = ${finalScore.toFixed(1)}`,
     ],
   };
 }
@@ -2857,6 +2892,49 @@ function positionQdFactorMenu() {
   menu.style.top  = `${r.bottom + 6}px`;
 }
 
+// Alphabetical (A→Z) row of chips — one per currently-ticked Enemy
+// Factor — shown above the Enemy Factors label/dropdown. Clicking a
+// chip toggles whether that Factor is "prioritized": prioritized
+// Factors get a 1.5x boost to their average score in Factor-mode
+// scoring (qdFactorEntryForHero). Purely a display+toggle surface —
+// the actual tick/untick still happens in the dropdown menu itself
+// (renderQdFactorMenuList); this row can only prioritize what's
+// already ticked there.
+function renderQdFactorPriorityChips() {
+  const box = document.getElementById("qd-factor-priority-chips");
+  if (!box) return; // this page doesn't have an Enemy Factors control
+
+  if (qdTickedFactorIds.size === 0) {
+    box.innerHTML = "";
+    box.style.display = "none";
+    return;
+  }
+  box.style.display = "flex";
+
+  const tickedFactors = [...qdTickedFactorIds]
+    .map(id => taxonomy.factors.find(f => f.id === id))
+    .filter(Boolean)
+    .sort((a, b) => (a.name || "").toLowerCase().localeCompare((b.name || "").toLowerCase()));
+
+  box.innerHTML = tickedFactors.map(f => `
+    <button type="button" class="qd-factor-priority-chip${qdPrioritizedFactorIds.has(f.id) ? " active" : ""}" data-factor-id="${f.id}" title="${qdPrioritizedFactorIds.has(f.id) ? "Prioritized — click to remove the 1.5x boost" : "Click to prioritize (1.5x score boost)"}">
+      ${qdPrioritizedFactorIds.has(f.id) ? "⭐ " : ""}${f.name || "(unnamed)"}
+    </button>
+  `).join("");
+
+  box.querySelectorAll(".qd-factor-priority-chip").forEach(chip => {
+    chip.addEventListener("click", () => {
+      const factorId = taxonomy.factors.find(f => String(f.id) === chip.dataset.factorId)?.id;
+      if (factorId === undefined) return;
+      if (qdPrioritizedFactorIds.has(factorId)) qdPrioritizedFactorIds.delete(factorId);
+      else qdPrioritizedFactorIds.add(factorId);
+      renderQdFactorPriorityChips(); // just this row — cheap, and avoids losing dropdown scroll/search state
+      renderQuickDraft(); // filled slots' scores/(i) explanations shift with the boost
+      if (quickDraftSuggestOpen) renderQuickDraftSuggestions();
+    });
+  });
+}
+
 function renderQdFactorChips() {
   const btn = document.getElementById("qd-factor-menu-btn");
   if (!btn) return; // this page doesn't have an Enemy Factors control
@@ -2866,11 +2944,12 @@ function renderQdFactorChips() {
   // Prune ticks pointing at a Factor that's since been deleted, so a
   // stale id can't silently keep affecting recommendations forever.
   [...qdTickedFactorIds].forEach(id => {
-    if (!taxonomy.factors.some(f => f.id === id)) qdTickedFactorIds.delete(id);
+    if (!taxonomy.factors.some(f => f.id === id)) { qdTickedFactorIds.delete(id); qdPrioritizedFactorIds.delete(id); }
   });
 
   document.getElementById("qd-factor-menu-btn-label").textContent = qdFactorMenuLabel();
   renderQdFactorMenuList();
+  renderQdFactorPriorityChips();
 
   // Wire the trigger just once — every other call just refreshes the
   // label and list content above, so re-adding a Factor or re-opening
@@ -2889,7 +2968,7 @@ function renderQdFactorChips() {
       // then sit empty until something incidental (like typing in the
       // search box) triggered renderQdFactorMenuList() again.
       [...qdTickedFactorIds].forEach(id => {
-        if (!taxonomy.factors.some(f => f.id === id)) qdTickedFactorIds.delete(id);
+        if (!taxonomy.factors.some(f => f.id === id)) { qdTickedFactorIds.delete(id); qdPrioritizedFactorIds.delete(id); }
       });
       renderQdFactorMenuList();
       menu.style.display = "block";
@@ -2936,10 +3015,11 @@ function renderQdFactorMenuList() {
     cb.addEventListener("change", () => {
       const factorId = taxonomy.factors.find(f => String(f.id) === cb.dataset.factorId)?.id;
       if (factorId === undefined) return;
-      if (cb.checked) qdTickedFactorIds.add(factorId); else qdTickedFactorIds.delete(factorId);
+      if (cb.checked) qdTickedFactorIds.add(factorId); else { qdTickedFactorIds.delete(factorId); qdPrioritizedFactorIds.delete(factorId); }
       cb.closest(".qd-factor-menu-item")?.classList.toggle("active", cb.checked);
       document.getElementById("qd-factor-menu-btn-label").textContent = qdFactorMenuLabel();
       saveQuickDraftModeLocal();
+      renderQdFactorPriorityChips(); // the ticked-Factor chip row above the dropdown needs updating too
       renderQuickDraft(); // refresh already-filled slots' scores/(i) explanations too, not just the suggestion panel
       if (quickDraftSuggestOpen) renderQuickDraftSuggestions();
     });
