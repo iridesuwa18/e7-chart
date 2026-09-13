@@ -7665,11 +7665,74 @@
         "hType": "SST",
         "hScore": 4
       },
-      "reactions": [],
-      "engagements": [],
+      "reactions": [
+        {
+          "refId": 1789177042422
+        },
+        {
+          "refId": 1789301614949
+        },
+        {
+          "refId": 1788775147348
+        },
+        {
+          "refId": 1788780327120
+        }
+      ],
+      "engagements": [
+        {
+          "refId": 1788912251007
+        },
+        {
+          "refId": 1788773067411
+        },
+        {
+          "refId": 1788924109560
+        },
+        {
+          "refId": 1788782920388
+        },
+        {
+          "refId": 1788783486720
+        },
+        {
+          "refId": 1788772268160
+        },
+        {
+          "refId": 1789015241813
+        },
+        {
+          "refId": 1789115108791
+        }
+      ],
       "selfishScore": 0,
-      "selflessScore": 0,
-      "needsRerating": true
+      "selflessScore": 2.25,
+      "needsRerating": false,
+      "pvpTag": false,
+      "altStats": null,
+      "selfSkillIds": [],
+      "allySupport": [
+        {
+          "healing": 10,
+          "passive": 40,
+          "buffCount": 4
+        },
+        {
+          "healing": 0,
+          "passive": 40,
+          "buffCount": 2
+        },
+        {
+          "healing": 0,
+          "passive": 40,
+          "buffCount": 2
+        },
+        {
+          "healing": 0,
+          "passive": 40,
+          "buffCount": 2
+        }
+      ]
     },
     {
       "id": 1787755553539,
@@ -16609,6 +16672,15 @@
           1788785891810,
           1788774099692
         ]
+      },
+      {
+        "id": 1789301614949,
+        "name": "Increase Max Health Passive",
+        "value": 9,
+        "factorIds": [
+          1788694866469,
+          1788774099692
+        ]
       }
     ],
     "engagements": [
@@ -18391,5 +18463,5 @@
     ]
   },
   "schemaVersion": 2,
-  "savedAt": "2026-09-13T12:11:03.925Z"
+  "savedAt": "2026-09-13T12:18:00.008Z"
 }
