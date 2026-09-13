@@ -13215,10 +13215,17 @@
       "altStats_legacy": null,
       "reactions": [],
       "engagements": [],
-      "selfishScore": 0,
+      "selfishScore": 2,
       "selflessScore": 0,
-      "needsRerating": true,
-      "hidden": true
+      "needsRerating": false,
+      "hidden": true,
+      "pvpTag": false,
+      "altStats": null,
+      "selfSkillIds": [
+        "extraTurns",
+        "immobDebuff"
+      ],
+      "allySupport": []
     },
     {
       "id": 1787754632713,
@@ -15805,5 +15812,5 @@
     ]
   },
   "schemaVersion": 2,
-  "savedAt": "2026-09-13T02:03:03.653Z"
+  "savedAt": "2026-09-13T02:29:42.258Z"
 }
