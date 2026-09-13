@@ -13347,6 +13347,9 @@
         },
         {
           "refId": 1788785954933
+        },
+        {
+          "refId": 1788773060667
         }
       ],
       "selfishScore": 4,
@@ -13402,6 +13405,9 @@
         },
         {
           "refId": 1789178467146
+        },
+        {
+          "refId": 1788773060667
         }
       ],
       "selfishScore": 1,
@@ -13432,11 +13438,44 @@
       "hScore_legacy": 2,
       "altStats_legacy": null,
       "reactions": [],
-      "engagements": [],
-      "selfishScore": 0,
+      "engagements": [
+        {
+          "refId": 1789132181142
+        },
+        {
+          "refId": 1788786124368
+        },
+        {
+          "refId": 1788785021751
+        },
+        {
+          "refId": 1788773067411
+        },
+        {
+          "refId": 1789267591247
+        },
+        {
+          "refId": 1789118896007
+        },
+        {
+          "refId": 1789118612104
+        },
+        {
+          "refId": 1789201317168
+        }
+      ],
+      "selfishScore": 3,
       "selflessScore": 0,
-      "needsRerating": true,
-      "hidden": true
+      "needsRerating": false,
+      "hidden": true,
+      "pvpTag": false,
+      "altStats": null,
+      "selfSkillIds": [
+        "spdCr",
+        "decCr",
+        "injuries"
+      ],
+      "allySupport": []
     },
     {
       "id": 1787754958883,
@@ -15624,6 +15663,15 @@
           1788774099692,
           1789014978867
         ]
+      },
+      {
+        "id": 1789267591247,
+        "name": "Spread debuffs",
+        "value": 8,
+        "factorIds": [
+          1789014978867,
+          1788773731924
+        ]
       }
     ],
     "factors": [
@@ -15940,5 +15988,5 @@
     ]
   },
   "schemaVersion": 2,
-  "savedAt": "2026-09-13T02:43:19.859Z"
+  "savedAt": "2026-09-13T02:48:30.631Z"
 }
