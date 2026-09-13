@@ -143,6 +143,11 @@
       flex-direction: column;
       min-height: 0;
     }
+    .taxonomy-jump-top-btn {
+      display: block;
+      margin: 8px 0;
+      width: 100%;
+    }
 
     /* Taxonomy search box — filters the currently active tab's list */
     .taxonomy-search {
@@ -1159,6 +1164,8 @@
         </div>
 
         <p class="taxonomy-cr-note">Increase and Decrease of Combat Readiness through an attack or non-attack skills will not be listed here.</p>
+
+        <button type="button" class="btn btn-ghost btn-sm taxonomy-jump-top-btn" id="taxonomy-jump-top">↑ Jump to Top</button>
 
         <div class="taxonomy-tabs">
           <button type="button" class="taxonomy-tab active" data-tab="reactions">Reactions</button>

@@ -852,6 +852,15 @@ const fSsScore     = document.getElementById("f-ss-score");
   document.querySelectorAll(".taxonomy-tab").forEach(btn => {
     btn.addEventListener("click", () => switchTaxonomyTab(btn.dataset.tab));
   });
+  // "Jump to Top" — the header/tabs stay fixed (see the CSS comment on
+  // .taxonomy-modal-sticky) but the panel content itself, including the
+  // search bar sitting near the top of whichever tab is open, scrolls
+  // inside .taxonomy-body. Scrolling that back to 0 is all "back to my
+  // search bar" needs, and it works the same regardless of which of
+  // the 3 tabs is currently active since each has the same layout.
+  document.getElementById("taxonomy-jump-top").addEventListener("click", () => {
+    document.querySelector(".taxonomy-modal .taxonomy-body").scrollTo({ top: 0, behavior: "smooth" });
+  });
 
   // Rename modal (opened by each row's ✏️ button) — this one's a single
   // small field, so unlike the Taxonomy manager above it's fine to
