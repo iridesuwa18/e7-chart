@@ -6622,11 +6622,47 @@
         "hType": "SUR",
         "hScore": 10
       },
-      "reactions": [],
-      "engagements": [],
-      "selfishScore": 0,
+      "reactions": [
+        {
+          "refId": 1789209367308
+        },
+        {
+          "refId": 1789115386205
+        }
+      ],
+      "engagements": [
+        {
+          "refId": 1788700311844
+        },
+        {
+          "refId": 1788773067411
+        },
+        {
+          "refId": 1789297429599
+        },
+        {
+          "refId": 1789297498612
+        },
+        {
+          "refId": 1788783734183
+        },
+        {
+          "refId": 1788785954933
+        },
+        {
+          "refId": 1788785021751
+        }
+      ],
+      "selfishScore": 2,
       "selflessScore": 0,
-      "needsRerating": true
+      "needsRerating": false,
+      "pvpTag": false,
+      "altStats": null,
+      "selfSkillIds": [
+        "decCr",
+        "extraTurns"
+      ],
+      "allySupport": []
     },
     {
       "id": 1787485053714,
@@ -15919,6 +15955,7 @@
         "id": 1789296721037,
         "name": "Reflect damage passive",
         "value": 9.8,
+        "pinned": false,
         "factorIds": [
           1788694866469,
           1788774099692,
@@ -17280,10 +17317,36 @@
         "id": 1789296401576,
         "name": "Copies buffs (regardless of hit)",
         "value": 7.7,
+        "pinned": false,
         "factorIds": [
           1788773731924,
           1789014978867
         ]
+      },
+      {
+        "id": 1789297429599,
+        "name": "Pilfer (Unique) Debuff (Decrease Atk, HP, DEF)",
+        "value": 9,
+        "factorIds": [
+          1788694866469,
+          1788701036557,
+          1788700420912,
+          1788774099692,
+          1789297548874
+        ]
+      },
+      {
+        "id": 1789297498612,
+        "name": "Spoils (Unique) Buff (Increase Atk, HP, DEF) x4 Stacks",
+        "value": 9,
+        "factorIds": [
+          1788694866469,
+          1788701036557,
+          1788700420912,
+          1788774099692,
+          1788912649792
+        ],
+        "pinned": false
       }
     ],
     "factors": [
@@ -17616,9 +17679,13 @@
         "id": 1789287399739,
         "name": "Anti-soulburn teams",
         "pinned": false
+      },
+      {
+        "id": 1789297548874,
+        "name": "Cleansers / Debuff Dispellers"
       }
     ]
   },
   "schemaVersion": 2,
-  "savedAt": "2026-09-13T10:58:47.762Z"
+  "savedAt": "2026-09-13T11:07:59.867Z"
 }
