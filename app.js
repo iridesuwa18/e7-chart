@@ -858,9 +858,17 @@ const fSsScore     = document.getElementById("f-ss-score");
   // inside .taxonomy-body. Scrolling that back to 0 is all "back to my
   // search bar" needs, and it works the same regardless of which of
   // the 3 tabs is currently active since each has the same layout.
-  document.getElementById("taxonomy-jump-top").addEventListener("click", () => {
-    document.querySelector(".taxonomy-modal .taxonomy-body").scrollTo({ top: 0, behavior: "smooth" });
-  });
+  // Guarded with a null-check: quickdraft.html carries its own separate
+  // copy of this modal's markup, so any button added to one HTML file
+  // and not the other must never be assumed present — an unguarded
+  // .addEventListener on a missing element throws and silently kills
+  // every bit of button-wiring code still queued after it.
+  const jumpTopBtn = document.getElementById("taxonomy-jump-top");
+  if (jumpTopBtn) {
+    jumpTopBtn.addEventListener("click", () => {
+      document.querySelector(".taxonomy-modal .taxonomy-body").scrollTo({ top: 0, behavior: "smooth" });
+    });
+  }
 
   // Rename modal (opened by each row's ✏️ button) — this one's a single
   // small field, so unlike the Taxonomy manager above it's fine to
