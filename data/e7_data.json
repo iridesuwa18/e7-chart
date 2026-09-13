@@ -5287,11 +5287,62 @@
         "hType": "SUR",
         "hScore": 3
       },
-      "reactions": [],
-      "engagements": [],
+      "reactions": [
+        {
+          "refId": 1789276809428
+        },
+        {
+          "refId": 1789276853775
+        }
+      ],
+      "engagements": [
+        {
+          "refId": 1788772268160
+        },
+        {
+          "refId": 1788780605209
+        },
+        {
+          "refId": 1788772163166
+        },
+        {
+          "refId": 1789276945500
+        },
+        {
+          "refId": 1788912251007
+        },
+        {
+          "refId": 1789277060195
+        }
+      ],
       "selfishScore": 0,
-      "selflessScore": 0,
-      "needsRerating": true
+      "selflessScore": 2,
+      "needsRerating": false,
+      "pvpTag": false,
+      "altStats": null,
+      "selfSkillIds": [],
+      "allySupport": [
+        {
+          "healing": 20,
+          "passive": 0,
+          "buffCount": 4
+        },
+        {
+          "healing": 20,
+          "passive": 0,
+          "buffCount": 4
+        },
+        {
+          "healing": 20,
+          "passive": 0,
+          "buffCount": 4
+        },
+        {
+          "healing": 20,
+          "passive": 0,
+          "buffCount": 4
+        }
+      ]
     },
     {
       "id": 1787482285976,
@@ -14864,6 +14915,20 @@
         "factorIds": [
           1788773216100
         ]
+      },
+      {
+        "id": 1789276809428,
+        "name": "Unaffected by decreases to Combat Readiness",
+        "value": 8,
+        "factorIds": [
+          1789130596970
+        ]
+      },
+      {
+        "id": 1789276853775,
+        "name": "Dispel immortality (passive)",
+        "value": 9,
+        "factorIds": []
       }
     ],
     "engagements": [
@@ -16150,6 +16215,25 @@
           1788772992919,
           1788783127095
         ]
+      },
+      {
+        "id": 1789276945500,
+        "name": "Radiance (Undispellable) buff",
+        "value": 8,
+        "factorIds": [
+          1788694866469,
+          1788774099692
+        ]
+      },
+      {
+        "id": 1789277060195,
+        "name": "Ignore damage share buff",
+        "value": 9,
+        "pinned": false,
+        "factorIds": [
+          1788773130306,
+          1788774033143
+        ]
       }
     ],
     "factors": [
@@ -16462,9 +16546,13 @@
         "id": 1789259574556,
         "name": "Low defense units",
         "pinned": false
+      },
+      {
+        "id": 1789276871897,
+        "name": "Immortality units"
       }
     ]
   },
   "schemaVersion": 2,
-  "savedAt": "2026-09-13T05:18:27.288Z"
+  "savedAt": "2026-09-13T05:24:51.832Z"
 }
