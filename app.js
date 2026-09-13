@@ -706,6 +706,70 @@ const QD_SIZE = 5;
 const QD_SELFLESS_TARGET = 2;
 const QD_SELFISH_TARGET  = 3;
 let quickDraft = [null, null, null, null, null];
+
+// Fake Enemy Team (practice/testing scratch tool, see the "Enemy Team"
+// button wiring above) — [{ hero, side }], session-only, never
+// persisted. Regenerated fresh by qdGenerateFakeEnemyTeam(); kept
+// around between renders only so re-opening the panel without
+// clicking Reroll shows the same team instead of blanking out.
+let qdEnemyTeam = [];
+
+// Picks up to n random, non-repeating entries out of pool without
+// mutating it (Fisher–Yates-style partial shuffle via splice on a
+// copy). Returns fewer than n if the pool itself is smaller.
+function qdPickRandomFrom(pool, n) {
+  const copy = [...pool];
+  const picked = [];
+  while (picked.length < n && copy.length) {
+    const idx = Math.floor(Math.random() * copy.length);
+    picked.push(copy.splice(idx, 1)[0]);
+  }
+  return picked;
+}
+
+// Builds a random 3 Selfish + 2 Selfless "enemy" team from the roster
+// — mirrors Autofill's own default composition (QD_SELFISH_TARGET /
+// QD_SELFLESS_TARGET), just for a fake opposing side to plan against.
+// Heroes already in the user's own Quick Draft team are excluded so
+// the two teams can never overlap. Only ever reads primary-build side
+// (qdHeroSide with "primary") since there's no Ghost-vs-primary choice
+// to make for a hypothetical enemy. Purely a practice/testing tool —
+// qdEnemyTeam is never saved to GitHub or touched by save/load at all.
+function qdGenerateFakeEnemyTeam() {
+  const draftedIds = new Set(quickDraft.filter(raw => raw !== null && raw !== undefined).map(raw => qdParsePick(raw).heroId));
+  const available = heroes.filter(h => !draftedIds.has(h.id));
+  const selfishPool  = available.filter(h => qdHeroSide(h, "primary") === "selfish");
+  const selflessPool = available.filter(h => qdHeroSide(h, "primary") === "selfless");
+  qdEnemyTeam = [
+    ...qdPickRandomFrom(selfishPool, QD_SELFISH_TARGET).map(hero => ({ hero, side: "selfish" })),
+    ...qdPickRandomFrom(selflessPool, QD_SELFLESS_TARGET).map(hero => ({ hero, side: "selfless" })),
+  ];
+  renderQdEnemyTeam();
+}
+
+function renderQdEnemyTeam() {
+  const box = document.getElementById("qd-enemy-team-slots");
+  if (!box) return;
+  const totalWanted = QD_SELFISH_TARGET + QD_SELFLESS_TARGET;
+  if (!qdEnemyTeam.length) {
+    box.innerHTML = `<div class="qd-enemy-team-note">Not enough rated Selfish/Selfless heroes in your roster yet to build a fake team.</div>`;
+    return;
+  }
+  const note = qdEnemyTeam.length < totalWanted
+    ? `<div class="qd-enemy-team-note">Only found ${qdEnemyTeam.length}/${totalWanted} — not enough rated Selfish/Selfless heroes left in your roster (outside your own Quick Draft team) for a full split.</div>`
+    : "";
+  const slotsHTML = qdEnemyTeam.map(({ hero, side }) => {
+    const portrait = hero.iconData ? `<img src="${hero.iconData}">` : "⚔️";
+    const sideIcon = side === "selfish" ? "😈" : "🙏";
+    return `
+      <div class="qd-enemy-slot">
+        <div class="qd-slot-portrait">${portrait}</div>
+        <div class="qd-slot-name">${hero.name || "Unnamed"}</div>
+        <div class="qd-enemy-slot-side">${sideIcon} ${side === "selfish" ? "Selfish" : "Selfless"}</div>
+      </div>`;
+  }).join("");
+  box.innerHTML = note + slotsHTML;
+}
 // Section 9.4 — manual override for which side (Selfless/Selfish) Suggest,
 // Next Best, and Autofill prioritize for the next open slot. null = follow
 // the automatic 3-Selfish/2-Selfless quota (qdRequiredSideForDraft); set to
@@ -1117,6 +1181,34 @@ const fSsScore     = document.getElementById("f-ss-score");
     if (quickDraft.some(id => id !== null) && !confirm("Clear all Quick Draft slots?")) return;
     clearQuickDraft();
   });
+  // Fake Enemy Team — pure practice/testing scratch tool, session-only
+  // (never saved to GitHub, never touches the real quickDraft array).
+  // Guarded with null-checks throughout: index.html and quickdraft.html
+  // each keep their own separate copy of this drawer's markup, and an
+  // unguarded .addEventListener on a missing element has already once
+  // taken down every button on the page (see the taxonomy-jump-top fix)
+  // — never again assume a button added to one HTML file is present in
+  // both without checking.
+  const btnEnemyTeam = document.getElementById("btn-qd-enemy-team");
+  if (btnEnemyTeam) {
+    btnEnemyTeam.addEventListener("click", () => {
+      const panel = document.getElementById("qd-enemy-team-panel");
+      if (!panel) return;
+      const isOpen = panel.style.display !== "none";
+      if (isOpen) { panel.style.display = "none"; return; }
+      panel.style.display = "block";
+      if (!qdEnemyTeam.length) qdGenerateFakeEnemyTeam();
+    });
+  }
+  const btnEnemyReroll = document.getElementById("btn-qd-enemy-reroll");
+  if (btnEnemyReroll) btnEnemyReroll.addEventListener("click", qdGenerateFakeEnemyTeam);
+  const btnEnemyClose = document.getElementById("btn-qd-enemy-close");
+  if (btnEnemyClose) {
+    btnEnemyClose.addEventListener("click", () => {
+      const panel = document.getElementById("qd-enemy-team-panel");
+      if (panel) panel.style.display = "none";
+    });
+  }
   // Ban Protect element — the opponent's un-bannable pick (Rule 1).
   // Single-select (tap again to clear); once set, suggestions lock onto
   // whichever element counters it (see qdSuggestForNextSlot).

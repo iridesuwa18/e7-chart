@@ -369,6 +369,22 @@
         <div class="quickdraft-inner">
           <div class="quickdraft-slots" id="quickdraft-slots"></div>
 
+          <!-- Separate, collapsible panel for a randomly-generated "fake
+               enemy team" — pure practice/testing scratch data, never
+               saved to GitHub. 3 Selfish + 2 Selfless mirrors Autofill's
+               own default team-composition quota (QD_SELFISH_TARGET /
+               QD_SELFLESS_TARGET). -->
+          <div class="qd-enemy-team-panel" id="qd-enemy-team-panel" style="display:none">
+            <div class="qd-enemy-team-header">
+              <span>⚔️ Fake Enemy Team (3 Selfish + 2 Selfless)</span>
+              <div class="qd-enemy-team-header-actions">
+                <button type="button" class="btn btn-ghost btn-xs" id="btn-qd-enemy-reroll">🎲 Reroll</button>
+                <button type="button" class="btn btn-ghost btn-xs" id="btn-qd-enemy-close">✕</button>
+              </div>
+            </div>
+            <div class="qd-enemy-team-slots" id="qd-enemy-team-slots"></div>
+          </div>
+
           <div class="quickdraft-toolbar">
             <div class="quickdraft-stats" id="quickdraft-stats"></div>
             <div class="quickdraft-toolbar-actions">
@@ -376,6 +392,7 @@
               <button class="btn btn-gold btn-sm" id="btn-quickdraft-suggest">🔮 Suggest</button>
               <button class="btn btn-gold btn-sm" id="btn-quickdraft-autofill" title="Add the top-suggested pick for the next empty slot">⚡ Autofill</button>
               <button class="btn btn-ghost btn-sm" id="btn-quickdraft-nextbest" title="Swap the last-filled slot for the next-best option (does not add a new hero)" disabled>⏭ Rep. Curr.</button>
+              <button class="btn btn-ghost btn-sm" id="btn-qd-enemy-team" title="Generate a random 3 Selfish + 2 Selfless fake enemy team from your roster">🎲 Enemy Team</button>
               <button class="btn btn-ghost btn-xs" id="btn-quickdraft-clear">✕ Clear</button>
             </div>
           </div>
