@@ -15066,7 +15066,7 @@
       {
         "id": 1789209367308,
         "name": "Cannot crit",
-        "value": 7,
+        "value": 7.5,
         "pinned": false,
         "factorIds": [
           1788783127095,
@@ -16987,5 +16987,5 @@
     ]
   },
   "schemaVersion": 2,
-  "savedAt": "2026-09-13T06:33:34.551Z"
+  "savedAt": "2026-09-13T06:33:54.262Z"
 }
