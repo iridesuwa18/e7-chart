@@ -2119,7 +2119,7 @@ body.dot-mode .origin-dot:hover {
   display: flex;
   flex-wrap: wrap;
   gap: 6px;
-  margin: -6px 0 14px;
+  margin: 0 0 14px;
 }
 .taxonomy-quickfill-btn {
   flex-shrink: 0;

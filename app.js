@@ -442,25 +442,6 @@ function wireTaxonomyAddRow(addBtnId, inputId, label, onAdd) {
       if (!input.readOnly && !input.value.trim() && document.activeElement !== input) lock();
     }, 150);
   });
-
-  // Quick-fill chips (Increase/Decrease/Passive/Buff/Debuff/Dispel) —
-  // common recurring first words for Reaction/Engagement/Factor names.
-  // Clicking one unlocks the field (same as the first "+ Add" tap) if
-  // it's still locked, then fills or appends the word so typing the
-  // rest of the name (e.g. "Increase" + " ATK") is all that's left.
-  const quickFillBox = document.getElementById(`${inputId}-quickfill`);
-  if (quickFillBox) {
-    quickFillBox.querySelectorAll(".taxonomy-quickfill-btn").forEach(chip => {
-      chip.addEventListener("click", () => {
-        if (input.readOnly) unlock();
-        const word = chip.textContent.trim();
-        const current = input.value.trim();
-        input.value = current ? `${current} ${word}` : word;
-        input.focus();
-        input.setSelectionRange(input.value.length, input.value.length);
-      });
-    });
-  }
 }
 
 // Every hero currently holding a given Reaction/Engagement — backs both
@@ -970,6 +951,36 @@ const fSsScore     = document.getElementById("f-ss-score");
     addFactor(val);
     renderQdFactorChips(); // Section 8.1 checklist — new Factor shows up immediately
   });
+
+  // Quick-fill chips (Increase/Decrease/Passive/Buff/Debuff/Dispel) sit
+  // under each tab's search box — clicking one fills/appends that word
+  // into the search bar itself (not the "add new" row) and re-runs the
+  // filter, so it's a fast way to jump straight to, say, every existing
+  // "Buff"-named item — or, combined with the "+" quick-add button next
+  // to the search box, to quickly start naming a new one from a common
+  // recurring word.
+  const wireTaxonomyQuickFill = (quickFillId, searchInputId) => {
+    const box = document.getElementById(quickFillId);
+    const searchInput = document.getElementById(searchInputId);
+    if (!box || !searchInput) return;
+    box.querySelectorAll(".taxonomy-quickfill-btn").forEach(chip => {
+      chip.addEventListener("click", () => {
+        const word = chip.textContent.trim();
+        const current = searchInput.value.trim();
+        searchInput.value = current ? `${current} ${word}` : word;
+        // Programmatic value changes don't fire "input" on their own —
+        // dispatch one so the existing search-filter wiring (and the
+        // "+" quick-add button's visibility) reacts exactly as if it
+        // had been typed.
+        searchInput.dispatchEvent(new Event("input", { bubbles: true }));
+        searchInput.focus();
+        searchInput.setSelectionRange(searchInput.value.length, searchInput.value.length);
+      });
+    });
+  };
+  wireTaxonomyQuickFill("taxonomy-search-reactions-quickfill", "taxonomy-search-reactions");
+  wireTaxonomyQuickFill("taxonomy-search-engagements-quickfill", "taxonomy-search-engagements");
+  wireTaxonomyQuickFill("taxonomy-search-factors-quickfill", "taxonomy-search-factors");
 
   // Sort dropdowns for each Taxonomy tab (oldest/newest by creation,
   // or A→Z / Z→A by name) — same independent-per-tab pattern as search.
