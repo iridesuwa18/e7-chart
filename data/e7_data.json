@@ -5366,11 +5366,82 @@
         "hType": "SUR",
         "hScore": 6
       },
-      "reactions": [],
-      "engagements": [],
+      "reactions": [
+        {
+          "refId": 1789174925004
+        }
+      ],
+      "engagements": [
+        {
+          "refId": 1788783359037
+        },
+        {
+          "refId": 1788785505206
+        },
+        {
+          "refId": 1789277487780
+        },
+        {
+          "refId": 1788912251007
+        },
+        {
+          "refId": 1788772163166
+        },
+        {
+          "refId": 1788772268160
+        },
+        {
+          "refId": 1788782920388
+        },
+        {
+          "refId": 1789015241813
+        },
+        {
+          "refId": 1788785181579
+        },
+        {
+          "refId": 1789210423124
+        },
+        {
+          "refId": 1789133298898
+        }
+      ],
       "selfishScore": 0,
-      "selflessScore": 0,
-      "needsRerating": true
+      "selflessScore": 3.25,
+      "needsRerating": false,
+      "pvpTag": false,
+      "altStats": {
+        "selfishScore": 2,
+        "selflessScore": 0,
+        "selfSkillIds": [
+          "selfPassive",
+          "injuries"
+        ],
+        "allySupport": []
+      },
+      "selfSkillIds": [],
+      "allySupport": [
+        {
+          "healing": 75,
+          "passive": 0,
+          "buffCount": 3
+        },
+        {
+          "healing": 75,
+          "passive": 0,
+          "buffCount": 2
+        },
+        {
+          "healing": 75,
+          "passive": 0,
+          "buffCount": 2
+        },
+        {
+          "healing": 75,
+          "passive": 0,
+          "buffCount": 2
+        }
+      ]
     },
     {
       "id": 1787482426768,
@@ -16234,6 +16305,21 @@
           1788773130306,
           1788774033143
         ]
+      },
+      {
+        "id": 1789277487780,
+        "name": "Lingering fragrance (Undispellable) buffs",
+        "value": 9.5,
+        "factorIds": [
+          1788694866469,
+          1788774099692,
+          1788772992919,
+          1788701036557,
+          1788783127095,
+          1788775427431,
+          1788786300042,
+          1788775944046
+        ]
       }
     ],
     "factors": [
@@ -16554,5 +16640,5 @@
     ]
   },
   "schemaVersion": 2,
-  "savedAt": "2026-09-13T05:24:51.832Z"
+  "savedAt": "2026-09-13T05:36:21.348Z"
 }
