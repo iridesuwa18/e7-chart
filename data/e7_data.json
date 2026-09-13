@@ -12871,8 +12871,34 @@
       "hType_legacy": "SUR",
       "hScore_legacy": 5,
       "altStats_legacy": null,
-      "reactions": [],
-      "engagements": [],
+      "reactions": [
+        {
+          "refId": 1789259042871
+        },
+        {
+          "refId": 1788775147348
+        }
+      ],
+      "engagements": [
+        {
+          "refId": 1788924109560
+        },
+        {
+          "refId": 1789118896007
+        },
+        {
+          "refId": 1788772163166
+        },
+        {
+          "refId": 1788783099100
+        },
+        {
+          "refId": 1788786336798
+        },
+        {
+          "refId": 1788785021751
+        }
+      ],
       "selfishScore": 2,
       "selflessScore": 0,
       "needsRerating": false,
@@ -13960,11 +13986,27 @@
         "id": 1789259194029,
         "name": "Attack equal to allies' highest attack",
         "value": 8,
+        "pinned": false,
         "factorIds": [
           1788700420912,
           1788701036557,
           1788772992919,
           1788783127095,
+          1788786571272
+        ]
+      },
+      {
+        "id": 1789262656055,
+        "name": "Stackable Additional Damage",
+        "value": 8.5,
+        "pinned": false,
+        "factorIds": [
+          1788785891810,
+          1788700420912,
+          1788701036557,
+          1788783127095,
+          1788772992919,
+          1788786248167,
           1788786571272
         ]
       }
@@ -15531,14 +15573,16 @@
       },
       {
         "id": 1789259075608,
-        "name": "Non-attack skills"
+        "name": "Non-attack skills",
+        "pinned": false
       },
       {
         "id": 1789259574556,
-        "name": "Low defense units"
+        "name": "Low defense units",
+        "pinned": false
       }
     ]
   },
   "schemaVersion": 2,
-  "savedAt": "2026-09-13T01:19:50.800Z"
+  "savedAt": "2026-09-13T01:25:40.909Z"
 }
