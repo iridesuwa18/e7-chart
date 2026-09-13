@@ -703,12 +703,12 @@ const QD_SIZE = 5;
 // only ever apply through qdRequiredSideForDraft() below; they don't
 // change QD_SIZE itself, so a non-default QD_SIZE would just relax once
 // both targets are met (see that function's "quotas already met" case).
-const QD_SELFLESS_TARGET = 3;
-const QD_SELFISH_TARGET  = 2;
+const QD_SELFLESS_TARGET = 2;
+const QD_SELFISH_TARGET  = 3;
 let quickDraft = [null, null, null, null, null];
 // Section 9.4 — manual override for which side (Selfless/Selfish) Suggest,
 // Next Best, and Autofill prioritize for the next open slot. null = follow
-// the automatic 3-Selfless/2-Selfish quota (qdRequiredSideForDraft); set to
+// the automatic 3-Selfish/2-Selfless quota (qdRequiredSideForDraft); set to
 // "selfless"/"selfish" once the ⇄ switch next to the Avg badge is tapped,
 // overriding that quota until Clear resets it (see clearQuickDraft).
 let qdManualSideOverride = null;
@@ -1864,7 +1864,7 @@ function qdSuggestForNextSlot() {
        this only partitions its output.
      - qdRequiredSideForDraft() is Autofill/example-team's ratio engine
        (9.2/9.3): given a draft in progress, it returns which side MUST
-       be used for the next slot to still hit 3 Selfless + 2 Selfish by
+       be used for the next slot to still hit 3 Selfish + 2 Selfless by
        the time the team is full, or null once both quotas are already
        met (no further restriction) or nothing's actually forcing a
        specific side yet (both still have slack — see below).
@@ -1881,7 +1881,7 @@ function qdHeroSide(h, variant) {
 }
 
 // Which side (if any) the NEXT empty slot in draftArr must fill to still
-// land on 3 Selfless + 2 Selfish once the team's full. Returns null when
+// land on 3 Selfish + 2 Selfless once the team's full. Returns null when
 // there's no forced side — either both quotas are already satisfied, or
 // there's still enough slack left that either side is fine for now (in
 // which case the caller should prefer whichever has the bigger
@@ -2186,7 +2186,7 @@ function qdFactorHint() {
    entirely separate from the real in-progress draft — used by the "How
    Quick Draft picks a team" mould examples (see quickdraft.html). Each
    remaining slot takes whatever qdSuggestForNextIdx ranks #1 — Section
-   9.3 applies the same 3-Selfless/2-Selfish default (via
+   9.3 applies the same 3-Selfish/2-Selfless default (via
    qdRequiredSideForDraft) that Autofill uses, so example teams stay
    consistent with what pressing Autofill would actually produce.
    [Section 6] Now goes through the real dispatcher (Factor-aware if any
@@ -2519,7 +2519,7 @@ function renderQuickDraft() {
   if (filledCount < QD_SIZE) {
     const effSide = qdEffectiveRequiredSide(quickDraft);
     const sideLabel = effSide === "selfish" ? "⚔ Selfish" : effSide === "selfless" ? "🛡 Selfless" : "⚖ Either";
-    const modeNote = qdManualSideOverride ? "Manually set" : "Auto — needed to hit the default 3 Selfless + 2 Selfish split";
+    const modeNote = qdManualSideOverride ? "Manually set" : "Auto — needed to hit the default 3 Selfish + 2 Selfless split";
     sideBadgeHtml = `
       <span class="qd-stat qd-side-badge" title="${modeNote}. This is what Suggest/Next Best/Autofill will prioritize for the next open slot.">${sideLabel}</span>
       <button type="button" class="qd-side-switch-btn" id="qd-side-switch-btn" title="Switch which side (Selfless/Selfish) is prioritized for the next open slot">⇄</button>`;
