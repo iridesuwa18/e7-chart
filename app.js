@@ -2000,9 +2000,23 @@ function qdHeroSide(h, variant) {
 // which case the caller should prefer whichever has the bigger
 // outstanding need, ties favoring Selfless, matching the spec's "3
 // Selfless, 2 Selfish" ordering — see the two callers below).
-function qdRequiredSideForDraft(draftArr) {
+//
+// `excludeIdx` (optional) leaves one slot's own current occupant out of
+// the count entirely — critical for Rep. Curr., which re-picks a slot
+// that's already filled. Without this, that slot's own current hero
+// got counted toward "already satisfied", which could lock the quota
+// to the OPPOSITE side of whatever was currently sitting there — e.g.
+// swap in one Selfless hero, and the very next Rep. Curr. click for
+// that same slot would see Selfless "already covered" (by the hero
+// about to be replaced) and filter its own candidate pool down to
+// Selfish-only, making it impossible to ever cycle back to another
+// Selfless option for that slot short of hitting Clear and starting
+// over. Suggest/Autofill only ever target a genuinely empty slot, so
+// they're unaffected either way — this only matters when re-picking an
+// already-filled one.
+function qdRequiredSideForDraft(draftArr, excludeIdx) {
   draftArr = draftArr || quickDraft;
-  const filled = draftArr.filter(raw => raw !== null && raw !== undefined);
+  const filled = draftArr.filter((raw, i) => raw !== null && raw !== undefined && i !== excludeIdx);
   const slotsLeft = QD_SIZE - filled.length;
   if (slotsLeft <= 0) return null;
 
@@ -2036,8 +2050,10 @@ function qdRequiredSideForDraft(draftArr) {
 // simulation (qdSimulateChain) can stay purely automatic — it's a
 // hypothetical illustration, not the real draft, and shouldn't be
 // steered by an override the person set for their actual picks.
-function qdEffectiveRequiredSide(draftArr) {
-  return qdManualSideOverride || qdRequiredSideForDraft(draftArr);
+// `excludeIdx` just passes through to qdRequiredSideForDraft above; the
+// manual override (if any) still wins regardless, same as before.
+function qdEffectiveRequiredSide(draftArr, excludeIdx) {
+  return qdManualSideOverride || qdRequiredSideForDraft(draftArr, excludeIdx);
 }
 
 // Flips the manual override — always to whichever side ISN'T currently
@@ -2167,7 +2183,7 @@ function qdSimpleSuggestForSlot(nextIdx, draftArr, banProtectEl) {
   // via qdEffectiveRequiredSide — see Section 9.4) — same "filter down,
   // but relax back to the full list if that would empty it" pattern the
   // old Autofill/mould code already used.
-  const requiredSide = qdEffectiveRequiredSide(draftArr);
+  const requiredSide = qdEffectiveRequiredSide(draftArr, nextIdx);
   if (requiredSide) {
     const sideMatches = entries.filter(e => qdHeroSide(e.hero, e.variant) === requiredSide);
     if (sideMatches.length) entries = sideMatches;
