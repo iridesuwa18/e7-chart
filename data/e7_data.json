@@ -5918,9 +5918,6 @@
           "refId": 1788780327120
         },
         {
-          "refId": 1789113568734
-        },
-        {
           "refId": 1789209367308
         }
       ],
@@ -5946,9 +5943,10 @@
       "needsRerating": false,
       "pvpTag": false,
       "altStats": {
-        "selfishScore": 2,
+        "selfishScore": 3,
         "selflessScore": 0,
         "selfSkillIds": [
+          "extraTurns",
           "spdCr",
           "lifesteal"
         ],
@@ -16987,5 +16985,5 @@
     ]
   },
   "schemaVersion": 2,
-  "savedAt": "2026-09-13T06:33:54.262Z"
+  "savedAt": "2026-09-13T06:34:43.791Z"
 }
