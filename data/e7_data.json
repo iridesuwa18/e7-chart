@@ -5694,11 +5694,39 @@
         "hType": "SUR",
         "hScore": 10
       },
-      "reactions": [],
-      "engagements": [],
-      "selfishScore": 0,
+      "reactions": [
+        {
+          "refId": 1789287371412
+        }
+      ],
+      "engagements": [
+        {
+          "refId": 1788773476896
+        },
+        {
+          "refId": 1788924109560
+        },
+        {
+          "refId": 1788773060667
+        },
+        {
+          "refId": 1788785021751
+        },
+        {
+          "refId": 1789221204007
+        }
+      ],
+      "selfishScore": 3,
       "selflessScore": 0,
-      "needsRerating": true
+      "needsRerating": false,
+      "pvpTag": false,
+      "altStats": null,
+      "selfSkillIds": [
+        "immobDebuff",
+        "selfPassive",
+        "shields"
+      ],
+      "allySupport": []
     },
     {
       "id": 1787483149440,
@@ -15473,6 +15501,15 @@
         "factorIds": [
           1788780896026
         ]
+      },
+      {
+        "id": 1789287371412,
+        "name": "Increase Soul Acquired Passive",
+        "value": 10,
+        "factorIds": [
+          1788784362484,
+          1789287399739
+        ]
       }
     ],
     "engagements": [
@@ -17136,9 +17173,13 @@
         "id": 1789280899424,
         "name": "Non-critical attacks",
         "pinned": false
+      },
+      {
+        "id": 1789287399739,
+        "name": "Anti-soulburn teams"
       }
     ]
   },
   "schemaVersion": 2,
-  "savedAt": "2026-09-13T08:13:48.489Z"
+  "savedAt": "2026-09-13T08:18:24.642Z"
 }
