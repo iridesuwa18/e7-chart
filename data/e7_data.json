@@ -12341,12 +12341,66 @@
       "hType_legacy": "SUR",
       "hScore_legacy": 4,
       "altStats_legacy": null,
-      "reactions": [],
-      "engagements": [],
+      "reactions": [
+        {
+          "refId": 1788780327120
+        }
+      ],
+      "engagements": [
+        {
+          "refId": 1788783359037
+        },
+        {
+          "refId": 1788785736229
+        },
+        {
+          "refId": 1788773067411
+        },
+        {
+          "refId": 1788927609636
+        },
+        {
+          "refId": 1788914238894
+        },
+        {
+          "refId": 1788783099100
+        },
+        {
+          "refId": 1788782920388
+        },
+        {
+          "refId": 1788773060667
+        }
+      ],
       "selfishScore": 0,
-      "selflessScore": 0,
-      "needsRerating": true,
-      "hidden": true
+      "selflessScore": 0.42,
+      "needsRerating": false,
+      "hidden": true,
+      "pvpTag": false,
+      "altStats": null,
+      "selfSkillIds": [],
+      "allySupport": [
+        {
+          "healing": 0,
+          "passive": 0,
+          "buffCount": 2
+        },
+        {
+          "healing": 0,
+          "passive": 0,
+          "buffCount": 1
+        },
+        {
+          "healing": 0,
+          "passive": 0,
+          "buffCount": 1
+        },
+        {
+          "healing": 0,
+          "passive": 0,
+          "buffCount": 1
+        }
+      ]
     },
     {
       "id": 1787753484471,
@@ -13493,6 +13547,7 @@
         "id": 1789216537415,
         "name": "Vampirism buff",
         "value": 7,
+        "pinned": false,
         "factorIds": [
           1788694866469,
           1788772019318,
@@ -13516,6 +13571,7 @@
         "id": 1789217293880,
         "name": "Reacts to extra turns",
         "value": 8.5,
+        "pinned": false,
         "factorIds": [
           1788772861638
         ]
@@ -14761,6 +14817,7 @@
         "id": 1789218602674,
         "name": "Unaffected by elemental disadvantage",
         "value": 7.8,
+        "pinned": false,
         "factorIds": [
           1789218645455
         ]
@@ -14769,6 +14826,7 @@
         "id": 1789219311500,
         "name": "Chain of Chiron (Undispellable) Buff to ally (4 random debuffs)",
         "value": 8,
+        "pinned": false,
         "factorIds": [
           1788773731924,
           1789014978867,
@@ -15101,14 +15159,16 @@
       },
       {
         "id": 1789218645455,
-        "name": "Counter element units"
+        "name": "Counter element units",
+        "pinned": false
       },
       {
         "id": 1789220943266,
-        "name": "Lack of buffers team"
+        "name": "Lack of buffers team",
+        "pinned": false
       }
     ]
   },
   "schemaVersion": 2,
-  "savedAt": "2026-09-12T14:04:33.009Z"
+  "savedAt": "2026-09-13T00:13:43.515Z"
 }
