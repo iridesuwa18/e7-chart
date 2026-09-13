@@ -7155,11 +7155,62 @@
         "hType": "SUR",
         "hScore": 9
       },
-      "reactions": [],
-      "engagements": [],
+      "reactions": [
+        {
+          "refId": 1789299557625
+        }
+      ],
+      "engagements": [
+        {
+          "refId": 1788772163166
+        },
+        {
+          "refId": 1788783099100
+        },
+        {
+          "refId": 1789114206059
+        },
+        {
+          "refId": 1788786336798
+        },
+        {
+          "refId": 1788783486720
+        },
+        {
+          "refId": 1788782920388
+        },
+        {
+          "refId": 1789221204007
+        }
+      ],
       "selfishScore": 0,
-      "selflessScore": 0,
-      "needsRerating": true
+      "selflessScore": 1,
+      "needsRerating": false,
+      "pvpTag": false,
+      "altStats": null,
+      "selfSkillIds": [],
+      "allySupport": [
+        {
+          "healing": 0,
+          "passive": 0,
+          "buffCount": 3
+        },
+        {
+          "healing": 0,
+          "passive": 0,
+          "buffCount": 3
+        },
+        {
+          "healing": 0,
+          "passive": 0,
+          "buffCount": 3
+        },
+        {
+          "healing": 0,
+          "passive": 0,
+          "buffCount": 3
+        }
+      ]
     },
     {
       "id": 1787485980143,
@@ -16262,6 +16313,14 @@
           1788700420912,
           1788783127095
         ]
+      },
+      {
+        "id": 1789299557625,
+        "name": "Reacts to poison and venom effects",
+        "value": 8,
+        "factorIds": [
+          1789299573426
+        ]
       }
     ],
     "engagements": [
@@ -18003,9 +18062,13 @@
       {
         "id": 1789297548874,
         "name": "Cleansers / Debuff Dispellers"
+      },
+      {
+        "id": 1789299573426,
+        "name": "Poison / venom units"
       }
     ]
   },
   "schemaVersion": 2,
-  "savedAt": "2026-09-13T11:37:35.981Z"
+  "savedAt": "2026-09-13T11:41:41.777Z"
 }
