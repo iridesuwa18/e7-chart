@@ -786,6 +786,29 @@ let quickDraftSuggestOpen = false;
    one rank per click and wrapping back to #1 if you run off the end. */
 let qdLastFilledSlot = null;
 let qdNextBestRank = 0;
+
+// [NEW FEATURE] heroId -> slotIndex it was swapped OUT of the last time
+// Rep. Curr. was pressed. While a heroId is in here, it's excluded from
+// every OTHER slot's suggestions (Suggest/Autofill/Randomize/Rep. Curr.)
+// — see qdSimpleSuggestForSlot — but the slot it was swapped out of can
+// still cycle back to it, since that's not "another" slot. Cleared
+// entirely by Clear (clearQuickDraft) and kept in sync with slot shifts
+// caused by removing a hero (see qdReindexReplacedHeroOrigins).
+let qdReplacedHeroOrigin = new Map();
+
+// Keeps qdReplacedHeroOrigin's slot indices valid after removeFromQuickDraft
+// compacts the array. Any exclusion recorded against the slot that just
+// emptied out is dropped (that slot's identity changed), everything after
+// it shifts down by one, matching the array's own compaction.
+function qdReindexReplacedHeroOrigins(removedIndex) {
+  if (removedIndex === -1 || removedIndex == null || qdReplacedHeroOrigin.size === 0) return;
+  const next = new Map();
+  qdReplacedHeroOrigin.forEach((slotIdx, heroId) => {
+    if (slotIdx === removedIndex) return;
+    next.set(heroId, slotIdx > removedIndex ? slotIdx - 1 : slotIdx);
+  });
+  qdReplacedHeroOrigin = next;
+}
 let qdBanProtectElement = null; // the element of the enemy's un-bannable "Ban Protect" pick, if set (Rule 1)
 let qdCompetitiveMode = false; // when on: 3★ heroes (chained or support) are excluded from Randomize/Suggest/Autofill unless pvpTag is set. Session-only, like the rest of Quick Draft's state.
 
@@ -2114,7 +2137,25 @@ function qdSimpleSuggestForSlot(nextIdx, draftArr, banProtectEl) {
   const usedHeroIds = new Set(
     draftArr.filter((raw, i) => raw !== null && i !== nextIdx).map(raw => qdParsePick(raw).heroId)
   );
-  const candidateHeroes = heroes.filter(h => !usedHeroIds.has(h.id) && !qdIsBannedByCompetitive(h));
+  // [BUGFIX] Rep. Curr. targets an already-filled slot (nextIdx), so the
+  // slot's CURRENT occupant must not count as "already committed" when we
+  // work out which Selfish/Selfless side is still required — otherwise a
+  // slot's own hero gets double-counted against the 3/2 quota it's still
+  // trying to fill, incorrectly narrowing (or relaxing) its own candidate
+  // pool. Build a copy of draftArr with nextIdx nulled out purely for that
+  // calculation, mirroring how usedHeroIds above already excludes nextIdx.
+  const draftArrForQuota = draftArr.map((raw, i) => (i === nextIdx ? null : raw));
+  const candidateHeroes = heroes.filter(h => {
+    if (usedHeroIds.has(h.id)) return false;
+    if (qdIsBannedByCompetitive(h)) return false;
+    // [NEW FEATURE] Heroes swapped OUT of a slot via Rep. Curr. are
+    // benched from every OTHER slot's suggestions (Suggest/Autofill/
+    // Randomize/Rep. Curr.) until Clear is pressed — see
+    // qdReplacedHeroOrigin. The slot they were swapped out of is still
+    // allowed to cycle back to them (that's "this slot", not "another").
+    if (qdReplacedHeroOrigin.has(h.id) && qdReplacedHeroOrigin.get(h.id) !== nextIdx) return false;
+    return true;
+  });
 
   const counterEl = banProtectEl ? QD_ELEMENT_COUNTER[banProtectEl] : null;
   const avoidEl   = banProtectEl ? Object.keys(QD_ELEMENT_COUNTER).find(k => QD_ELEMENT_COUNTER[k] === banProtectEl) : null;
@@ -2167,7 +2208,7 @@ function qdSimpleSuggestForSlot(nextIdx, draftArr, banProtectEl) {
   // via qdEffectiveRequiredSide — see Section 9.4) — same "filter down,
   // but relax back to the full list if that would empty it" pattern the
   // old Autofill/mould code already used.
-  const requiredSide = qdEffectiveRequiredSide(draftArr);
+  const requiredSide = qdEffectiveRequiredSide(draftArrForQuota);
   if (requiredSide) {
     const sideMatches = entries.filter(e => qdHeroSide(e.hero, e.variant) === requiredSide);
     if (sideMatches.length) entries = sideMatches;
@@ -2433,8 +2474,18 @@ function nextBestQuickDraftPick() {
   }
   if (scored.length === 0) { setStatus("⚠️ No more heroes left in your Roster to swap in."); return; }
 
+  // [NEW FEATURE] Remember whoever's about to get swapped out of this
+  // slot so they stop showing up in every OTHER slot's suggestions until
+  // Clear is pressed. Only counts as a "replace" when the heroId itself
+  // changes — cycling between a hero's own Primary/Ghost build isn't
+  // swapping the hero out, so that doesn't bench it.
+  const outgoing = quickDraft[slotIndex] ? qdParsePick(quickDraft[slotIndex]) : null;
+
   qdNextBestRank = (qdNextBestRank + 1) % scored.length;
   const pick = scored[qdNextBestRank];
+  if (outgoing && outgoing.heroId !== pick.heroId) {
+    qdReplacedHeroOrigin.set(outgoing.heroId, slotIndex);
+  }
   quickDraft[slotIndex] = qdMakePickId(pick.heroId, pick.variant);
   saveQuickDraftLocal();
   renderQuickDraft();
@@ -2461,7 +2512,15 @@ function randomizeQuickDraft() {
   const idx = quickDraft.indexOf(null);
   if (idx === -1) { setStatus("⚠️ Quick Draft is full (5/5)"); return; }
   const usedHeroIds = new Set(quickDraft.filter(raw => raw !== null).map(raw => qdParsePick(raw).heroId));
-  const pool = heroes.filter(h => !usedHeroIds.has(h.id) && !qdIsBannedByCompetitive(h));
+  const pool = heroes.filter(h => {
+    if (usedHeroIds.has(h.id)) return false;
+    if (qdIsBannedByCompetitive(h)) return false;
+    // [NEW FEATURE] same Rep. Curr. exclusion as qdSimpleSuggestForSlot —
+    // Randomize is filling `idx`, so a hero benched from a different slot
+    // still can't be randomly drawn into this one either.
+    if (qdReplacedHeroOrigin.has(h.id) && qdReplacedHeroOrigin.get(h.id) !== idx) return false;
+    return true;
+  });
   if (pool.length === 0) {
     setStatus(qdCompetitiveMode
       ? "⚠️ No eligible heroes left (Competitive mode is banning non-PVP-tagged 3★s)."
@@ -2524,8 +2583,10 @@ function autofillTopQuickDraftPick() {
    it removes the hero regardless of which build (primary/Ghost) was
    drafted for it. */
 function removeFromQuickDraft(id) {
+  const removedIndex = quickDraft.findIndex(x => x !== null && qdParsePick(x).heroId === id);
   quickDraft = quickDraft.filter(x => x === null || qdParsePick(x).heroId !== id);
   while (quickDraft.length < QD_SIZE) quickDraft.push(null);
+  qdReindexReplacedHeroOrigins(removedIndex);
   saveQuickDraftLocal();
   renderQuickDraft();
   renderRoster();
@@ -2543,6 +2604,7 @@ function clearQuickDraft() {
   quickDraftSuggestOpen = false;
   qdLastFilledSlot = null;
   qdNextBestRank = 0;
+  qdReplacedHeroOrigin = new Map(); // [NEW FEATURE] new draft, new enemy — clear the Rep. Curr. bench
   document.getElementById("quickdraft-suggestions").style.display = "none";
   saveQuickDraftLocal();
 
