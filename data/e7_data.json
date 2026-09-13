@@ -13758,12 +13758,52 @@
         "hType": "SST",
         "hScore": 5
       },
-      "reactions": [],
-      "engagements": [],
-      "selfishScore": 0,
+      "reactions": [
+        {
+          "refId": 1789121061181
+        },
+        {
+          "refId": 1788780217783
+        }
+      ],
+      "engagements": [
+        {
+          "refId": 1788783099100
+        },
+        {
+          "refId": 1789116549901
+        },
+        {
+          "refId": 1788786336798
+        },
+        {
+          "refId": 1788773067411
+        },
+        {
+          "refId": 1789218602674
+        },
+        {
+          "refId": 1788785954933
+        },
+        {
+          "refId": 1789203922731
+        },
+        {
+          "refId": 1789274846919
+        }
+      ],
+      "selfishScore": 3,
       "selflessScore": 0,
-      "needsRerating": true,
-      "hidden": true
+      "needsRerating": false,
+      "hidden": true,
+      "pvpTag": false,
+      "altStats": null,
+      "selfSkillIds": [
+        "selfPassive",
+        "immunity",
+        "lifesteal"
+      ],
+      "allySupport": []
     },
     {
       "id": 1788554904018,
@@ -15880,6 +15920,14 @@
           1789014978867,
           1788773731924
         ]
+      },
+      {
+        "id": 1789274846919,
+        "name": "Apply debuff regardless of hit",
+        "value": 7.8,
+        "factorIds": [
+          1788783127095
+        ]
       }
     ],
     "factors": [
@@ -16196,5 +16244,5 @@
     ]
   },
   "schemaVersion": 2,
-  "savedAt": "2026-09-13T04:43:40.522Z"
+  "savedAt": "2026-09-13T04:47:56.668Z"
 }
