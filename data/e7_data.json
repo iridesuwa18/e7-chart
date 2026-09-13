@@ -12532,12 +12532,52 @@
         "hType": "SUR",
         "hScore": 6
       },
-      "reactions": [],
-      "engagements": [],
-      "selfishScore": 0,
+      "reactions": [
+        {
+          "refId": 1788780327120
+        },
+        {
+          "refId": 1789191471240
+        },
+        {
+          "refId": 1789259042871
+        },
+        {
+          "refId": 1789259194029
+        }
+      ],
+      "engagements": [
+        {
+          "refId": 1788773060667
+        },
+        {
+          "refId": 1788785505206
+        },
+        {
+          "refId": 1788772163166
+        },
+        {
+          "refId": 1788914238894
+        },
+        {
+          "refId": 1788782920388
+        },
+        {
+          "refId": 1789115995455
+        }
+      ],
+      "selfishScore": 3,
       "selflessScore": 0,
-      "needsRerating": true,
-      "hidden": true
+      "needsRerating": false,
+      "hidden": true,
+      "pvpTag": false,
+      "altStats": null,
+      "selfSkillIds": [
+        "decCr",
+        "immunity",
+        "shields"
+      ],
+      "allySupport": []
     },
     {
       "id": 1787753929525,
@@ -13673,6 +13713,27 @@
           1788913802940,
           1788775944046,
           1788773895734
+        ]
+      },
+      {
+        "id": 1789259042871,
+        "name": "Reacts to enemy non-attack skills",
+        "value": 8.6,
+        "pinned": false,
+        "factorIds": [
+          1789259075608
+        ]
+      },
+      {
+        "id": 1789259194029,
+        "name": "Attack equal to allies' highest attack",
+        "value": 8,
+        "factorIds": [
+          1788700420912,
+          1788701036557,
+          1788772992919,
+          1788783127095,
+          1788786571272
         ]
       }
     ],
@@ -15224,9 +15285,13 @@
         "id": 1789220943266,
         "name": "Lack of buffers team",
         "pinned": false
+      },
+      {
+        "id": 1789259075608,
+        "name": "Non-attack skills"
       }
     ]
   },
   "schemaVersion": 2,
-  "savedAt": "2026-09-13T00:20:51.822Z"
+  "savedAt": "2026-09-13T00:28:34.222Z"
 }
