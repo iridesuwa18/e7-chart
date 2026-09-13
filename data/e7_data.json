@@ -7014,11 +7014,54 @@
         "hType": "SUR",
         "hScore": 4
       },
-      "reactions": [],
-      "engagements": [],
-      "selfishScore": 0,
+      "reactions": [
+        {
+          "refId": 1788775147348
+        },
+        {
+          "refId": 1789134378369
+        }
+      ],
+      "engagements": [
+        {
+          "refId": 1788773060667
+        },
+        {
+          "refId": 1789134498394
+        },
+        {
+          "refId": 1788773067411
+        },
+        {
+          "refId": 1789201317168
+        },
+        {
+          "refId": 1788780377530
+        },
+        {
+          "refId": 1789115108791
+        },
+        {
+          "refId": 1788783486720
+        },
+        {
+          "refId": 1789299195538
+        },
+        {
+          "refId": 1788912251007
+        }
+      ],
+      "selfishScore": 3,
       "selflessScore": 0,
-      "needsRerating": true
+      "needsRerating": false,
+      "pvpTag": false,
+      "altStats": null,
+      "selfSkillIds": [
+        "spdCr",
+        "lifesteal",
+        "selfPassive"
+      ],
+      "allySupport": []
     },
     {
       "id": 1787485759696,
@@ -17566,6 +17609,22 @@
           1788773130306,
           1788700420912
         ]
+      },
+      {
+        "id": 1789299195538,
+        "name": "Ice Cream (Undispellable) Buff",
+        "value": 9,
+        "factorIds": [
+          1788694866469,
+          1788774099692,
+          1788913802940,
+          1788775427431,
+          1788786300042,
+          1788772214825,
+          1788775944046,
+          1788912649792,
+          1788700781693
+        ]
       }
     ],
     "factors": [
@@ -17906,5 +17965,5 @@
     ]
   },
   "schemaVersion": 2,
-  "savedAt": "2026-09-13T11:29:08.523Z"
+  "savedAt": "2026-09-13T11:34:51.085Z"
 }
