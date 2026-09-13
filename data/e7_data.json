@@ -6454,11 +6454,79 @@
       "hType_legacy": "SUR",
       "hScore_legacy": 5,
       "altStats_legacy": null,
-      "reactions": [],
-      "engagements": [],
+      "reactions": [
+        {
+          "refId": 1788775147348
+        },
+        {
+          "refId": 1789177637826
+        },
+        {
+          "refId": 1789296502290
+        }
+      ],
+      "engagements": [
+        {
+          "refId": 1789177107595
+        },
+        {
+          "refId": 1788783099100
+        },
+        {
+          "refId": 1788783734183
+        },
+        {
+          "refId": 1789129986550
+        },
+        {
+          "refId": 1789296401576
+        },
+        {
+          "refId": 1788785021751
+        },
+        {
+          "refId": 1788783359037
+        },
+        {
+          "refId": 1789218602674
+        }
+      ],
       "selfishScore": 0,
-      "selflessScore": 0,
-      "needsRerating": true
+      "selflessScore": 0.92,
+      "needsRerating": false,
+      "pvpTag": false,
+      "altStats": {
+        "selfishScore": 2,
+        "selflessScore": 0,
+        "selfSkillIds": [
+          "immunity",
+          "spdCr"
+        ],
+        "allySupport": []
+      },
+      "selfSkillIds": [],
+      "allySupport": [
+        {
+          "healing": 0,
+          "passive": 30,
+          "buffCount": 2
+        },
+        {
+          "healing": 0,
+          "passive": 0,
+          "buffCount": 2
+        },
+        {
+          "healing": 0,
+          "passive": 0,
+          "buffCount": 2
+        },
+        {
+          "healing": 0,
+          "passive": 0,
+          "buffCount": 2
+        }
+      ]
     },
     {
       "id": 1787484762650,
@@ -15793,6 +15861,15 @@
           1788774099692,
           1789113473631
         ]
+      },
+      {
+        "id": 1789296502290,
+        "name": "Reacts to enemy's attack with a buff",
+        "value": 8,
+        "pinned": false,
+        "factorIds": [
+          1788773731924
+        ]
       }
     ],
     "engagements": [
@@ -17138,6 +17215,15 @@
         "factorIds": [
           1789113473631
         ]
+      },
+      {
+        "id": 1789296401576,
+        "name": "Copies buffs (regardless of hit)",
+        "value": 7.7,
+        "factorIds": [
+          1788773731924,
+          1789014978867
+        ]
       }
     ],
     "factors": [
@@ -17474,5 +17560,5 @@
     ]
   },
   "schemaVersion": 2,
-  "savedAt": "2026-09-13T09:03:42.954Z"
+  "savedAt": "2026-09-13T10:49:45.709Z"
 }
