@@ -13379,12 +13379,41 @@
       "hType_legacy": "SUR",
       "hScore_legacy": 6,
       "altStats_legacy": null,
-      "reactions": [],
-      "engagements": [],
-      "selfishScore": 0,
+      "reactions": [
+        {
+          "refId": 1789267292000
+        }
+      ],
+      "engagements": [
+        {
+          "refId": 1789198537752
+        },
+        {
+          "refId": 1788773067411
+        },
+        {
+          "refId": 1789133085456
+        },
+        {
+          "refId": 1789132813412
+        },
+        {
+          "refId": 1788783359037
+        },
+        {
+          "refId": 1789178467146
+        }
+      ],
+      "selfishScore": 1,
       "selflessScore": 0,
-      "needsRerating": true,
-      "hidden": true
+      "needsRerating": false,
+      "hidden": true,
+      "pvpTag": false,
+      "altStats": null,
+      "selfSkillIds": [
+        "spdCr"
+      ],
+      "allySupport": []
     },
     {
       "id": 1787754881572,
@@ -14326,6 +14355,15 @@
           1788772992919,
           1789191623914,
           1789259574556
+        ]
+      },
+      {
+        "id": 1789267292000,
+        "name": "Reacts to ally's extra turns",
+        "value": 8.5,
+        "pinned": false,
+        "factorIds": [
+          1788785891810
         ]
       }
     ],
@@ -15902,5 +15940,5 @@
     ]
   },
   "schemaVersion": 2,
-  "savedAt": "2026-09-13T02:39:36.663Z"
+  "savedAt": "2026-09-13T02:43:19.859Z"
 }
