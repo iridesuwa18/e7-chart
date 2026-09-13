@@ -13027,6 +13027,12 @@
         },
         {
           "refId": 1789133298898
+        },
+        {
+          "refId": 1788773067411
+        },
+        {
+          "refId": 1789132233866
         }
       ],
       "selfishScore": 1,
@@ -13729,7 +13735,7 @@
       },
       {
         "id": 1789177042422,
-        "name": "Effect Resistance passive",
+        "name": "Increase Effect Resistance passive",
         "value": 9.8,
         "pinned": false,
         "factorIds": [
@@ -13825,7 +13831,7 @@
       },
       {
         "id": 1789198037209,
-        "name": "Effectiveness passive",
+        "name": "Increase Effectiveness (Unique) passive",
         "value": 8,
         "pinned": false,
         "factorIds": [
@@ -14092,6 +14098,7 @@
         "id": 1789263239648,
         "name": "Increase burn damage passive",
         "value": 8,
+        "pinned": false,
         "factorIds": [
           1789014978867,
           1788701036557,
@@ -15673,5 +15680,5 @@
     ]
   },
   "schemaVersion": 2,
-  "savedAt": "2026-09-13T01:40:04.396Z"
+  "savedAt": "2026-09-13T01:48:06.646Z"
 }
