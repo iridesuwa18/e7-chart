@@ -5904,11 +5904,53 @@
         "hType": "SUR",
         "hScore": 2
       },
-      "reactions": [],
-      "engagements": [],
+      "reactions": [
+        {
+          "refId": 1788786348512
+        },
+        {
+          "refId": 1789221069112
+        }
+      ],
+      "engagements": [
+        {
+          "refId": 1788772163166
+        },
+        {
+          "refId": 1788698917413
+        },
+        {
+          "refId": 1789177107595
+        }
+      ],
       "selfishScore": 0,
-      "selflessScore": 0,
-      "needsRerating": true
+      "selflessScore": 2,
+      "needsRerating": false,
+      "pvpTag": false,
+      "altStats": null,
+      "selfSkillIds": [],
+      "allySupport": [
+        {
+          "healing": 20,
+          "passive": 20,
+          "buffCount": 2
+        },
+        {
+          "healing": 20,
+          "passive": 20,
+          "buffCount": 2
+        },
+        {
+          "healing": 20,
+          "passive": 20,
+          "buffCount": 2
+        },
+        {
+          "healing": 20,
+          "passive": 20,
+          "buffCount": 2
+        }
+      ]
     },
     {
       "id": 1787483571116,
@@ -15386,7 +15428,7 @@
       },
       {
         "id": 1789221069112,
-        "name": "Reacts to AOE attacks",
+        "name": "Reacts to enemy's AOE attacks",
         "value": 8.6,
         "pinned": false,
         "factorIds": [
@@ -17297,5 +17339,5 @@
     ]
   },
   "schemaVersion": 2,
-  "savedAt": "2026-09-13T08:34:58.158Z"
+  "savedAt": "2026-09-13T08:39:50.833Z"
 }
