@@ -1259,6 +1259,9 @@
         },
         {
           "refId": 1788775147348
+        },
+        {
+          "refId": 1789177637826
         }
       ],
       "engagements": [
@@ -2542,6 +2545,9 @@
         },
         {
           "refId": 1789174925004
+        },
+        {
+          "refId": 1789177637826
         }
       ],
       "engagements": [
@@ -12384,6 +12390,9 @@
         },
         {
           "refId": 1789221117694
+        },
+        {
+          "refId": 1789177637826
         }
       ],
       "engagements": [
@@ -12458,6 +12467,9 @@
         },
         {
           "refId": 1788775147348
+        },
+        {
+          "refId": 1789177637826
         }
       ],
       "engagements": [
@@ -13133,12 +13145,57 @@
       "hType_legacy": "SUR",
       "hScore_legacy": 7,
       "altStats_legacy": null,
-      "reactions": [],
-      "engagements": [],
-      "selfishScore": 0,
+      "reactions": [
+        {
+          "refId": 1789115386205
+        },
+        {
+          "refId": 1789199188207
+        },
+        {
+          "refId": 1789198095367
+        },
+        {
+          "refId": 1789264561709
+        },
+        {
+          "refId": 1789177637826
+        },
+        {
+          "refId": 1789200895728
+        }
+      ],
+      "engagements": [
+        {
+          "refId": 1788785505206
+        },
+        {
+          "refId": 1789217623138
+        },
+        {
+          "refId": 1788773067411
+        },
+        {
+          "refId": 1789131692127
+        },
+        {
+          "refId": 1788783359037
+        },
+        {
+          "refId": 1789118896007
+        }
+      ],
+      "selfishScore": 2,
       "selflessScore": 0,
-      "needsRerating": true,
-      "hidden": true
+      "needsRerating": false,
+      "hidden": true,
+      "pvpTag": false,
+      "altStats": null,
+      "selfSkillIds": [
+        "spdCr",
+        "decCr"
+      ],
+      "allySupport": []
     },
     {
       "id": 1787754579849,
@@ -13889,7 +13946,7 @@
       },
       {
         "id": 1789198095367,
-        "name": "Critical Hit Damage passive",
+        "name": "Increase Critical Hit Damage passive",
         "value": 7.5,
         "pinned": false,
         "factorIds": [
@@ -14161,6 +14218,17 @@
         "factorIds": [
           1788772992919,
           1788773130306
+        ]
+      },
+      {
+        "id": 1789264561709,
+        "name": "Reacts to enemy's death done by allies (not caster)",
+        "value": 8.6,
+        "pinned": false,
+        "factorIds": [
+          1788772992919,
+          1789191623914,
+          1789259574556
         ]
       }
     ],
@@ -15737,5 +15805,5 @@
     ]
   },
   "schemaVersion": 2,
-  "savedAt": "2026-09-13T01:53:46.853Z"
+  "savedAt": "2026-09-13T02:03:03.653Z"
 }
