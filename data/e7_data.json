@@ -6579,11 +6579,75 @@
         "hType": "SST",
         "hScore": 4
       },
-      "reactions": [],
-      "engagements": [],
+      "reactions": [
+        {
+          "refId": 1788780327120
+        }
+      ],
+      "engagements": [
+        {
+          "refId": 1788772268160
+        },
+        {
+          "refId": 1788772163166
+        },
+        {
+          "refId": 1789278130134
+        },
+        {
+          "refId": 1788782920388
+        },
+        {
+          "refId": 1789132181142
+        },
+        {
+          "refId": 1788773067411
+        },
+        {
+          "refId": 1789132668882
+        },
+        {
+          "refId": 1788785736229
+        }
+      ],
       "selfishScore": 0,
-      "selflessScore": 0,
-      "needsRerating": true
+      "selflessScore": 2,
+      "needsRerating": false,
+      "pvpTag": false,
+      "altStats": {
+        "selfishScore": 4,
+        "selflessScore": 0,
+        "selfSkillIds": [
+          "immobDebuff",
+          "selfPassive",
+          "shields",
+          "lifesteal"
+        ],
+        "allySupport": []
+      },
+      "selfSkillIds": [],
+      "allySupport": [
+        {
+          "healing": 50,
+          "passive": 0,
+          "buffCount": 1
+        },
+        {
+          "healing": 50,
+          "passive": 0,
+          "buffCount": 1
+        },
+        {
+          "healing": 50,
+          "passive": 0,
+          "buffCount": 1
+        },
+        {
+          "healing": 50,
+          "passive": 0,
+          "buffCount": 1
+        }
+      ]
     },
     {
       "id": 1787755972416,
@@ -14986,6 +15050,7 @@
         "id": 1789275305361,
         "name": "Dispel stealth (passive)",
         "value": 8,
+        "pinned": false,
         "factorIds": [
           1788773216100
         ]
@@ -14994,6 +15059,7 @@
         "id": 1789276809428,
         "name": "Unaffected by decreases to Combat Readiness",
         "value": 8,
+        "pinned": false,
         "factorIds": [
           1789130596970
         ]
@@ -15002,6 +15068,7 @@
         "id": 1789276853775,
         "name": "Dispel immortality (passive)",
         "value": 9,
+        "pinned": false,
         "factorIds": []
       }
     ],
@@ -16277,6 +16344,7 @@
         "id": 1789274846919,
         "name": "Apply debuff regardless of hit",
         "value": 7.8,
+        "pinned": false,
         "factorIds": [
           1788783127095
         ]
@@ -16285,6 +16353,7 @@
         "id": 1789276598548,
         "name": "Exploiting weak points",
         "value": 7,
+        "pinned": false,
         "factorIds": [
           1788772992919,
           1788783127095
@@ -16294,6 +16363,7 @@
         "id": 1789276945500,
         "name": "Radiance (Undispellable) buff",
         "value": 8,
+        "pinned": false,
         "factorIds": [
           1788694866469,
           1788774099692
@@ -16313,6 +16383,7 @@
         "id": 1789277487780,
         "name": "Lingering fragrance (Undispellable) buffs",
         "value": 9.5,
+        "pinned": false,
         "factorIds": [
           1788694866469,
           1788774099692,
@@ -16322,6 +16393,18 @@
           1788775427431,
           1788786300042,
           1788775944046
+        ]
+      },
+      {
+        "id": 1789278130134,
+        "name": "Distribute health among allies",
+        "value": 8,
+        "pinned": false,
+        "factorIds": [
+          1788694866469,
+          1788772019318,
+          1788774099692,
+          1789278159333
         ]
       }
     ],
@@ -16638,10 +16721,15 @@
       },
       {
         "id": 1789276871897,
-        "name": "Immortality units"
+        "name": "Immortality units",
+        "pinned": false
+      },
+      {
+        "id": 1789278159333,
+        "name": "Cannot heal / unhealable effects"
       }
     ]
   },
   "schemaVersion": 2,
-  "savedAt": "2026-09-13T05:38:28.347Z"
+  "savedAt": "2026-09-13T05:44:32.987Z"
 }
