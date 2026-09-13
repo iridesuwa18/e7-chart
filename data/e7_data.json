@@ -13062,12 +13062,60 @@
       "hType_legacy": "SUR",
       "hScore_legacy": 4,
       "altStats_legacy": null,
-      "reactions": [],
-      "engagements": [],
+      "reactions": [
+        {
+          "refId": 1789203511668
+        },
+        {
+          "refId": 1789264307766
+        }
+      ],
+      "engagements": [
+        {
+          "refId": 1788773060667
+        },
+        {
+          "refId": 1789116549901
+        },
+        {
+          "refId": 1788783734183
+        },
+        {
+          "refId": 1788786124368
+        },
+        {
+          "refId": 1788773067411
+        }
+      ],
       "selfishScore": 0,
-      "selflessScore": 0,
-      "needsRerating": true,
-      "hidden": true
+      "selflessScore": 0.42,
+      "needsRerating": false,
+      "hidden": true,
+      "pvpTag": false,
+      "altStats": null,
+      "selfSkillIds": [],
+      "allySupport": [
+        {
+          "healing": 0,
+          "passive": 0,
+          "buffCount": 2
+        },
+        {
+          "healing": 0,
+          "passive": 0,
+          "buffCount": 1
+        },
+        {
+          "healing": 0,
+          "passive": 0,
+          "buffCount": 1
+        },
+        {
+          "healing": 0,
+          "passive": 0,
+          "buffCount": 1
+        }
+      ]
     },
     {
       "id": 1787754501552,
@@ -14104,6 +14152,15 @@
           1788701036557,
           1788700420912,
           1788783127095
+        ]
+      },
+      {
+        "id": 1789264307766,
+        "name": "Increase Dual Attack Passive",
+        "value": 7.6,
+        "factorIds": [
+          1788772992919,
+          1788773130306
         ]
       }
     ],
@@ -15680,5 +15737,5 @@
     ]
   },
   "schemaVersion": 2,
-  "savedAt": "2026-09-13T01:48:06.646Z"
+  "savedAt": "2026-09-13T01:53:46.853Z"
 }
