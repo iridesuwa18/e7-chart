@@ -16527,7 +16527,9 @@
         "name": "Dispel immortality (passive)",
         "value": 9,
         "pinned": false,
-        "factorIds": []
+        "factorIds": [
+          1789276871897
+        ]
       },
       {
         "id": 1789280776320,
@@ -16623,6 +16625,7 @@
         "id": 1789298129096,
         "name": "Stackable Attack passive",
         "value": 9,
+        "pinned": false,
         "factorIds": [
           1788772992919,
           1788694866469,
@@ -16635,6 +16638,7 @@
         "id": 1789299557625,
         "name": "Reacts to poison and venom effects",
         "value": 8,
+        "pinned": false,
         "factorIds": [
           1789299573426
         ]
@@ -16656,6 +16660,7 @@
         "id": 1789300087249,
         "name": "Cleanses fully upon being attacked / start of turn",
         "value": 10,
+        "pinned": false,
         "factorIds": [
           1788700781693,
           1789130156790,
@@ -16666,6 +16671,7 @@
         "id": 1789301037314,
         "name": "Speed scaling passive",
         "value": 9,
+        "pinned": false,
         "factorIds": [
           1788773895734,
           1788694866469,
@@ -16677,6 +16683,7 @@
         "id": 1789301614949,
         "name": "Increase Max Health Passive",
         "value": 9,
+        "pinned": false,
         "factorIds": [
           1788694866469,
           1788774099692
@@ -18041,6 +18048,7 @@
         "id": 1789297429599,
         "name": "Pilfer (Unique) Debuff (Decrease Atk, HP, DEF)",
         "value": 9,
+        "pinned": false,
         "factorIds": [
           1788694866469,
           1788701036557,
@@ -18053,19 +18061,20 @@
         "id": 1789297498612,
         "name": "Spoils (Unique) Buff (Increase Atk, HP, DEF) x4 Stacks",
         "value": 9,
+        "pinned": false,
         "factorIds": [
           1788694866469,
           1788701036557,
           1788700420912,
           1788774099692,
           1788912649792
-        ],
-        "pinned": false
+        ]
       },
       {
         "id": 1789298662125,
         "name": "Deterrence (Unique) Effect",
         "value": 10,
+        "pinned": false,
         "factorIds": [
           1788773130306,
           1788700420912
@@ -18075,6 +18084,7 @@
         "id": 1789299195538,
         "name": "Ice Cream (Undispellable) Buff",
         "value": 9,
+        "pinned": false,
         "factorIds": [
           1788694866469,
           1788774099692,
@@ -18091,6 +18101,7 @@
         "id": 1789299850224,
         "name": "Special Friendship (Undispellable) Buff to Earth Ally",
         "value": 8.6,
+        "pinned": false,
         "factorIds": [
           1788772992919,
           1788700420912,
@@ -18454,14 +18465,16 @@
       },
       {
         "id": 1789297548874,
-        "name": "Cleansers / Debuff Dispellers"
+        "name": "Cleansers / Debuff Dispellers",
+        "pinned": false
       },
       {
         "id": 1789299573426,
-        "name": "Poison / venom units"
+        "name": "Poison / venom units",
+        "pinned": false
       }
     ]
   },
   "schemaVersion": 2,
-  "savedAt": "2026-09-13T12:18:17.230Z"
+  "savedAt": "2026-09-14T10:16:18.911Z"
 }
