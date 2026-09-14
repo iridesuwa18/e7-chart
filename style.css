@@ -568,6 +568,125 @@ main {
   font-size: 14px;
   color: var(--gold2, #e0c060);
 }
+
+/* Hero search inside the "Know More" explainer — reuses
+   .qd-factor-menu-searchbar/-search/-clear for the input itself (same
+   look as the Enemy Factors search), these just cover the results list
+   and per-hero score-pick rows underneath it. */
+.qd-score-explainer-searchbar { margin-bottom: 6px; }
+.qd-score-explainer-search-results {
+  flex: 0 1 auto;
+  max-height: 32vh;
+  overflow-y: auto;
+  margin-bottom: 10px;
+  padding: 4px;
+  border: 1px solid rgba(255,255,255,0.1);
+  border-radius: 8px;
+  background: rgba(0,0,0,0.15);
+}
+.qd-score-explainer-search-empty {
+  padding: 8px 6px;
+  font-size: 12px;
+  font-style: italic;
+  color: var(--text-dim);
+}
+.qd-score-explainer-search-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 8px;
+  border-radius: 6px;
+}
+.qd-score-explainer-search-row:hover { background: rgba(255,255,255,0.05); }
+.qd-score-explainer-search-name {
+  flex: 1 1 auto;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: 13px;
+}
+.qd-score-explainer-search-pick {
+  flex: 0 0 auto;
+  padding: 4px 10px;
+  border-radius: 999px;
+  border: 1.5px solid rgba(74,222,128,0.4);
+  background: rgba(74,222,128,0.1);
+  color: #bff7d3;
+  font-size: 12px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background .15s;
+}
+.qd-score-explainer-search-pick:hover { background: rgba(74,222,128,0.22); }
+
+/* Per-Factor step-by-step-with-real-numbers cards. */
+.qd-score-explainer-factor-card {
+  margin-bottom: 12px;
+  padding: 10px 12px;
+  border-radius: 10px;
+  border: 1px solid rgba(74,222,128,0.3);
+  background: rgba(74,222,128,0.05);
+}
+.qd-score-explainer-factor-card.unmatched {
+  border-color: rgba(255,255,255,0.12);
+  background: rgba(255,255,255,0.03);
+}
+.qd-score-explainer-factor-card-title {
+  font-family: 'Cinzel', serif;
+  letter-spacing: .03em;
+  font-size: 13.5px;
+  color: var(--gold2, #e0c060);
+  margin-bottom: 6px;
+}
+.qd-score-explainer-factor-steps {
+  font-size: 12.5px;
+  line-height: 1.6;
+  color: var(--text);
+  margin-bottom: 8px;
+}
+.qd-score-explainer-rank-list {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  max-height: 220px;
+  overflow-y: auto;
+  padding: 6px;
+  border-radius: 6px;
+  background: rgba(0,0,0,0.15);
+}
+.qd-score-explainer-rank-empty {
+  padding: 4px 2px;
+  font-size: 11.5px;
+  font-style: italic;
+  color: var(--text-dim);
+}
+.qd-score-explainer-rank-row {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 3px 6px;
+  border-radius: 4px;
+  font-size: 11.5px;
+  color: var(--text-dim);
+}
+.qd-score-explainer-rank-row.held {
+  color: #eafff2;
+  background: rgba(74,222,128,0.12);
+}
+.qd-score-explainer-rank-name {
+  flex: 1 1 auto;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.qd-score-explainer-rank-nums {
+  flex: 0 0 auto;
+  white-space: nowrap;
+  font-family: 'Courier New', monospace;
+}
 .qd-slot-supports-for {
   font-size: 8px;
   color: var(--text-dim);

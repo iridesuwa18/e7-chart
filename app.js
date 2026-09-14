@@ -2287,14 +2287,22 @@ function qdSuggestForNextIdx(nextIdx, draftArr, banProtectEl) {
 // never on which heroes hold them). Returns a Map keyed
 // `${kind}:${id}` → ranked base score (that tag's own value × its
 // rank-derived ×1–×2 multiplier).
-function qdFactorRankedBaseScores(factorId) {
+// Full ranked breakdown for one Factor — every Reaction/Engagement
+// tagged to it (regardless of which heroes hold them), each with its
+// rank-derived percentage, multiplier, and resulting ranked score.
+// Sorted highest-ranked-score-first. This is the single source of
+// truth for "step 1/2" of the scoring system — qdFactorRankedBaseScores
+// below is just this same data flattened into a lookup map, and the
+// "Know More" explainer (qdScoreExplainerContent) renders this list
+// directly so a person can see exactly where every tag landed, not
+// just the ones a given hero happens to hold.
+function qdFactorRankedBreakdown(factorId) {
   const { reactions, engagements } = taxonomyItemsForFactor(factorId);
   const items = [
-    ...reactions.map(r => ({ key: `reactions:${r.id}`, value: r.value })),
-    ...engagements.map(e => ({ key: `engagements:${e.id}`, value: e.value })),
+    ...reactions.map(r => ({ key: `reactions:${r.id}`, kind: "reactions", id: r.id, name: r.name || "(unnamed)", value: r.value })),
+    ...engagements.map(e => ({ key: `engagements:${e.id}`, kind: "engagements", id: e.id, name: e.name || "(unnamed)", value: e.value })),
   ];
-  const map = new Map();
-  if (items.length === 0) return map;
+  if (items.length === 0) return [];
 
   // Distinct values only, so tags that tie on score land on the exact
   // same rank slot (and so the same %) instead of being spread apart
@@ -2303,14 +2311,23 @@ function qdFactorRankedBaseScores(factorId) {
   const lastIdx = distinctDesc.length - 1;
   const rankIndexOf = new Map(distinctDesc.map((v, idx) => [v, idx]));
 
-  items.forEach(({ key, value }) => {
-    const idx = rankIndexOf.get(value);
+  return items.map(it => {
+    const idx = rankIndexOf.get(it.value);
     // Only one distinct value tagged to this Factor at all → nothing to
     // rank against, so it's simply the top: 100%.
     const percentage = lastIdx > 0 ? 1 - idx / lastIdx : 1;
     const multiplier = 1 + percentage; // 0% → ×1, 100% → ×2
-    map.set(key, value * multiplier);
-  });
+    return { ...it, percentage, multiplier, rankedScore: it.value * multiplier };
+  }).sort((a, b) => b.rankedScore - a.rankedScore || a.name.localeCompare(b.name));
+}
+
+// `${kind}:${id}` -> ranked score lookup for one Factor, derived from
+// qdFactorRankedBreakdown above — kept as its own function since most
+// callers (the actual scoring path) only need the numbers, not the
+// full sorted breakdown.
+function qdFactorRankedBaseScores(factorId) {
+  const map = new Map();
+  qdFactorRankedBreakdown(factorId).forEach(it => map.set(it.key, it.rankedScore));
   return map;
 }
 
@@ -2321,35 +2338,36 @@ function qdFactorEntryForHero(h, variant) {
 
   const perFactorScores = []; // one entry per ticked Factor this hero matches at all
   const matchReasons = [];
+  const breakdown = []; // structured per-Factor detail for the "Know More" explainer
 
   qdTickedFactorIds.forEach(factorId => {
     const { reactions: taggedR, engagements: taggedE } = taxonomyItemsForFactor(factorId);
     const taggedRIds = new Set(taggedR.map(r => r.id));
     const taggedEIds = new Set(taggedE.map(e => e.id));
-    const rankedScores = qdFactorRankedBaseScores(factorId); // `${kind}:${id}` -> ranked (×1–×2) base score
+    const rankedItems = qdFactorRankedBreakdown(factorId); // full ranked list for this Factor, every tagged item
+    const rankedByKey = new Map(rankedItems.map(it => [it.key, it]));
 
     // Every one of the hero's own Reactions/Engagements tagged to this
     // Factor counts — not just the single best one.
-    const matchedRanked = [];
-    const matchedNames = [];
+    const matchedItems = [];
     reactions.forEach(r => {
       const refId = r?.refId ?? r;
       if (!taggedRIds.has(refId)) return;
-      matchedRanked.push(rankedScores.get(`reactions:${refId}`) ?? 0);
-      matchedNames.push(taxonomyName("reactions", refId));
+      const item = rankedByKey.get(`reactions:${refId}`);
+      if (item) matchedItems.push(item);
     });
     engagements.forEach(e => {
       const refId = e?.refId ?? e;
       if (!taggedEIds.has(refId)) return;
-      matchedRanked.push(rankedScores.get(`engagements:${refId}`) ?? 0);
-      matchedNames.push(taxonomyName("engagements", refId));
+      const item = rankedByKey.get(`engagements:${refId}`);
+      if (item) matchedItems.push(item);
     });
-    if (matchedRanked.length === 0) return; // hero doesn't match this ticked Factor at all
+    if (matchedItems.length === 0) return; // hero doesn't match this ticked Factor at all
 
     // Step 3 — sum of this hero's own matched tags' ranked scores,
     // divided by how many of them it holds.
-    const totalPoints = matchedRanked.reduce((a, b) => a + b, 0);
-    const factorScore = totalPoints / matchedRanked.length;
+    const totalPoints = matchedItems.reduce((a, b) => a + b.rankedScore, 0);
+    const factorScore = totalPoints / matchedItems.length;
 
     // Step 4 — a prioritized Factor's score is simply doubled, on its
     // own, independent of any other prioritized Factor.
@@ -2357,9 +2375,19 @@ function qdFactorEntryForHero(h, variant) {
     const finalFactorScore = isPrioritized ? factorScore * 2 : factorScore;
     perFactorScores.push(finalFactorScore);
 
+    const matchedNames = matchedItems.map(it => it.name);
+    breakdown.push({
+      factorId,
+      factorName: taxonomyName("factors", factorId),
+      isPrioritized,
+      rankedItems,   // every tagged item for this Factor (for the full step 1/2 listing)
+      matchedItems,  // just the ones this hero holds (for step 3/4)
+      totalPoints, factorScore, finalFactorScore,
+    });
+
     const boostNote = isPrioritized ? ` ⭐×2 = ${finalFactorScore.toFixed(1)}` : "";
     matchReasons.push(
-      `🎯 ${taxonomyName("factors", factorId)} → ${factorScore.toFixed(1)}${boostNote} across ${matchedRanked.length} match${matchedRanked.length === 1 ? "" : "es"} (${matchedNames.join(", ")})`
+      `🎯 ${taxonomyName("factors", factorId)} → ${factorScore.toFixed(1)}${boostNote} across ${matchedItems.length} match${matchedItems.length === 1 ? "" : "es"} (${matchedNames.join(", ")})`
     );
   });
 
@@ -2375,6 +2403,7 @@ function qdFactorEntryForHero(h, variant) {
     heroId: h.id, hero: h, variant,
     matchedCount: perFactorScores.length,
     score: +finalScore.toFixed(1),
+    breakdown,
     reasons: [
       `Matches ${perFactorScores.length}/${qdTickedFactorIds.size} ticked Factor${qdTickedFactorIds.size === 1 ? "" : "s"}`,
       ...matchReasons,
@@ -2816,7 +2845,7 @@ function qdShowSlotInfo(btn, info) {
   // score was calculated — see ensureQdScoreExplainer/qdShowScoreExplainer.
   popup.querySelector("#qd-slot-info-knowmore").addEventListener("click", () => {
     popup.style.display = "none";
-    qdShowScoreExplainer(info);
+    qdShowScoreExplainer(info.hero, info.variant);
   });
 }
 
@@ -2826,8 +2855,10 @@ let qdScoreExplainerEl = null;
 // overlay+panel shell as the Enemy Factors picker (.qd-factor-menu-*,
 // see ensureQdFactorMenu) so it floods the screen the same way,
 // morphing from an edge-to-edge sheet on phones to a large centered,
-// backdrop-dimmed modal on wider screens. Only its body content is
-// specific to this popup — see qdScoreExplainerContent.
+// backdrop-dimmed modal on wider screens. Includes its own hero search
+// (any hero, not just ones already in the draft — this is a pure
+// analysis tool) so a person can look up "why wasn't X picked" and see
+// its exact score breakdown without having to draft it first.
 function ensureQdScoreExplainer() {
   if (qdScoreExplainerEl) return qdScoreExplainerEl;
 
@@ -2841,6 +2872,11 @@ function ensureQdScoreExplainer() {
         <div class="qd-factor-menu-title" id="qd-score-explainer-title">📖 How This Score Was Calculated</div>
         <button type="button" class="qd-factor-menu-close" id="qd-score-explainer-close" aria-label="Close">✕</button>
       </div>
+      <div class="qd-factor-menu-searchbar qd-score-explainer-searchbar">
+        <input type="text" class="taxonomy-search qd-factor-menu-search" id="qd-score-explainer-search" autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false" placeholder="🔍 Search any hero to see its score…" />
+        <button type="button" class="qd-factor-menu-clear" id="qd-score-explainer-search-clear" title="Clear search" aria-label="Clear search">✕</button>
+      </div>
+      <div class="qd-score-explainer-search-results" id="qd-score-explainer-search-results" style="display:none"><!-- populated while searching --></div>
       <div class="qd-score-explainer-body" id="qd-score-explainer-body"><!-- populated per-hero, see qdShowScoreExplainer --></div>
     </div>
   `;
@@ -2857,18 +2893,167 @@ function ensureQdScoreExplainer() {
     if (e.key === "Escape" && overlay.style.display !== "none") closeExplainer();
   });
 
+  const searchInput = overlay.querySelector("#qd-score-explainer-search");
+  const clearBtn    = overlay.querySelector("#qd-score-explainer-search-clear");
+  const resultsBox  = overlay.querySelector("#qd-score-explainer-search-results");
+
+  const runSearch = () => {
+    const raw = searchInput.value.trim();
+    const q = raw.toLowerCase();
+    clearBtn.style.display = q ? "flex" : "none";
+    if (!q) { resultsBox.style.display = "none"; resultsBox.innerHTML = ""; return; }
+
+    const matches = heroes.filter(h => (h.name || "").toLowerCase().includes(q)).slice(0, 40);
+    resultsBox.style.display = "block";
+    if (matches.length === 0) {
+      resultsBox.innerHTML = `<div class="qd-score-explainer-search-empty">No heroes match "${raw}"</div>`;
+      return;
+    }
+
+    // Every candidate's score is shown right on its row — this is
+    // deliberately not restricted to heroes eligible for the current
+    // draft slot (used/banned/side-locked heroes included), since the
+    // whole point is comparing "why did this one lose to that one".
+    resultsBox.innerHTML = matches.map(h => {
+      const primary = qdExplainerEntryFor(h, "primary");
+      const ghost   = h.altStats ? qdExplainerEntryFor(h, "ghost") : null;
+      return `
+        <div class="qd-score-explainer-search-row">
+          <span class="qd-score-explainer-search-name">${h.name || "Unnamed"}</span>
+          <button type="button" class="qd-score-explainer-search-pick" data-hero-id="${h.id}" data-variant="primary">${primary.score.toFixed(1)}</button>
+          ${ghost ? `<button type="button" class="qd-score-explainer-search-pick" data-hero-id="${h.id}" data-variant="ghost">👻 ${ghost.score.toFixed(1)}</button>` : ""}
+        </div>
+      `;
+    }).join("");
+
+    resultsBox.querySelectorAll(".qd-score-explainer-search-pick").forEach(pickBtn => {
+      pickBtn.addEventListener("click", () => {
+        const hero = heroes.find(h => h.id === Number(pickBtn.dataset.heroId));
+        if (!hero) return;
+        // Search stays open (resetSearch: false) so several heroes can
+        // be checked back-to-back without retyping the search each time.
+        qdShowScoreExplainer(hero, pickBtn.dataset.variant, { resetSearch: false });
+      });
+    });
+  };
+  searchInput.addEventListener("input", runSearch);
+  clearBtn.addEventListener("click", () => { searchInput.value = ""; runSearch(); searchInput.focus(); });
+
   return overlay;
+}
+
+// Computes a hero's score/breakdown for the CURRENT ticked
+// Factors/Ban Protect exactly like the live ranking does, but for ANY
+// hero — including ones with zero matches, already in the draft, or
+// banned by competitive rules — since this only powers the read-only
+// "Know More" explainer, never an actual pick. Unlike qdSimpleScoreEntry
+// (which returns null on zero matches so the real ranking can exclude
+// the hero), this always returns something to explain, with a plain
+// zero score and a reason when there's nothing to show — that's the
+// whole point of being able to look up "why wasn't this hero chosen".
+function qdExplainerEntryFor(hero, variant) {
+  const counterEl = qdBanProtectElement ? QD_ELEMENT_COUNTER[qdBanProtectElement] : null;
+  const avoidEl   = qdBanProtectElement ? Object.keys(QD_ELEMENT_COUNTER).find(k => QD_ELEMENT_COUNTER[k] === qdBanProtectElement) : null;
+  const elBucket  = qdElementBucket(hero, counterEl, avoidEl);
+  const elNote = !qdBanProtectElement ? null
+    : elBucket === 0 ? `⚔️ Counters the enemy's ${qdBanProtectElement} Ban Protect`
+    : elBucket === 2 ? `⚠️ Same element the enemy's ${qdBanProtectElement} Ban Protect already beats`
+    : null;
+  const side = qdHeroSide(hero, variant);
+
+  if (qdTickedFactorIds.size > 0) {
+    const factorEntry = qdFactorEntryForHero(hero, variant);
+    if (factorEntry) return { ...factorEntry, elNote, side };
+    return {
+      heroId: hero.id, hero, variant, matchedCount: 0, score: 0, breakdown: [],
+      reasons: [`⚠️ Doesn't hold any Reaction/Engagement tagged to any of the ${qdTickedFactorIds.size} ticked Enemy Factor${qdTickedFactorIds.size === 1 ? "" : "s"} — scores 0 and is excluded from live suggestions while these Factors stay ticked.`],
+      elNote, side,
+    };
+  }
+  return {
+    heroId: hero.id, hero, variant, matchedCount: null, breakdown: [],
+    score: qdOverallKitScore(hero, variant), reasons: [], elNote, side,
+  };
+}
+
+// Builds the "step-by-step for THIS hero" section — real numbers, not
+// just a description. Walks every currently-ticked Factor (not just
+// the ones this hero happens to match, so an unmatched Factor still
+// shows up explaining why it contributed nothing) and, for each, lists
+// EVERY Reaction/Engagement tagged to it — highest-ranked-score-first
+// — marking with ✅ whichever ones this hero actually holds, so it's
+// immediately visible which specific tag on the hero (or missing tag)
+// is driving its score up or down for adjustment purposes.
+function qdScoreExplainerFactorDetailHtml(entry) {
+  const h = entry.hero;
+  const name = `${h.name || "Unnamed"}${entry.variant === "ghost" ? " (Ghost)" : ""}`;
+  const breakdownByFactorId = new Map((entry.breakdown || []).map(b => [b.factorId, b]));
+
+  const factorCards = [...qdTickedFactorIds].map(factorId => {
+    const factorName = taxonomyName("factors", factorId);
+    const b = breakdownByFactorId.get(factorId);
+    const rankedItems = b ? b.rankedItems : qdFactorRankedBreakdown(factorId);
+    const matchedKeys = new Set((b ? b.matchedItems : []).map(it => it.key));
+
+    const rankedRowsHtml = rankedItems.length
+      ? rankedItems.map(it => {
+          const held = matchedKeys.has(it.key);
+          const icon = it.kind === "reactions" ? "⚡" : "🛡";
+          return `
+            <div class="qd-score-explainer-rank-row${held ? " held" : ""}">
+              <span class="qd-score-explainer-rank-name">${held ? "✅ " : ""}${icon} ${it.name}</span>
+              <span class="qd-score-explainer-rank-nums">${it.value.toFixed(1)} × ${it.multiplier.toFixed(2)} (${Math.round(it.percentage * 100)}%) = <strong>${it.rankedScore.toFixed(1)}</strong></span>
+            </div>
+          `;
+        }).join("")
+      : `<div class="qd-score-explainer-rank-empty">Nothing is tagged to this Factor yet.</div>`;
+
+    const stepsForFactorHtml = b ? `
+      <div class="qd-score-explainer-factor-steps">
+        <div>① Ranked ${rankedItems.length} tag${rankedItems.length === 1 ? "" : "s"} tagged to this Factor below, highest → lowest ranked score.</div>
+        <div>② Each tag's ranked score = its own base score × its rank multiplier (both shown next to it below).</div>
+        <div>③ ${name} holds ${b.matchedItems.length}: ${b.matchedItems.map(it => `${it.name} (${it.rankedScore.toFixed(1)})`).join(" + ")} → ${b.totalPoints.toFixed(1)} ÷ ${b.matchedItems.length} = <strong>${b.factorScore.toFixed(1)}</strong></div>
+        <div>④ ${b.isPrioritized ? `Prioritized ⭐ → ${b.factorScore.toFixed(1)} × 2 = <strong>${b.finalFactorScore.toFixed(1)}</strong>` : `Not prioritized → stays <strong>${b.finalFactorScore.toFixed(1)}</strong>`}</div>
+      </div>
+    ` : `
+      <div class="qd-score-explainer-factor-steps">
+        <div>① Ranked ${rankedItems.length} tag${rankedItems.length === 1 ? "" : "s"} tagged to this Factor below, highest → lowest ranked score.</div>
+        <div>${name} holds none of them — this Factor contributes <strong>nothing</strong> to its score.</div>
+      </div>
+    `;
+
+    return `
+      <div class="qd-score-explainer-factor-card${b ? "" : " unmatched"}">
+        <div class="qd-score-explainer-factor-card-title">${b ? "🎯" : "⛔"} ${factorName}${b && b.isPrioritized ? " ⭐" : ""}</div>
+        ${stepsForFactorHtml}
+        <div class="qd-score-explainer-rank-list">${rankedRowsHtml}</div>
+      </div>
+    `;
+  }).join("");
+
+  const matchedFinals = (entry.breakdown || []).map(b => b.finalFactorScore);
+  const step5Html = matchedFinals.length
+    ? `<div class="qd-score-explainer-line">⑤ ${matchedFinals.map(v => v.toFixed(1)).join(" + ")} = ${matchedFinals.reduce((a, b) => a + b, 0).toFixed(1)}, ÷ ${matchedFinals.length} matched Factor${matchedFinals.length === 1 ? "" : "s"} = <strong>${entry.score.toFixed(1)}</strong></div>`
+    : `<div class="qd-score-explainer-line">⑤ ${name} matched 0 of the ${qdTickedFactorIds.size} ticked Factor${qdTickedFactorIds.size === 1 ? "" : "s"} → final score is <strong>0</strong>, excluded from live suggestions while these stay ticked.</div>`;
+
+  return `
+    <div class="qd-score-explainer-line qd-score-explainer-line-title">Step-by-step for ${name}</div>
+    ${factorCards}
+    ${step5Html}
+  `;
 }
 
 // Builds the explainer body: the general step-by-step methodology
 // (Factor mode's 5 steps, or the plain overall-kit-score fallback when
-// nothing's ticked), then this specific hero's actual breakdown (reusing
-// the exact same `reasons` text the small (i) popup already showed —
-// so the two can never say something different), then the formula in
-// symbolic form, ending on the final number.
-function qdScoreExplainerContent(info) {
-  const h = info.hero;
-  const name = `${h.name || "Unnamed"}${info.variant === "ghost" ? " (Ghost)" : ""}`;
+// nothing's ticked), then this SPECIFIC hero's actual numbers walking
+// through those same 5 steps (qdScoreExplainerFactorDetailHtml), then
+// the compact "Applied to X" summary (reusing the exact same `reasons`
+// text the small (i) popup already showed, so the two can never say
+// something different), then the formula in symbolic form, ending on
+// the final number.
+function qdScoreExplainerContent(entry) {
+  const h = entry.hero;
+  const name = `${h.name || "Unnamed"}${entry.variant === "ghost" ? " (Ghost)" : ""}`;
   const factorMode = qdTickedFactorIds.size > 0;
 
   const stepsHtml = factorMode ? `
@@ -2883,12 +3068,14 @@ function qdScoreExplainerContent(info) {
     <p class="qd-score-explainer-note">No Enemy Factors are currently ticked, so ${name} is ranked by plain <strong>overall kit score</strong> instead — the average of every one of ${name}'s own Reaction and Engagement scores, nothing else factored in. Tick an Enemy Factor from the 🎯 Enemy Factors picker to switch to the step-by-step Factor scoring below.</p>
   `;
 
+  const detailHtml = factorMode ? qdScoreExplainerFactorDetailHtml(entry) : "";
+
   const appliedHtml = `
-    <div class="qd-score-explainer-line qd-score-explainer-line-title">Applied to ${name}</div>
-    ${info.reasons.length
-      ? info.reasons.map(r => `<div class="qd-score-explainer-line">${r}</div>`).join("")
-      : `<div class="qd-score-explainer-line">Average of every one of ${name}'s Reaction/Engagement scores = ${info.score.toFixed(1)}</div>`}
-    ${info.elNote ? `<div class="qd-score-explainer-line">${info.elNote}</div>` : ""}
+    <div class="qd-score-explainer-line qd-score-explainer-line-title">Summary</div>
+    ${entry.reasons.length
+      ? entry.reasons.map(r => `<div class="qd-score-explainer-line">${r}</div>`).join("")
+      : `<div class="qd-score-explainer-line">Average of every one of ${name}'s Reaction/Engagement scores = ${entry.score.toFixed(1)}</div>`}
+    ${entry.elNote ? `<div class="qd-score-explainer-line">${entry.elNote}</div>` : ""}
   `;
 
   const formulaHtml = factorMode ? `
@@ -2904,22 +3091,38 @@ function qdScoreExplainerContent(info) {
 
   return `
     ${stepsHtml}
+    ${detailHtml ? `<div class="qd-score-explainer-divider"></div>${detailHtml}` : ""}
     <div class="qd-score-explainer-divider"></div>
     ${appliedHtml}
     <div class="qd-score-explainer-divider"></div>
     <div class="qd-score-explainer-line qd-score-explainer-line-title">Formula</div>
     ${formulaHtml}
-    <div class="qd-score-explainer-final">Final score: <strong>${info.score.toFixed(1)}</strong></div>
+    <div class="qd-score-explainer-final">Final score: <strong>${entry.score.toFixed(1)}</strong></div>
   `;
 }
 
-function qdShowScoreExplainer(info) {
+function qdShowScoreExplainer(hero, variant, opts) {
+  opts = opts || {};
   const overlay = ensureQdScoreExplainer();
-  const h = info.hero;
-  overlay.querySelector("#qd-score-explainer-title").textContent = `📖 How ${h.name || "this hero"} was scored`;
-  overlay.querySelector("#qd-score-explainer-body").innerHTML = qdScoreExplainerContent(info);
+  const entry = qdExplainerEntryFor(hero, variant);
+  overlay.querySelector("#qd-score-explainer-title").textContent = `📖 How ${hero.name || "this hero"} was scored`;
+  const body = overlay.querySelector("#qd-score-explainer-body");
+  body.innerHTML = qdScoreExplainerContent(entry);
+  body.scrollTop = 0;
   overlay.style.display = "flex";
   document.body.classList.add("qd-factor-menu-open"); // reuses the same background-scroll lock as the Enemy Factors picker
+
+  // A fresh open (from the (i) popup) starts the search box empty; a
+  // pick FROM the search results leaves it open (opts.resetSearch:
+  // false) so several heroes can be compared back-to-back.
+  if (opts.resetSearch !== false) {
+    const searchInput = overlay.querySelector("#qd-score-explainer-search");
+    const resultsBox  = overlay.querySelector("#qd-score-explainer-search-results");
+    const clearBtn    = overlay.querySelector("#qd-score-explainer-search-clear");
+    if (searchInput) searchInput.value = "";
+    if (resultsBox)  { resultsBox.style.display = "none"; resultsBox.innerHTML = ""; }
+    if (clearBtn)    clearBtn.style.display = "none";
+  }
 }
 
 function renderQuickDraft() {
