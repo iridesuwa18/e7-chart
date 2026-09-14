@@ -16078,7 +16078,7 @@
       {
         "id": 1789177637826,
         "name": "Reactive attack by passives (Not counter)",
-        "value": 9.6,
+        "value": 8,
         "pinned": true,
         "factorIds": [
           1789177680699,
@@ -18476,5 +18476,5 @@
     ]
   },
   "schemaVersion": 2,
-  "savedAt": "2026-09-14T14:43:17.948Z"
+  "savedAt": "2026-09-14T22:21:24.255Z"
 }
