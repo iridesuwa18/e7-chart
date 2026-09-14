@@ -17095,7 +17095,7 @@
       {
         "id": 1788924109560,
         "name": "Stun enemies",
-        "value": 9.5,
+        "value": 8.5,
         "pinned": false,
         "factorIds": [
           1788700862798,
@@ -17319,7 +17319,7 @@
       {
         "id": 1789132668882,
         "name": "Sleep on enemies",
-        "value": 9,
+        "value": 8,
         "pinned": false,
         "factorIds": [
           1788700862798,
@@ -18475,5 +18475,5 @@
     ]
   },
   "schemaVersion": 2,
-  "savedAt": "2026-09-14T22:27:50.130Z"
+  "savedAt": "2026-09-14T22:45:18.625Z"
 }
