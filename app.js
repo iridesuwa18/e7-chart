@@ -823,11 +823,13 @@ let qdCompetitiveMode = false; // when on: 3★ heroes (chained or support) are 
 let qdTickedFactorIds = new Set();
 
 // Which of the ticked Factors above are additionally "prioritized" —
-// each one's average score gets a 1.5x boost before being folded into
-// a hero's final Factor-mode score (see qdFactorEntryForHero). Always
-// a subset of qdTickedFactorIds; anything pruned from that Set (untick,
-// or the Factor itself gets deleted) is pruned from this one too.
-// Session-only, same as qdTickedFactorIds.
+// each one's average score gets a specialist-scaled boost before being
+// folded into a hero's final Factor-mode score (see
+// qdPriorityBoostMultiplier / qdFactorEntryForHero for the actual
+// formula — it's no longer a flat multiplier). Always a subset of
+// qdTickedFactorIds; anything pruned from that Set (untick, or the
+// Factor itself gets deleted) is pruned from this one too. Session-only,
+// same as qdTickedFactorIds.
 let qdPrioritizedFactorIds = new Set();
 
 // Enemy Factor dropdown menu state (Section 8.1) — declared up here,
@@ -2275,6 +2277,40 @@ function qdSuggestForNextIdx(nextIdx, draftArr, banProtectEl) {
 // deliberately modest, flat nudge (not a multiplier) precisely so it
 // only breaks that kind of close call rather than swamping the
 // specialist entirely.
+// Specialist-scaled boost for a prioritized Factor. A flat "×1.5 for
+// everyone who matches" barely moved the ranking, because with a Factor
+// ticked, EVERY candidate already has to match it to show up at all
+// (qdSimpleScoreEntry excludes non-matches outright) — so a flat
+// multiplier just scaled the whole board up together and left the
+// ORDER between heroes almost unchanged. What should actually move the
+// needle is rewarding the hero who answers this specific threat with
+// only one or two sharp, dedicated tools over the hero who happens to
+// have ten loosely-related ones (and is probably already scoring well
+// generically because of that breadth) — a specialist bonus, not a
+// participation bonus.
+//   matchCount        — how many of the hero's OWN Reactions/Engagements
+//                        are tagged to this prioritized Factor. Fewer =
+//                        more specialized = bigger boost; this is the
+//                        "10 matches → ~1.2x, 1 match → up to 4x" curve.
+//   prioritizedCount  — how many Factors are prioritized right now.
+//                        The "extra" above 1x is divided by this count,
+//                        so ticking a 2nd prioritized Factor roughly
+//                        halves each one's boost, a 3rd roughly thirds
+//                        them, etc. — otherwise every additional
+//                        prioritized Factor would stack its own boost on
+//                        top of the others and snowball into an
+//                        unbounded multiplier for a hero that happens to
+//                        specialize in several of them at once.
+const QD_PRIORITY_BOOST_FLOOR = 1.2; // a broad generalist still gets *something*
+const QD_PRIORITY_BOOST_CEIL  = 4.0; // a lone, dedicated answer is worth a lot, not infinity
+const QD_PRIORITY_BOOST_K     = 3;   // shape constant for the 1/matchCount falloff below
+function qdPriorityBoostMultiplier(matchCount, prioritizedCount) {
+  if (prioritizedCount <= 0) return 1;
+  const raw    = 1 + QD_PRIORITY_BOOST_K / Math.max(1, matchCount);
+  const capped = Math.min(QD_PRIORITY_BOOST_CEIL, Math.max(QD_PRIORITY_BOOST_FLOOR, raw));
+  return 1 + (capped - 1) / prioritizedCount;
+}
+
 function qdFactorEntryForHero(h, variant) {
   const reactions   = h.reactions   || [];
   const engagements = h.engagements || [];
@@ -2307,14 +2343,18 @@ function qdFactorEntryForHero(h, variant) {
     if (matchedScores.length === 0) return; // hero doesn't match this ticked Factor at all
 
     const factorAvg = matchedScores.reduce((a, b) => a + b, 0) / matchedScores.length;
-    // Prioritized Factors (see renderQdFactorPriorityChips) get a 1.5x
-    // boost applied right here, before this Factor's average gets
-    // folded into the hero's overall Factor-mode score below — so a
-    // hero's best answer to a Factor you've flagged as the top threat
-    // outweighs an equally-matched but unprioritized one.
-    const boosted = qdPrioritizedFactorIds.has(factorId) ? factorAvg * 1.5 : factorAvg;
+    // Prioritized Factors (see renderQdFactorPriorityChips) get a
+    // specialist-scaled boost applied right here, before this Factor's
+    // average gets folded into the hero's overall Factor-mode score
+    // below — see qdPriorityBoostMultiplier for why it's shaped this
+    // way (fewer matches on THIS Factor = bigger boost, more
+    // prioritized Factors ticked at once = each boost shrinks).
+    const boostMultiplier = qdPrioritizedFactorIds.has(factorId)
+      ? qdPriorityBoostMultiplier(matchedScores.length, qdPrioritizedFactorIds.size)
+      : 1;
+    const boosted = factorAvg * boostMultiplier;
     perFactorAverages.push(boosted);
-    const boostNote = qdPrioritizedFactorIds.has(factorId) ? ` ⭐×1.5 = ${boosted.toFixed(1)}` : "";
+    const boostNote = qdPrioritizedFactorIds.has(factorId) ? ` ⭐×${boostMultiplier.toFixed(2)} = ${boosted.toFixed(1)}` : "";
     matchReasons.push(
       `🎯 ${taxonomyName("factors", factorId)} → avg ${factorAvg.toFixed(1)}${boostNote} across ${matchedScores.length} match${matchedScores.length === 1 ? "" : "es"} (${matchedNames.join(", ")})`
     );
@@ -2326,7 +2366,7 @@ function qdFactorEntryForHero(h, variant) {
   // out ahead of one matching fewer, even when the fewer-but-sharper
   // hero's average is a bit higher — a flat +1 per matched Factor, added
   // after averaging (not before), so it can't distort the per-Factor
-  // averages or the 1.5x priority boost above, only nudge the final
+  // averages or the priority boost above, only nudge the final
   // ranking. E.g. one match at a perfect 10 vs. three matches averaging
   // 8.6 (10, 9, 7) — without this, 10 > 8.6 and the narrower match wins;
   // with it, 8.6 + 3 = 11.6 pulls ahead, since matching three separate
@@ -2994,8 +3034,8 @@ function positionQdFactorMenu() {}
 // Alphabetical (A→Z) row of chips — one per currently-ticked Enemy
 // Factor — shown above the Enemy Factors label/dropdown. Clicking a
 // chip toggles whether that Factor is "prioritized": prioritized
-// Factors get a 1.5x boost to their average score in Factor-mode
-// scoring (qdFactorEntryForHero). Purely a display+toggle surface —
+// Factors get a specialist-scaled boost to their average score in
+// Factor-mode scoring (qdFactorEntryForHero/qdPriorityBoostMultiplier). Purely a display+toggle surface —
 // the actual tick/untick still happens in the dropdown menu itself
 // (renderQdFactorMenuList); this row can only prioritize what's
 // already ticked there.
@@ -3016,7 +3056,7 @@ function renderQdFactorPriorityChips() {
     .sort((a, b) => (a.name || "").toLowerCase().localeCompare((b.name || "").toLowerCase()));
 
   box.innerHTML = tickedFactors.map(f => `
-    <button type="button" class="qd-factor-priority-chip${qdPrioritizedFactorIds.has(f.id) ? " active" : ""}" data-factor-id="${f.id}" title="${qdPrioritizedFactorIds.has(f.id) ? "Prioritized — click to remove the 1.5x boost" : "Click to prioritize (1.5x score boost)"}">
+    <button type="button" class="qd-factor-priority-chip${qdPrioritizedFactorIds.has(f.id) ? " active" : ""}" data-factor-id="${f.id}" title="${qdPrioritizedFactorIds.has(f.id) ? "Prioritized — click to remove the boost" : "Click to prioritize (bigger boost for specialists with fewer matches on this Factor)"}">
       ${qdPrioritizedFactorIds.has(f.id) ? "⭐ " : ""}${f.name || "(unnamed)"}
     </button>
   `).join("");
