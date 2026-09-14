@@ -840,6 +840,16 @@ let qdPrioritizedFactorIds = new Set();
 let qdFactorMenuSearch = "";
 let qdFactorMenuEl = null;
 
+// Quick-tap keyword chips shown under the Enemy Factors search bar —
+// common substrings so a frequent filter is one tap instead of typing.
+// Clicking one drops it straight into the search box (see
+// qdFactorMenuSetSearch); clicking the same one again clears it.
+const QD_FACTOR_QUICK_WORDS = [
+  "High", "Low", "Evasion", "Buff", "Debuff", "Dispel", "Pen", "Shield",
+  "Defen", "Counter", "Additional", "Damage", "Unit", "Soul", "Attack",
+  "Heal", "Stun",
+];
+
 // Shared by every Quick Draft pick source (Randomize, Suggest, Autofill —
 // Autofill just calls into Suggest under the hood) so the ban is applied
 // consistently everywhere a hero could be chosen, whether as a chain
@@ -2880,84 +2890,106 @@ function qdFactorMenuLabel() {
   return n === 0 ? "🎯 Enemy Factors ▾" : `🎯 Enemy Factors (${n} ticked) ▾`;
 }
 
-// Builds the floating menu the first time it's needed and reuses it after.
+// Pushes a new search value into the menu — used by both the text input
+// itself and the quick-word chips, so both stay in sync (typing a quick
+// word's text manually highlights its chip too, since the chip's
+// "active" check is just a string compare against qdFactorMenuSearch).
+function qdFactorMenuSetSearch(value, opts) {
+  opts = opts || {};
+  qdFactorMenuSearch = value;
+  const input    = document.getElementById("qd-factor-menu-search");
+  const clearBtn = document.getElementById("qd-factor-menu-clear");
+  if (input && input.value !== value) input.value = value;
+  if (clearBtn) clearBtn.style.display = value ? "flex" : "none";
+  renderQdFactorMenuQuickWords();
+  renderQdFactorMenuList();
+  if (opts.focus && input) input.focus();
+}
+
+// The quick-word chip row — one tap fills the search box with that word
+// (toggle off by tapping the already-active chip again).
+function renderQdFactorMenuQuickWords() {
+  const box = document.getElementById("qd-factor-menu-quickwords");
+  if (!box) return;
+  const active = qdFactorMenuSearch.trim().toLowerCase();
+
+  box.innerHTML = QD_FACTOR_QUICK_WORDS.map(word => `
+    <button type="button" class="qd-factor-quickword${active === word.toLowerCase() ? " active" : ""}" data-word="${word}">${word}</button>
+  `).join("");
+
+  box.querySelectorAll(".qd-factor-quickword").forEach(chip => {
+    chip.addEventListener("click", () => {
+      const word = chip.dataset.word;
+      const isActive = qdFactorMenuSearch.trim().toLowerCase() === word.toLowerCase();
+      qdFactorMenuSetSearch(isActive ? "" : word);
+    });
+  });
+}
+
+// Builds the fullscreen Enemy Factors picker the first time it's needed
+// and reuses it after. Rebuilt as a screen-filling overlay+panel (rather
+// than a small anchored dropdown) so there's room for every Factor to
+// sit in a neat, generously-tappable, vertically-scrolling grid instead
+// of a cramped floating box — see .qd-factor-menu-overlay/-panel in
+// style.css for how it morphs from a true edge-to-edge sheet on phones
+// to a large centered, backdrop-dimmed modal on wider screens.
 function ensureQdFactorMenu() {
   if (qdFactorMenuEl) return qdFactorMenuEl;
 
   const menu = document.createElement("div");
-  menu.className = "qd-factor-menu";
+  menu.className = "qd-factor-menu-overlay";
   menu.id = "qd-factor-menu";
   menu.style.display = "none";
   menu.innerHTML = `
-    <div class="qd-factor-menu-searchbar">
-      <input type="text" class="taxonomy-search qd-factor-menu-search" id="qd-factor-menu-search" autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false" placeholder="🔍 Search Factors…" />
-      <button type="button" class="qd-factor-menu-clear" id="qd-factor-menu-clear" title="Clear search" aria-label="Clear search">✕</button>
+    <div class="qd-factor-menu-panel">
+      <div class="qd-factor-menu-header">
+        <div class="qd-factor-menu-title">🎯 Enemy Factors</div>
+        <button type="button" class="qd-factor-menu-close" id="qd-factor-menu-close" aria-label="Close">✕</button>
+      </div>
+      <div class="qd-factor-menu-searchbar">
+        <input type="text" class="taxonomy-search qd-factor-menu-search" id="qd-factor-menu-search" autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false" placeholder="🔍 Search Factors…" />
+        <button type="button" class="qd-factor-menu-clear" id="qd-factor-menu-clear" title="Clear search" aria-label="Clear search">✕</button>
+      </div>
+      <div class="qd-factor-menu-quickwords" id="qd-factor-menu-quickwords"><!-- quick-tap keyword chips --></div>
+      <div class="qd-factor-menu-list" id="qd-factor-menu-list"><!-- populated from the taxonomy Factors library --></div>
     </div>
-    <div class="qd-factor-menu-list" id="qd-factor-menu-list"><!-- populated from the taxonomy Factors library --></div>
   `;
   document.body.appendChild(menu);
   qdFactorMenuEl = menu;
 
   const searchInput = menu.querySelector("#qd-factor-menu-search");
   const clearBtn    = menu.querySelector("#qd-factor-menu-clear");
+  const closeBtn    = menu.querySelector("#qd-factor-menu-close");
 
-  searchInput.addEventListener("input", e => {
-    qdFactorMenuSearch = e.target.value;
-    clearBtn.style.display = qdFactorMenuSearch ? "flex" : "none";
-    renderQdFactorMenuList();
-  });
+  searchInput.addEventListener("input", e => qdFactorMenuSetSearch(e.target.value));
   // Fast X-to-clear next to the search box — wipes the text and hands
   // focus straight back so the next word can be typed immediately,
   // instead of needing a click-then-select-all-then-type round trip.
-  clearBtn.addEventListener("click", () => {
-    qdFactorMenuSearch = "";
-    searchInput.value = "";
-    clearBtn.style.display = "none";
-    renderQdFactorMenuList();
-    searchInput.focus();
-  });
+  clearBtn.addEventListener("click", () => qdFactorMenuSetSearch("", { focus: true }));
 
-  const reposition = () => { if (menu.style.display !== "none") positionQdFactorMenu(); };
-  window.addEventListener("resize", reposition);
-  window.addEventListener("scroll", reposition, true);
-
-  document.addEventListener("click", e => {
-    if (menu.style.display === "none") return;
-    const btn = document.getElementById("qd-factor-menu-btn");
-    if (menu.contains(e.target) || (btn && btn.contains(e.target))) return;
+  const closeMenu = () => {
     menu.style.display = "none";
-  });
+    document.body.classList.remove("qd-factor-menu-open");
+  };
+  closeBtn.addEventListener("click", closeMenu);
+  // Tapping the dimmed backdrop (outside the panel) closes it too — but
+  // not a click that started inside the panel and merely bubbled up
+  // (e.g. releasing a text selection), so only react when the backdrop
+  // itself was the actual target.
+  menu.addEventListener("click", e => { if (e.target === menu) closeMenu(); });
   document.addEventListener("keydown", e => {
-    if (e.key === "Escape" && menu.style.display !== "none") menu.style.display = "none";
+    if (e.key === "Escape" && menu.style.display !== "none") closeMenu();
   });
 
   return menu;
 }
 
-// Anchors the floating menu directly under whichever trigger button
-// exists on the current page — always downward, never flipped above
-// it, so it can't end up covering the draft slots sitting right above
-// the button. Fixed coordinates are relative to the viewport, so this
-// is re-run on scroll/resize while the menu is open to keep it glued
-// to the button. The menu's own list scrolls internally (see its
-// max-height in CSS) if there isn't enough room below on a very short
-// viewport, rather than flipping upward to "fit" by covering the slots.
-function positionQdFactorMenu() {
-  const btn  = document.getElementById("qd-factor-menu-btn");
-  const menu = qdFactorMenuEl;
-  if (!btn || !menu) return;
-
-  const r = btn.getBoundingClientRect();
-  const menuWidth = menu.offsetWidth || 340;
-
-  let left = r.left;
-  if (left + menuWidth > window.innerWidth - 8) {
-    left = Math.max(8, window.innerWidth - menuWidth - 8);
-  }
-
-  menu.style.left = `${left}px`;
-  menu.style.top  = `${r.bottom + 6}px`;
-}
+// [Fullscreen picker] positionQdFactorMenu was the old anchored-dropdown
+// placement logic (compute button rect, glue menu below it, reposition
+// on scroll/resize). The picker is now a fixed fullscreen overlay that
+// needs no such positioning — kept as a no-op only in case anything
+// external still calls it, rather than hunting down every call site.
+function positionQdFactorMenu() {}
 
 // Alphabetical (A→Z) row of chips — one per currently-ticked Enemy
 // Factor — shown above the Enemy Factors label/dropdown. Clicking a
@@ -3015,6 +3047,7 @@ function renderQdFactorChips() {
   });
 
   document.getElementById("qd-factor-menu-btn-label").textContent = qdFactorMenuLabel();
+  renderQdFactorMenuQuickWords();
   renderQdFactorMenuList();
   renderQdFactorPriorityChips();
 
@@ -3037,12 +3070,14 @@ function renderQdFactorChips() {
       [...qdTickedFactorIds].forEach(id => {
         if (!taxonomy.factors.some(f => f.id === id)) { qdTickedFactorIds.delete(id); qdPrioritizedFactorIds.delete(id); }
       });
+      renderQdFactorMenuQuickWords();
       renderQdFactorMenuList();
-      menu.style.display = "block";
-      positionQdFactorMenu(); // real width/height only known once visible
+      menu.style.display = "flex";
+      document.body.classList.add("qd-factor-menu-open"); // locks background scroll behind the fullscreen picker
       document.getElementById("qd-factor-menu-search")?.focus();
     } else {
       menu.style.display = "none";
+      document.body.classList.remove("qd-factor-menu-open");
     }
   });
 }

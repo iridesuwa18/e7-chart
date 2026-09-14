@@ -691,29 +691,93 @@ main {
 
 /* Section 8.1 — Enemy Factor checklist. Built for fast mid-match
    tapping: generous hit targets, no confirm step, toggles instantly.
-   The trigger button below sits inline in the row; the dropdown menu
-   itself (.qd-factor-menu and children) is built once by app.js and
+   The trigger button below sits inline in the row; the picker itself
+   (.qd-factor-menu-overlay and children) is built once by app.js and
    appended directly to <body>, positioned with `position:fixed` —
-   see ensureQdFactorMenu()/positionQdFactorMenu() in app.js for why:
-   it needs to escape the Quick Draft drawer's `overflow:hidden`
-   (used for its open/close animation) so the menu can never be
-   clipped or buried underneath the drawer's own content again. */
+   see ensureQdFactorMenu() in app.js. It's a fullscreen picker rather
+   than a small anchored dropdown: a true edge-to-edge sheet on phones,
+   morphing into a large centered, backdrop-dimmed modal on wider
+   screens (see the media query below) — plenty of room for every
+   Factor to sit in a neat, generously-tappable, vertically-scrolling
+   grid instead of a cramped floating box. */
 .qd-factor-row { margin-top: 6px; }
 .qd-factor-menu-btn { white-space: nowrap; }
 
-.qd-factor-menu {
+/* Locks the page behind the picker from scrolling while it's open. */
+body.qd-factor-menu-open { overflow: hidden; }
+
+.qd-factor-menu-overlay {
   position: fixed;
-  z-index: 300;
-  width: min(480px, 94vw);
-  background: #0b1a2e;
-  border: 1px solid rgba(201,162,39,0.35);
-  border-radius: 8px;
-  padding: 10px;
-  box-shadow: 0 10px 32px rgba(0,0,0,0.55);
+  inset: 0;
+  z-index: 500;
+  display: none; /* toggled to flex by app.js when opened */
+  align-items: center;
+  justify-content: center;
+  padding: 4vh 4vw;
+  background: rgba(4, 9, 16, 0.72);
+  backdrop-filter: blur(2px);
 }
+.qd-factor-menu-panel {
+  width: min(720px, 92vw);
+  height: min(88vh, 860px);
+  max-height: 100%;
+  display: flex;
+  flex-direction: column;
+  background: linear-gradient(180deg, #0b1a2e 0%, #071120 100%);
+  border: 1px solid rgba(201,162,39,0.35);
+  border-radius: 14px;
+  padding: 16px;
+  box-shadow: 0 20px 60px rgba(0,0,0,0.6);
+}
+/* Below ~640px wide, the panel morphs into a true fullscreen sheet
+   (flush edges, no backdrop gap) rather than a floating modal. */
+@media (max-width: 640px) {
+  .qd-factor-menu-overlay { padding: 0; }
+  .qd-factor-menu-panel {
+    width: 100vw;
+    height: 100vh;
+    height: 100dvh;
+    max-height: none;
+    border-radius: 0;
+    border: none;
+    padding: max(14px, env(safe-area-inset-top)) 14px max(14px, env(safe-area-inset-bottom));
+  }
+}
+
+.qd-factor-menu-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex: 0 0 auto;
+  margin-bottom: 10px;
+}
+.qd-factor-menu-title {
+  font-family: 'Cinzel', serif;
+  letter-spacing: .08em;
+  font-size: 15px;
+  color: var(--gold, #c9a227);
+}
+.qd-factor-menu-close {
+  flex-shrink: 0;
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  border: 1.5px solid rgba(255,255,255,0.18);
+  background: rgba(255,255,255,0.06);
+  color: #dce8f5;
+  font-size: 13px;
+  cursor: pointer;
+  transition: background .15s;
+}
+.qd-factor-menu-close:hover { background: rgba(255,255,255,0.16); }
+
 .qd-factor-menu-searchbar {
   position: relative;
-  margin: 0 0 8px;
+  flex: 0 0 auto;
+  margin: 0 0 10px;
 }
 .qd-factor-menu-searchbar .qd-factor-menu-search {
   margin: 0;
@@ -741,26 +805,59 @@ main {
 }
 .qd-factor-menu-clear:hover { background: rgba(255,255,255,0.2); color: #dce8f5; }
 
-/* A wrapping grid of pills — several rows of Factors visible (and
-   quickly tappable) at once, rather than one narrow vertical list. */
+/* Quick-tap keyword chips — one tap drops a common substring straight
+   into the search box above (see qdFactorMenuSetSearch in app.js). */
+.qd-factor-menu-quickwords {
+  flex: 0 0 auto;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin: 0 0 10px;
+  padding-bottom: 10px;
+  border-bottom: 1px solid rgba(255,255,255,0.08);
+}
+.qd-factor-quickword {
+  padding: 5px 12px;
+  border-radius: 999px;
+  border: 1.5px solid rgba(201,162,39,0.35);
+  background: rgba(201,162,39,0.08);
+  color: #d9c98a;
+  font-size: 11.5px;
+  font-family: 'Cinzel', serif;
+  letter-spacing: .02em;
+  white-space: nowrap;
+  cursor: pointer;
+  transition: background .15s, border-color .15s, color .15s;
+}
+.qd-factor-quickword:hover { background: rgba(201,162,39,0.18); }
+.qd-factor-quickword.active {
+  border-color: #4ade80;
+  background: rgba(74,222,128,.18);
+  color: #eafff2;
+}
+
+/* A wrapping grid of pills that fills the rest of the panel and scrolls
+   vertically once there are more Factors than fit on screen. */
 .qd-factor-menu-list {
-  max-height: min(46vh, 320px);
+  flex: 1 1 auto;
+  min-height: 0;
   overflow-y: auto;
   display: flex;
   flex-wrap: wrap;
   align-content: flex-start;
-  gap: 6px;
+  gap: 8px;
+  padding-bottom: 8px;
 }
 .qd-factor-menu-item {
   display: flex;
   align-items: center;
   gap: 6px;
-  padding: 6px 12px;
+  padding: 8px 14px;
   border-radius: 999px;
   border: 1.5px solid rgba(255,255,255,0.12);
   background: rgba(255,255,255,0.04);
   color: #b9c9d8;
-  font-size: 12.5px;
+  font-size: 13.5px;
   font-family: 'Crimson Pro', serif;
   white-space: nowrap;
   cursor: pointer;
