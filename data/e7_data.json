@@ -15860,7 +15860,7 @@
       {
         "id": 1788786288554,
         "name": "Cannot trigger counterattacks",
-        "value": 8,
+        "value": 9.5,
         "pinned": false,
         "factorIds": [
           1788775427431
@@ -15869,7 +15869,7 @@
       {
         "id": 1788785760659,
         "name": "Reacts to counterattacks",
-        "value": 9,
+        "value": 9.8,
         "pinned": false,
         "factorIds": [
           1788775427431
@@ -18476,5 +18476,5 @@
     ]
   },
   "schemaVersion": 2,
-  "savedAt": "2026-09-14T22:21:24.255Z"
+  "savedAt": "2026-09-14T22:24:14.353Z"
 }
