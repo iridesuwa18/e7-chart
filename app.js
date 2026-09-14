@@ -823,13 +823,13 @@ let qdCompetitiveMode = false; // when on: 3★ heroes (chained or support) are 
 let qdTickedFactorIds = new Set();
 
 // Which of the ticked Factors above are additionally "prioritized" —
-// each one's average score gets a specialist-scaled boost before being
-// folded into a hero's final Factor-mode score (see
-// qdPriorityBoostMultiplier / qdFactorEntryForHero for the actual
-// formula — it's no longer a flat multiplier). Always a subset of
-// qdTickedFactorIds; anything pruned from that Set (untick, or the
-// Factor itself gets deleted) is pruned from this one too. Session-only,
-// same as qdTickedFactorIds.
+// each one's per-Factor score is simply doubled (independently of any
+// other prioritized Factor) before being averaged into a hero's final
+// Factor-mode score — see qdFactorEntryForHero for the actual ranked-
+// %-spread scoring formula. Always a subset of qdTickedFactorIds;
+// anything pruned from that Set (untick, or the Factor itself gets
+// deleted) is pruned from this one too. Session-only, same as
+// qdTickedFactorIds.
 let qdPrioritizedFactorIds = new Set();
 
 // Enemy Factor dropdown menu state (Section 8.1) — declared up here,
@@ -2248,67 +2248,70 @@ function qdSuggestForNextIdx(nextIdx, draftArr, banProtectEl) {
   return qdSimpleSuggestForSlot(nextIdx, draftArr, banProtectEl);
 }
 
-// One candidate hero+variant pair, scored against every ticked Factor.
-// Returns null when the hero/variant matches none of them, so callers
-// can filter losers out with a simple `.filter(Boolean)`. Ghost shares
-// the main build's Reactions/Engagements (see qdOverallKitScore above),
-// so both variants read the same h.reactions/h.engagements here too.
+// ═══════════════════════════════════════
+// Enemy Factor scoring — "ranked % spread" system. Full replacement of
+// the old two-level-average + specialist-boost + flat breadth-bonus
+// system; nothing from that old system carries over.
 //
-// Two-level average, not an uncapped sum: a Factor can be tagged onto
-// several Reactions/Engagements, and a hero can hold several of the
-// ones tagged to any one ticked Factor. Step 1 — for each ticked
-// Factor the hero matches at all, average together EVERY one of the
-// hero's own Reaction/Engagement scores tagged to that Factor (not
-// just the best one) to get that hero's own average score for that one
-// Factor. Step 2 — average those per-Factor averages together across
-// however many ticked Factors the hero actually matched. Averaging at
-// both levels (rather than summing raw matches) means a shallow
-// generalist who weakly touches many ticked Factors can't automatically
-// outrank a sharp specialist nailing just one — ticking fewer, more
-// targeted Factors surfaces whichever heroes are genuinely the
-// best-suited answers to exactly those threats.
+// For each ticked Factor:
+//   1. Rank EVERY Reaction/Engagement tagged to that Factor (not just
+//      ones any one hero holds) by their own fixed score, highest to
+//      lowest. That rank becomes a percentage spread evenly from 100%
+//      at the top down to 0% at the bottom, across however many
+//      DISTINCT scores are tagged to the Factor — tags sharing the
+//      same score share the same percentage (see
+//      qdFactorRankedBaseScores).
+//   2. That percentage is a bonus multiplier on the tag's own score:
+//      0% → ×1 (unchanged), 100% → ×2 (doubled), linear in between.
+//      This is the tag's new "ranked" base score for this Factor.
+//   3. A hero's score for this Factor is the sum of the ranked base
+//      scores of only the tags it actually holds that are tagged to
+//      this Factor, divided by how many of those tags it holds — i.e.
+//      the average of its own matched tags' ranked scores.
+//   4. If the Factor is prioritized (see renderQdFactorPriorityChips),
+//      that average is simply doubled — independently of any other
+//      prioritized Factor, no sharing/redistribution between them, so
+//      prioritizing a 2nd or 3rd Factor doesn't shrink the doubling on
+//      the first.
 //
-// A small flat "breadth bonus" (+1 per matched Factor) is then added
-// AFTER that averaging, on top of the two-level average above — not
-// folded into it. Matching more ticked Factors fairly is still
-// generally more useful than nailing only one perfectly, so a hero
-// averaging a slightly lower score across three matches can and should
-// still edge out a hero with a single, higher-scoring match. This is a
-// deliberately modest, flat nudge (not a multiplier) precisely so it
-// only breaks that kind of close call rather than swamping the
-// specialist entirely.
-// Specialist-scaled boost for a prioritized Factor. A flat "×1.5 for
-// everyone who matches" barely moved the ranking, because with a Factor
-// ticked, EVERY candidate already has to match it to show up at all
-// (qdSimpleScoreEntry excludes non-matches outright) — so a flat
-// multiplier just scaled the whole board up together and left the
-// ORDER between heroes almost unchanged. What should actually move the
-// needle is rewarding the hero who answers this specific threat with
-// only one or two sharp, dedicated tools over the hero who happens to
-// have ten loosely-related ones (and is probably already scoring well
-// generically because of that breadth) — a specialist bonus, not a
-// participation bonus.
-//   matchCount        — how many of the hero's OWN Reactions/Engagements
-//                        are tagged to this prioritized Factor. Fewer =
-//                        more specialized = bigger boost; this is the
-//                        "10 matches → ~1.2x, 1 match → up to 4x" curve.
-//   prioritizedCount  — how many Factors are prioritized right now.
-//                        The "extra" above 1x is divided by this count,
-//                        so ticking a 2nd prioritized Factor roughly
-//                        halves each one's boost, a 3rd roughly thirds
-//                        them, etc. — otherwise every additional
-//                        prioritized Factor would stack its own boost on
-//                        top of the others and snowball into an
-//                        unbounded multiplier for a hero that happens to
-//                        specialize in several of them at once.
-const QD_PRIORITY_BOOST_FLOOR = 1.2; // a broad generalist still gets *something*
-const QD_PRIORITY_BOOST_CEIL  = 4.0; // a lone, dedicated answer is worth a lot, not infinity
-const QD_PRIORITY_BOOST_K     = 3;   // shape constant for the 1/matchCount falloff below
-function qdPriorityBoostMultiplier(matchCount, prioritizedCount) {
-  if (prioritizedCount <= 0) return 1;
-  const raw    = 1 + QD_PRIORITY_BOOST_K / Math.max(1, matchCount);
-  const capped = Math.min(QD_PRIORITY_BOOST_CEIL, Math.max(QD_PRIORITY_BOOST_FLOOR, raw));
-  return 1 + (capped - 1) / prioritizedCount;
+// A hero's FINAL Factor-mode score is then the average of its
+// per-Factor scores (step 3/4) across only the ticked Factors it
+// actually matched at least one tag for — sum of those divided by how
+// many that is. Purely an average at every level, nothing added on
+// top, so the ranking is exactly and only what the ranked-%-spread
+// scores say it should be.
+// ═══════════════════════════════════════
+
+// Precomputed per Factor (not per hero — this only depends on the
+// Factor's own tagged Reactions/Engagements and their fixed scores,
+// never on which heroes hold them). Returns a Map keyed
+// `${kind}:${id}` → ranked base score (that tag's own value × its
+// rank-derived ×1–×2 multiplier).
+function qdFactorRankedBaseScores(factorId) {
+  const { reactions, engagements } = taxonomyItemsForFactor(factorId);
+  const items = [
+    ...reactions.map(r => ({ key: `reactions:${r.id}`, value: r.value })),
+    ...engagements.map(e => ({ key: `engagements:${e.id}`, value: e.value })),
+  ];
+  const map = new Map();
+  if (items.length === 0) return map;
+
+  // Distinct values only, so tags that tie on score land on the exact
+  // same rank slot (and so the same %) instead of being spread apart
+  // just because more items happen to share that value.
+  const distinctDesc = [...new Set(items.map(i => i.value))].sort((a, b) => b - a);
+  const lastIdx = distinctDesc.length - 1;
+  const rankIndexOf = new Map(distinctDesc.map((v, idx) => [v, idx]));
+
+  items.forEach(({ key, value }) => {
+    const idx = rankIndexOf.get(value);
+    // Only one distinct value tagged to this Factor at all → nothing to
+    // rank against, so it's simply the top: 100%.
+    const percentage = lastIdx > 0 ? 1 - idx / lastIdx : 1;
+    const multiplier = 1 + percentage; // 0% → ×1, 100% → ×2
+    map.set(key, value * multiplier);
+  });
+  return map;
 }
 
 function qdFactorEntryForHero(h, variant) {
@@ -2316,71 +2319,66 @@ function qdFactorEntryForHero(h, variant) {
   const engagements = h.engagements || [];
   if (reactions.length === 0 && engagements.length === 0) return null;
 
-  const perFactorAverages = []; // one entry per ticked Factor this hero matches at all
+  const perFactorScores = []; // one entry per ticked Factor this hero matches at all
   const matchReasons = [];
 
   qdTickedFactorIds.forEach(factorId => {
     const { reactions: taggedR, engagements: taggedE } = taxonomyItemsForFactor(factorId);
     const taggedRIds = new Set(taggedR.map(r => r.id));
     const taggedEIds = new Set(taggedE.map(e => e.id));
+    const rankedScores = qdFactorRankedBaseScores(factorId); // `${kind}:${id}` -> ranked (×1–×2) base score
 
     // Every one of the hero's own Reactions/Engagements tagged to this
-    // Factor counts toward its average — not just the single best one.
-    const matchedScores = [];
+    // Factor counts — not just the single best one.
+    const matchedRanked = [];
     const matchedNames = [];
     reactions.forEach(r => {
       const refId = r?.refId ?? r;
       if (!taggedRIds.has(refId)) return;
-      matchedScores.push(taxonomyValue("reactions", refId));
+      matchedRanked.push(rankedScores.get(`reactions:${refId}`) ?? 0);
       matchedNames.push(taxonomyName("reactions", refId));
     });
     engagements.forEach(e => {
       const refId = e?.refId ?? e;
       if (!taggedEIds.has(refId)) return;
-      matchedScores.push(taxonomyValue("engagements", refId));
+      matchedRanked.push(rankedScores.get(`engagements:${refId}`) ?? 0);
       matchedNames.push(taxonomyName("engagements", refId));
     });
-    if (matchedScores.length === 0) return; // hero doesn't match this ticked Factor at all
+    if (matchedRanked.length === 0) return; // hero doesn't match this ticked Factor at all
 
-    const factorAvg = matchedScores.reduce((a, b) => a + b, 0) / matchedScores.length;
-    // Prioritized Factors (see renderQdFactorPriorityChips) get a
-    // specialist-scaled boost applied right here, before this Factor's
-    // average gets folded into the hero's overall Factor-mode score
-    // below — see qdPriorityBoostMultiplier for why it's shaped this
-    // way (fewer matches on THIS Factor = bigger boost, more
-    // prioritized Factors ticked at once = each boost shrinks).
-    const boostMultiplier = qdPrioritizedFactorIds.has(factorId)
-      ? qdPriorityBoostMultiplier(matchedScores.length, qdPrioritizedFactorIds.size)
-      : 1;
-    const boosted = factorAvg * boostMultiplier;
-    perFactorAverages.push(boosted);
-    const boostNote = qdPrioritizedFactorIds.has(factorId) ? ` ⭐×${boostMultiplier.toFixed(2)} = ${boosted.toFixed(1)}` : "";
+    // Step 3 — sum of this hero's own matched tags' ranked scores,
+    // divided by how many of them it holds.
+    const totalPoints = matchedRanked.reduce((a, b) => a + b, 0);
+    const factorScore = totalPoints / matchedRanked.length;
+
+    // Step 4 — a prioritized Factor's score is simply doubled, on its
+    // own, independent of any other prioritized Factor.
+    const isPrioritized = qdPrioritizedFactorIds.has(factorId);
+    const finalFactorScore = isPrioritized ? factorScore * 2 : factorScore;
+    perFactorScores.push(finalFactorScore);
+
+    const boostNote = isPrioritized ? ` ⭐×2 = ${finalFactorScore.toFixed(1)}` : "";
     matchReasons.push(
-      `🎯 ${taxonomyName("factors", factorId)} → avg ${factorAvg.toFixed(1)}${boostNote} across ${matchedScores.length} match${matchedScores.length === 1 ? "" : "es"} (${matchedNames.join(", ")})`
+      `🎯 ${taxonomyName("factors", factorId)} → ${factorScore.toFixed(1)}${boostNote} across ${matchedRanked.length} match${matchedRanked.length === 1 ? "" : "es"} (${matchedNames.join(", ")})`
     );
   });
 
-  if (perFactorAverages.length === 0) return null;
-  const avgScore = perFactorAverages.reduce((a, b) => a + b, 0) / perFactorAverages.length;
-  // Breadth bonus: a hero matching MORE ticked Factors should still come
-  // out ahead of one matching fewer, even when the fewer-but-sharper
-  // hero's average is a bit higher — a flat +1 per matched Factor, added
-  // after averaging (not before), so it can't distort the per-Factor
-  // averages or the priority boost above, only nudge the final
-  // ranking. E.g. one match at a perfect 10 vs. three matches averaging
-  // 8.6 (10, 9, 7) — without this, 10 > 8.6 and the narrower match wins;
-  // with it, 8.6 + 3 = 11.6 pulls ahead, since matching three separate
-  // threats fairly is generally the more useful pick than nailing just one.
-  const breadthBonus = perFactorAverages.length;
-  const finalScore = avgScore + breadthBonus;
+  if (perFactorScores.length === 0) return null;
+
+  // Final score — plain average of the per-Factor scores above across
+  // however many ticked Factors this hero actually matched. Nothing
+  // added on top: no flat breadth bonus, no extra weighting — just the
+  // average, so heroes are ranked purely on how well their own tags
+  // rank within each selected Factor.
+  const finalScore = perFactorScores.reduce((a, b) => a + b, 0) / perFactorScores.length;
   return {
     heroId: h.id, hero: h, variant,
-    matchedCount: perFactorAverages.length,
+    matchedCount: perFactorScores.length,
     score: +finalScore.toFixed(1),
     reasons: [
-      `Matches ${perFactorAverages.length}/${qdTickedFactorIds.size} ticked Factor${qdTickedFactorIds.size === 1 ? "" : "s"}`,
+      `Matches ${perFactorScores.length}/${qdTickedFactorIds.size} ticked Factor${qdTickedFactorIds.size === 1 ? "" : "s"}`,
       ...matchReasons,
-      `Averaged ${avgScore.toFixed(1)} + ${breadthBonus} matched-Factor bonus = ${finalScore.toFixed(1)}`,
+      `Averaged across ${perFactorScores.length} Factor${perFactorScores.length === 1 ? "" : "s"} = ${finalScore.toFixed(1)}`,
     ],
   };
 }
@@ -3034,8 +3032,8 @@ function positionQdFactorMenu() {}
 // Alphabetical (A→Z) row of chips — one per currently-ticked Enemy
 // Factor — shown above the Enemy Factors label/dropdown. Clicking a
 // chip toggles whether that Factor is "prioritized": prioritized
-// Factors get a specialist-scaled boost to their average score in
-// Factor-mode scoring (qdFactorEntryForHero/qdPriorityBoostMultiplier). Purely a display+toggle surface —
+// Factors get their score simply doubled in Factor-mode scoring (see
+// qdFactorEntryForHero). Purely a display+toggle surface —
 // the actual tick/untick still happens in the dropdown menu itself
 // (renderQdFactorMenuList); this row can only prioritize what's
 // already ticked there.
@@ -3056,7 +3054,7 @@ function renderQdFactorPriorityChips() {
     .sort((a, b) => (a.name || "").toLowerCase().localeCompare((b.name || "").toLowerCase()));
 
   box.innerHTML = tickedFactors.map(f => `
-    <button type="button" class="qd-factor-priority-chip${qdPrioritizedFactorIds.has(f.id) ? " active" : ""}" data-factor-id="${f.id}" title="${qdPrioritizedFactorIds.has(f.id) ? "Prioritized — click to remove the boost" : "Click to prioritize (bigger boost for specialists with fewer matches on this Factor)"}">
+    <button type="button" class="qd-factor-priority-chip${qdPrioritizedFactorIds.has(f.id) ? " active" : ""}" data-factor-id="${f.id}" title="${qdPrioritizedFactorIds.has(f.id) ? "Prioritized — click to remove the ×2 boost" : "Click to prioritize (doubles this Factor's score)"}">
       ${qdPrioritizedFactorIds.has(f.id) ? "⭐ " : ""}${f.name || "(unnamed)"}
     </button>
   `).join("");
