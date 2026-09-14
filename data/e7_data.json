@@ -16524,7 +16524,7 @@
       {
         "id": 1789276853775,
         "name": "Dispel immortality (passive)",
-        "value": 9,
+        "value": 9.6,
         "pinned": false,
         "factorIds": [
           1789276871897
@@ -18476,5 +18476,5 @@
     ]
   },
   "schemaVersion": 2,
-  "savedAt": "2026-09-14T12:07:25.629Z"
+  "savedAt": "2026-09-14T14:43:17.948Z"
 }
