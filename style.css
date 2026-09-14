@@ -498,6 +498,76 @@ main {
   margin-bottom: 4px;
 }
 .qd-slot-info-line:last-child { margin-bottom: 0; }
+.qd-slot-info-knowmore {
+  display: block;
+  width: 100%;
+  margin-top: 8px;
+  padding: 7px 10px;
+  border-radius: 6px;
+  border: 1.5px solid rgba(201,162,39,0.4);
+  background: rgba(201,162,39,0.1);
+  color: var(--gold2, #e0c060);
+  font-family: 'Cinzel', serif;
+  font-size: 10.5px;
+  letter-spacing: .03em;
+  text-align: center;
+  cursor: pointer;
+  transition: background .15s;
+}
+.qd-slot-info-knowmore:hover { background: rgba(201,162,39,0.2); }
+
+/* "Know More" fullscreen explainer body — the overlay/panel shell
+   itself is shared with the Enemy Factors picker (.qd-factor-menu-*). */
+.qd-score-explainer-body {
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow-y: auto;
+  font-size: 13.5px;
+  line-height: 1.55;
+  color: var(--text);
+}
+.qd-score-explainer-steps {
+  margin: 0;
+  padding-left: 20px;
+}
+.qd-score-explainer-steps li { margin-bottom: 10px; }
+.qd-score-explainer-steps li strong { color: var(--gold2, #e0c060); }
+.qd-score-explainer-note {
+  margin: 0;
+  color: var(--text-dim);
+  font-style: italic;
+}
+.qd-score-explainer-divider {
+  height: 1px;
+  margin: 14px 0;
+  background: rgba(255,255,255,0.1);
+}
+.qd-score-explainer-line { margin-bottom: 6px; }
+.qd-score-explainer-line-title {
+  font-family: 'Cinzel', serif;
+  letter-spacing: .04em;
+  color: var(--gold, #c9a227);
+  margin-bottom: 8px;
+}
+.qd-score-explainer-formula {
+  font-family: 'Courier New', monospace;
+  font-size: 12.5px;
+  line-height: 1.7;
+  color: #b9c9d8;
+  background: rgba(255,255,255,0.05);
+  border: 1px solid rgba(255,255,255,0.1);
+  border-radius: 8px;
+  padding: 10px 12px;
+  margin-top: 4px;
+}
+.qd-score-explainer-final {
+  margin-top: 14px;
+  padding-top: 12px;
+  border-top: 1px solid rgba(255,255,255,0.1);
+  font-family: 'Cinzel', serif;
+  font-size: 14px;
+  color: var(--gold2, #e0c060);
+}
 .qd-slot-supports-for {
   font-size: 8px;
   color: var(--text-dim);

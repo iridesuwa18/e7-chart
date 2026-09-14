@@ -2807,10 +2807,119 @@ function qdShowSlotInfo(btn, info) {
     <div class="qd-slot-info-line">${sideLine}</div>
     ${reasonLines}
     ${elLine}
+    <button type="button" class="qd-slot-info-knowmore" id="qd-slot-info-knowmore">📖 Know More</button>
   `;
   popup.dataset.anchorIdx = btn.dataset.idx;
   popup.style.display = "block";
   positionQdSlotInfoPopup(btn);
+  // Opens the fullscreen step-by-step breakdown of exactly how this
+  // score was calculated — see ensureQdScoreExplainer/qdShowScoreExplainer.
+  popup.querySelector("#qd-slot-info-knowmore").addEventListener("click", () => {
+    popup.style.display = "none";
+    qdShowScoreExplainer(info);
+  });
+}
+
+let qdScoreExplainerEl = null;
+
+// The "Know More" fullscreen explainer — reuses the exact same
+// overlay+panel shell as the Enemy Factors picker (.qd-factor-menu-*,
+// see ensureQdFactorMenu) so it floods the screen the same way,
+// morphing from an edge-to-edge sheet on phones to a large centered,
+// backdrop-dimmed modal on wider screens. Only its body content is
+// specific to this popup — see qdScoreExplainerContent.
+function ensureQdScoreExplainer() {
+  if (qdScoreExplainerEl) return qdScoreExplainerEl;
+
+  const overlay = document.createElement("div");
+  overlay.className = "qd-factor-menu-overlay";
+  overlay.id = "qd-score-explainer";
+  overlay.style.display = "none";
+  overlay.innerHTML = `
+    <div class="qd-factor-menu-panel">
+      <div class="qd-factor-menu-header">
+        <div class="qd-factor-menu-title" id="qd-score-explainer-title">📖 How This Score Was Calculated</div>
+        <button type="button" class="qd-factor-menu-close" id="qd-score-explainer-close" aria-label="Close">✕</button>
+      </div>
+      <div class="qd-score-explainer-body" id="qd-score-explainer-body"><!-- populated per-hero, see qdShowScoreExplainer --></div>
+    </div>
+  `;
+  document.body.appendChild(overlay);
+  qdScoreExplainerEl = overlay;
+
+  const closeExplainer = () => {
+    overlay.style.display = "none";
+    document.body.classList.remove("qd-factor-menu-open");
+  };
+  overlay.querySelector("#qd-score-explainer-close").addEventListener("click", closeExplainer);
+  overlay.addEventListener("click", e => { if (e.target === overlay) closeExplainer(); });
+  document.addEventListener("keydown", e => {
+    if (e.key === "Escape" && overlay.style.display !== "none") closeExplainer();
+  });
+
+  return overlay;
+}
+
+// Builds the explainer body: the general step-by-step methodology
+// (Factor mode's 5 steps, or the plain overall-kit-score fallback when
+// nothing's ticked), then this specific hero's actual breakdown (reusing
+// the exact same `reasons` text the small (i) popup already showed —
+// so the two can never say something different), then the formula in
+// symbolic form, ending on the final number.
+function qdScoreExplainerContent(info) {
+  const h = info.hero;
+  const name = `${h.name || "Unnamed"}${info.variant === "ghost" ? " (Ghost)" : ""}`;
+  const factorMode = qdTickedFactorIds.size > 0;
+
+  const stepsHtml = factorMode ? `
+    <ol class="qd-score-explainer-steps">
+      <li><strong>Rank every tag.</strong> For each ticked Enemy Factor, every Reaction/Engagement tagged to it (across the whole roster, not just ${name}'s own) is ranked by its own fixed score, highest → lowest. That rank becomes a percentage spread evenly from <strong>100%</strong> at the top down to <strong>0%</strong> at the bottom — tags that tie on score share the same percentage.</li>
+      <li><strong>Turn the % into a multiplier.</strong> 0% → ×1 (score unchanged), 100% → ×2 (score doubled), scaling linearly in between. This gives every tag a new "ranked" score for that Factor.</li>
+      <li><strong>Score ${name} for that Factor.</strong> Add up the ranked scores of only the tags ${name} actually holds for that Factor, then divide by how many of those tags it holds — the average of its own matches.</li>
+      <li><strong>Double it if prioritized.</strong> If that Factor is marked as a priority (⭐), this score is simply doubled — independently of any other prioritized Factor, so prioritizing more than one doesn't shrink either one's doubling.</li>
+      <li><strong>Average across every matched Factor.</strong> Add up ${name}'s scores from steps 3–4 for every ticked Factor it matched at all, then divide by how many Factors that is. That average is the final score below.</li>
+    </ol>
+  ` : `
+    <p class="qd-score-explainer-note">No Enemy Factors are currently ticked, so ${name} is ranked by plain <strong>overall kit score</strong> instead — the average of every one of ${name}'s own Reaction and Engagement scores, nothing else factored in. Tick an Enemy Factor from the 🎯 Enemy Factors picker to switch to the step-by-step Factor scoring below.</p>
+  `;
+
+  const appliedHtml = `
+    <div class="qd-score-explainer-line qd-score-explainer-line-title">Applied to ${name}</div>
+    ${info.reasons.length
+      ? info.reasons.map(r => `<div class="qd-score-explainer-line">${r}</div>`).join("")
+      : `<div class="qd-score-explainer-line">Average of every one of ${name}'s Reaction/Engagement scores = ${info.score.toFixed(1)}</div>`}
+    ${info.elNote ? `<div class="qd-score-explainer-line">${info.elNote}</div>` : ""}
+  `;
+
+  const formulaHtml = factorMode ? `
+    <div class="qd-score-explainer-formula">
+      <div>FactorScore&nbsp;=&nbsp;( Σ ranked scores of ${name}'s matched tags )&nbsp;÷&nbsp;( # matched tags )&nbsp;&nbsp;<em>[×2 if prioritized]</em></div>
+      <div>FinalScore&nbsp;=&nbsp;( Σ FactorScore for each Factor ${name} matched )&nbsp;÷&nbsp;( # matched Factors )</div>
+    </div>
+  ` : `
+    <div class="qd-score-explainer-formula">
+      <div>FinalScore&nbsp;=&nbsp;( Σ every Reaction + Engagement score )&nbsp;÷&nbsp;( total count )</div>
+    </div>
+  `;
+
+  return `
+    ${stepsHtml}
+    <div class="qd-score-explainer-divider"></div>
+    ${appliedHtml}
+    <div class="qd-score-explainer-divider"></div>
+    <div class="qd-score-explainer-line qd-score-explainer-line-title">Formula</div>
+    ${formulaHtml}
+    <div class="qd-score-explainer-final">Final score: <strong>${info.score.toFixed(1)}</strong></div>
+  `;
+}
+
+function qdShowScoreExplainer(info) {
+  const overlay = ensureQdScoreExplainer();
+  const h = info.hero;
+  overlay.querySelector("#qd-score-explainer-title").textContent = `📖 How ${h.name || "this hero"} was scored`;
+  overlay.querySelector("#qd-score-explainer-body").innerHTML = qdScoreExplainerContent(info);
+  overlay.style.display = "flex";
+  document.body.classList.add("qd-factor-menu-open"); // reuses the same background-scroll lock as the Enemy Factors picker
 }
 
 function renderQuickDraft() {
