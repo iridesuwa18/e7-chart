@@ -2514,6 +2514,15 @@ body.dot-mode .origin-dot:hover {
   color: #ce93d8;
   background: rgba(186,104,200,.08);
 }
+.taxonomy-factor-tag-score {
+  display: inline-block;
+  margin-left: 4px;
+  padding: 0 4px;
+  border-radius: 6px;
+  background: rgba(255,255,255,.12);
+  color: var(--gold, #c9a227);
+  font-weight: 700;
+}
 .taxonomy-factor-chip {
   font-family: 'Cinzel', serif;
   font-size: 9px;

@@ -5535,9 +5535,16 @@ function renderFactorsPanel() {
     // by the tag-picker on those rows, so this can never drift out of
     // sync with what's really assigned.
     const tagged = taxonomyItemsForFactor(f.id);
+    // Sorted highest-score-first within each type — with the score now
+    // shown on every chip (below), that ordering makes it easy to scan
+    // "which of this Factor's tags actually carries weight" instead of
+    // having to compare numbers scattered in whatever order they were
+    // originally tagged.
     const chips = [
-      ...tagged.reactions.map(r => `<span class="taxonomy-factor-tag reaction" title="Reaction">⚡ ${r.name || "(unnamed)"}</span>`),
-      ...tagged.engagements.map(e => `<span class="taxonomy-factor-tag engagement" title="Engagement">🛡 ${e.name || "(unnamed)"}</span>`),
+      ...[...tagged.reactions].sort((a, b) => b.value - a.value)
+        .map(r => `<span class="taxonomy-factor-tag reaction" title="Reaction — score ${r.value.toFixed(1)}">⚡ ${r.name || "(unnamed)"} <span class="taxonomy-factor-tag-score">${r.value.toFixed(1)}</span></span>`),
+      ...[...tagged.engagements].sort((a, b) => b.value - a.value)
+        .map(e => `<span class="taxonomy-factor-tag engagement" title="Engagement — score ${e.value.toFixed(1)}">🛡 ${e.name || "(unnamed)"} <span class="taxonomy-factor-tag-score">${e.value.toFixed(1)}</span></span>`),
     ];
     return `
     <div class="taxonomy-row${f.pinned ? " pinned" : ""}" data-id="${f.id}">
