@@ -132,7 +132,7 @@ function toggleTaxonomyPin(kind, id) {
    removal and the RTE assignment UI further down, which is read-only
    with respect to value). */
 function addTaxonomyItem(kind, name) {
-  const item = { id: newTaxonomyId(), name: String(name || "").trim(), value: 0, factorIds: [] };
+  const item = { id: newTaxonomyId(), name: String(name || "").trim(), value: 0, factorIds: [], locked: false };
   taxonomy = { ...taxonomy, [kind]: [...taxonomy[kind], item] };
   saveLocal();
   return item;
@@ -150,11 +150,14 @@ function renameTaxonomyItem(kind, id, name) {
 // value and Factor tags, but starts with no heroes linked (heroes hold
 // a link, not the item itself, so a copy can't silently attach itself
 // to whoever held the original). Gets its own fresh id, so it sorts as
-// newly-created regardless of where the original sits.
+// newly-created regardless of where the original sits. Also starts
+// unlocked, even if the original was locked — a lock is a deliberate
+// "stop me from fat-fingering THIS specific score" flag on one item,
+// not something that should silently carry over to a copy.
 function duplicateTaxonomyItem(kind, id, newName) {
   const item = taxonomy[kind].find(x => x.id === id);
   if (!item) return null;
-  const copy = { ...item, id: newTaxonomyId(), name: String(newName || "").trim(), pinned: false, factorIds: [...item.factorIds] };
+  const copy = { ...item, id: newTaxonomyId(), name: String(newName || "").trim(), pinned: false, locked: false, factorIds: [...item.factorIds] };
   taxonomy = { ...taxonomy, [kind]: [...taxonomy[kind], copy] };
   saveLocal();
   return copy;
@@ -162,12 +165,30 @@ function duplicateTaxonomyItem(kind, id, newName) {
 
 // Sets a Reaction/Engagement's fixed value (0-10) — the single source of
 // truth for its score everywhere it's used (chart axes, Quick Draft
-// ranking, etc.). This is the ONLY place the value is ever set.
+// ranking, etc.). This is the ONLY place the value is ever set. Locked
+// items are a hard no-op here (not just a disabled slider) — defense in
+// depth so a lock can never be bypassed by any caller, present or future.
 function setTaxonomyItemValue(kind, id, value) {
+  const item = taxonomy[kind].find(x => x.id === id);
+  if (!item || item.locked) return;
   const clamped = Math.max(0, Math.min(10, Number(value) || 0));
   taxonomy = {
     ...taxonomy,
     [kind]: taxonomy[kind].map(x => x.id === id ? { ...x, value: clamped } : x),
+  };
+  saveLocal();
+}
+
+// Toggles a Reaction/Engagement's lock — a locked item's score can't be
+// changed by the number input, the slider, or setTaxonomyItemValue
+// itself (see above) until it's unlocked again here. Purely a
+// "don't let me accidentally bump this one" safeguard, not a
+// permissions system — anyone with access to the Taxonomy screen can
+// toggle it either way.
+function toggleTaxonomyItemLock(kind, id) {
+  taxonomy = {
+    ...taxonomy,
+    [kind]: taxonomy[kind].map(x => x.id === id ? { ...x, locked: !x.locked } : x),
   };
   saveLocal();
 }
@@ -353,6 +374,16 @@ function computeEngageScore(h) {
 function taxonomyName(kind, id) {
   const item = taxonomy[kind]?.find(x => x.id === id);
   return item ? item.name : "(deleted)";
+}
+
+// Same padlock design already used for a locked hero's roster-card
+// badge (see renderRoster) — reused here for score-locking so the two
+// features look like one consistent "lock" language across the app
+// instead of two different icon styles.
+function qdLockIconSvg(locked, size = 13) {
+  return locked
+    ? `<svg width="${size}" height="${size}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>`
+    : `<svg width="${size}" height="${size}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 9.9-1"/></svg>`;
 }
 
 // ── Performance Ranking System (Section 5.4) ──
@@ -5579,11 +5610,14 @@ function ensureQdRankingSlider() {
     <div class="qd-factor-menu-panel">
       <div class="qd-factor-menu-header">
         <div class="qd-factor-menu-title" id="qd-ranking-slider-title">Set Score</div>
-        <button type="button" class="qd-factor-menu-close" id="qd-ranking-slider-close" aria-label="Close">✕</button>
+        <div class="qd-ranking-slider-header-actions">
+          <button type="button" class="qd-ranking-slider-lock-btn" id="qd-ranking-slider-lock-btn">${qdLockIconSvg(false)} Lock</button>
+          <button type="button" class="qd-factor-menu-close" id="qd-ranking-slider-close" aria-label="Close">✕</button>
+        </div>
       </div>
       <div class="qd-ranking-slider-body">
         <div class="qd-ranking-slider-value" id="qd-ranking-slider-value">0.0</div>
-        <input type="range" id="qd-ranking-slider-input" min="0" max="10" step="1" value="0" />
+        <input type="range" id="qd-ranking-slider-input" min="0" max="10" step="0.1" value="0" />
         <div class="qd-ranking-slider-scale"><span>0</span><span>10</span></div>
         <div class="qd-ranking-slider-desc" id="qd-ranking-slider-desc"></div>
       </div>
@@ -5610,6 +5644,13 @@ function ensureQdRankingSlider() {
 // Draft/Taxonomy) and refreshing every screen that reads this value —
 // the number input back in its own tab, any hero's open edit screen,
 // live Quick Draft suggestions, and the Performance Ranking list.
+// Steps in full 0.1 increments (matching the number input's own
+// precision) rather than whole numbers, but the Performance Ranking
+// ladder descriptions only exist at whole numbers — see
+// qdPerformanceLadderDescription — so the description line is simply
+// left blank while sitting on a fractional value instead of showing a
+// misleading "closest" description for a number the ladder never
+// actually defined.
 function qdShowRankingSlider(kind, id) {
   const overlay = ensureQdRankingSlider();
   const item = taxonomy[kind]?.find(x => x.id === id);
@@ -5620,22 +5661,30 @@ function qdShowRankingSlider(kind, id) {
   const input = overlay.querySelector("#qd-ranking-slider-input");
   const valueEl = overlay.querySelector("#qd-ranking-slider-value");
   const descEl = overlay.querySelector("#qd-ranking-slider-desc");
+  const lockBtn = overlay.querySelector("#qd-ranking-slider-lock-btn");
 
   const refresh = value => {
     valueEl.textContent = value.toFixed(1);
-    descEl.textContent = qdPerformanceLadderDescription(value);
+    // Whole numbers only — a 0.1 fine-tuning step is for precision, not
+    // for walking through the narrative ladder, so anything in between
+    // two rungs shows no description at all rather than guessing.
+    descEl.textContent = Number.isInteger(value) ? qdPerformanceLadderDescription(value) : "";
   };
-  // Snapped to the nearest whole rung for the slider's own position —
-  // the ladder descriptions only exist at whole numbers — but a value
-  // set more precisely via the number input (e.g. 6.5) still displays
-  // accurately above the slider until it's actually dragged.
-  input.value = Math.round(item.value);
+  const refreshLockUI = () => {
+    const locked = !!taxonomy[kind]?.find(x => x.id === id)?.locked;
+    input.disabled = locked;
+    lockBtn.innerHTML = `${qdLockIconSvg(locked)} ${locked ? "Locked" : "Lock"}`;
+    lockBtn.classList.toggle("locked", locked);
+  };
+
+  input.value = item.value;
   refresh(item.value);
+  refreshLockUI();
 
   input.oninput = () => {
     const value = Number(input.value);
     refresh(value);
-    setTaxonomyItemValue(kind, id, value);
+    setTaxonomyItemValue(kind, id, value); // no-ops while locked — input is also disabled above as the visible half of that
     // Keep every other view of this same number in sync immediately —
     // mirrors exactly what the .taxonomy-row-value-input change handler
     // in renderTaxonomyPanel already does.
@@ -5644,6 +5693,14 @@ function qdShowRankingSlider(kind, id) {
     if (taxonomyRankingOverlayIsOpen()) renderTaxonomyRankingPanel();
     renderRteSection();
     if (quickDraftSuggestOpen) renderQuickDraftSuggestions();
+  };
+
+  lockBtn.onclick = () => {
+    toggleTaxonomyItemLock(kind, id);
+    refreshLockUI();
+    // Reflect the new lock state everywhere else it's shown too.
+    if (taxonomyRankingOverlayIsOpen()) renderTaxonomyRankingPanel();
+    if (taxonomyActiveTab === kind) renderTaxonomyPanel(kind);
   };
 
   overlay.style.display = "flex";
@@ -5682,10 +5739,11 @@ function renderTaxonomyRankingPanel() {
     const icon = kind === "reactions" ? "⚡" : "🛡";
     const heroCount = heroesLinkedToTaxonomyItem(kind, item.id).length;
     return `
-      <div class="taxonomy-ranking-row" data-kind="${kind}" data-id="${item.id}">
+      <div class="taxonomy-ranking-row${item.locked ? " locked" : ""}" data-kind="${kind}" data-id="${item.id}">
         <span class="taxonomy-ranking-row-icon">${icon}</span>
         <span class="taxonomy-ranking-row-name">${item.name || "(unnamed)"}</span>
         ${heroCount === 0 ? `<span class="taxonomy-ranking-row-unassigned" title="Not assigned to any hero yet">⚠️ Unassigned</span>` : ""}
+        <button type="button" class="taxonomy-ranking-row-lock" data-kind="${kind}" data-id="${item.id}" title="${item.locked ? "Locked — click to unlock" : "Lock this score so it can't be changed"}">${qdLockIconSvg(item.locked)}</button>
         <button type="button" class="taxonomy-ranking-row-score" data-kind="${kind}" data-id="${item.id}" title="Tap to open the slider">${item.value.toFixed(1)}</button>
       </div>
     `;
@@ -5693,6 +5751,13 @@ function renderTaxonomyRankingPanel() {
 
   box.querySelectorAll(".taxonomy-ranking-row-score").forEach(btn => {
     btn.addEventListener("click", () => qdShowRankingSlider(btn.dataset.kind, Number(btn.dataset.id)));
+  });
+  box.querySelectorAll(".taxonomy-ranking-row-lock").forEach(btn => {
+    btn.addEventListener("click", () => {
+      toggleTaxonomyItemLock(btn.dataset.kind, Number(btn.dataset.id));
+      renderTaxonomyRankingPanel();
+      if (taxonomyActiveTab === btn.dataset.kind) renderTaxonomyPanel(btn.dataset.kind);
+    });
   });
 }
 
@@ -5725,8 +5790,9 @@ function renderTaxonomyPanel(kind) {
         </div>
         <div class="taxonomy-row-value">
           <label for="taxonomy-value-${kind}-${item.id}">Value</label>
-          <input type="number" id="taxonomy-value-${kind}-${item.id}" class="taxonomy-row-value-input" min="0" max="10" step="0.1" value="${item.value.toFixed(1)}" data-kind="${kind}" data-id="${item.id}" title="Fixed score (0-10) used everywhere this ${label} is assigned" />
+          <input type="number" id="taxonomy-value-${kind}-${item.id}" class="taxonomy-row-value-input" min="0" max="10" step="0.1" value="${item.value.toFixed(1)}" data-kind="${kind}" data-id="${item.id}" title="Fixed score (0-10) used everywhere this ${label} is assigned"${item.locked ? " disabled" : ""} />
           <button type="button" class="taxonomy-row-slider-btn" data-kind="${kind}" data-id="${item.id}" title="Open the slider (with the Performance Ranking description) instead">🎚</button>
+          <button type="button" class="taxonomy-row-lockbtn${item.locked ? " locked" : ""}" data-kind="${kind}" data-id="${item.id}" title="${item.locked ? "Locked — click to unlock" : "Lock this score so it can't be changed"}">${qdLockIconSvg(item.locked)}</button>
         </div>
         <button type="button" class="btn btn-ghost btn-xs taxonomy-row-tagbtn" data-kind="${kind}" data-id="${item.id}">🏷 Factors (${item.factorIds.length})</button>
         <button type="button" class="btn btn-ghost btn-xs taxonomy-row-herobtn" data-kind="${kind}" data-id="${item.id}" title="Search a hero and add this ${label} to them instantly, without opening their edit screen">➕ Add to Hero${heroCount ? ` (${heroCount})` : ""}</button>
@@ -5767,6 +5833,13 @@ function renderTaxonomyPanel(kind) {
   });
   box.querySelectorAll(".taxonomy-row-slider-btn").forEach(btn => {
     btn.addEventListener("click", () => qdShowRankingSlider(btn.dataset.kind, Number(btn.dataset.id)));
+  });
+  box.querySelectorAll(".taxonomy-row-lockbtn").forEach(btn => {
+    btn.addEventListener("click", () => {
+      toggleTaxonomyItemLock(btn.dataset.kind, Number(btn.dataset.id));
+      renderTaxonomyPanel(btn.dataset.kind);
+      if (taxonomyRankingOverlayIsOpen()) renderTaxonomyRankingPanel();
+    });
   });
   box.querySelectorAll(".taxonomy-row-delete").forEach(btn => {
     btn.addEventListener("click", () => {
