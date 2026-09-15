@@ -1021,22 +1021,19 @@ const fSsScore     = document.getElementById("f-ss-score");
   });
 
   // Performance Ranking System — fullscreen overlay, not a tab (see
-  // openTaxonomyRankingOverlay). This one DOES close on backdrop-tap/
-  // Escape, matching the Enemy Factors picker / Know More explainer it
-  // shares its shell with — it's a read-mostly list (only the slider
-  // popup on top of it actually edits anything), so an accidental
-  // outside tap here can't discard mid-edit work the way it could on
-  // the main Taxonomy modal above.
+  // openTaxonomyRankingOverlay). Deliberately no backdrop-tap/Escape
+  // close here (unlike the Enemy Factors picker / Know More explainer
+  // it shares its shell with) — it now has real editing on it (rename,
+  // lock, the score slider), not just a read-only list, so an
+  // accidental outside tap could interrupt someone mid-edit the same
+  // way it could on the main Taxonomy modal. The ✕ button is the only
+  // way out.
   const rankingBtn = document.getElementById("taxonomy-ranking-btn");
   const rankingOverlay = document.getElementById("taxonomy-ranking-overlay");
   if (rankingBtn) rankingBtn.addEventListener("click", openTaxonomyRankingOverlay);
   if (rankingOverlay) {
     rankingOverlay.querySelector("#taxonomy-ranking-close")?.addEventListener("click", closeTaxonomyRankingOverlay);
-    rankingOverlay.addEventListener("click", e => { if (e.target === rankingOverlay) closeTaxonomyRankingOverlay(); });
   }
-  document.addEventListener("keydown", e => {
-    if (e.key === "Escape" && taxonomyRankingOverlayIsOpen()) closeTaxonomyRankingOverlay();
-  });
   // "Jump to Top" — the header/tabs stay fixed (see the CSS comment on
   // .taxonomy-modal-sticky) but the panel content itself, including the
   // search bar sitting near the top of whichever tab is open, scrolls
