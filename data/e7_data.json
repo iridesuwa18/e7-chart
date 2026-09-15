@@ -16328,7 +16328,7 @@
       },
       {
         "id": 1789217068833,
-        "name": "Increase Attack passive",
+        "name": "PASSIVE : Increase Attack %",
         "value": 9,
         "pinned": false,
         "factorIds": [
@@ -16337,7 +16337,8 @@
           1788700420912,
           1788701036557,
           1788773130306
-        ]
+        ],
+        "locked": true
       },
       {
         "id": 1789217293880,
@@ -16525,8 +16526,8 @@
       },
       {
         "id": 1789276853775,
-        "name": "Dispel immortality (passive)",
-        "value": 9.6,
+        "name": "PASSIVE : Dispel immortality",
+        "value": 9,
         "pinned": false,
         "factorIds": [
           1789276871897
@@ -16903,16 +16904,17 @@
       },
       {
         "id": 1788783734183,
-        "name": "Increase Attack Buff",
-        "value": 9,
+        "name": "BUFF : Increase Attack",
+        "value": 7,
         "pinned": false,
         "factorIds": [
           1788772992919
-        ]
+        ],
+        "locked": true
       },
       {
         "id": 1788785021751,
-        "name": "Additional / fixed damage",
+        "name": "DAMAGE: Additional / fixed",
         "value": 10,
         "pinned": false,
         "factorIds": [
@@ -16921,7 +16923,8 @@
           1788786248167,
           1788786571272,
           1788700420912
-        ]
+        ],
+        "locked": true
       },
       {
         "id": 1788785505206,
@@ -17877,15 +17880,16 @@
       },
       {
         "id": 1789217623138,
-        "name": "Increase Attack Greater Buff",
-        "value": 9,
+        "name": "BUFF : Increase Attack Greater",
+        "value": 7.5,
         "pinned": false,
         "factorIds": [
           1788772992919,
           1788783127095,
           1788700420912,
           1788701036557
-        ]
+        ],
+        "locked": true
       },
       {
         "id": 1789218602674,
@@ -18478,5 +18482,5 @@
     ]
   },
   "schemaVersion": 2,
-  "savedAt": "2026-09-15T03:26:02.681Z"
+  "savedAt": "2026-09-15T12:34:37.601Z"
 }
