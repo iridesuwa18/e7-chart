@@ -17127,7 +17127,7 @@
       },
       {
         "id": 1788914604468,
-        "name": "Rage (Undispellable) Buff",
+        "name": "UNDISPELLABLE : BUFF : Rage",
         "value": 9.5,
         "pinned": false,
         "factorIds": [
@@ -17973,12 +17973,13 @@
       },
       {
         "id": 1789220911164,
-        "name": "Increase Damage against no buffs",
-        "value": 7.5,
+        "name": "ONGOING : Increase Damage against no buffs",
+        "value": 10,
         "pinned": false,
         "factorIds": [
           1789220943266
-        ]
+        ],
+        "locked": true
       },
       {
         "id": 1789221204007,
@@ -18536,5 +18537,5 @@
     ]
   },
   "schemaVersion": 2,
-  "savedAt": "2026-09-15T13:49:47.909Z"
+  "savedAt": "2026-09-15T13:51:34.859Z"
 }
