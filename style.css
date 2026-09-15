@@ -906,6 +906,13 @@ body.qd-factor-menu-open { overflow: hidden; }
   background: rgba(4, 9, 16, 0.72);
   backdrop-filter: blur(2px);
 }
+/* The Rename/Duplicate modal (base .overlay, z-index 200) can now be
+   opened FROM inside one of these fullscreen pickers/panels (e.g. the
+   ✏️ Edit button on a Performance Ranking row) — without this, it would
+   render underneath the z-index:500 overlay it was opened on top of and
+   look like nothing happened. Always wins over any single
+   .qd-factor-menu-overlay, whichever one happens to be open behind it. */
+#rename-modal-overlay { z-index: 600; }
 .qd-factor-menu-panel {
   width: min(720px, 92vw);
   height: min(88vh, 860px);
@@ -1867,8 +1874,7 @@ body.dot-mode .origin-dot:hover {
   position: fixed; inset: 0;
   background: rgba(0,0,0,.7);
   backdrop-filter: blur(4px);
-  z-index: 200;
-  /* flex-start (not center) so tall modals dock to the top of the scroll
+  z-index: 200;  /* flex-start (not center) so tall modals dock to the top of the scroll
      area instead of being centered and having their top half pushed off
      -screen and unreachable — a centered flex item in a scrolling
      container can't be scrolled past its own top edge. The modal below
@@ -2715,6 +2721,7 @@ body.dot-mode .origin-dot:hover {
 .taxonomy-ranking-row {
   display: flex;
   align-items: center;
+  flex-wrap: wrap; /* lets a long name's second line push onto its own row instead of squeezing the action buttons */
   gap: 8px;
   padding: 7px 10px;
   border-radius: 8px;
@@ -2723,14 +2730,16 @@ body.dot-mode .origin-dot:hover {
 }
 .taxonomy-ranking-row-icon { flex-shrink: 0; font-size: 13px; }
 .taxonomy-ranking-row-name {
-  flex: 1 1 auto;
-  min-width: 0;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
+  flex: 1 1 160px;
+  min-width: 120px;
+  overflow: visible;
+  text-overflow: clip;
+  white-space: normal;
+  word-break: break-word;
   color: var(--text);
   font-family: 'Crimson Pro', serif;
   font-size: 13px;
+  line-height: 1.35;
 }
 .taxonomy-ranking-row-unassigned {
   flex-shrink: 0;
@@ -2758,6 +2767,22 @@ body.dot-mode .origin-dot:hover {
   transition: background .15s;
 }
 .taxonomy-ranking-row-score:hover { background: rgba(201,162,39,.22); }
+.taxonomy-ranking-row-edit {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 26px; height: 26px;
+  padding: 0;
+  border-radius: 6px;
+  border: 1px solid var(--border);
+  background: rgba(255,255,255,.03);
+  color: var(--text-dim);
+  font-size: 12px;
+  cursor: pointer;
+  transition: background .15s, border-color .15s, color .15s;
+}
+.taxonomy-ranking-row-edit:hover { background: rgba(201,162,39,.12); border-color: var(--gold-dim); color: var(--gold2); }
 .taxonomy-ranking-row-lock {
   flex-shrink: 0;
   display: flex;
@@ -2791,12 +2816,14 @@ body.dot-mode .origin-dot:hover {
   background: rgba(0,0,0,.1);
   color: #111;
 }
+.taxonomy-ranking-row.locked .taxonomy-ranking-row-edit,
 .taxonomy-ranking-row.locked .taxonomy-ranking-row-lock,
 .taxonomy-ranking-row.locked .taxonomy-ranking-row-score {
   border-color: rgba(0,0,0,.35);
   background: rgba(0,0,0,.1);
   color: #111;
 }
+.taxonomy-ranking-row.locked .taxonomy-ranking-row-edit:hover,
 .taxonomy-ranking-row.locked .taxonomy-ranking-row-lock:hover,
 .taxonomy-ranking-row.locked .taxonomy-ranking-row-score:hover {
   background: rgba(0,0,0,.18);

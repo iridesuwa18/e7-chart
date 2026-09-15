@@ -5533,6 +5533,7 @@ function saveRenameModal() {
     }
   }
   renderRteSection(); // reflects the change immediately if the hero modal is open behind this one
+  if (kind !== "factors" && taxonomyRankingOverlayIsOpen()) renderTaxonomyRankingPanel(); // the Ranking overlay can be open behind this modal too
   closeRenameModal();
 }
 
@@ -5743,6 +5744,7 @@ function renderTaxonomyRankingPanel() {
         <span class="taxonomy-ranking-row-icon">${icon}</span>
         <span class="taxonomy-ranking-row-name">${item.name || "(unnamed)"}</span>
         ${heroCount === 0 ? `<span class="taxonomy-ranking-row-unassigned" title="Not assigned to any hero yet">⚠️ Unassigned</span>` : ""}
+        <button type="button" class="taxonomy-ranking-row-edit" data-kind="${kind}" data-id="${item.id}" title="Edit name">✏️</button>
         <button type="button" class="taxonomy-ranking-row-lock" data-kind="${kind}" data-id="${item.id}" title="${item.locked ? "Locked — click to unlock" : "Lock this score so it can't be changed"}">${qdLockIconSvg(item.locked)}</button>
         <button type="button" class="taxonomy-ranking-row-score" data-kind="${kind}" data-id="${item.id}" title="Tap to open the slider">${item.value.toFixed(1)}</button>
       </div>
@@ -5751,6 +5753,12 @@ function renderTaxonomyRankingPanel() {
 
   box.querySelectorAll(".taxonomy-ranking-row-score").forEach(btn => {
     btn.addEventListener("click", () => qdShowRankingSlider(btn.dataset.kind, Number(btn.dataset.id)));
+  });
+  box.querySelectorAll(".taxonomy-ranking-row-edit").forEach(btn => {
+    btn.addEventListener("click", () => {
+      const item = taxonomy[btn.dataset.kind].find(x => x.id === Number(btn.dataset.id));
+      openRenameModal(btn.dataset.kind, Number(btn.dataset.id), item?.name || "");
+    });
   });
   box.querySelectorAll(".taxonomy-ranking-row-lock").forEach(btn => {
     btn.addEventListener("click", () => {
