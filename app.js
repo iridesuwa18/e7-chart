@@ -37,6 +37,13 @@ const RARITY_META = {
 let heroes     = [];
 let selectedId = null;
 
+// True from the moment any local edit happens (hero, taxonomy, draft —
+// anything that flows through saveLocal below) until the next
+// successful push to GitHub or a fresh load/sync from it. Drives the
+// "you've made changes" reminder banner at the top of the Performance
+// Ranking overlay (see updateTaxonomySaveReminder further down).
+let hasUnsavedChanges = false;
+
 /* ═══════════════════════════════════════
    REACTION / ENGAGEMENT / FACTOR TAXONOMY
    (Rebuild Spec Section 1.1)
@@ -98,12 +105,14 @@ function normalizeTaxonomy(t) {
         name: typeof x.name === "string" ? x.name : "",
         value: Math.max(0, Math.min(10, Number(x.value) || 0)),
         pinned: !!x.pinned,
+        locked: !!x.locked,
+        marked: !!x.marked,
         ...(Array.isArray(x.factorIds) ? { factorIds: x.factorIds.slice() } : { factorIds: [] }),
       }))
     : [];
   return {
-    reactions:   cleanList(t.reactions).map(x => ({ id: x.id, name: x.name, value: x.value, pinned: x.pinned, factorIds: x.factorIds })),
-    engagements: cleanList(t.engagements).map(x => ({ id: x.id, name: x.name, value: x.value, pinned: x.pinned, factorIds: x.factorIds })),
+    reactions:   cleanList(t.reactions).map(x => ({ id: x.id, name: x.name, value: x.value, pinned: x.pinned, locked: x.locked, marked: x.marked, factorIds: x.factorIds })),
+    engagements: cleanList(t.engagements).map(x => ({ id: x.id, name: x.name, value: x.value, pinned: x.pinned, locked: x.locked, marked: x.marked, factorIds: x.factorIds })),
     factors:     (Array.isArray(t.factors) ? t.factors : [])
       .filter(x => x && typeof x === "object" && x.id !== undefined)
       .map(x => ({ id: x.id, name: typeof x.name === "string" ? x.name : "", pinned: !!x.pinned })),
@@ -132,7 +141,7 @@ function toggleTaxonomyPin(kind, id) {
    removal and the RTE assignment UI further down, which is read-only
    with respect to value). */
 function addTaxonomyItem(kind, name) {
-  const item = { id: newTaxonomyId(), name: String(name || "").trim(), value: 0, factorIds: [], locked: false };
+  const item = { id: newTaxonomyId(), name: String(name || "").trim(), value: 0, factorIds: [], locked: false, marked: false };
   taxonomy = { ...taxonomy, [kind]: [...taxonomy[kind], item] };
   saveLocal();
   return item;
@@ -157,7 +166,7 @@ function renameTaxonomyItem(kind, id, name) {
 function duplicateTaxonomyItem(kind, id, newName) {
   const item = taxonomy[kind].find(x => x.id === id);
   if (!item) return null;
-  const copy = { ...item, id: newTaxonomyId(), name: String(newName || "").trim(), pinned: false, locked: false, factorIds: [...item.factorIds] };
+  const copy = { ...item, id: newTaxonomyId(), name: String(newName || "").trim(), pinned: false, locked: false, marked: false, factorIds: [...item.factorIds] };
   taxonomy = { ...taxonomy, [kind]: [...taxonomy[kind], copy] };
   saveLocal();
   return copy;
@@ -189,6 +198,19 @@ function toggleTaxonomyItemLock(kind, id) {
   taxonomy = {
     ...taxonomy,
     [kind]: taxonomy[kind].map(x => x.id === id ? { ...x, locked: !x.locked } : x),
+  };
+  saveLocal();
+}
+
+// Toggles the personal "I edited this" bookmark used in the
+// Performance Ranking list (Section 5.4) — teal-blue, purely a memory
+// aid with zero effect on scoring/sorting/locking. Round-trips through
+// save/load like everything else on a taxonomy item, but nothing else
+// in the app ever reads it.
+function toggleTaxonomyItemMarked(kind, id) {
+  taxonomy = {
+    ...taxonomy,
+    [kind]: taxonomy[kind].map(x => x.id === id ? { ...x, marked: !x.marked } : x),
   };
   saveLocal();
 }
@@ -384,6 +406,18 @@ function qdLockIconSvg(locked, size = 13) {
   return locked
     ? `<svg width="${size}" height="${size}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>`
     : `<svg width="${size}" height="${size}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 9.9-1"/></svg>`;
+}
+
+// A purely personal "I edited this" bookmark for the Performance
+// Ranking list — no effect on scoring, sorting, or saving, it just
+// paints the row teal-blue so an editing session is easy to retrace at
+// a glance. Filled when marked, outline when not, same visual language
+// as qdLockIconSvg above.
+function qdMarkIconSvg(marked, size = 13) {
+  const d = "M6 3.5h12a.5.5 0 0 1 .5.5v16.2a.5.5 0 0 1-.77.42L12 16.5l-5.73 4.12a.5.5 0 0 1-.77-.42V4a.5.5 0 0 1 .5-.5z";
+  return marked
+    ? `<svg width="${size}" height="${size}" viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"><path d="${d}"/></svg>`
+    : `<svg width="${size}" height="${size}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><path d="${d}"/></svg>`;
 }
 
 // ── Performance Ranking System (Section 5.4) ──
@@ -1033,6 +1067,21 @@ const fSsScore     = document.getElementById("f-ss-score");
   if (rankingBtn) rankingBtn.addEventListener("click", openTaxonomyRankingOverlay);
   if (rankingOverlay) {
     rankingOverlay.querySelector("#taxonomy-ranking-close")?.addEventListener("click", closeTaxonomyRankingOverlay);
+    // Quick Save — same admin-gated GitHub save as the header's ↑ Save
+    // button, just reachable without leaving the Ranking overlay. Reuses
+    // openAdminGate so a cached password (this session) saves instantly;
+    // otherwise it prompts the same password modal (now above this
+    // overlay — see #admin-overlay's z-index).
+    rankingOverlay.querySelector("#taxonomy-ranking-quicksave")?.addEventListener("click", () => openAdminGate("save"));
+    // Locked/Marked/Unassigned filter chips — each toggles independently
+    // and they combine (AND), see taxonomyRankingFilter.
+    rankingOverlay.querySelectorAll(".taxonomy-ranking-filter-chip").forEach(chip => {
+      chip.addEventListener("click", () => {
+        const key = chip.dataset.filter;
+        taxonomyRankingFilter[key] = !taxonomyRankingFilter[key];
+        renderTaxonomyRankingPanel();
+      });
+    });
   }
   // "Jump to Top" — the header/tabs stay fixed (see the CSS comment on
   // .taxonomy-modal-sticky) but the panel content itself, including the
@@ -1052,18 +1101,25 @@ const fSsScore     = document.getElementById("f-ss-score");
     });
   }
 
-  // Rename modal (opened by each row's ✏️ button) — this one's a single
-  // small field, so unlike the Taxonomy manager above it's fine to
-  // close it on an outside click/Escape, same as the rest of the app's
-  // modals (Admin, Details, etc.).
+  // Rename modal (opened by each row's ✏️ button) — can be triggered
+  // from inside the Performance Ranking overlay, where an accidental
+  // outside tap while renaming shouldn't silently discard the edit. So,
+  // unlike most of the app's other small modals, this one is only
+  // closed via its own Cancel button or Escape — never an outside
+  // click on the backdrop.
   document.getElementById("rename-modal-save").addEventListener("click", saveRenameModal);
   document.getElementById("rename-modal-cancel").addEventListener("click", closeRenameModal);
-  document.getElementById("rename-modal-overlay").addEventListener("click", e => {
-    if (e.target === document.getElementById("rename-modal-overlay")) closeRenameModal();
-  });
   document.getElementById("rename-modal-input").addEventListener("keydown", e => {
     if (e.key === "Enter") { e.preventDefault(); saveRenameModal(); }
     else if (e.key === "Escape") { e.preventDefault(); closeRenameModal(); }
+  });
+  // Live "does this already exist?" suggestions — see
+  // renderRenameModalSuggestions. Re-filters on every keystroke; hides
+  // on blur (delayed so a click on a suggestion registers first).
+  document.getElementById("rename-modal-input").addEventListener("input", renderRenameModalSuggestions);
+  document.getElementById("rename-modal-input").addEventListener("focus", renderRenameModalSuggestions);
+  document.getElementById("rename-modal-input").addEventListener("blur", () => {
+    setTimeout(hideRenameModalSuggestions, 150);
   });
   wireTaxonomyAddRow("taxonomy-add-reaction", "taxonomy-new-reaction", "Reaction", val => {
     const item = addTaxonomyItem("reactions", val);
@@ -5474,6 +5530,7 @@ function openRenameModal(kind, id, currentName) {
   document.getElementById("rename-modal-save").textContent = "Save";
   const input = document.getElementById("rename-modal-input");
   input.value = currentName || "";
+  hideRenameModalSuggestions();
   document.getElementById("rename-modal-overlay").classList.add("open");
   input.focus();
   input.select();
@@ -5490,6 +5547,7 @@ function openDuplicateModal(kind, id, currentName) {
   document.getElementById("rename-modal-save").textContent = "Duplicate";
   const input = document.getElementById("rename-modal-input");
   input.value = currentName ? `${currentName} (copy)` : "";
+  hideRenameModalSuggestions();
   document.getElementById("rename-modal-overlay").classList.add("open");
   input.focus();
   input.select();
@@ -5499,6 +5557,80 @@ function closeRenameModal() {
   document.getElementById("rename-modal-overlay").classList.remove("open");
   document.getElementById("rename-modal-save").textContent = "Save";
   renameModalTarget = null;
+  hideRenameModalSuggestions();
+}
+
+function hideRenameModalSuggestions() {
+  const box = document.getElementById("rename-modal-suggest");
+  if (!box) return;
+  box.style.display = "none";
+  box.innerHTML = "";
+}
+
+// Live "does something like this already exist?" dropdown under the
+// rename modal's text box — only for Reactions/Engagements (Factors
+// have their own separate naming space, so cross-checking against them
+// wouldn't mean anything). Matches against BOTH lists together
+// regardless of which one is currently being renamed, since the whole
+// point is catching an accidental near-duplicate before it's saved,
+// not just duplicates within the same list. Excludes the item
+// currently being renamed (renaming something to its own existing name
+// isn't a "duplicate" worth flagging).
+function renderRenameModalSuggestions() {
+  const box = document.getElementById("rename-modal-suggest");
+  const input = document.getElementById("rename-modal-input");
+  if (!box || !input || !renameModalTarget) return;
+
+  const { kind, id, mode } = renameModalTarget;
+  if (kind !== "reactions" && kind !== "engagements") { hideRenameModalSuggestions(); return; }
+
+  const q = input.value.trim().toLowerCase();
+  if (!q) { hideRenameModalSuggestions(); return; }
+
+  const candidates = [
+    ...taxonomy.reactions.map(item => ({ kind: "reactions", item })),
+    ...taxonomy.engagements.map(item => ({ kind: "engagements", item })),
+  ].filter(({ kind: k, item }) => {
+    if (mode === "rename" && k === kind && item.id === id) return false; // don't suggest itself
+    return (item.name || "").toLowerCase().includes(q);
+  });
+
+  if (!candidates.length) { hideRenameModalSuggestions(); return; }
+
+  // Names starting with what's typed float above ones that merely
+  // contain it somewhere in the middle, then alphabetical; capped at 8
+  // so this can never grow into its own scrollable wall of text.
+  candidates.sort((a, b) => {
+    const an = (a.item.name || "").toLowerCase(), bn = (b.item.name || "").toLowerCase();
+    const aStarts = an.startsWith(q) ? 0 : 1, bStarts = bn.startsWith(q) ? 0 : 1;
+    return aStarts - bStarts || an.localeCompare(bn);
+  });
+
+  box.innerHTML = candidates.slice(0, 8).map(({ kind: k, item }) => {
+    const icon = k === "reactions" ? "⚡" : "🛡";
+    return `
+      <div class="rename-modal-suggest-item" data-name="${escAttr(item.name || "")}">
+        <span class="rename-modal-suggest-item-icon">${icon}</span>
+        <span class="rename-modal-suggest-item-name">${item.name || "(unnamed)"}</span>
+        <span class="rename-modal-suggest-item-score">${item.value.toFixed(1)}</span>
+      </div>
+    `;
+  }).join("");
+
+  // mousedown (not click) fires before the input's blur, and
+  // preventDefault on it stops that blur from happening at all — so
+  // picking a suggestion fills the box without the dropdown flickering
+  // closed-then-reopened, and focus stays put for further editing.
+  box.querySelectorAll(".rename-modal-suggest-item").forEach(row => {
+    row.addEventListener("mousedown", e => {
+      e.preventDefault();
+      input.value = row.dataset.name;
+      hideRenameModalSuggestions();
+      input.focus();
+    });
+  });
+
+  box.style.display = "block";
 }
 
 function saveRenameModal() {
@@ -5614,7 +5746,7 @@ function ensureQdRankingSlider() {
         </div>
       </div>
       <div class="qd-ranking-slider-body">
-        <div class="qd-ranking-slider-value" id="qd-ranking-slider-value">0.0</div>
+        <input type="number" id="qd-ranking-slider-value-input" class="qd-ranking-slider-value-input" min="0" max="10" step="0.1" inputmode="decimal" value="0" />
         <input type="range" id="qd-ranking-slider-input" min="0" max="10" step="0.1" value="0" />
         <div class="qd-ranking-slider-scale"><span>0</span><span>10</span></div>
         <div class="qd-ranking-slider-desc" id="qd-ranking-slider-desc"></div>
@@ -5657,41 +5789,59 @@ function qdShowRankingSlider(kind, id) {
 
   overlay.querySelector("#qd-ranking-slider-title").textContent = `${label} — ${item.name || "(unnamed)"}`;
   const input = overlay.querySelector("#qd-ranking-slider-input");
-  const valueEl = overlay.querySelector("#qd-ranking-slider-value");
+  const valueEl = overlay.querySelector("#qd-ranking-slider-value-input");
   const descEl = overlay.querySelector("#qd-ranking-slider-desc");
   const lockBtn = overlay.querySelector("#qd-ranking-slider-lock-btn");
 
-  const refresh = value => {
-    valueEl.textContent = value.toFixed(1);
-    // Whole numbers only — a 0.1 fine-tuning step is for precision, not
-    // for walking through the narrative ladder, so anything in between
-    // two rungs shows no description at all rather than guessing.
+  // Just repaints both controls + the description from a known-good
+  // value — used on open and once typing is done (blur/Enter), never
+  // mid-keystroke (see applyValue's keepTyping below).
+  const renderDisplay = value => {
+    input.value = value;
+    valueEl.value = value.toFixed(1);
     descEl.textContent = Number.isInteger(value) ? qdPerformanceLadderDescription(value) : "";
   };
   const refreshLockUI = () => {
     const locked = !!taxonomy[kind]?.find(x => x.id === id)?.locked;
     input.disabled = locked;
+    valueEl.disabled = locked;
     lockBtn.innerHTML = `${qdLockIconSvg(locked)} ${locked ? "Locked" : "Lock"}`;
     lockBtn.classList.toggle("locked", locked);
   };
 
-  input.value = item.value;
-  refresh(item.value);
+  renderDisplay(item.value);
   refreshLockUI();
 
-  input.oninput = () => {
-    const value = Number(input.value);
-    refresh(value);
-    setTaxonomyItemValue(kind, id, value); // no-ops while locked — input is also disabled above as the visible half of that
-    // Keep every other view of this same number in sync immediately —
-    // mirrors exactly what the .taxonomy-row-value-input change handler
-    // in renderTaxonomyPanel already does.
+  // Applies a new value from either control, keeps the other control
+  // (and every other view of this same number — its own tab, hero
+  // screens, Quick Draft) in sync, and persists it immediately.
+  // `keepTyping` skips overwriting the number input's own value so a
+  // mid-edit cursor (e.g. typing "7." on the way to "7.5", or briefly
+  // clearing the field) isn't clobbered on every keystroke — the range
+  // slider and everything else still update live either way.
+  const applyValue = (value, { keepTyping = false } = {}) => {
+    const clamped = Math.max(0, Math.min(10, Number.isFinite(value) ? value : 0));
+    input.value = clamped;
+    if (!keepTyping) valueEl.value = clamped.toFixed(1);
+    descEl.textContent = Number.isInteger(clamped) ? qdPerformanceLadderDescription(clamped) : "";
+    setTaxonomyItemValue(kind, id, clamped); // no-ops while locked — both controls are also disabled above as the visible half of that
     const numberInput = document.getElementById(`taxonomy-value-${kind}-${id}`);
-    if (numberInput) numberInput.value = value.toFixed(1);
+    if (numberInput) numberInput.value = clamped.toFixed(1);
     if (taxonomyRankingOverlayIsOpen()) renderTaxonomyRankingPanel();
     renderRteSection();
     if (quickDraftSuggestOpen) renderQuickDraftSuggestions();
   };
+
+  input.oninput = () => applyValue(Number(input.value));
+  valueEl.oninput = () => {
+    if (valueEl.value === "" || valueEl.value === "-") return; // let them keep typing before clamping/persisting
+    applyValue(Number(valueEl.value), { keepTyping: true });
+  };
+  // Blur/Enter is when we normalize the *displayed* text (clamp a typed
+  // 15 down to 10.0, round out a stray "7." to "7.0", etc) — the actual
+  // score was already clamped and persisted on every keystroke above.
+  valueEl.onblur = () => renderDisplay(Math.max(0, Math.min(10, Number(valueEl.value) || 0)));
+  valueEl.onkeydown = e => { if (e.key === "Enter") valueEl.blur(); };
 
   lockBtn.onclick = () => {
     toggleTaxonomyItemLock(kind, id);
@@ -5707,6 +5857,10 @@ function qdShowRankingSlider(kind, id) {
 
 let taxonomyRankingSearchQuery = "";
 
+// Independent, combinable (AND'd) toggle filters for the Performance
+// Ranking list — all false is "All" (no filtering), the default.
+let taxonomyRankingFilter = { locked: false, marked: false, unassigned: false };
+
 // The Performance Ranking System (Section 5.4) — every Reaction AND
 // Engagement together in one score-sorted, vertically-scrolling list,
 // so the whole taxonomy's scoring stays internally consistent at a
@@ -5716,31 +5870,49 @@ function renderTaxonomyRankingPanel() {
   const box = document.getElementById("taxonomy-ranking-list");
   if (!box) return;
 
+  updateTaxonomySaveReminder(); // keep the reminder banner in sync every time this list redraws
+
   const q = taxonomyRankingSearchQuery.trim().toLowerCase();
   const combined = [
     ...taxonomy.reactions.map(item => ({ kind: "reactions", item })),
     ...taxonomy.engagements.map(item => ({ kind: "engagements", item })),
   ]
+    // heroCount computed once up front so both the filter chips and the
+    // row template below can use it without asking twice.
+    .map(x => ({ ...x, heroCount: heroesLinkedToTaxonomyItem(x.kind, x.item.id).length }))
     .filter(({ item }) => !q || (item.name || "").toLowerCase().includes(q))
+    .filter(({ item }) => !taxonomyRankingFilter.locked || item.locked)
+    .filter(({ item }) => !taxonomyRankingFilter.marked || item.marked)
+    .filter(({ heroCount }) => !taxonomyRankingFilter.unassigned || heroCount === 0)
     // Highest score first; ties broken alphabetically so the order
     // stays stable and predictable rather than shuffling on re-render.
     .sort((a, b) => b.item.value - a.item.value || (a.item.name || "").localeCompare(b.item.name || ""));
 
+  // Keep the chip row's pressed-state in sync with taxonomyRankingFilter
+  // every time this list redraws (e.g. after a chip click, or simply on
+  // open) rather than only when a chip itself is clicked.
+  document.querySelectorAll(".taxonomy-ranking-filter-chip").forEach(chip => {
+    chip.classList.toggle("active", !!taxonomyRankingFilter[chip.dataset.filter]);
+  });
+
+  const anyFilterActive = taxonomyRankingFilter.locked || taxonomyRankingFilter.marked || taxonomyRankingFilter.unassigned;
   if (combined.length === 0) {
     box.innerHTML = (taxonomy.reactions.length + taxonomy.engagements.length) === 0
       ? `<div class="taxonomy-empty-note">No Reactions or Engagements yet — add some in their own tabs first.</div>`
-      : `<div class="taxonomy-empty-note">No Reactions or Engagements match your search.</div>`;
+      : anyFilterActive
+        ? `<div class="taxonomy-empty-note">Nothing matches the active filter${q ? " and search" : ""}.</div>`
+        : `<div class="taxonomy-empty-note">No Reactions or Engagements match your search.</div>`;
     return;
   }
 
-  box.innerHTML = combined.map(({ kind, item }) => {
+  box.innerHTML = combined.map(({ kind, item, heroCount }) => {
     const icon = kind === "reactions" ? "⚡" : "🛡";
-    const heroCount = heroesLinkedToTaxonomyItem(kind, item.id).length;
     return `
-      <div class="taxonomy-ranking-row${item.locked ? " locked" : ""}" data-kind="${kind}" data-id="${item.id}">
+      <div class="taxonomy-ranking-row${item.locked ? " locked" : ""}${item.marked ? " marked" : ""}" data-kind="${kind}" data-id="${item.id}">
         <span class="taxonomy-ranking-row-icon">${icon}</span>
         <span class="taxonomy-ranking-row-name">${item.name || "(unnamed)"}</span>
         ${heroCount === 0 ? `<span class="taxonomy-ranking-row-unassigned" title="Not assigned to any hero yet">⚠️ Unassigned</span>` : ""}
+        <button type="button" class="taxonomy-ranking-row-mark${item.marked ? " marked" : ""}" data-kind="${kind}" data-id="${item.id}" title="${item.marked ? "Marked as edited — click to unmark" : "Mark as edited (just a reminder for you)"}">${qdMarkIconSvg(item.marked)}</button>
         <button type="button" class="taxonomy-ranking-row-edit" data-kind="${kind}" data-id="${item.id}" title="Edit name">✏️</button>
         <button type="button" class="taxonomy-ranking-row-lock" data-kind="${kind}" data-id="${item.id}" title="${item.locked ? "Locked — click to unlock" : "Lock this score so it can't be changed"}">${qdLockIconSvg(item.locked)}</button>
         <button type="button" class="taxonomy-ranking-row-score" data-kind="${kind}" data-id="${item.id}" title="Tap to open the slider">${item.value.toFixed(1)}</button>
@@ -5762,6 +5934,12 @@ function renderTaxonomyRankingPanel() {
       toggleTaxonomyItemLock(btn.dataset.kind, Number(btn.dataset.id));
       renderTaxonomyRankingPanel();
       if (taxonomyActiveTab === btn.dataset.kind) renderTaxonomyPanel(btn.dataset.kind);
+    });
+  });
+  box.querySelectorAll(".taxonomy-ranking-row-mark").forEach(btn => {
+    btn.addEventListener("click", () => {
+      toggleTaxonomyItemMarked(btn.dataset.kind, Number(btn.dataset.id));
+      renderTaxonomyRankingPanel();
     });
   });
 }
@@ -6560,7 +6738,18 @@ function applyYSlider() {
    Draft panel the in-memory roster changed.)
 ═══════════════════════════════════════ */
 function saveLocal() {
+  hasUnsavedChanges = true;
+  updateTaxonomySaveReminder();
   window.dispatchEvent(new CustomEvent("chartHeroesUpdated"));
+}
+
+// Shows/hides the teal reminder banner at the top of the Performance
+// Ranking overlay based on hasUnsavedChanges. Safe to call any time —
+// no-ops if the overlay's markup isn't there for some reason.
+function updateTaxonomySaveReminder() {
+  const el = document.getElementById("taxonomy-ranking-save-reminder");
+  if (!el) return;
+  el.style.display = hasUnsavedChanges ? "flex" : "none";
 }
 
 /* ═══════════════════════════════════════
@@ -6691,6 +6880,10 @@ async function autoLoadFromServer() {
       const migrated = migrateHeroTypes(data.heroes);
       heroes = cleanDanglingTaxonomyRefs(migrated, taxonomy);
       saveLocal(); // notifies Draft panel, no browser storage involved
+      // The page just opened with exactly what's on GitHub — not a
+      // local edit, so it shouldn't trip the unsaved-changes reminder.
+      hasUnsavedChanges = false;
+      updateTaxonomySaveReminder();
       renderAll();
     }
 
@@ -7106,6 +7299,11 @@ async function saveToServer(password) {
     // know with certainty that GitHub now matches what this tab has.
     serverSavedAt = lastSavedAt;
     updateLastSavedIndicator();
+    // Everything in memory just made it to GitHub, so there's nothing
+    // left unsaved — clears the Ranking overlay's reminder banner too,
+    // whether this save came from Quick Save or the header's ↑ Save.
+    hasUnsavedChanges = false;
+    updateTaxonomySaveReminder();
     setStatus("✅ Saved to GitHub");
   } catch (e) {
     setStatus("❌ " + e.message);
@@ -7138,6 +7336,10 @@ async function loadFromServer(password) {
       const migrated = migrateHeroTypes(data.heroes);
       heroes = cleanDanglingTaxonomyRefs(migrated, taxonomy);
       saveLocal();
+      // A fresh load from GitHub is in sync by definition — overrides
+      // the dirty flag saveLocal() just set above.
+      hasUnsavedChanges = false;
+      updateTaxonomySaveReminder();
       renderAll();
       if (data.draftData) window.chartDraftData = data.draftData;
       applyLoadedSavedAt(data); // the actual last-saved time, not "not saved this session"

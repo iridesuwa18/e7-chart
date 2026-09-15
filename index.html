@@ -1321,12 +1321,29 @@
     <div class="qd-factor-menu-panel">
       <div class="qd-factor-menu-header">
         <div class="qd-factor-menu-title">📊 Performance Ranking System</div>
-        <button type="button" class="qd-factor-menu-close" id="taxonomy-ranking-close" aria-label="Close">✕</button>
+        <div class="taxonomy-ranking-header-actions">
+          <button type="button" class="taxonomy-ranking-quicksave" id="taxonomy-ranking-quicksave" title="Save everything to GitHub right now">💾 Quick Save</button>
+          <button type="button" class="qd-factor-menu-close" id="taxonomy-ranking-close" aria-label="Close">✕</button>
+        </div>
       </div>
-      <p class="taxonomy-panel-hint">Every Reaction (⚡) and Engagement (🛡) together, ranked highest → lowest score, so you can sanity-check consistency across your whole taxonomy at a glance. Tap a score to open the slider. ⚠️ marks anything not yet assigned to a single hero.</p>
+      <div class="taxonomy-ranking-save-reminder" id="taxonomy-ranking-save-reminder">
+        <span class="taxonomy-ranking-save-reminder-icon">🔵</span>
+        <span>You've made changes that aren't saved yet — tap <strong>Quick Save</strong> above to keep them.</span>
+      </div>
+      <p class="taxonomy-panel-hint">Every Reaction (⚡) and Engagement (🛡) together, ranked highest → lowest score, so you can sanity-check consistency across your whole taxonomy at a glance. Tap a score to open the slider, or the 🔖 to mark one teal as a reminder that you've edited it. ⚠️ marks anything not yet assigned to a single hero.</p>
       <div class="qd-factor-menu-searchbar">
         <input type="text" class="taxonomy-search qd-factor-menu-search" id="taxonomy-search-ranking" autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false" placeholder="🔍 Search Reactions &amp; Engagements…" />
         <button type="button" class="qd-factor-menu-clear" id="taxonomy-search-ranking-clear" title="Clear search" aria-label="Clear search">✕</button>
+      </div>
+      <!-- Filter chips — independent toggles (AND'd together, not
+           radio buttons), so e.g. Locked + Marked can be combined to
+           find things that are both. None active = "All", the default.
+           See taxonomyRankingFilter/renderTaxonomyRankingPanel in
+           app.js. -->
+      <div class="taxonomy-ranking-filter-row" id="taxonomy-ranking-filter-row">
+        <button type="button" class="taxonomy-ranking-filter-chip" data-filter="locked" title="Show only locked scores">🔒 Locked</button>
+        <button type="button" class="taxonomy-ranking-filter-chip" data-filter="marked" title="Show only items you've marked as edited">🔖 Marked</button>
+        <button type="button" class="taxonomy-ranking-filter-chip" data-filter="unassigned" title="Show only items not yet assigned to any hero">⚠️ Unassigned</button>
       </div>
       <div class="taxonomy-ranking-list" id="taxonomy-ranking-list"></div>
     </div>
@@ -1352,13 +1369,20 @@
   <!-- Rename modal (Taxonomy 5.1/5.2's ✏️ edit button) — Reaction,
        Engagement, and Factor names all show as wrapped read-only text
        in their row now instead of a cramped inline input; this is
-       where the actual text entry happens. -->
+       where the actual text entry happens. When renaming/duplicating a
+       Reaction or Engagement, a dropdown of existing Reaction/
+       Engagement names (#rename-modal-suggest) live-filters as you
+       type — see wireRenameModalSuggestions in app.js — purely to help
+       you notice you're about to create a near-duplicate of something
+       that already exists; picking one just fills the text box, it
+       doesn't rename INTO that item. -->
   <div class="overlay" id="rename-modal-overlay">
     <div class="modal" id="rename-modal" style="max-width:380px">
       <div class="modal-title" id="rename-modal-title">Rename</div>
-      <div class="form-group">
+      <div class="form-group rename-modal-input-wrap">
         <label>Name</label>
         <input type="text" id="rename-modal-input" autocomplete="off" spellcheck="false" />
+        <div class="rename-modal-suggest" id="rename-modal-suggest" style="display:none"></div>
       </div>
       <div class="modal-btns">
         <button class="btn btn-gold" id="rename-modal-save">Save</button>

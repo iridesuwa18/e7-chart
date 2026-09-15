@@ -14,6 +14,9 @@
   --blue:      #1e6fa8;
   --blue2:     #3b9fd4;
   --blue-dim:  #0d3550;
+  --teal:      #2dd4bf;
+  --teal2:     #7ce8da;
+  --teal-dim:  #0f3d3a;
   --text:      #dce8f5;
   --text-dim:  #607a90;
   --danger:    #c0392b;
@@ -913,6 +916,11 @@ body.qd-factor-menu-open { overflow: hidden; }
    look like nothing happened. Always wins over any single
    .qd-factor-menu-overlay, whichever one happens to be open behind it. */
 #rename-modal-overlay { z-index: 600; }
+/* Same reasoning applies to the admin password gate — the new Quick
+   Save button inside the Performance Ranking overlay opens it, so it
+   needs to render above that overlay (z-index 500) rather than behind
+   it. */
+#admin-overlay { z-index: 600; }
 .qd-factor-menu-panel {
   width: min(720px, 92vw);
   height: min(88vh, 860px);
@@ -969,6 +977,105 @@ body.qd-factor-menu-open { overflow: hidden; }
   transition: background .15s;
 }
 .qd-factor-menu-close:hover { background: rgba(255,255,255,0.16); }
+
+/* Performance Ranking header extras — Quick Save button that sits next
+   to the ✕ close button, plus the "you've made changes" reminder
+   banner directly under the header (see #taxonomy-ranking-save-reminder
+   below). Scoped to this one overlay's header, not the shared
+   .qd-factor-menu-header used by the Enemy Factors picker / Know More
+   explainer, so those stay untouched. */
+.taxonomy-ranking-header-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-shrink: 0;
+}
+.taxonomy-ranking-quicksave {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  flex-shrink: 0;
+  white-space: nowrap;
+  border: 1.5px solid var(--teal);
+  background: rgba(45,212,191,.12);
+  color: var(--teal2);
+  font-family: 'Cinzel', serif;
+  font-weight: 700;
+  letter-spacing: .03em;
+  border-radius: 999px;
+  padding: 6px 13px;
+  font-size: 10.5px;
+  cursor: pointer;
+  transition: background .15s, box-shadow .15s, transform .1s;
+}
+.taxonomy-ranking-quicksave:hover { background: rgba(45,212,191,.22); box-shadow: 0 0 14px rgba(45,212,191,.35); }
+.taxonomy-ranking-quicksave:active { transform: scale(.96); }
+
+/* Reminder banner — hidden by default (app.js toggles display via
+   updateTaxonomySaveReminder), shown whenever hasUnsavedChanges is
+   true. Teal-blue to visually pair with the Quick Save button and the
+   "marked" row accent below, so the whole "I edited something" story
+   uses one consistent color. */
+.taxonomy-ranking-save-reminder {
+  display: none;
+  align-items: center;
+  gap: 7px;
+  flex: 0 0 auto;
+  margin-bottom: 10px;
+  padding: 8px 12px;
+  border-radius: 8px;
+  border: 1px solid rgba(45,212,191,.4);
+  background: rgba(45,212,191,.09);
+  color: var(--teal2);
+  font-family: 'Crimson Pro', serif;
+  font-size: 12.5px;
+  line-height: 1.3;
+}
+.taxonomy-ranking-save-reminder strong { color: var(--teal); font-family: 'Cinzel', serif; font-size: 11px; letter-spacing: .02em; }
+.taxonomy-ranking-save-reminder-icon { flex-shrink: 0; font-size: 14px; }
+
+/* Filter chips above the Performance Ranking list — Locked/Marked/
+   Unassigned toggle independently and combine (AND), each lighting up
+   in the color that already means that state elsewhere in this list
+   (gold = locked, teal = marked, amber = unassigned) so an active chip
+   reads as a preview of what it's filtering for. */
+.taxonomy-ranking-filter-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  flex: 0 0 auto;
+  margin: 8px 0 10px;
+}
+.taxonomy-ranking-filter-chip {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  border: 1px solid var(--border);
+  background: rgba(255,255,255,.03);
+  color: var(--text-dim);
+  border-radius: 999px;
+  padding: 5px 12px;
+  font-family: 'Crimson Pro', serif;
+  font-size: 11.5px;
+  cursor: pointer;
+  transition: background .15s, border-color .15s, color .15s;
+}
+.taxonomy-ranking-filter-chip:hover { background: rgba(255,255,255,.08); color: var(--text); }
+.taxonomy-ranking-filter-chip[data-filter="locked"].active {
+  border-color: #b8a463;
+  background: rgba(217,201,138,.18);
+  color: #d9c98a;
+}
+.taxonomy-ranking-filter-chip[data-filter="marked"].active {
+  border-color: var(--teal);
+  background: rgba(45,212,191,.18);
+  color: var(--teal2);
+}
+.taxonomy-ranking-filter-chip[data-filter="unassigned"].active {
+  border-color: rgba(224,166,58,.5);
+  background: rgba(224,166,58,.16);
+  color: #e0a63a;
+}
 
 .qd-factor-menu-searchbar {
   position: relative;
@@ -1936,6 +2043,50 @@ body.dot-mode .origin-dot:hover {
 }
 .form-row .form-group { margin-bottom: 0; }
 
+/* Rename modal's live suggestion dropdown — existing Reaction/
+   Engagement names that match what's being typed, so a near-duplicate
+   is obvious before you save it. Absolutely positioned against the
+   input's own wrapper so it floats just below the text box without
+   pushing the Save/Cancel buttons down. */
+.rename-modal-input-wrap { position: relative; }
+.rename-modal-suggest {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  z-index: 20;
+  margin-top: 4px;
+  max-height: 168px;
+  overflow-y: auto;
+  background: var(--bg3);
+  border: 1px solid var(--border);
+  border-top: 2px solid var(--gold-dim);
+  border-radius: 6px;
+  box-shadow: 0 10px 28px rgba(0,0,0,.5);
+}
+.rename-modal-suggest-item {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  padding: 8px 11px;
+  font-family: 'Crimson Pro', serif;
+  font-size: 13px;
+  color: var(--text);
+  cursor: pointer;
+  border-bottom: 1px solid var(--border);
+}
+.rename-modal-suggest-item:last-child { border-bottom: none; }
+.rename-modal-suggest-item:hover,
+.rename-modal-suggest-item.active-hover { background: rgba(201,162,39,.12); }
+.rename-modal-suggest-item-icon { flex-shrink: 0; font-size: 12px; }
+.rename-modal-suggest-item-name { flex: 1 1 auto; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.rename-modal-suggest-item-score {
+  flex-shrink: 0;
+  font-family: 'Cinzel', serif;
+  font-size: 10.5px;
+  color: var(--gold2, #e0c060);
+}
+
 .score-input-group {
   display: flex; gap: 5px;
 }
@@ -2800,6 +2951,44 @@ body.dot-mode .origin-dot:hover {
 }
 .taxonomy-ranking-row-lock:hover { background: rgba(201,162,39,.12); border-color: var(--gold-dim); color: var(--gold2); }
 
+/* "I edited this" marker (bookmark toggle) — purely a personal
+   reminder with no effect on scoring/sorting/saving; teal-blue was
+   chosen specifically so it never gets confused with the gold "locked"
+   styling or the amber "unassigned" pill already used in this list. */
+.taxonomy-ranking-row-mark {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 26px; height: 26px;
+  padding: 0;
+  border-radius: 6px;
+  border: 1px solid var(--border);
+  background: rgba(255,255,255,.03);
+  color: var(--text-dim);
+  cursor: pointer;
+  transition: background .15s, border-color .15s, color .15s;
+}
+.taxonomy-ranking-row-mark:hover { background: rgba(45,212,191,.14); border-color: var(--teal); color: var(--teal2); }
+.taxonomy-ranking-row-mark.marked {
+  border-color: var(--teal);
+  background: rgba(45,212,191,.2);
+  color: var(--teal2);
+}
+.taxonomy-ranking-row-mark.marked:hover { background: rgba(45,212,191,.32); }
+
+/* The row itself picks up a teal left-edge accent + faint tint when
+   marked — an inset box-shadow rather than a plain border so it still
+   shows up even when the row is ALSO .locked (solid gold background,
+   see below) instead of being painted over. */
+.taxonomy-ranking-row.marked {
+  box-shadow: inset 3px 0 0 0 var(--teal);
+  background: rgba(45,212,191,.07);
+}
+.taxonomy-ranking-row.locked.marked {
+  box-shadow: inset 3px 0 0 0 var(--teal-dim);
+}
+
 /* A locked Reaction/Engagement — desaturated yellow, easy on the eyes,
    with near-black text for contrast (per request) rather than the
    usual light-on-dark theme colors used everywhere else in this list. */
@@ -2842,12 +3031,35 @@ body.dot-mode .origin-dot:hover {
   gap: 10px;
   text-align: center;
 }
-.qd-ranking-slider-value {
+.qd-ranking-slider-value-input {
   font-family: 'Cinzel', serif;
   font-size: 40px;
   font-weight: 700;
   color: var(--gold2, #e0c060);
+  background: transparent;
+  border: none;
+  border-bottom: 2px solid transparent;
+  text-align: center;
+  width: 130px;
+  padding: 0 4px 2px;
+  transition: border-color .15s, background .15s;
+  /* Hide the native up/down spinner arrows — this is meant to read as
+     the same big centered number the old read-only div was, just now
+     editable, not as a normal form field. */
+  -moz-appearance: textfield;
 }
+.qd-ranking-slider-value-input::-webkit-outer-spin-button,
+.qd-ranking-slider-value-input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+.qd-ranking-slider-value-input:hover { background: rgba(255,255,255,.03); }
+.qd-ranking-slider-value-input:focus {
+  outline: none;
+  border-bottom-color: var(--gold-dim);
+  background: rgba(201,162,39,.08);
+}
+.qd-ranking-slider-value-input:disabled { opacity: .45; cursor: not-allowed; }
 #qd-ranking-slider-input {
   width: 100%;
   max-width: 420px;
