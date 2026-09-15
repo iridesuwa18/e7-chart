@@ -16906,13 +16906,14 @@
       },
       {
         "id": 1788783486720,
-        "name": "Increase Defense Buff",
+        "name": "BUFF : Increase Defense",
         "value": 7,
         "pinned": false,
         "factorIds": [
           1788694866469,
           1788774099692
-        ]
+        ],
+        "locked": true
       },
       {
         "id": 1788783245423,
@@ -16982,7 +16983,7 @@
       },
       {
         "id": 1788785733011,
-        "name": "Vigor (Undispellable) Buff",
+        "name": "UNDISPELLABLE : BUFF : Vigor",
         "value": 9.5,
         "pinned": false,
         "factorIds": [
@@ -16991,7 +16992,8 @@
           1788774099692,
           1788700781693,
           1788912649792
-        ]
+        ],
+        "locked": true
       },
       {
         "id": 1788785736229,
@@ -17006,12 +17008,13 @@
       },
       {
         "id": 1788785377663,
-        "name": "Decrease buff durations",
-        "value": 7,
+        "name": "EFFECT : Decrease buff durations",
+        "value": 4,
         "pinned": false,
         "factorIds": [
           1788773731924
-        ]
+        ],
+        "locked": true
       },
       {
         "id": 1788785954933,
@@ -17093,12 +17096,13 @@
       },
       {
         "id": 1788912738063,
-        "name": "Extend buff durations",
-        "value": 7,
+        "name": "EFFECT : Extend buff durations",
+        "value": 10,
         "pinned": false,
         "factorIds": [
           1788912501579
-        ]
+        ],
+        "locked": true
       },
       {
         "id": 1788914238894,
@@ -17124,7 +17128,7 @@
       {
         "id": 1788914604468,
         "name": "Rage (Undispellable) Buff",
-        "value": 7.2,
+        "value": 9.5,
         "pinned": false,
         "factorIds": [
           1788785891810,
@@ -17132,7 +17136,8 @@
           1788701036557,
           1788700781693,
           1788912649792
-        ]
+        ],
+        "locked": true
       },
       {
         "id": 1788924109560,
@@ -17315,14 +17320,15 @@
       },
       {
         "id": 1789129986550,
-        "name": "Increase Critical Hit Resistance Buff",
+        "name": "BUFF : Increase Critical Hit Resistance",
         "value": 7,
         "pinned": false,
         "factorIds": [
           1788774921178,
           1788694866469,
           1788774099692
-        ]
+        ],
+        "locked": true
       },
       {
         "id": 1789131692127,
@@ -17347,12 +17353,13 @@
       },
       {
         "id": 1789132233866,
-        "name": "Unable to be buffed on enemies",
-        "value": 9.5,
+        "name": "DEBUFF : Unable to be buffed",
+        "value": 4.5,
         "pinned": false,
         "factorIds": [
           1788773731924
-        ]
+        ],
+        "locked": true
       },
       {
         "id": 1789132307453,
@@ -17472,8 +17479,8 @@
       },
       {
         "id": 1789135829243,
-        "name": "Cascade (Undispellable) Buff",
-        "value": 7,
+        "name": "UNDISPELLABLE : BUFF : Cascade",
+        "value": 9.5,
         "pinned": false,
         "factorIds": [
           1788701036557,
@@ -17484,7 +17491,8 @@
           1788700420912,
           1788700781693,
           1788912649792
-        ]
+        ],
+        "locked": true
       },
       {
         "id": 1789136009020,
@@ -17554,7 +17562,7 @@
       {
         "id": 1789176410307,
         "name": "EFFECT : Decrease debuff durations",
-        "value": 4,
+        "value": 10,
         "pinned": false,
         "factorIds": [
           1788700781693
@@ -18528,5 +18536,5 @@
     ]
   },
   "schemaVersion": 2,
-  "savedAt": "2026-09-15T13:44:15.038Z"
+  "savedAt": "2026-09-15T13:49:47.909Z"
 }
