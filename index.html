@@ -1193,7 +1193,10 @@
     <div class="modal taxonomy-modal" id="taxonomy-modal">
       <div class="taxonomy-modal-sticky">
         <div class="details-modal-header">
-          <div class="modal-title" style="margin:0;padding:0;border:none">REACTIONS · ENGAGEMENTS · FACTORS</div>
+          <div class="taxonomy-modal-title-row">
+            <div class="modal-title" style="margin:0;padding:0;border:none">REACTIONS · ENGAGEMENTS · FACTORS</div>
+            <button type="button" class="btn btn-ghost btn-sm" id="taxonomy-ranking-btn" title="Every Reaction &amp; Engagement in one score-sorted fullscreen list">📊 Ranking</button>
+          </div>
           <button class="det-close-btn" id="taxonomy-close">×</button>
         </div>
 
@@ -1302,6 +1305,30 @@
           <div class="taxonomy-list" id="taxonomy-list-factors"></div>
         </div>
       </div>
+    </div>
+  </div>
+
+  <!-- Performance Ranking System — every Reaction AND Engagement
+       together in one vertical, scrollable, score-sorted, fullscreen
+       list. Opened via the "📊 Ranking" button next to the Taxonomy
+       modal's title (not a tab — it floods the whole screen the same
+       way the Enemy Factors picker / Know More explainer do, see
+       .qd-factor-menu-overlay). Tap a score to open the same 0–10
+       slider popup used in the Reactions/Engagements tabs (see
+       ensureQdRankingSlider in app.js). Anything with 0 heroes linked
+       is flagged so gaps in the roster's tagging are obvious at a glance. -->
+  <div class="qd-factor-menu-overlay" id="taxonomy-ranking-overlay" style="display:none">
+    <div class="qd-factor-menu-panel">
+      <div class="qd-factor-menu-header">
+        <div class="qd-factor-menu-title">📊 Performance Ranking System</div>
+        <button type="button" class="qd-factor-menu-close" id="taxonomy-ranking-close" aria-label="Close">✕</button>
+      </div>
+      <p class="taxonomy-panel-hint">Every Reaction (⚡) and Engagement (🛡) together, ranked highest → lowest score, so you can sanity-check consistency across your whole taxonomy at a glance. Tap a score to open the slider. ⚠️ marks anything not yet assigned to a single hero.</p>
+      <div class="qd-factor-menu-searchbar">
+        <input type="text" class="taxonomy-search qd-factor-menu-search" id="taxonomy-search-ranking" autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false" placeholder="🔍 Search Reactions &amp; Engagements…" />
+        <button type="button" class="qd-factor-menu-clear" id="taxonomy-search-ranking-clear" title="Clear search" aria-label="Clear search">✕</button>
+      </div>
+      <div class="taxonomy-ranking-list" id="taxonomy-ranking-list"></div>
     </div>
   </div>
 

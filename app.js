@@ -355,6 +355,35 @@ function taxonomyName(kind, id) {
   return item ? item.name : "(deleted)";
 }
 
+// ── Performance Ranking System (Section 5.4) ──
+// The narrative ladder shown under the 0–10 slider (see
+// ensureQdRankingSlider) — every whole number has a description of how
+// consistently/reliably a Reaction or Engagement is actually "active"
+// (relevant, triggering) over the course of a match, so a score can be
+// picked by matching a description instead of guessing a number.
+const QD_PERFORMANCE_LADDER = [
+  { value: 10, desc: "Active throughout the game" },
+  { value: 9,  desc: "Active almost the entire game, with only rare gaps" },
+  { value: 8,  desc: "Active very frequently, with only occasional gaps" },
+  { value: 7,  desc: "Active through both enemy and player actions" },
+  { value: 6,  desc: "Active through most enemy or player actions, fairly reliable" },
+  { value: 5,  desc: "Active through either an enemy or player's actions" },
+  { value: 4,  desc: "Active through enemy or player actions, but inconsistently" },
+  { value: 3,  desc: "Active only through a slight RNG" },
+  { value: 2,  desc: "Active only through noticeable RNG, rarely triggers" },
+  { value: 1,  desc: "Active only through pure luck" },
+  { value: 0,  desc: "Not useful at all" },
+];
+// Snaps any value (including the fractional ones the number input still
+// allows) to its nearest ladder rung for display purposes only — the
+// stored value itself is untouched.
+function qdPerformanceLadderDescription(value) {
+  const rung = QD_PERFORMANCE_LADDER.reduce((closest, entry) =>
+    Math.abs(entry.value - value) < Math.abs(closest.value - value) ? entry : closest
+  );
+  return rung.desc;
+}
+
 // Every Reaction/Engagement tagged against a given Factor id — this is
 // the lookup Section 8's recommendation engine will run per ticked
 // Factor ("look up every Reaction and Engagement tagged with that
@@ -959,6 +988,24 @@ const fSsScore     = document.getElementById("f-ss-score");
   document.querySelectorAll(".taxonomy-tab").forEach(btn => {
     btn.addEventListener("click", () => switchTaxonomyTab(btn.dataset.tab));
   });
+
+  // Performance Ranking System — fullscreen overlay, not a tab (see
+  // openTaxonomyRankingOverlay). This one DOES close on backdrop-tap/
+  // Escape, matching the Enemy Factors picker / Know More explainer it
+  // shares its shell with — it's a read-mostly list (only the slider
+  // popup on top of it actually edits anything), so an accidental
+  // outside tap here can't discard mid-edit work the way it could on
+  // the main Taxonomy modal above.
+  const rankingBtn = document.getElementById("taxonomy-ranking-btn");
+  const rankingOverlay = document.getElementById("taxonomy-ranking-overlay");
+  if (rankingBtn) rankingBtn.addEventListener("click", openTaxonomyRankingOverlay);
+  if (rankingOverlay) {
+    rankingOverlay.querySelector("#taxonomy-ranking-close")?.addEventListener("click", closeTaxonomyRankingOverlay);
+    rankingOverlay.addEventListener("click", e => { if (e.target === rankingOverlay) closeTaxonomyRankingOverlay(); });
+  }
+  document.addEventListener("keydown", e => {
+    if (e.key === "Escape" && taxonomyRankingOverlayIsOpen()) closeTaxonomyRankingOverlay();
+  });
   // "Jump to Top" — the header/tabs stay fixed (see the CSS comment on
   // .taxonomy-modal-sticky) but the panel content itself, including the
   // search bar sitting near the top of whichever tab is open, scrolls
@@ -1066,6 +1113,18 @@ const fSsScore     = document.getElementById("f-ss-score");
     addFactor(val);
     renderQdFactorChips(); // Section 8.1 checklist — new Factor shows up immediately
   });
+
+  // Ranking tab's search box — simpler than wireTaxonomySearch above
+  // since it spans both kinds at once and has no "+ quick add" concept
+  // (you can't "add" a combined Reaction/Engagement row).
+  (() => {
+    const input = document.getElementById("taxonomy-search-ranking");
+    const clearBtn = document.getElementById("taxonomy-search-ranking-clear");
+    if (!input) return;
+    const apply = () => { taxonomyRankingSearchQuery = input.value; renderTaxonomyRankingPanel(); };
+    input.addEventListener("input", apply);
+    wireTaxonomySearchClear(input, clearBtn, apply);
+  })();
 
   // Quick-fill chips (Increase/Decrease/Passive/Buff/Debuff/Dispel) sit
   // under each tab's search box — clicking one fills/appends that word
@@ -5472,11 +5531,169 @@ function switchTaxonomyTab(tab) {
   else renderTaxonomyPanel(tab);
 }
 
+// Performance Ranking System — a fullscreen overlay (not a tab; see
+// .qd-factor-menu-overlay/-panel, shared with the Enemy Factors picker
+// and Know More explainer), opened via the "📊 Ranking" button next to
+// the Taxonomy modal's own title.
+function openTaxonomyRankingOverlay() {
+  const overlay = document.getElementById("taxonomy-ranking-overlay");
+  if (!overlay) return;
+  renderTaxonomyRankingPanel();
+  overlay.style.display = "flex";
+  document.body.classList.add("qd-factor-menu-open");
+}
+function closeTaxonomyRankingOverlay() {
+  const overlay = document.getElementById("taxonomy-ranking-overlay");
+  if (!overlay) return;
+  overlay.style.display = "none";
+  document.body.classList.remove("qd-factor-menu-open");
+}
+function taxonomyRankingOverlayIsOpen() {
+  const overlay = document.getElementById("taxonomy-ranking-overlay");
+  return !!overlay && overlay.style.display !== "none";
+}
+
 // Case-insensitive substring match against the current tab's search box.
 function taxonomyMatchesSearch(kind, name) {
   const q = (taxonomySearchQuery[kind] || "").trim().toLowerCase();
   if (!q) return true;
   return (name || "").toLowerCase().includes(q);
+}
+
+let qdRankingSliderEl = null;
+
+// The 0–10 score slider popup — shared by the Performance Ranking list
+// AND the normal Reactions/Engagements tabs (via the 🎚 button next to
+// each row's number input), so there's exactly one way this works
+// everywhere. Reuses the same fullscreen overlay+panel shell as the
+// Enemy Factors picker / Know More explainer (.qd-factor-menu-*) so it
+// scales to any screen size the same way they do.
+function ensureQdRankingSlider() {
+  if (qdRankingSliderEl) return qdRankingSliderEl;
+
+  const overlay = document.createElement("div");
+  overlay.className = "qd-factor-menu-overlay";
+  overlay.id = "qd-ranking-slider";
+  overlay.style.display = "none";
+  overlay.innerHTML = `
+    <div class="qd-factor-menu-panel">
+      <div class="qd-factor-menu-header">
+        <div class="qd-factor-menu-title" id="qd-ranking-slider-title">Set Score</div>
+        <button type="button" class="qd-factor-menu-close" id="qd-ranking-slider-close" aria-label="Close">✕</button>
+      </div>
+      <div class="qd-ranking-slider-body">
+        <div class="qd-ranking-slider-value" id="qd-ranking-slider-value">0.0</div>
+        <input type="range" id="qd-ranking-slider-input" min="0" max="10" step="1" value="0" />
+        <div class="qd-ranking-slider-scale"><span>0</span><span>10</span></div>
+        <div class="qd-ranking-slider-desc" id="qd-ranking-slider-desc"></div>
+      </div>
+    </div>
+  `;
+  document.body.appendChild(overlay);
+  qdRankingSliderEl = overlay;
+
+  const closeSlider = () => {
+    overlay.style.display = "none";
+    document.body.classList.remove("qd-factor-menu-open");
+  };
+  overlay.querySelector("#qd-ranking-slider-close").addEventListener("click", closeSlider);
+  overlay.addEventListener("click", e => { if (e.target === overlay) closeSlider(); });
+  document.addEventListener("keydown", e => {
+    if (e.key === "Escape" && overlay.style.display !== "none") closeSlider();
+  });
+
+  return overlay;
+}
+
+// Opens the slider popup for one Reaction/Engagement, live-saving on
+// every drag (same "no confirm step" philosophy as the rest of Quick
+// Draft/Taxonomy) and refreshing every screen that reads this value —
+// the number input back in its own tab, any hero's open edit screen,
+// live Quick Draft suggestions, and the Performance Ranking list.
+function qdShowRankingSlider(kind, id) {
+  const overlay = ensureQdRankingSlider();
+  const item = taxonomy[kind]?.find(x => x.id === id);
+  if (!item) return;
+  const label = kind === "reactions" ? "⚡ Reaction" : "🛡 Engagement";
+
+  overlay.querySelector("#qd-ranking-slider-title").textContent = `${label} — ${item.name || "(unnamed)"}`;
+  const input = overlay.querySelector("#qd-ranking-slider-input");
+  const valueEl = overlay.querySelector("#qd-ranking-slider-value");
+  const descEl = overlay.querySelector("#qd-ranking-slider-desc");
+
+  const refresh = value => {
+    valueEl.textContent = value.toFixed(1);
+    descEl.textContent = qdPerformanceLadderDescription(value);
+  };
+  // Snapped to the nearest whole rung for the slider's own position —
+  // the ladder descriptions only exist at whole numbers — but a value
+  // set more precisely via the number input (e.g. 6.5) still displays
+  // accurately above the slider until it's actually dragged.
+  input.value = Math.round(item.value);
+  refresh(item.value);
+
+  input.oninput = () => {
+    const value = Number(input.value);
+    refresh(value);
+    setTaxonomyItemValue(kind, id, value);
+    // Keep every other view of this same number in sync immediately —
+    // mirrors exactly what the .taxonomy-row-value-input change handler
+    // in renderTaxonomyPanel already does.
+    const numberInput = document.getElementById(`taxonomy-value-${kind}-${id}`);
+    if (numberInput) numberInput.value = value.toFixed(1);
+    if (taxonomyRankingOverlayIsOpen()) renderTaxonomyRankingPanel();
+    renderRteSection();
+    if (quickDraftSuggestOpen) renderQuickDraftSuggestions();
+  };
+
+  overlay.style.display = "flex";
+  document.body.classList.add("qd-factor-menu-open");
+}
+
+let taxonomyRankingSearchQuery = "";
+
+// The Performance Ranking System (Section 5.4) — every Reaction AND
+// Engagement together in one score-sorted, vertically-scrolling list,
+// so the whole taxonomy's scoring stays internally consistent at a
+// glance instead of having to flip between two separate tabs to
+// compare, say, a 7-scored Reaction against an 8-scored Engagement.
+function renderTaxonomyRankingPanel() {
+  const box = document.getElementById("taxonomy-ranking-list");
+  if (!box) return;
+
+  const q = taxonomyRankingSearchQuery.trim().toLowerCase();
+  const combined = [
+    ...taxonomy.reactions.map(item => ({ kind: "reactions", item })),
+    ...taxonomy.engagements.map(item => ({ kind: "engagements", item })),
+  ]
+    .filter(({ item }) => !q || (item.name || "").toLowerCase().includes(q))
+    // Highest score first; ties broken alphabetically so the order
+    // stays stable and predictable rather than shuffling on re-render.
+    .sort((a, b) => b.item.value - a.item.value || (a.item.name || "").localeCompare(b.item.name || ""));
+
+  if (combined.length === 0) {
+    box.innerHTML = (taxonomy.reactions.length + taxonomy.engagements.length) === 0
+      ? `<div class="taxonomy-empty-note">No Reactions or Engagements yet — add some in their own tabs first.</div>`
+      : `<div class="taxonomy-empty-note">No Reactions or Engagements match your search.</div>`;
+    return;
+  }
+
+  box.innerHTML = combined.map(({ kind, item }) => {
+    const icon = kind === "reactions" ? "⚡" : "🛡";
+    const heroCount = heroesLinkedToTaxonomyItem(kind, item.id).length;
+    return `
+      <div class="taxonomy-ranking-row" data-kind="${kind}" data-id="${item.id}">
+        <span class="taxonomy-ranking-row-icon">${icon}</span>
+        <span class="taxonomy-ranking-row-name">${item.name || "(unnamed)"}</span>
+        ${heroCount === 0 ? `<span class="taxonomy-ranking-row-unassigned" title="Not assigned to any hero yet">⚠️ Unassigned</span>` : ""}
+        <button type="button" class="taxonomy-ranking-row-score" data-kind="${kind}" data-id="${item.id}" title="Tap to open the slider">${item.value.toFixed(1)}</button>
+      </div>
+    `;
+  }).join("");
+
+  box.querySelectorAll(".taxonomy-ranking-row-score").forEach(btn => {
+    btn.addEventListener("click", () => qdShowRankingSlider(btn.dataset.kind, Number(btn.dataset.id)));
+  });
 }
 
 // Shared renderer for the Reactions and Engagements panels (5.1). Each
@@ -5509,6 +5726,7 @@ function renderTaxonomyPanel(kind) {
         <div class="taxonomy-row-value">
           <label for="taxonomy-value-${kind}-${item.id}">Value</label>
           <input type="number" id="taxonomy-value-${kind}-${item.id}" class="taxonomy-row-value-input" min="0" max="10" step="0.1" value="${item.value.toFixed(1)}" data-kind="${kind}" data-id="${item.id}" title="Fixed score (0-10) used everywhere this ${label} is assigned" />
+          <button type="button" class="taxonomy-row-slider-btn" data-kind="${kind}" data-id="${item.id}" title="Open the slider (with the Performance Ranking description) instead">🎚</button>
         </div>
         <button type="button" class="btn btn-ghost btn-xs taxonomy-row-tagbtn" data-kind="${kind}" data-id="${item.id}">🏷 Factors (${item.factorIds.length})</button>
         <button type="button" class="btn btn-ghost btn-xs taxonomy-row-herobtn" data-kind="${kind}" data-id="${item.id}" title="Search a hero and add this ${label} to them instantly, without opening their edit screen">➕ Add to Hero${heroCount ? ` (${heroCount})` : ""}</button>
@@ -5546,6 +5764,9 @@ function renderTaxonomyPanel(kind) {
       renderRteSection(); // any hero currently open needs its live score badges refreshed
       if (quickDraftSuggestOpen) renderQuickDraftSuggestions(); // scores feed Quick Draft too
     });
+  });
+  box.querySelectorAll(".taxonomy-row-slider-btn").forEach(btn => {
+    btn.addEventListener("click", () => qdShowRankingSlider(btn.dataset.kind, Number(btn.dataset.id)));
   });
   box.querySelectorAll(".taxonomy-row-delete").forEach(btn => {
     btn.addEventListener("click", () => {
