@@ -922,6 +922,9 @@
       "reactions": [
         {
           "refId": 1788780327120
+        },
+        {
+          "refId": 1789478508170
         }
       ],
       "engagements": [
@@ -936,9 +939,6 @@
         },
         {
           "refId": 1788927609636
-        },
-        {
-          "refId": 1788913999604
         },
         {
           "refId": 1789014762306
@@ -2769,9 +2769,6 @@
         },
         {
           "refId": 1788700311844
-        },
-        {
-          "refId": 1788913999604
         }
       ],
       "selfishScore": 4,
@@ -8737,7 +8734,11 @@
         "hType": "SUR",
         "hScore": 6
       },
-      "reactions": [],
+      "reactions": [
+        {
+          "refId": 1789478508170
+        }
+      ],
       "engagements": [],
       "selfishScore": 0,
       "selflessScore": 0,
@@ -15810,7 +15811,7 @@
       },
       {
         "id": 1788780122184,
-        "name": "Fighting Spirit (React)",
+        "name": "RESOURCE : Fighting Spirit (React)",
         "value": 6,
         "pinned": false,
         "factorIds": [
@@ -15820,7 +15821,8 @@
           1788775427431,
           1788786300042,
           1788913802940
-        ]
+        ],
+        "locked": true
       },
       {
         "id": 1788783157740,
@@ -16016,8 +16018,8 @@
       },
       {
         "id": 1789134378369,
-        "name": "Focus (React)",
-        "value": 8,
+        "name": "RESOURCE : Focus (React)",
+        "value": 6,
         "pinned": false,
         "factorIds": [
           1788773895734,
@@ -16026,7 +16028,8 @@
           1788775427431,
           1788786300042,
           1788913802940
-        ]
+        ],
+        "locked": true
       },
       {
         "id": 1789136659023,
@@ -16240,14 +16243,15 @@
       },
       {
         "id": 1789202101550,
-        "name": "Cannot exceed caster's Speed passive",
+        "name": "PASSIVE : Cannot exceed caster's Speed",
         "value": 10,
         "pinned": false,
         "factorIds": [
           1788773895734,
           1788694866469,
           1788774099692
-        ]
+        ],
+        "locked": true
       },
       {
         "id": 1789202456049,
@@ -16693,6 +16697,15 @@
           1788694866469,
           1788774099692
         ]
+      },
+      {
+        "id": 1789478508170,
+        "name": "PASSIVE : Soul Reduction / Usage %",
+        "value": 9,
+        "factorIds": [
+          1788913836890
+        ],
+        "locked": false
       }
     ],
     "engagements": [
@@ -16796,13 +16809,14 @@
       },
       {
         "id": 1788773060667,
-        "name": "AOE attack",
-        "value": 5,
+        "name": "ATTACK : AOE",
+        "value": 10,
         "pinned": true,
         "factorIds": [
           1788773130306,
           1788773216100
-        ]
+        ],
+        "locked": true
       },
       {
         "id": 1788773067411,
@@ -16970,13 +16984,14 @@
       },
       {
         "id": 1788785736229,
-        "name": "Decrease Attack to enemies",
-        "value": 5,
+        "name": "DEBUFF : Decrease Attack",
+        "value": 4,
         "pinned": false,
         "factorIds": [
           1788694866469,
           1788774099692
-        ]
+        ],
+        "locked": true
       },
       {
         "id": 1788785377663,
@@ -17075,22 +17090,24 @@
       },
       {
         "id": 1788914238894,
-        "name": "Provoke enemies",
-        "value": 6,
+        "name": "DEBUFF : Provoke",
+        "value": 4,
         "pinned": false,
         "factorIds": [
           1788694866469,
           1788774099692
-        ]
+        ],
+        "locked": true
       },
       {
         "id": 1788913999604,
-        "name": "Soul removal / decrease",
-        "value": 6.5,
+        "name": "EFFECT : Soul removal",
+        "value": 4,
         "pinned": false,
         "factorIds": [
           1788913836890
-        ]
+        ],
+        "locked": true
       },
       {
         "id": 1788914604468,
@@ -17149,12 +17166,13 @@
       },
       {
         "id": 1789015361909,
-        "name": "Continuous healing buff",
-        "value": 5,
+        "name": "BUFF : Continuous healing",
+        "value": 7,
         "pinned": false,
         "factorIds": [
           1789015311206
-        ]
+        ],
+        "locked": true
       },
       {
         "id": 1789114206059,
@@ -17214,12 +17232,13 @@
       },
       {
         "id": 1789116549901,
-        "name": "Unhealable to enemies",
-        "value": 6,
+        "name": "DEBUFF : Unhealable",
+        "value": 4,
         "pinned": false,
         "factorIds": [
           1789116584346
-        ]
+        ],
+        "locked": true
       },
       {
         "id": 1789116663470,
@@ -17356,15 +17375,16 @@
       },
       {
         "id": 1789133085456,
-        "name": "Burn enemies",
-        "value": 6.2,
+        "name": "DEBUFF : Burn effect",
+        "value": 4,
         "pinned": false,
         "factorIds": [
           1788701036557,
           1788700420912,
           1788772992919,
           1789014978867
-        ]
+        ],
+        "locked": true
       },
       {
         "id": 1789133298898,
@@ -17668,15 +17688,16 @@
       },
       {
         "id": 1789198537752,
-        "name": "Bleed on enemies",
-        "value": 6.2,
+        "name": "DEBUFF : Bleed effect",
+        "value": 4,
         "pinned": false,
         "factorIds": [
           1788701036557,
           1788700420912,
           1788772992919,
           1789014978867
-        ]
+        ],
+        "locked": true
       },
       {
         "id": 1789198804604,
@@ -17744,14 +17765,15 @@
       },
       {
         "id": 1789201180270,
-        "name": "Death Sentence (Undispellable) on enemies",
-        "value": 5,
+        "name": "UNDISPELLABLE : DEBUFF : Death Sentence",
+        "value": 9,
         "pinned": false,
         "factorIds": [
           1788701036557,
           1788700420912,
           1789014978867
-        ]
+        ],
+        "locked": true
       },
       {
         "id": 1789201317168,
@@ -18498,5 +18520,5 @@
     ]
   },
   "schemaVersion": 2,
-  "savedAt": "2026-09-15T13:08:24.760Z"
+  "savedAt": "2026-09-15T13:24:55.003Z"
 }
