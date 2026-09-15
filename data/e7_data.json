@@ -16817,13 +16817,14 @@
       },
       {
         "id": 1788779840121,
-        "name": "Beguile to enemies",
+        "name": "DEBUFF : Beguile effect",
         "value": 4,
         "pinned": false,
         "factorIds": [
           1788700420912,
           1788701036557
-        ]
+        ],
+        "locked": true
       },
       {
         "id": 1788780377530,
@@ -16849,13 +16850,14 @@
       },
       {
         "id": 1788780430787,
-        "name": "Fighting Spirit (Engage)",
+        "name": "RESOURCE : Fighting Spirit (Engage)",
         "value": 5,
         "pinned": false,
         "factorIds": [
           1788783972533,
           1788785891810
-        ]
+        ],
+        "locked": true
       },
       {
         "id": 1788782920388,
@@ -17125,15 +17127,16 @@
       },
       {
         "id": 1789014762306,
-        "name": "Increase crit chance buff",
-        "value": 5,
+        "name": "BUFF : Increase crit chance",
+        "value": 7,
         "pinned": false,
         "factorIds": [
           1788772992919,
           1789116366949,
           1788786571272,
           1789191623914
-        ]
+        ],
+        "locked": true
       },
       {
         "id": 1789015241813,
@@ -17366,7 +17369,7 @@
       {
         "id": 1789133298898,
         "name": "DAMAGE : Detonation on debuffs (erosion/poison/venom/burn/bleed/bomb)",
-        "value": 5,
+        "value": 10,
         "pinned": false,
         "factorIds": [
           1788772992919,
@@ -17377,13 +17380,14 @@
       },
       {
         "id": 1789134498394,
-        "name": "Focus (Engage)",
+        "name": "RESOURCE : Focus (Engage)",
         "value": 5,
         "pinned": false,
         "factorIds": [
           1788783972533,
           1788785891810
-        ]
+        ],
+        "locked": true
       },
       {
         "id": 1789134890095,
@@ -18494,5 +18498,5 @@
     ]
   },
   "schemaVersion": 2,
-  "savedAt": "2026-09-15T13:04:46.425Z"
+  "savedAt": "2026-09-15T13:08:24.760Z"
 }
