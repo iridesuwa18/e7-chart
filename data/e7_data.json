@@ -16983,7 +16983,7 @@
       },
       {
         "id": 1788785733011,
-        "name": "UNDISPELLABLE : BUFF : Vigor",
+        "name": "UNDISPELLABLE : BUFF : Vigor (Atk and Def)",
         "value": 9.5,
         "pinned": false,
         "factorIds": [
@@ -17127,7 +17127,7 @@
       },
       {
         "id": 1788914604468,
-        "name": "UNDISPELLABLE : BUFF : Rage",
+        "name": "UNDISPELLABLE : BUFF : Rage (Atk and Spd)",
         "value": 9.5,
         "pinned": false,
         "factorIds": [
@@ -17479,7 +17479,7 @@
       },
       {
         "id": 1789135829243,
-        "name": "UNDISPELLABLE : BUFF : Cascade",
+        "name": "UNDISPELLABLE : BUFF : Cascade (Add. Dmg)",
         "value": 9.5,
         "pinned": false,
         "factorIds": [
@@ -17583,7 +17583,7 @@
       },
       {
         "id": 1789178324173,
-        "name": "UNDISPELLABLE : BUFF: Rampage",
+        "name": "UNDISPELLABLE : BUFF: Rampage (Spd and Eva)",
         "value": 9.5,
         "pinned": false,
         "factorIds": [
@@ -17651,8 +17651,8 @@
       },
       {
         "id": 1789195970804,
-        "name": "Perception - Crit Chance and Dmg (Undispellable) Buff",
-        "value": 7.8,
+        "name": "UNDISPELLABLE : BUFF : Perception (Crit Chance and Dmg)",
+        "value": 9.5,
         "pinned": false,
         "factorIds": [
           1788772992919,
@@ -17661,7 +17661,8 @@
           1788786571272,
           1789116366949,
           1789191623914
-        ]
+        ],
+        "locked": true
       },
       {
         "id": 1789197410409,
@@ -17689,8 +17690,8 @@
       },
       {
         "id": 1789198155998,
-        "name": "Increase Critical Hit Damage Buff",
-        "value": 7.5,
+        "name": "BUFF : Increase Critical Hit Damage",
+        "value": 7,
         "pinned": false,
         "factorIds": [
           1788772992919,
@@ -17699,7 +17700,8 @@
           1788773130306,
           1788774033143,
           1788786248167
-        ]
+        ],
+        "locked": true
       },
       {
         "id": 1789198537752,
@@ -17731,7 +17733,7 @@
       },
       {
         "id": 1789199806462,
-        "name": "UNDISPELLABLE : BUFF: Challenge",
+        "name": "UNDISPELLABLE : BUFF: Challenge (Counter)",
         "value": 9.5,
         "pinned": false,
         "factorIds": [
@@ -17871,25 +17873,27 @@
       },
       {
         "id": 1789209851847,
-        "name": "Effectiveness (Undispellable) Buff",
-        "value": 7.5,
+        "name": "UNDISPELLABLE : BUFF : Effectiveness",
+        "value": 9.5,
         "pinned": false,
         "factorIds": [
           1789014978867,
           1788700781693,
           1788912649792
-        ]
+        ],
+        "locked": true
       },
       {
         "id": 1789209870815,
-        "name": "Speed (Undispellable) Buff",
-        "value": 7.8,
+        "name": "UNDISPELLABLE : BUFF : Speed",
+        "value": 9.5,
         "pinned": false,
         "factorIds": [
           1788785891810,
           1788912649792,
           1788700781693
-        ]
+        ],
+        "locked": true
       },
       {
         "id": 1789210263222,
@@ -18096,13 +18100,14 @@
       },
       {
         "id": 1789296401576,
-        "name": "Copies buffs (regardless of hit)",
-        "value": 7.7,
+        "name": "EFFECT : Copies buffs regardless of hit",
+        "value": 9,
         "pinned": false,
         "factorIds": [
           1788773731924,
           1789014978867
-        ]
+        ],
+        "locked": true
       },
       {
         "id": 1789297429599,
@@ -18174,14 +18179,15 @@
       },
       {
         "id": 1789300374834,
-        "name": "Concealment (Undispellable) Buff",
-        "value": 9,
+        "name": "UNDISPELLABLE : BUFF : Concealement (Stealth)",
+        "value": 9.5,
         "pinned": false,
         "factorIds": [
           1788694866469,
           1788774099692,
           1788772214825
-        ]
+        ],
+        "locked": true
       },
       {
         "id": 1789300460655,
@@ -18537,5 +18543,5 @@
     ]
   },
   "schemaVersion": 2,
-  "savedAt": "2026-09-15T13:51:34.859Z"
+  "savedAt": "2026-09-15T14:00:09.688Z"
 }
