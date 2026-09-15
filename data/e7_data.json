@@ -16765,12 +16765,13 @@
       },
       {
         "id": 1788772163166,
-        "name": "Dispel debuffs",
-        "value": 7.2,
+        "name": "EFFECT : Dispel debuffs",
+        "value": 9,
         "pinned": false,
         "factorIds": [
           1788700781693
-        ]
+        ],
+        "locked": true
       },
       {
         "id": 1788772268160,
@@ -16826,15 +16827,16 @@
       },
       {
         "id": 1788780377530,
-        "name": "Decrease hit chance debuff",
-        "value": 6.5,
+        "name": "DEBUFF : Decrease hit chance",
+        "value": 4,
         "pinned": false,
         "factorIds": [
           1788774921178,
           1788694866469,
           1788774099692,
           1788780324713
-        ]
+        ],
+        "locked": true
       },
       {
         "id": 1788780605209,
@@ -17175,13 +17177,14 @@
       },
       {
         "id": 1789115995455,
-        "name": "Increase Damage against Debuffs",
-        "value": 7.2,
+        "name": "ONGOING : Increase Damage against Debuffs",
+        "value": 10,
         "pinned": false,
         "factorIds": [
           1789014978867,
           1788772992919
-        ]
+        ],
+        "locked": true
       },
       {
         "id": 1789116164590,
@@ -17362,14 +17365,15 @@
       },
       {
         "id": 1789133298898,
-        "name": "Detonation on debuffs (erosion/poison/venom/burn/bleed/bomb)",
-        "value": 7,
+        "name": "DAMAGE : Detonation on debuffs (erosion/poison/venom/burn/bleed/bomb)",
+        "value": 5,
         "pinned": false,
         "factorIds": [
           1788772992919,
           1789014978867,
           1788701036557
-        ]
+        ],
+        "locked": true
       },
       {
         "id": 1789134498394,
@@ -17510,12 +17514,13 @@
       },
       {
         "id": 1789176410307,
-        "name": "Decrease debuff durations",
-        "value": 7.2,
+        "name": "EFFECT : Decrease debuff durations",
+        "value": 4,
         "pinned": false,
         "factorIds": [
           1788700781693
-        ]
+        ],
+        "locked": true
       },
       {
         "id": 1789176992477,
@@ -17796,8 +17801,8 @@
       },
       {
         "id": 1789203922731,
-        "name": "Curse enemies",
-        "value": 10,
+        "name": "DEBUFF : Curse effect",
+        "value": 4,
         "pinned": false,
         "factorIds": [
           1788701036557,
@@ -17808,7 +17813,8 @@
           1788700420912,
           1789014978867,
           1788773130306
-        ]
+        ],
+        "locked": true
       },
       {
         "id": 1789204085344,
@@ -18487,5 +18493,5 @@
     ]
   },
   "schemaVersion": 2,
-  "savedAt": "2026-09-15T12:53:41.017Z"
+  "savedAt": "2026-09-15T13:02:53.778Z"
 }
