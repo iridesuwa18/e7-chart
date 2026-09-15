@@ -16003,7 +16003,7 @@
       },
       {
         "id": 1789130715725,
-        "name": "Double stats (Unique)",
+        "name": "UNIQUE : Double stats",
         "value": 10,
         "pinned": false,
         "factorIds": [
@@ -16014,7 +16014,8 @@
           1789113473631,
           1788772992919,
           1788785891810
-        ]
+        ],
+        "locked": true
       },
       {
         "id": 1789134036840,
@@ -17300,12 +17301,13 @@
       },
       {
         "id": 1789119614792,
-        "name": "Increase effectiveness of attacks",
-        "value": 6.5,
+        "name": "ONGOING : Increase effectiveness of attacks",
+        "value": 10,
         "pinned": false,
         "factorIds": [
           1789014978867
-        ]
+        ],
+        "locked": true
       },
       {
         "id": 1789129986550,
@@ -18115,7 +18117,7 @@
       },
       {
         "id": 1789298662125,
-        "name": "UNIQUE : Deterrence Effect",
+        "name": "UNIQUE : Deterrence Effect (Remove front ally)",
         "value": 10,
         "pinned": false,
         "factorIds": [
@@ -18520,5 +18522,5 @@
     ]
   },
   "schemaVersion": 2,
-  "savedAt": "2026-09-15T13:33:44.790Z"
+  "savedAt": "2026-09-15T13:35:47.884Z"
 }
