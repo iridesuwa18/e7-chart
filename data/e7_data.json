@@ -2765,9 +2765,6 @@
           "refId": 1788786428743
         },
         {
-          "refId": 1789176992477
-        },
-        {
           "refId": 1788782920388
         },
         {
@@ -17559,15 +17556,6 @@
         "locked": true
       },
       {
-        "id": 1789176992477,
-        "name": "Increase soul consumption",
-        "value": 6.5,
-        "pinned": false,
-        "factorIds": [
-          1788913836890
-        ]
-      },
-      {
         "id": 1789177107595,
         "name": "Increase Effect Resistance Buff",
         "value": 9.8,
@@ -18532,5 +18520,5 @@
     ]
   },
   "schemaVersion": 2,
-  "savedAt": "2026-09-15T13:32:13.517Z"
+  "savedAt": "2026-09-15T13:33:44.790Z"
 }
