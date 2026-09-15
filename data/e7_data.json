@@ -15746,14 +15746,15 @@
       },
       {
         "id": 1788773362914,
-        "name": "Damage Negation",
+        "name": "ONGOING : Damage Negation",
         "value": 10,
         "pinned": false,
         "factorIds": [
           1788694866469,
           1788772401653,
           1788774099692
-        ]
+        ],
+        "locked": true
       },
       {
         "id": 1788774616004,
@@ -15898,13 +15899,14 @@
       },
       {
         "id": 1788786348512,
-        "name": "Damage reduction",
-        "value": 9.5,
+        "name": "ONGOING : Damage reduction",
+        "value": 10,
         "pinned": false,
         "factorIds": [
           1788694866469,
           1788774099692
-        ]
+        ],
+        "locked": true
       },
       {
         "id": 1789113568734,
@@ -16531,7 +16533,8 @@
         "pinned": false,
         "factorIds": [
           1789276871897
-        ]
+        ],
+        "locked": true
       },
       {
         "id": 1789280776320,
@@ -16915,7 +16918,7 @@
       {
         "id": 1788785021751,
         "name": "DAMAGE: Additional / fixed",
-        "value": 10,
+        "value": 9.5,
         "pinned": false,
         "factorIds": [
           1788701036557,
@@ -17931,7 +17934,7 @@
       },
       {
         "id": 1789221204007,
-        "name": "Additional / fixed damage (regardless of hit)",
+        "name": "DAMAGE: Additional / fixed (regardless of hit)",
         "value": 10,
         "pinned": false,
         "factorIds": [
@@ -17941,7 +17944,8 @@
           1788786248167,
           1788786571272,
           1788700420912
-        ]
+        ],
+        "locked": true
       },
       {
         "id": 1789259524816,
@@ -18078,13 +18082,14 @@
       },
       {
         "id": 1789298662125,
-        "name": "Deterrence (Unique) Effect",
+        "name": "UNIQUE : Deterrence Effect",
         "value": 10,
         "pinned": false,
         "factorIds": [
           1788773130306,
           1788700420912
-        ]
+        ],
+        "locked": true
       },
       {
         "id": 1789299195538,
@@ -18482,5 +18487,5 @@
     ]
   },
   "schemaVersion": 2,
-  "savedAt": "2026-09-15T12:43:22.011Z"
+  "savedAt": "2026-09-15T12:53:41.017Z"
 }
