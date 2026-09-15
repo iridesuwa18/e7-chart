@@ -16333,14 +16333,15 @@
       },
       {
         "id": 1789216537415,
-        "name": "Vampirism buff",
+        "name": "BUFF : Vampirism",
         "value": 7,
         "pinned": false,
         "factorIds": [
           1788694866469,
           1788772019318,
           1788774099692
-        ]
+        ],
+        "locked": true
       },
       {
         "id": 1789217068833,
@@ -17033,12 +17034,13 @@
       },
       {
         "id": 1788786124368,
-        "name": "Increase Speed Buff",
-        "value": 6.8,
+        "name": "BUFF : Increase Speed",
+        "value": 7,
         "pinned": false,
         "factorIds": [
           1788785891810
-        ]
+        ],
+        "locked": true
       },
       {
         "id": 1788786336798,
@@ -17167,12 +17169,13 @@
       },
       {
         "id": 1789015241813,
-        "name": "Increase effectiveness buff",
-        "value": 6.5,
+        "name": "BUFF : Increase effectiveness",
+        "value": 7,
         "pinned": false,
         "factorIds": [
           1789014978867
-        ]
+        ],
+        "locked": true
       },
       {
         "id": 1789015361909,
@@ -17219,8 +17222,8 @@
       },
       {
         "id": 1789116164590,
-        "name": "Atk and Crit Dmg (Undispellable) Buff",
-        "value": 6.8,
+        "name": "UNDISPELLABLE : BUFF : Atk and Crit Dmg",
+        "value": 9.5,
         "pinned": false,
         "factorIds": [
           1788700420912,
@@ -17229,7 +17232,8 @@
           1788700781693,
           1788912649792,
           1789116366949
-        ]
+        ],
+        "locked": true
       },
       {
         "id": 1789116440535,
@@ -17571,8 +17575,8 @@
       },
       {
         "id": 1789178324173,
-        "name": "Rampage (Undispellable) Buff",
-        "value": 7,
+        "name": "UNDISPELLABLE : BUFF: Rampage",
+        "value": 9.5,
         "pinned": false,
         "factorIds": [
           1788785891810,
@@ -17580,7 +17584,8 @@
           1788774099692,
           1788700781693,
           1788912649792
-        ]
+        ],
+        "locked": true
       },
       {
         "id": 1789178467146,
@@ -17718,8 +17723,8 @@
       },
       {
         "id": 1789199806462,
-        "name": "Challenge (Undispellable) Buffs",
-        "value": 6.5,
+        "name": "UNDISPELLABLE : BUFF: Challenge",
+        "value": 9.5,
         "pinned": false,
         "factorIds": [
           1788701036557,
@@ -17729,7 +17734,8 @@
           1788786571272,
           1788700420912,
           1788785891810
-        ]
+        ],
+        "locked": true
       },
       {
         "id": 1789200202866,
@@ -18522,5 +18528,5 @@
     ]
   },
   "schemaVersion": 2,
-  "savedAt": "2026-09-15T13:35:47.884Z"
+  "savedAt": "2026-09-15T13:44:15.038Z"
 }
