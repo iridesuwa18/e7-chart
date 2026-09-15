@@ -17976,12 +17976,13 @@
       },
       {
         "id": 1789274846919,
-        "name": "Apply debuff regardless of hit",
-        "value": 7.8,
+        "name": "EFFECT : Apply debuff regardless of hit",
+        "value": 9,
         "pinned": false,
         "factorIds": [
           1788783127095
-        ]
+        ],
+        "locked": true
       },
       {
         "id": 1789276598548,
@@ -18493,5 +18494,5 @@
     ]
   },
   "schemaVersion": 2,
-  "savedAt": "2026-09-15T13:02:53.778Z"
+  "savedAt": "2026-09-15T13:04:46.425Z"
 }
