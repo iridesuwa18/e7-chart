@@ -15752,10 +15752,10 @@
       },
       {
         "id": 1788772502540,
-        "name": "Counterattacks",
-        "value": 6.5,
+        "name": "ATTACK : Counterattacks",
+        "value": 10,
         "pinned": false,
-        "locked": false,
+        "locked": true,
         "marked": false,
         "factorIds": [
           1788772861638,
@@ -17006,10 +17006,10 @@
       },
       {
         "id": 1788773476896,
-        "name": "Extra attack",
-        "value": 6.5,
+        "name": "ATTACK : Extra attack",
+        "value": 10,
         "pinned": false,
-        "locked": false,
+        "locked": true,
         "marked": false,
         "factorIds": [
           1788772992919,
@@ -17761,10 +17761,10 @@
       },
       {
         "id": 1789135466749,
-        "name": "Barrier inversion",
-        "value": 6.7,
+        "name": "EFFECT : Barrier inversion",
+        "value": 10,
         "pinned": false,
-        "locked": false,
+        "locked": true,
         "marked": false,
         "factorIds": [
           1789135503443
@@ -18090,10 +18090,10 @@
       },
       {
         "id": 1789200446028,
-        "name": "Bomb enemies",
-        "value": 6.5,
+        "name": "DEBUFF : Bomb effect",
+        "value": 4,
         "pinned": false,
-        "locked": false,
+        "locked": true,
         "marked": false,
         "factorIds": [
           1788701036557,
@@ -18940,5 +18940,5 @@
     ]
   },
   "schemaVersion": 2,
-  "savedAt": "2026-09-17T15:05:55.030Z"
+  "savedAt": "2026-09-17T15:11:12.165Z"
 }
