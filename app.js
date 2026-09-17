@@ -1255,6 +1255,19 @@ const fSsScore     = document.getElementById("f-ss-score");
   wireTaxonomySort("taxonomy-sort-engagements", "engagements", renderTaxonomyPanel);
   wireTaxonomySort("taxonomy-sort-factors", "factors", renderFactorsPanel);
 
+  // Same pattern, but a separate select/state (taxonomyRankingSortMode)
+  // since the Ranking overlay's options are score-based rather than
+  // creation-order-based, and it's a combined Reactions+Engagements
+  // list rather than one tab.
+  const rankingSort = document.getElementById("taxonomy-sort-ranking");
+  if (rankingSort) {
+    rankingSort.value = taxonomyRankingSortMode;
+    rankingSort.addEventListener("change", () => {
+      taxonomyRankingSortMode = rankingSort.value;
+      renderTaxonomyRankingPanel();
+    });
+  }
+
   // Per-hero Reaction/Engagement assignment (Section 5.3), inside the hero
   // edit modal — search-to-add is wired lazily from renderRteAddSearch()
   // itself (see rte section below) since the search inputs need to bind
@@ -5861,6 +5874,12 @@ let taxonomyRankingSearchQuery = "";
 // Ranking list — all false is "All" (no filtering), the default.
 let taxonomyRankingFilter = { locked: false, marked: false, unassigned: false };
 
+// Sort order for the Performance Ranking list — one of "score-desc"
+// (default), "score-asc", "az", "za". Separate from taxonomySortMode
+// (used by the individual Reactions/Engagements/Factors tabs, which
+// sort by creation order or name, never by score).
+let taxonomyRankingSortMode = "score-desc";
+
 // The Performance Ranking System (Section 5.4) — every Reaction AND
 // Engagement together in one score-sorted, vertically-scrolling list,
 // so the whole taxonomy's scoring stays internally consistent at a
@@ -5884,9 +5903,20 @@ function renderTaxonomyRankingPanel() {
     .filter(({ item }) => !taxonomyRankingFilter.locked || item.locked)
     .filter(({ item }) => !taxonomyRankingFilter.marked || item.marked)
     .filter(({ heroCount }) => !taxonomyRankingFilter.unassigned || heroCount === 0)
-    // Highest score first; ties broken alphabetically so the order
-    // stays stable and predictable rather than shuffling on re-render.
-    .sort((a, b) => b.item.value - a.item.value || (a.item.name || "").localeCompare(b.item.name || ""));
+    .sort((a, b) => {
+      const an = (a.item.name || "").toLowerCase(), bn = (b.item.name || "").toLowerCase();
+      switch (taxonomyRankingSortMode) {
+        case "score-asc": return a.item.value - b.item.value || an.localeCompare(bn);
+        case "az":         return an.localeCompare(bn) || b.item.value - a.item.value;
+        case "za":         return bn.localeCompare(an) || b.item.value - a.item.value;
+        case "score-desc":
+        default:
+          // Highest score first; ties broken alphabetically so the
+          // order stays stable and predictable rather than shuffling
+          // on re-render.
+          return b.item.value - a.item.value || an.localeCompare(bn);
+      }
+    });
 
   // Keep the chip row's pressed-state in sync with taxonomyRankingFilter
   // every time this list redraws (e.g. after a chip click, or simply on

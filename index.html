@@ -1331,9 +1331,17 @@
         <span>You've made changes that aren't saved yet — tap <strong>Quick Save</strong> above to keep them.</span>
       </div>
       <p class="taxonomy-panel-hint">Every Reaction (⚡) and Engagement (🛡) together, ranked highest → lowest score, so you can sanity-check consistency across your whole taxonomy at a glance. Tap a score to open the slider, or the 🔖 to mark one teal as a reminder that you've edited it. ⚠️ marks anything not yet assigned to a single hero.</p>
-      <div class="qd-factor-menu-searchbar">
-        <input type="text" class="taxonomy-search qd-factor-menu-search" id="taxonomy-search-ranking" autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false" placeholder="🔍 Search Reactions &amp; Engagements…" />
-        <button type="button" class="qd-factor-menu-clear" id="taxonomy-search-ranking-clear" title="Clear search" aria-label="Clear search">✕</button>
+      <div class="taxonomy-ranking-search-row">
+        <div class="qd-factor-menu-searchbar">
+          <input type="text" class="taxonomy-search qd-factor-menu-search" id="taxonomy-search-ranking" autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false" placeholder="🔍 Search Reactions &amp; Engagements…" />
+          <button type="button" class="qd-factor-menu-clear" id="taxonomy-search-ranking-clear" title="Clear search" aria-label="Clear search">✕</button>
+        </div>
+        <select class="taxonomy-sort-select" id="taxonomy-sort-ranking" title="Sort order">
+          <option value="score-desc">Score: High → Low</option>
+          <option value="score-asc">Score: Low → High</option>
+          <option value="az">A → Z</option>
+          <option value="za">Z → A</option>
+        </select>
       </div>
       <!-- Filter chips — independent toggles (AND'd together, not
            radio buttons), so e.g. Locked + Marked can be combined to

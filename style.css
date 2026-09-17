@@ -1034,6 +1034,23 @@ body.qd-factor-menu-open { overflow: hidden; }
 .taxonomy-ranking-save-reminder strong { color: var(--teal); font-family: 'Cinzel', serif; font-size: 11px; letter-spacing: .02em; }
 .taxonomy-ranking-save-reminder-icon { flex-shrink: 0; font-size: 14px; }
 
+/* Row holding the Ranking overlay's search box + its sort dropdown
+   side by side — .qd-factor-menu-searchbar (shared with the Enemy
+   Factors picker/Know More/Score explainer) is left untouched and
+   just becomes the flexible-width child here, same wrapping approach
+   as .taxonomy-search-row uses for the Reactions/Engagements tabs. */
+.taxonomy-ranking-search-row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin: 0 0 10px;
+}
+.taxonomy-ranking-search-row .qd-factor-menu-searchbar {
+  flex: 1 1 auto;
+  min-width: 0;
+  margin: 0;
+}
+
 /* Filter chips above the Performance Ranking list — Locked/Marked/
    Unassigned toggle independently and combine (AND), each lighting up
    in the color that already means that state elsewhere in this list
