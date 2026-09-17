@@ -5749,6 +5749,21 @@ function taxonomyMatchesSearch(kind, name) {
 }
 
 let qdRankingSliderEl = null;
+let qdRankingSliderRafId = null;
+
+// Coalesces the slider's expensive downstream re-renders to at most one
+// per animation frame instead of one per "input" event — see the call
+// site in applyValue for why. If a frame is already queued, later calls
+// before it fires are just dropped, since only the latest value matters.
+function qdScheduleRankingSliderHeavyRefresh() {
+  if (qdRankingSliderRafId !== null) return;
+  qdRankingSliderRafId = requestAnimationFrame(() => {
+    qdRankingSliderRafId = null;
+    if (taxonomyRankingOverlayIsOpen()) renderTaxonomyRankingPanel();
+    renderRteSection();
+    if (quickDraftSuggestOpen) renderQuickDraftSuggestions();
+  });
+}
 
 // The 0–10 score slider popup — shared by the Performance Ranking list
 // AND the normal Reactions/Engagements tabs (via the 🎚 button next to
@@ -5854,9 +5869,17 @@ function qdShowRankingSlider(kind, id) {
     setTaxonomyItemValue(kind, id, clamped); // no-ops while locked — both controls are also disabled above as the visible half of that
     const numberInput = document.getElementById(`taxonomy-value-${kind}-${id}`);
     if (numberInput) numberInput.value = clamped.toFixed(1);
-    if (taxonomyRankingOverlayIsOpen()) renderTaxonomyRankingPanel();
-    renderRteSection();
-    if (quickDraftSuggestOpen) renderQuickDraftSuggestions();
+    // The three calls below (Ranking list, hero edit screen, Quick Draft
+    // suggestions) each rebuild a chunk of DOM from scratch, and Ranking
+    // in particular re-walks every hero per row (heroesLinkedToTaxonomyItem).
+    // Dragging the range input can fire many more "input" events than the
+    // screen can actually repaint, especially on mobile touch — running
+    // all three on every single one of those events is what made the
+    // slider feel laggy. Coalescing them into a single rAF-scheduled
+    // refresh keeps this in step with the display instead of the touch
+    // events, while the slider handle/number above still update instantly
+    // since those stay synchronous.
+    qdScheduleRankingSliderHeavyRefresh();
   };
 
   input.oninput = () => applyValue(Number(input.value));
