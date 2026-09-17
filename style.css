@@ -3053,7 +3053,7 @@ body.dot-mode .origin-dot:hover {
   gap: 10px;
   text-align: center;
 }
-.qd-ranking-slider-value-input {
+input[type=number].qd-ranking-slider-value-input {
   font-family: 'Cinzel', serif;
   font-size: 40px;
   font-weight: 700;
