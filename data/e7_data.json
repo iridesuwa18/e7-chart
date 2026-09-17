@@ -16033,10 +16033,10 @@
       },
       {
         "id": 1789130098781,
-        "name": "Immune to debuffs preventing movement (stun, sleep, fear)",
-        "value": 10,
+        "name": "PASSIVE : Immune to debuffs preventing movement (stun, sleep, fear)",
+        "value": 9.5,
         "pinned": false,
-        "locked": false,
+        "locked": true,
         "marked": false,
         "factorIds": [
           1789130156790,
@@ -16753,10 +16753,10 @@
       },
       {
         "id": 1789287371412,
-        "name": "Increase Soul Acquired Passive",
-        "value": 10,
+        "name": "UNDISPELLABLE : BUFF : Increase Soul Acquired",
+        "value": 9.5,
         "pinned": false,
-        "locked": false,
+        "locked": true,
         "marked": false,
         "factorIds": [
           1788784362484,
@@ -18940,5 +18940,5 @@
     ]
   },
   "schemaVersion": 2,
-  "savedAt": "2026-09-17T15:01:32.315Z"
+  "savedAt": "2026-09-17T15:05:55.030Z"
 }
