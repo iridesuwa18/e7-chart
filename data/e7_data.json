@@ -15719,6 +15719,8 @@
         "name": "Revives upon death",
         "value": 9,
         "pinned": false,
+        "locked": false,
+        "marked": false,
         "factorIds": [
           1788694866469
         ]
@@ -15728,6 +15730,8 @@
         "name": "Immune to Debuffs",
         "value": 10,
         "pinned": false,
+        "locked": false,
+        "marked": false,
         "factorIds": [
           1788700781693
         ]
@@ -15737,6 +15741,8 @@
         "name": "Damage sharing",
         "value": 9.5,
         "pinned": false,
+        "locked": false,
+        "marked": false,
         "factorIds": [
           1788772019318,
           1788694866469,
@@ -15749,6 +15755,8 @@
         "name": "Counterattacks",
         "value": 6.5,
         "pinned": false,
+        "locked": false,
+        "marked": false,
         "factorIds": [
           1788772861638,
           1788773895734
@@ -15759,18 +15767,21 @@
         "name": "ONGOING : Damage Negation",
         "value": 10,
         "pinned": false,
+        "locked": true,
+        "marked": false,
         "factorIds": [
           1788694866469,
           1788772401653,
           1788774099692
-        ],
-        "locked": true
+        ]
       },
       {
         "id": 1788774616004,
         "name": "Forced Provoke Passive",
         "value": 8.5,
         "pinned": false,
+        "locked": false,
+        "marked": false,
         "factorIds": [
           1788774099692,
           1788694866469
@@ -15781,6 +15792,8 @@
         "name": "Increase Evasion to allies (passive)",
         "value": 9,
         "pinned": false,
+        "locked": false,
+        "marked": false,
         "factorIds": [
           1788774921178,
           1788700781693
@@ -15791,6 +15804,8 @@
         "name": "CR Passives",
         "value": 8,
         "pinned": true,
+        "locked": false,
+        "marked": false,
         "factorIds": [
           1788772861638,
           1788773895734,
@@ -15804,6 +15819,8 @@
         "name": "Damage prop to lost health",
         "value": 7,
         "pinned": false,
+        "locked": false,
+        "marked": false,
         "factorIds": [
           1788694866469,
           1788774099692
@@ -15814,6 +15831,8 @@
         "name": "Damage prop to max health",
         "value": 6.8,
         "pinned": false,
+        "locked": false,
+        "marked": false,
         "factorIds": [
           1788780483075
         ]
@@ -15823,6 +15842,8 @@
         "name": "RESOURCE : Fighting Spirit (React)",
         "value": 6,
         "pinned": false,
+        "locked": true,
+        "marked": false,
         "factorIds": [
           1788773895734,
           1788772861638,
@@ -15830,14 +15851,15 @@
           1788775427431,
           1788786300042,
           1788913802940
-        ],
-        "locked": true
+        ]
       },
       {
         "id": 1788783157740,
         "name": "Damage prop to defense",
         "value": 7,
         "pinned": false,
+        "locked": false,
+        "marked": false,
         "factorIds": [
           1788783127095,
           1788772401653
@@ -15848,6 +15870,8 @@
         "name": "Soul Production",
         "value": 8.5,
         "pinned": false,
+        "locked": false,
+        "marked": false,
         "factorIds": [
           1788784362484
         ]
@@ -15857,6 +15881,8 @@
         "name": "Resource increase",
         "value": 9,
         "pinned": false,
+        "locked": false,
+        "marked": false,
         "factorIds": [
           1788783972533
         ]
@@ -15866,6 +15892,8 @@
         "name": "Damage scaling Passive",
         "value": 8,
         "pinned": false,
+        "locked": false,
+        "marked": false,
         "factorIds": [
           1788772992919,
           1788701036557,
@@ -15877,6 +15905,8 @@
         "name": "Cannot trigger counterattacks",
         "value": 8.5,
         "pinned": false,
+        "locked": false,
+        "marked": false,
         "factorIds": [
           1788775427431
         ]
@@ -15886,6 +15916,8 @@
         "name": "Reacts to counterattacks",
         "value": 9.8,
         "pinned": false,
+        "locked": false,
+        "marked": false,
         "factorIds": [
           1788775427431
         ]
@@ -15895,6 +15927,8 @@
         "name": "Reacts to dual attacks",
         "value": 9,
         "pinned": false,
+        "locked": false,
+        "marked": false,
         "factorIds": [
           1788786300042
         ]
@@ -15904,6 +15938,8 @@
         "name": "Reacts to extra attacks",
         "value": 9,
         "pinned": false,
+        "locked": false,
+        "marked": false,
         "factorIds": [
           1788775944046
         ]
@@ -15913,17 +15949,20 @@
         "name": "ONGOING : Damage reduction",
         "value": 10,
         "pinned": false,
+        "locked": true,
+        "marked": false,
         "factorIds": [
           1788694866469,
           1788774099692
-        ],
-        "locked": true
+        ]
       },
       {
         "id": 1789113568734,
         "name": "Cannot crit / heavy blow",
         "value": 7,
         "pinned": false,
+        "locked": false,
+        "marked": false,
         "factorIds": [
           1788783127095,
           1789113605205
@@ -15934,6 +15973,8 @@
         "name": "Increase Penetration Resistance passive",
         "value": 9,
         "pinned": false,
+        "locked": false,
+        "marked": false,
         "factorIds": [
           1788694866469,
           1788774099692,
@@ -15945,6 +15986,8 @@
         "name": "Damage prop to speed",
         "value": 7,
         "pinned": false,
+        "locked": false,
+        "marked": false,
         "factorIds": [
           1788785891810
         ]
@@ -15954,6 +15997,8 @@
         "name": "Stackable Damage",
         "value": 8.5,
         "pinned": false,
+        "locked": false,
+        "marked": false,
         "factorIds": [
           1788785891810,
           1788700420912,
@@ -15965,6 +16010,8 @@
         "name": "Damage does not exceed % of HP",
         "value": 9,
         "pinned": false,
+        "locked": false,
+        "marked": false,
         "factorIds": [
           1788694866469,
           1788774099692
@@ -15975,6 +16022,8 @@
         "name": "Immortality buff",
         "value": 9,
         "pinned": false,
+        "locked": false,
+        "marked": false,
         "factorIds": [
           1788694866469,
           1788774099692,
@@ -15987,6 +16036,8 @@
         "name": "Immune to debuffs preventing movement (stun, sleep, fear)",
         "value": 10,
         "pinned": false,
+        "locked": false,
+        "marked": false,
         "factorIds": [
           1789130156790,
           1788700781693
@@ -15997,6 +16048,8 @@
         "name": "Unaffected by Combat Readiness increase / decrease",
         "value": 7,
         "pinned": false,
+        "locked": false,
+        "marked": false,
         "factorIds": [
           1789130596970
         ]
@@ -16006,6 +16059,8 @@
         "name": "UNIQUE : Double stats",
         "value": 10,
         "pinned": false,
+        "locked": true,
+        "marked": false,
         "factorIds": [
           1788694866469,
           1788701036557,
@@ -16014,14 +16069,15 @@
           1789113473631,
           1788772992919,
           1788785891810
-        ],
-        "locked": true
+        ]
       },
       {
         "id": 1789134036840,
         "name": "Decrease 100% focus",
         "value": 8,
         "pinned": false,
+        "locked": false,
+        "marked": false,
         "factorIds": [
           1789114895603
         ]
@@ -16031,6 +16087,8 @@
         "name": "RESOURCE : Focus (React)",
         "value": 6,
         "pinned": false,
+        "locked": true,
+        "marked": false,
         "factorIds": [
           1788773895734,
           1788772861638,
@@ -16038,14 +16096,15 @@
           1788775427431,
           1788786300042,
           1788913802940
-        ],
-        "locked": true
+        ]
       },
       {
         "id": 1789136659023,
         "name": "Additional damage reduction",
         "value": 9,
         "pinned": false,
+        "locked": false,
+        "marked": false,
         "factorIds": [
           1788772019318
         ]
@@ -16055,6 +16114,8 @@
         "name": "Stackable Health & / or Defense",
         "value": 10,
         "pinned": false,
+        "locked": false,
+        "marked": false,
         "factorIds": [
           1788694866469,
           1788774099692,
@@ -16066,6 +16127,8 @@
         "name": "Defense scaling passive",
         "value": 8,
         "pinned": false,
+        "locked": false,
+        "marked": false,
         "factorIds": [
           1788694866469,
           1788774099692
@@ -16076,6 +16139,8 @@
         "name": "Reacts to damage done to allies",
         "value": 8.6,
         "pinned": false,
+        "locked": false,
+        "marked": false,
         "factorIds": [
           1788694866469,
           1788774099692
@@ -16086,6 +16151,8 @@
         "name": "Increase Effect Resistance passive",
         "value": 9.8,
         "pinned": false,
+        "locked": false,
+        "marked": false,
         "factorIds": [
           1788700781693,
           1789130156790,
@@ -16098,6 +16165,8 @@
         "name": "Reactive attack by passives (Not counter)",
         "value": 8,
         "pinned": true,
+        "locked": false,
+        "marked": false,
         "factorIds": [
           1789177680699,
           1788773895734,
@@ -16114,6 +16183,8 @@
         "name": "Damage prop to injuries",
         "value": 8,
         "pinned": false,
+        "locked": false,
+        "marked": false,
         "factorIds": [
           1788772992919,
           1788701036557,
@@ -16126,6 +16197,8 @@
         "name": "Damage prop to attack",
         "value": 8.5,
         "pinned": false,
+        "locked": false,
+        "marked": false,
         "factorIds": [
           1788772992919,
           1788700420912
@@ -16136,6 +16209,8 @@
         "name": "Reacts to combat readiness",
         "value": 9.8,
         "pinned": false,
+        "locked": false,
+        "marked": false,
         "factorIds": [
           1789116681636,
           1788785891810
@@ -16146,6 +16221,8 @@
         "name": "Increase Crit Hit Chance Passive",
         "value": 8,
         "pinned": false,
+        "locked": false,
+        "marked": false,
         "factorIds": [
           1788786571272,
           1789116366949,
@@ -16158,6 +16235,8 @@
         "name": "Reduces the effect of Combat Readiness increases",
         "value": 9,
         "pinned": false,
+        "locked": false,
+        "marked": false,
         "factorIds": [
           1789116681636
         ]
@@ -16167,6 +16246,8 @@
         "name": "Double attack and speed stats",
         "value": 7.5,
         "pinned": false,
+        "locked": false,
+        "marked": false,
         "factorIds": [
           1788773895734,
           1788785891810,
@@ -16181,6 +16262,8 @@
         "name": "Increase Effectiveness (Unique) passive",
         "value": 8,
         "pinned": false,
+        "locked": false,
+        "marked": false,
         "factorIds": [
           1789014978867,
           1788779877239
@@ -16191,6 +16274,8 @@
         "name": "Increase Critical Hit Damage passive",
         "value": 7.5,
         "pinned": false,
+        "locked": false,
+        "marked": false,
         "factorIds": [
           1788772992919,
           1788700420912,
@@ -16205,6 +16290,8 @@
         "name": "Attack scaling passive",
         "value": 9,
         "pinned": false,
+        "locked": false,
+        "marked": false,
         "factorIds": [
           1788783127095,
           1788772992919,
@@ -16218,15 +16305,19 @@
         "name": "Increase hit chance passive",
         "value": 9,
         "pinned": false,
+        "locked": false,
+        "marked": false,
         "factorIds": [
           1788783127095
         ]
       },
       {
         "id": 1789199290163,
-        "name": "Cannot revive passive",
+        "name": "PASSIVE : Cannot revive",
         "value": 10,
         "pinned": false,
+        "locked": true,
+        "marked": false,
         "factorIds": [
           1788786928682
         ]
@@ -16236,6 +16327,8 @@
         "name": "Resource decrease",
         "value": 9,
         "pinned": false,
+        "locked": false,
+        "marked": false,
         "factorIds": [
           1788780896026,
           1789114895603,
@@ -16247,6 +16340,8 @@
         "name": "Reacts to soulburns",
         "value": 8,
         "pinned": false,
+        "locked": false,
+        "marked": false,
         "factorIds": [
           1788913836890
         ]
@@ -16256,18 +16351,21 @@
         "name": "PASSIVE : Cannot exceed caster's Speed",
         "value": 10,
         "pinned": false,
+        "locked": true,
+        "marked": false,
         "factorIds": [
           1788773895734,
           1788694866469,
           1788774099692
-        ],
-        "locked": true
+        ]
       },
       {
         "id": 1789202456049,
         "name": "Reduces the effect of Combat Readiness increases (provided by Speed)",
         "value": 9,
         "pinned": false,
+        "locked": false,
+        "marked": false,
         "factorIds": [
           1788773895734
         ]
@@ -16277,6 +16375,8 @@
         "name": "Reacts to allies' turns",
         "value": 8,
         "pinned": false,
+        "locked": false,
+        "marked": false,
         "factorIds": [
           1788785891810
         ]
@@ -16286,6 +16386,8 @@
         "name": "Increase Effectiveness passive",
         "value": 9,
         "pinned": false,
+        "locked": false,
+        "marked": false,
         "factorIds": [
           1789014978867,
           1788779877239
@@ -16296,6 +16398,8 @@
         "name": "Increase Crit Hit Resistance passive",
         "value": 9,
         "pinned": false,
+        "locked": false,
+        "marked": false,
         "factorIds": [
           1788774921178,
           1788694866469,
@@ -16307,6 +16411,8 @@
         "name": "Unaffected by effects that reduce Combat Readiness increases the caster receives.",
         "value": 8,
         "pinned": false,
+        "locked": false,
+        "marked": false,
         "factorIds": [
           1789209213432
         ]
@@ -16316,6 +16422,8 @@
         "name": "Cannot crit",
         "value": 7.5,
         "pinned": false,
+        "locked": false,
+        "marked": false,
         "factorIds": [
           1788783127095,
           1789113605205
@@ -16326,6 +16434,8 @@
         "name": "Damage prop to target's current health",
         "value": 6.8,
         "pinned": false,
+        "locked": false,
+        "marked": false,
         "factorIds": [
           1788772992919,
           1788783127095
@@ -16336,32 +16446,36 @@
         "name": "BUFF : Vampirism",
         "value": 7,
         "pinned": false,
+        "locked": true,
+        "marked": false,
         "factorIds": [
           1788694866469,
           1788772019318,
           1788774099692
-        ],
-        "locked": true
+        ]
       },
       {
         "id": 1789217068833,
         "name": "PASSIVE : Increase Attack %",
         "value": 9,
         "pinned": false,
+        "locked": true,
+        "marked": false,
         "factorIds": [
           1788783127095,
           1788772992919,
           1788700420912,
           1788701036557,
           1788773130306
-        ],
-        "locked": true
+        ]
       },
       {
         "id": 1789217293880,
         "name": "Reacts to extra turns",
         "value": 8.5,
         "pinned": false,
+        "locked": false,
+        "marked": false,
         "factorIds": [
           1788772861638
         ]
@@ -16371,6 +16485,8 @@
         "name": "Reduces the effect of decreased Combat Readiness debuffs inflicted on all allies",
         "value": 8,
         "pinned": false,
+        "locked": false,
+        "marked": false,
         "factorIds": [
           1789209213432
         ]
@@ -16380,6 +16496,8 @@
         "name": "Reacts to enemy's AOE attacks",
         "value": 8.6,
         "pinned": false,
+        "locked": false,
+        "marked": false,
         "factorIds": [
           1788913802940
         ]
@@ -16389,6 +16507,8 @@
         "name": "Damage prop to target's max health",
         "value": 6.8,
         "pinned": false,
+        "locked": false,
+        "marked": false,
         "factorIds": [
           1788700420912,
           1788773130306
@@ -16399,6 +16519,8 @@
         "name": "Reacts to attack done to allies",
         "value": 8.6,
         "pinned": false,
+        "locked": false,
+        "marked": false,
         "factorIds": [
           1788775427431,
           1788786300042,
@@ -16412,6 +16534,8 @@
         "name": "Reacts to enemy non-attack skills",
         "value": 8.6,
         "pinned": false,
+        "locked": false,
+        "marked": false,
         "factorIds": [
           1789259075608
         ]
@@ -16421,6 +16545,8 @@
         "name": "Attack equal to allies' highest attack",
         "value": 8,
         "pinned": false,
+        "locked": false,
+        "marked": false,
         "factorIds": [
           1788700420912,
           1788701036557,
@@ -16434,6 +16560,8 @@
         "name": "Stackable Additional Damage",
         "value": 8.5,
         "pinned": false,
+        "locked": false,
+        "marked": false,
         "factorIds": [
           1788785891810,
           1788700420912,
@@ -16448,6 +16576,8 @@
         "name": "Increase burn damage passive",
         "value": 8,
         "pinned": false,
+        "locked": false,
+        "marked": false,
         "factorIds": [
           1789014978867,
           1788701036557,
@@ -16460,6 +16590,8 @@
         "name": "Increase Dual Attack Passive",
         "value": 7.6,
         "pinned": false,
+        "locked": false,
+        "marked": false,
         "factorIds": [
           1788772992919,
           1788773130306
@@ -16470,6 +16602,8 @@
         "name": "Reacts to enemy's death done by allies (not caster)",
         "value": 8.6,
         "pinned": false,
+        "locked": false,
+        "marked": false,
         "factorIds": [
           1788772992919,
           1789191623914,
@@ -16481,6 +16615,8 @@
         "name": "Reacts to ally's extra turns",
         "value": 8.5,
         "pinned": false,
+        "locked": false,
+        "marked": false,
         "factorIds": [
           1788785891810
         ]
@@ -16490,6 +16626,8 @@
         "name": "No Souls to activate first Soulburn",
         "value": 8,
         "pinned": false,
+        "locked": false,
+        "marked": false,
         "factorIds": [
           1788784362484,
           1788785891810
@@ -16500,6 +16638,8 @@
         "name": "No Souls if have buff to activate Soulburn",
         "value": 8,
         "pinned": false,
+        "locked": false,
+        "marked": false,
         "factorIds": [
           1788784362484,
           1788785891810
@@ -16510,6 +16650,8 @@
         "name": "Reacts to ally's AOE attacks",
         "value": 7,
         "pinned": false,
+        "locked": false,
+        "marked": false,
         "factorIds": [
           1788785891810
         ]
@@ -16519,6 +16661,8 @@
         "name": "Damage prop to target's speed",
         "value": 7.8,
         "pinned": false,
+        "locked": false,
+        "marked": false,
         "factorIds": [
           1788773895734
         ]
@@ -16528,6 +16672,8 @@
         "name": "Dispel stealth (passive)",
         "value": 8,
         "pinned": false,
+        "locked": false,
+        "marked": false,
         "factorIds": [
           1788773216100
         ]
@@ -16537,6 +16683,8 @@
         "name": "Unaffected by decreases to Combat Readiness",
         "value": 8,
         "pinned": false,
+        "locked": false,
+        "marked": false,
         "factorIds": [
           1789130596970
         ]
@@ -16546,16 +16694,19 @@
         "name": "PASSIVE : Dispel immortality",
         "value": 9,
         "pinned": false,
+        "locked": true,
+        "marked": false,
         "factorIds": [
           1789276871897
-        ],
-        "locked": true
+        ]
       },
       {
         "id": 1789280776320,
         "name": "Increase Speed Passive",
         "value": 8,
         "pinned": false,
+        "locked": false,
+        "marked": false,
         "factorIds": [
           1788785891810
         ]
@@ -16565,6 +16716,8 @@
         "name": "Reacts to enemy's non-critical attacks",
         "value": 8,
         "pinned": false,
+        "locked": false,
+        "marked": false,
         "factorIds": [
           1788774921178,
           1788772214825,
@@ -16581,6 +16734,8 @@
         "name": "Reacts to allies' non-attack skills",
         "value": 8,
         "pinned": false,
+        "locked": false,
+        "marked": false,
         "factorIds": [
           1788785891810
         ]
@@ -16590,6 +16745,8 @@
         "name": "Decrease 100% Fighting Spirit",
         "value": 9,
         "pinned": false,
+        "locked": false,
+        "marked": false,
         "factorIds": [
           1788780896026
         ]
@@ -16599,6 +16756,8 @@
         "name": "Increase Soul Acquired Passive",
         "value": 10,
         "pinned": false,
+        "locked": false,
+        "marked": false,
         "factorIds": [
           1788784362484,
           1789287399739
@@ -16609,6 +16768,8 @@
         "name": "Increase Defense Passive",
         "value": 8.5,
         "pinned": false,
+        "locked": false,
+        "marked": false,
         "factorIds": [
           1788694866469,
           1788774099692,
@@ -16620,6 +16781,8 @@
         "name": "Reacts to enemy's attack with a buff",
         "value": 8,
         "pinned": false,
+        "locked": false,
+        "marked": false,
         "factorIds": [
           1788773731924
         ]
@@ -16629,6 +16792,8 @@
         "name": "Reflect damage passive",
         "value": 9.8,
         "pinned": false,
+        "locked": false,
+        "marked": false,
         "factorIds": [
           1788694866469,
           1788774099692,
@@ -16646,6 +16811,8 @@
         "name": "Stackable Attack passive",
         "value": 9,
         "pinned": false,
+        "locked": false,
+        "marked": false,
         "factorIds": [
           1788772992919,
           1788694866469,
@@ -16659,6 +16826,8 @@
         "name": "Reacts to poison and venom effects",
         "value": 8,
         "pinned": false,
+        "locked": false,
+        "marked": false,
         "factorIds": [
           1789299573426
         ]
@@ -16668,6 +16837,8 @@
         "name": "Extra turn Passives",
         "value": 8,
         "pinned": false,
+        "locked": false,
+        "marked": false,
         "factorIds": [
           1788772861638,
           1788773895734,
@@ -16681,6 +16852,8 @@
         "name": "Cleanses fully upon being attacked / start of turn",
         "value": 10,
         "pinned": false,
+        "locked": false,
+        "marked": false,
         "factorIds": [
           1788700781693,
           1789130156790,
@@ -16692,6 +16865,8 @@
         "name": "Speed scaling passive",
         "value": 9,
         "pinned": false,
+        "locked": false,
+        "marked": false,
         "factorIds": [
           1788773895734,
           1788694866469,
@@ -16704,6 +16879,8 @@
         "name": "Increase Max Health Passive",
         "value": 9,
         "pinned": false,
+        "locked": false,
+        "marked": false,
         "factorIds": [
           1788694866469,
           1788774099692
@@ -16713,10 +16890,12 @@
         "id": 1789478508170,
         "name": "PASSIVE : Soul Reduction / Usage %",
         "value": 9,
+        "pinned": false,
+        "locked": true,
+        "marked": false,
         "factorIds": [
           1788913836890
-        ],
-        "locked": true
+        ]
       }
     ],
     "engagements": [
@@ -16725,6 +16904,8 @@
         "name": "Revives allies",
         "value": 9,
         "pinned": false,
+        "locked": false,
+        "marked": false,
         "factorIds": [
           1788694866469,
           1788774099692
@@ -16735,6 +16916,8 @@
         "name": "Invincibility to allies",
         "value": 8,
         "pinned": false,
+        "locked": false,
+        "marked": false,
         "factorIds": [
           1788694866469,
           1788774099692
@@ -16745,6 +16928,8 @@
         "name": "Damage limit to allies",
         "value": 7,
         "pinned": false,
+        "locked": false,
+        "marked": false,
         "factorIds": [
           1788694866469,
           1788774099692
@@ -16755,6 +16940,8 @@
         "name": "Seal enemies",
         "value": 9,
         "pinned": false,
+        "locked": false,
+        "marked": false,
         "factorIds": [
           1788700862798
         ]
@@ -16764,6 +16951,8 @@
         "name": "Ignore / penetrate defense",
         "value": 8,
         "pinned": false,
+        "locked": false,
+        "marked": false,
         "factorIds": [
           1788701036557
         ]
@@ -16773,6 +16962,8 @@
         "name": "Collapse on enemies",
         "value": 7,
         "pinned": false,
+        "locked": false,
+        "marked": false,
         "factorIds": [
           1788700420912
         ]
@@ -16782,6 +16973,8 @@
         "name": "Inflict injuries",
         "value": 8.5,
         "pinned": false,
+        "locked": false,
+        "marked": false,
         "factorIds": [
           1788700420912,
           1789191623914
@@ -16792,16 +16985,19 @@
         "name": "EFFECT : Dispel debuffs",
         "value": 9,
         "pinned": false,
+        "locked": true,
+        "marked": false,
         "factorIds": [
           1788700781693
-        ],
-        "locked": true
+        ]
       },
       {
         "id": 1788772268160,
         "name": "Recover / Healing allies / Lifesteal /Absorb damage",
         "value": 8,
         "pinned": false,
+        "locked": false,
+        "marked": false,
         "factorIds": [
           1788694866469,
           1788772019318,
@@ -16813,6 +17009,8 @@
         "name": "Extra attack",
         "value": 6.5,
         "pinned": false,
+        "locked": false,
+        "marked": false,
         "factorIds": [
           1788772992919,
           1788773130306
@@ -16823,17 +17021,20 @@
         "name": "ATTACK : AOE",
         "value": 10,
         "pinned": true,
+        "locked": true,
+        "marked": false,
         "factorIds": [
           1788773130306,
           1788773216100
-        ],
-        "locked": true
+        ]
       },
       {
         "id": 1788773067411,
         "name": "Dispel buffs",
         "value": 9,
         "pinned": false,
+        "locked": false,
+        "marked": false,
         "factorIds": [
           1788773731924,
           1789276871897,
@@ -16845,30 +17046,34 @@
         "name": "DEBUFF : Beguile effect",
         "value": 4,
         "pinned": false,
+        "locked": true,
+        "marked": false,
         "factorIds": [
           1788700420912,
           1788701036557
-        ],
-        "locked": true
+        ]
       },
       {
         "id": 1788780377530,
         "name": "DEBUFF : Decrease hit chance",
         "value": 4,
         "pinned": false,
+        "locked": true,
+        "marked": false,
         "factorIds": [
           1788774921178,
           1788694866469,
           1788774099692,
           1788780324713
-        ],
-        "locked": true
+        ]
       },
       {
         "id": 1788780605209,
         "name": "Ignore Effect Resistance",
         "value": 9.5,
         "pinned": false,
+        "locked": false,
+        "marked": false,
         "factorIds": [
           1788779877239
         ]
@@ -16878,17 +17083,20 @@
         "name": "RESOURCE : Fighting Spirit (Engage)",
         "value": 5,
         "pinned": false,
+        "locked": true,
+        "marked": false,
         "factorIds": [
           1788783972533,
           1788785891810
-        ],
-        "locked": true
+        ]
       },
       {
         "id": 1788782920388,
         "name": "Shields / barriers to allies",
         "value": 8,
         "pinned": false,
+        "locked": false,
+        "marked": false,
         "factorIds": [
           1788694866469,
           1788774099692,
@@ -16900,6 +17108,8 @@
         "name": "Immunity Buff",
         "value": 8,
         "pinned": false,
+        "locked": false,
+        "marked": false,
         "factorIds": [
           1788700781693
         ]
@@ -16909,17 +17119,20 @@
         "name": "BUFF : Increase Defense",
         "value": 7,
         "pinned": false,
+        "locked": true,
+        "marked": false,
         "factorIds": [
           1788694866469,
           1788774099692
-        ],
-        "locked": true
+        ]
       },
       {
         "id": 1788783245423,
         "name": "Damage increase with fewer enemies",
         "value": 7,
         "pinned": false,
+        "locked": false,
+        "marked": false,
         "factorIds": [
           1788772992919,
           1788783430365,
@@ -16931,6 +17144,8 @@
         "name": "Decrease defense to enemies",
         "value": 7.5,
         "pinned": false,
+        "locked": false,
+        "marked": false,
         "factorIds": [
           1788701036557
         ]
@@ -16940,30 +17155,34 @@
         "name": "BUFF : Increase Attack",
         "value": 7,
         "pinned": false,
+        "locked": true,
+        "marked": false,
         "factorIds": [
           1788772992919
-        ],
-        "locked": true
+        ]
       },
       {
         "id": 1788785021751,
         "name": "DAMAGE: Additional / fixed",
         "value": 9.5,
         "pinned": false,
+        "locked": true,
+        "marked": false,
         "factorIds": [
           1788701036557,
           1788772992919,
           1788786248167,
           1788786571272,
           1788700420912
-        ],
-        "locked": true
+        ]
       },
       {
         "id": 1788785505206,
         "name": "Dual attack",
         "value": 7.5,
         "pinned": false,
+        "locked": false,
+        "marked": false,
         "factorIds": [
           1788772992919,
           1788773130306
@@ -16974,6 +17193,8 @@
         "name": "Redirected Provoke to enemies",
         "value": 7.5,
         "pinned": false,
+        "locked": false,
+        "marked": false,
         "factorIds": [
           1788694866469,
           1788774099692,
@@ -16986,41 +17207,46 @@
         "name": "UNDISPELLABLE : BUFF : Vigor (Atk and Def)",
         "value": 9.5,
         "pinned": false,
+        "locked": true,
+        "marked": false,
         "factorIds": [
           1788772992919,
           1788694866469,
           1788774099692,
           1788700781693,
           1788912649792
-        ],
-        "locked": true
+        ]
       },
       {
         "id": 1788785736229,
         "name": "DEBUFF : Decrease Attack",
         "value": 4,
         "pinned": false,
+        "locked": true,
+        "marked": false,
         "factorIds": [
           1788694866469,
           1788774099692
-        ],
-        "locked": true
+        ]
       },
       {
         "id": 1788785377663,
         "name": "EFFECT : Decrease buff durations",
         "value": 4,
         "pinned": false,
+        "locked": true,
+        "marked": false,
         "factorIds": [
           1788773731924
-        ],
-        "locked": true
+        ]
       },
       {
         "id": 1788785954933,
         "name": "Extra turn",
         "value": 9.8,
         "pinned": false,
+        "locked": false,
+        "marked": false,
         "factorIds": [
           1788785891810
         ]
@@ -17030,6 +17256,8 @@
         "name": "Increase skill cooldown",
         "value": 8,
         "pinned": false,
+        "locked": false,
+        "marked": false,
         "factorIds": [
           1788773895734,
           1788772861638
@@ -17040,16 +17268,19 @@
         "name": "BUFF : Increase Speed",
         "value": 7,
         "pinned": false,
+        "locked": true,
+        "marked": false,
         "factorIds": [
           1788785891810
-        ],
-        "locked": true
+        ]
       },
       {
         "id": 1788786336798,
         "name": "Reset skill cooldowns (allies)",
         "value": 8.8,
         "pinned": false,
+        "locked": false,
+        "marked": false,
         "factorIds": [
           1788785891810
         ]
@@ -17059,6 +17290,8 @@
         "name": "Always crit (successful atk)",
         "value": 7,
         "pinned": false,
+        "locked": false,
+        "marked": false,
         "factorIds": [
           1788786571272,
           1788772992919,
@@ -17071,6 +17304,8 @@
         "name": "Extinction",
         "value": 9,
         "pinned": false,
+        "locked": false,
+        "marked": false,
         "factorIds": [
           1788786928682
         ]
@@ -17080,6 +17315,8 @@
         "name": "Elemental advantage (Light > Dark)",
         "value": 8,
         "pinned": false,
+        "locked": false,
+        "marked": false,
         "factorIds": [
           1788787028808
         ]
@@ -17089,6 +17326,8 @@
         "name": "Undispellable Buffs (Not Unique)",
         "value": 9,
         "pinned": false,
+        "locked": false,
+        "marked": false,
         "factorIds": [
           1788912649792,
           1788700781693
@@ -17099,51 +17338,57 @@
         "name": "EFFECT : Extend buff durations",
         "value": 10,
         "pinned": false,
+        "locked": true,
+        "marked": false,
         "factorIds": [
           1788912501579
-        ],
-        "locked": true
+        ]
       },
       {
         "id": 1788914238894,
         "name": "DEBUFF : Provoke",
         "value": 4,
         "pinned": false,
+        "locked": true,
+        "marked": false,
         "factorIds": [
           1788694866469,
           1788774099692
-        ],
-        "locked": true
+        ]
       },
       {
         "id": 1788913999604,
         "name": "EFFECT : Soul removal",
         "value": 4,
         "pinned": false,
+        "locked": true,
+        "marked": false,
         "factorIds": [
           1788913836890
-        ],
-        "locked": true
+        ]
       },
       {
         "id": 1788914604468,
         "name": "UNDISPELLABLE : BUFF : Rage (Atk and Spd)",
         "value": 9.5,
         "pinned": false,
+        "locked": true,
+        "marked": false,
         "factorIds": [
           1788785891810,
           1788700420912,
           1788701036557,
           1788700781693,
           1788912649792
-        ],
-        "locked": true
+        ]
       },
       {
         "id": 1788924109560,
         "name": "Stun enemies",
         "value": 8.5,
         "pinned": false,
+        "locked": false,
+        "marked": false,
         "factorIds": [
           1788700862798,
           1788775427431,
@@ -17155,6 +17400,8 @@
         "name": "Decrease speed to enemies",
         "value": 7.5,
         "pinned": false,
+        "locked": false,
+        "marked": false,
         "factorIds": [
           1788773895734
         ]
@@ -17164,39 +17411,44 @@
         "name": "BUFF : Increase crit chance",
         "value": 7,
         "pinned": false,
+        "locked": true,
+        "marked": false,
         "factorIds": [
           1788772992919,
           1789116366949,
           1788786571272,
           1789191623914
-        ],
-        "locked": true
+        ]
       },
       {
         "id": 1789015241813,
         "name": "BUFF : Increase effectiveness",
         "value": 7,
         "pinned": false,
+        "locked": true,
+        "marked": false,
         "factorIds": [
           1789014978867
-        ],
-        "locked": true
+        ]
       },
       {
         "id": 1789015361909,
         "name": "BUFF : Continuous healing",
         "value": 7,
         "pinned": false,
+        "locked": true,
+        "marked": false,
         "factorIds": [
           1789015311206
-        ],
-        "locked": true
+        ]
       },
       {
         "id": 1789114206059,
         "name": "Indomitable (Undispellable) Buff",
         "value": 8.8,
         "pinned": false,
+        "locked": false,
+        "marked": false,
         "factorIds": [
           1788694866469,
           1788774099692,
@@ -17210,6 +17462,8 @@
         "name": "Decrease skill cooldown",
         "value": 7.2,
         "pinned": false,
+        "locked": false,
+        "marked": false,
         "factorIds": [
           1788785891810
         ]
@@ -17219,17 +17473,20 @@
         "name": "ONGOING : Increase Damage against Debuffs",
         "value": 10,
         "pinned": false,
+        "locked": true,
+        "marked": false,
         "factorIds": [
           1789014978867,
           1788772992919
-        ],
-        "locked": true
+        ]
       },
       {
         "id": 1789116164590,
         "name": "UNDISPELLABLE : BUFF : Atk and Crit Dmg",
         "value": 9.5,
         "pinned": false,
+        "locked": true,
+        "marked": false,
         "factorIds": [
           1788700420912,
           1788701036557,
@@ -17237,14 +17494,15 @@
           1788700781693,
           1788912649792,
           1789116366949
-        ],
-        "locked": true
+        ]
       },
       {
         "id": 1789116440535,
         "name": "Stops all counterattacks",
         "value": 9.8,
         "pinned": false,
+        "locked": false,
+        "marked": false,
         "factorIds": [
           1788775427431
         ]
@@ -17254,16 +17512,19 @@
         "name": "DEBUFF : Unhealable",
         "value": 4,
         "pinned": false,
+        "locked": true,
+        "marked": false,
         "factorIds": [
           1789116584346
-        ],
-        "locked": true
+        ]
       },
       {
         "id": 1789116663470,
         "name": "Restrict enemies",
         "value": 7,
         "pinned": false,
+        "locked": false,
+        "marked": false,
         "factorIds": [
           1789116681636
         ]
@@ -17273,6 +17534,8 @@
         "name": "Ignore damage share",
         "value": 9.6,
         "pinned": false,
+        "locked": false,
+        "marked": false,
         "factorIds": [
           1788773130306,
           1788774033143
@@ -17283,6 +17546,8 @@
         "name": "Laceration on enemies",
         "value": 8.5,
         "pinned": false,
+        "locked": false,
+        "marked": false,
         "factorIds": [
           1788700420912
         ]
@@ -17292,6 +17557,8 @@
         "name": "Skill nullifier to allies",
         "value": 8,
         "pinned": false,
+        "locked": false,
+        "marked": false,
         "factorIds": [
           1788694866469,
           1788774099692
@@ -17302,6 +17569,8 @@
         "name": "Stealth buff",
         "value": 9,
         "pinned": false,
+        "locked": false,
+        "marked": false,
         "factorIds": [
           1788694866469,
           1788774099692,
@@ -17313,28 +17582,32 @@
         "name": "ONGOING : Increase effectiveness of attacks",
         "value": 10,
         "pinned": false,
+        "locked": true,
+        "marked": false,
         "factorIds": [
           1789014978867
-        ],
-        "locked": true
+        ]
       },
       {
         "id": 1789129986550,
         "name": "BUFF : Increase Critical Hit Resistance",
         "value": 7,
         "pinned": false,
+        "locked": true,
+        "marked": false,
         "factorIds": [
           1788774921178,
           1788694866469,
           1788774099692
-        ],
-        "locked": true
+        ]
       },
       {
         "id": 1789131692127,
         "name": "Target on enemies",
         "value": 9,
         "pinned": false,
+        "locked": false,
+        "marked": false,
         "factorIds": [
           1788783127095,
           1788772992919
@@ -17345,6 +17618,8 @@
         "name": "AOE non-attack skills",
         "value": 9,
         "pinned": true,
+        "locked": false,
+        "marked": false,
         "factorIds": [
           1788783127095,
           1788773216100,
@@ -17356,16 +17631,19 @@
         "name": "DEBUFF : Unable to be buffed",
         "value": 4.5,
         "pinned": false,
+        "locked": true,
+        "marked": false,
         "factorIds": [
           1788773731924
-        ],
-        "locked": true
+        ]
       },
       {
         "id": 1789132307453,
         "name": "Skill effect nullifier on allies",
         "value": 9,
         "pinned": false,
+        "locked": false,
+        "marked": false,
         "factorIds": [
           1788700781693,
           1789130156790,
@@ -17377,6 +17655,8 @@
         "name": "Sleep on enemies",
         "value": 8,
         "pinned": false,
+        "locked": false,
+        "marked": false,
         "factorIds": [
           1788700862798,
           1788785891810,
@@ -17390,6 +17670,8 @@
         "name": "Extend debuff durations",
         "value": 8,
         "pinned": false,
+        "locked": false,
+        "marked": false,
         "factorIds": [
           1789132845858,
           1789014978867
@@ -17400,42 +17682,47 @@
         "name": "DEBUFF : Burn effect",
         "value": 4,
         "pinned": false,
+        "locked": true,
+        "marked": false,
         "factorIds": [
           1788701036557,
           1788700420912,
           1788772992919,
           1789014978867
-        ],
-        "locked": true
+        ]
       },
       {
         "id": 1789133298898,
         "name": "DAMAGE : Detonation on debuffs (erosion/poison/venom/burn/bleed/bomb)",
         "value": 10,
         "pinned": false,
+        "locked": true,
+        "marked": false,
         "factorIds": [
           1788772992919,
           1789014978867,
           1788701036557
-        ],
-        "locked": true
+        ]
       },
       {
         "id": 1789134498394,
         "name": "RESOURCE : Focus (Engage)",
         "value": 5,
         "pinned": false,
+        "locked": true,
+        "marked": false,
         "factorIds": [
           1788783972533,
           1788785891810
-        ],
-        "locked": true
+        ]
       },
       {
         "id": 1789134890095,
         "name": "Poison enemies",
         "value": 7,
         "pinned": false,
+        "locked": false,
+        "marked": false,
         "factorIds": [
           1788700420912,
           1788772992919,
@@ -17448,6 +17735,8 @@
         "name": "Rupture to enemies",
         "value": 8,
         "pinned": false,
+        "locked": false,
+        "marked": false,
         "factorIds": [
           1788701036557,
           1788783127095,
@@ -17462,6 +17751,8 @@
         "name": "Block on enemies",
         "value": 9.3,
         "pinned": false,
+        "locked": false,
+        "marked": false,
         "factorIds": [
           1788773731924,
           1789014978867,
@@ -17473,6 +17764,8 @@
         "name": "Barrier inversion",
         "value": 6.7,
         "pinned": false,
+        "locked": false,
+        "marked": false,
         "factorIds": [
           1789135503443
         ]
@@ -17482,6 +17775,8 @@
         "name": "UNDISPELLABLE : BUFF : Cascade (Add. Dmg)",
         "value": 9.5,
         "pinned": false,
+        "locked": true,
+        "marked": false,
         "factorIds": [
           1788701036557,
           1788783127095,
@@ -17491,14 +17786,15 @@
           1788700420912,
           1788700781693,
           1788912649792
-        ],
-        "locked": true
+        ]
       },
       {
         "id": 1789136009020,
         "name": "Dispel debuffs preventing movement (stun, sleep, fear)",
         "value": 9,
         "pinned": false,
+        "locked": false,
+        "marked": false,
         "factorIds": [
           1789130156790
         ]
@@ -17508,6 +17804,8 @@
         "name": "Fear on enemies",
         "value": 9,
         "pinned": false,
+        "locked": false,
+        "marked": false,
         "factorIds": [
           1788700862798,
           1788775427431,
@@ -17519,6 +17817,8 @@
         "name": "Revive buff",
         "value": 9,
         "pinned": false,
+        "locked": false,
+        "marked": false,
         "factorIds": [
           1788694866469,
           1788774099692
@@ -17529,6 +17829,8 @@
         "name": "Time reversal",
         "value": 10,
         "pinned": false,
+        "locked": false,
+        "marked": false,
         "factorIds": [
           1788785891810,
           1788694866469,
@@ -17543,6 +17845,8 @@
         "name": "Ignore damage reduction",
         "value": 9,
         "pinned": false,
+        "locked": false,
+        "marked": false,
         "factorIds": [
           1788786248167,
           1788701036557,
@@ -17555,6 +17859,8 @@
         "name": "Elemental advantage (Dark > Light)",
         "value": 8,
         "pinned": false,
+        "locked": false,
+        "marked": false,
         "factorIds": [
           1789175114611
         ]
@@ -17564,16 +17870,19 @@
         "name": "EFFECT : Decrease debuff durations",
         "value": 10,
         "pinned": false,
+        "locked": true,
+        "marked": false,
         "factorIds": [
           1788700781693
-        ],
-        "locked": true
+        ]
       },
       {
         "id": 1789177107595,
         "name": "Increase Effect Resistance Buff",
         "value": 9.8,
         "pinned": false,
+        "locked": false,
+        "marked": false,
         "factorIds": [
           1788700781693,
           1789130156790,
@@ -17586,20 +17895,23 @@
         "name": "UNDISPELLABLE : BUFF: Rampage (Spd and Eva)",
         "value": 9.5,
         "pinned": false,
+        "locked": true,
+        "marked": false,
         "factorIds": [
           1788785891810,
           1788694866469,
           1788774099692,
           1788700781693,
           1788912649792
-        ],
-        "locked": true
+        ]
       },
       {
         "id": 1789178467146,
         "name": "Swift attack buff",
         "value": 8,
         "pinned": false,
+        "locked": false,
+        "marked": false,
         "factorIds": [
           1788785891810
         ]
@@ -17609,6 +17921,8 @@
         "name": "Clone allies / enemies",
         "value": 8,
         "pinned": false,
+        "locked": false,
+        "marked": false,
         "factorIds": [
           1789190874660
         ]
@@ -17618,6 +17932,8 @@
         "name": "Transfer debuffs",
         "value": 8.7,
         "pinned": false,
+        "locked": false,
+        "marked": false,
         "factorIds": [
           1788773731924,
           1789014978867,
@@ -17630,6 +17946,8 @@
         "name": "Evasion (Undispellable) Buff",
         "value": 9,
         "pinned": false,
+        "locked": false,
+        "marked": false,
         "factorIds": [
           1788700781693,
           1788912649792,
@@ -17642,6 +17960,8 @@
         "name": "Increase Evasion Buff",
         "value": 9,
         "pinned": false,
+        "locked": false,
+        "marked": false,
         "factorIds": [
           1788700781693,
           1788912649792,
@@ -17654,6 +17974,8 @@
         "name": "UNDISPELLABLE : BUFF : Perception (Crit Chance and Dmg)",
         "value": 9.5,
         "pinned": false,
+        "locked": true,
+        "marked": false,
         "factorIds": [
           1788772992919,
           1788700781693,
@@ -17661,14 +17983,15 @@
           1788786571272,
           1789116366949,
           1789191623914
-        ],
-        "locked": true
+        ]
       },
       {
         "id": 1789197410409,
         "name": "Erosion to enemies (dmg 5% of lost hp)",
         "value": 8,
         "pinned": false,
+        "locked": false,
+        "marked": false,
         "factorIds": [
           1788700420912,
           1788772992919,
@@ -17681,6 +18004,8 @@
         "name": "Bind on enemies",
         "value": 9,
         "pinned": false,
+        "locked": false,
+        "marked": false,
         "factorIds": [
           1788700862798,
           1788775427431,
@@ -17693,6 +18018,8 @@
         "name": "BUFF : Increase Critical Hit Damage",
         "value": 7,
         "pinned": false,
+        "locked": true,
+        "marked": false,
         "factorIds": [
           1788772992919,
           1788700420912,
@@ -17700,27 +18027,29 @@
           1788773130306,
           1788774033143,
           1788786248167
-        ],
-        "locked": true
+        ]
       },
       {
         "id": 1789198537752,
         "name": "DEBUFF : Bleed effect",
         "value": 4,
         "pinned": false,
+        "locked": true,
+        "marked": false,
         "factorIds": [
           1788701036557,
           1788700420912,
           1788772992919,
           1789014978867
-        ],
-        "locked": true
+        ]
       },
       {
         "id": 1789198804604,
         "name": "Superhumanization (Undispellable) Buff",
         "value": 10,
         "pinned": false,
+        "locked": false,
+        "marked": false,
         "factorIds": [
           1788772992919,
           1788694866469,
@@ -17736,6 +18065,8 @@
         "name": "UNDISPELLABLE : BUFF: Challenge (Counter)",
         "value": 9.5,
         "pinned": false,
+        "locked": true,
+        "marked": false,
         "factorIds": [
           1788701036557,
           1788783127095,
@@ -17744,14 +18075,15 @@
           1788786571272,
           1788700420912,
           1788785891810
-        ],
-        "locked": true
+        ]
       },
       {
         "id": 1789200202866,
         "name": "Increase Damage against Shields",
         "value": 7.5,
         "pinned": false,
+        "locked": false,
+        "marked": false,
         "factorIds": [
           1789135503443
         ]
@@ -17761,6 +18093,8 @@
         "name": "Bomb enemies",
         "value": 6.5,
         "pinned": false,
+        "locked": false,
+        "marked": false,
         "factorIds": [
           1788701036557,
           1788700420912,
@@ -17776,6 +18110,8 @@
         "name": "Stealing buffs",
         "value": 9,
         "pinned": false,
+        "locked": false,
+        "marked": false,
         "factorIds": [
           1788773731924,
           1789014978867
@@ -17786,18 +18122,21 @@
         "name": "UNDISPELLABLE : DEBUFF : Death Sentence",
         "value": 9,
         "pinned": false,
+        "locked": true,
+        "marked": false,
         "factorIds": [
           1788701036557,
           1788700420912,
           1789014978867
-        ],
-        "locked": true
+        ]
       },
       {
         "id": 1789201317168,
         "name": "Silence enemies",
         "value": 7.8,
         "pinned": false,
+        "locked": false,
+        "marked": false,
         "factorIds": [
           1789201341223
         ]
@@ -17807,6 +18146,8 @@
         "name": "Increase hit chance buff",
         "value": 9,
         "pinned": false,
+        "locked": false,
+        "marked": false,
         "factorIds": [
           1788783127095
         ]
@@ -17816,6 +18157,8 @@
         "name": "Unable to counterattack debuff",
         "value": 9,
         "pinned": false,
+        "locked": false,
+        "marked": false,
         "factorIds": [
           1788775427431
         ]
@@ -17825,6 +18168,8 @@
         "name": "Illusion (Unique) Buff",
         "value": 9,
         "pinned": false,
+        "locked": false,
+        "marked": false,
         "factorIds": [
           1788694866469,
           1788774099692,
@@ -17838,6 +18183,8 @@
         "name": "Increase Damage prop to no.of debuffs",
         "value": 8,
         "pinned": false,
+        "locked": false,
+        "marked": false,
         "factorIds": [
           1789014978867,
           1788772992919
@@ -17848,6 +18195,8 @@
         "name": "DEBUFF : Curse effect",
         "value": 4,
         "pinned": false,
+        "locked": true,
+        "marked": false,
         "factorIds": [
           1788701036557,
           1788783127095,
@@ -17857,14 +18206,15 @@
           1788700420912,
           1789014978867,
           1788773130306
-        ],
-        "locked": true
+        ]
       },
       {
         "id": 1789204085344,
         "name": "Single (at enemy) non-attack skills",
         "value": 9,
         "pinned": true,
+        "locked": false,
+        "marked": false,
         "factorIds": [
           1788783127095,
           1788773216100,
@@ -17876,30 +18226,34 @@
         "name": "UNDISPELLABLE : BUFF : Effectiveness",
         "value": 9.5,
         "pinned": false,
+        "locked": true,
+        "marked": false,
         "factorIds": [
           1789014978867,
           1788700781693,
           1788912649792
-        ],
-        "locked": true
+        ]
       },
       {
         "id": 1789209870815,
         "name": "UNDISPELLABLE : BUFF : Speed",
         "value": 9.5,
         "pinned": false,
+        "locked": true,
+        "marked": false,
         "factorIds": [
           1788785891810,
           1788912649792,
           1788700781693
-        ],
-        "locked": true
+        ]
       },
       {
         "id": 1789210263222,
         "name": "Pestilence (Undispellable) Buff",
         "value": 8,
         "pinned": false,
+        "locked": false,
+        "marked": false,
         "factorIds": [
           1788700420912,
           1788701036557,
@@ -17914,6 +18268,8 @@
         "name": "Venom on enemies",
         "value": 7,
         "pinned": false,
+        "locked": false,
+        "marked": false,
         "factorIds": [
           1788700420912,
           1788772992919,
@@ -17927,6 +18283,8 @@
         "name": "Increase hit chance (Undispellable) buff",
         "value": 9,
         "pinned": false,
+        "locked": false,
+        "marked": false,
         "factorIds": [
           1788783127095,
           1788700781693,
@@ -17938,19 +18296,22 @@
         "name": "BUFF : Increase Attack Greater",
         "value": 7.5,
         "pinned": false,
+        "locked": true,
+        "marked": false,
         "factorIds": [
           1788772992919,
           1788783127095,
           1788700420912,
           1788701036557
-        ],
-        "locked": true
+        ]
       },
       {
         "id": 1789218602674,
         "name": "Unaffected by elemental disadvantage",
         "value": 7.8,
         "pinned": false,
+        "locked": false,
+        "marked": false,
         "factorIds": [
           1789218645455
         ]
@@ -17960,6 +18321,8 @@
         "name": "Chain of Chiron (Undispellable) Buff to ally (4 random debuffs)",
         "value": 8,
         "pinned": false,
+        "locked": false,
+        "marked": false,
         "factorIds": [
           1788773731924,
           1789014978867,
@@ -17971,6 +18334,8 @@
         "name": "Increase hit chance attack",
         "value": 9,
         "pinned": false,
+        "locked": false,
+        "marked": false,
         "factorIds": [
           1788783127095
         ]
@@ -17980,16 +18345,19 @@
         "name": "ONGOING : Increase Damage against no buffs",
         "value": 10,
         "pinned": false,
+        "locked": true,
+        "marked": false,
         "factorIds": [
           1789220943266
-        ],
-        "locked": true
+        ]
       },
       {
         "id": 1789221204007,
         "name": "DAMAGE: Additional / fixed (regardless of hit)",
         "value": 10,
         "pinned": false,
+        "locked": true,
+        "marked": false,
         "factorIds": [
           1788701036557,
           1788783127095,
@@ -17997,14 +18365,15 @@
           1788786248167,
           1788786571272,
           1788700420912
-        ],
-        "locked": true
+        ]
       },
       {
         "id": 1789259524816,
         "name": "Vampiric Touch on enemies",
         "value": 7,
         "pinned": false,
+        "locked": false,
+        "marked": false,
         "factorIds": [
           1788694866469,
           1788774099692,
@@ -18016,6 +18385,8 @@
         "name": "Spread debuffs",
         "value": 8,
         "pinned": false,
+        "locked": false,
+        "marked": false,
         "factorIds": [
           1789014978867,
           1788773731924
@@ -18026,16 +18397,19 @@
         "name": "EFFECT : Apply debuff regardless of hit",
         "value": 9,
         "pinned": false,
+        "locked": true,
+        "marked": false,
         "factorIds": [
           1788783127095
-        ],
-        "locked": true
+        ]
       },
       {
         "id": 1789276598548,
         "name": "Exploiting weak points",
         "value": 7,
         "pinned": false,
+        "locked": false,
+        "marked": false,
         "factorIds": [
           1788772992919,
           1788783127095
@@ -18046,6 +18420,8 @@
         "name": "Radiance (Undispellable) buff",
         "value": 8,
         "pinned": false,
+        "locked": false,
+        "marked": false,
         "factorIds": [
           1788694866469,
           1788774099692
@@ -18056,6 +18432,8 @@
         "name": "Ignore damage share buff",
         "value": 9,
         "pinned": false,
+        "locked": false,
+        "marked": false,
         "factorIds": [
           1788773130306,
           1788774033143
@@ -18066,6 +18444,8 @@
         "name": "Lingering fragrance (Undispellable) buffs",
         "value": 9.5,
         "pinned": false,
+        "locked": false,
+        "marked": false,
         "factorIds": [
           1788694866469,
           1788774099692,
@@ -18082,6 +18462,8 @@
         "name": "Distribute health among allies",
         "value": 8,
         "pinned": false,
+        "locked": false,
+        "marked": false,
         "factorIds": [
           1788694866469,
           1788772019318,
@@ -18094,6 +18476,8 @@
         "name": "Increase Penetration Resistance Buff",
         "value": 9,
         "pinned": false,
+        "locked": false,
+        "marked": false,
         "factorIds": [
           1789113473631
         ]
@@ -18103,17 +18487,20 @@
         "name": "EFFECT : Copies buffs regardless of hit",
         "value": 9,
         "pinned": false,
+        "locked": true,
+        "marked": false,
         "factorIds": [
           1788773731924,
           1789014978867
-        ],
-        "locked": true
+        ]
       },
       {
         "id": 1789297429599,
         "name": "Pilfer (Unique) Debuff (Decrease Atk, HP, DEF)",
         "value": 9,
         "pinned": false,
+        "locked": false,
+        "marked": false,
         "factorIds": [
           1788694866469,
           1788701036557,
@@ -18127,6 +18514,8 @@
         "name": "Spoils (Unique) Buff (Increase Atk, HP, DEF) x4 Stacks",
         "value": 9,
         "pinned": false,
+        "locked": false,
+        "marked": false,
         "factorIds": [
           1788694866469,
           1788701036557,
@@ -18140,17 +18529,20 @@
         "name": "UNIQUE : Deterrence Effect (Remove front ally)",
         "value": 10,
         "pinned": false,
+        "locked": true,
+        "marked": false,
         "factorIds": [
           1788773130306,
           1788700420912
-        ],
-        "locked": true
+        ]
       },
       {
         "id": 1789299195538,
         "name": "Ice Cream (Undispellable) Buff",
         "value": 9,
         "pinned": false,
+        "locked": false,
+        "marked": false,
         "factorIds": [
           1788694866469,
           1788774099692,
@@ -18168,6 +18560,8 @@
         "name": "Special Friendship (Undispellable) Buff to Earth Ally",
         "value": 8.6,
         "pinned": false,
+        "locked": false,
+        "marked": false,
         "factorIds": [
           1788772992919,
           1788700420912,
@@ -18182,18 +18576,21 @@
         "name": "UNDISPELLABLE : BUFF : Concealement (Stealth)",
         "value": 9.5,
         "pinned": false,
+        "locked": true,
+        "marked": false,
         "factorIds": [
           1788694866469,
           1788774099692,
           1788772214825
-        ],
-        "locked": true
+        ]
       },
       {
         "id": 1789300460655,
         "name": "Immobilize debuff to enemies",
         "value": 9,
         "pinned": false,
+        "locked": false,
+        "marked": false,
         "factorIds": [
           1788773895734
         ]
@@ -18543,5 +18940,5 @@
     ]
   },
   "schemaVersion": 2,
-  "savedAt": "2026-09-15T14:06:51.321Z"
+  "savedAt": "2026-09-17T08:40:57.408Z"
 }
