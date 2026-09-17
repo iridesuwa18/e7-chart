@@ -75,6 +75,20 @@ let taxonomy = {
 // still be in its temporal-dead-zone at that point and throw, aborting
 // the rest of init() before it ever finishes setting up the page.
 let taxonomySortMode = { reactions: "oldest", engagements: "oldest", factors: "oldest" };
+// Sort order for the Performance Ranking list — one of "score-desc"
+// (default), "score-asc", "az", "za". Separate from taxonomySortMode
+// (used by the individual Reactions/Engagements/Factors tabs, which
+// sort by creation order or name, never by score). Declared here
+// (rather than down near renderTaxonomyRankingPanel) because the
+// startup code that wires up the Ranking sort dropdown — and,
+// critically, everything that runs after it in that same function,
+// including the Admin Panel's Confirm/Cancel button listeners — reads
+// this variable before that later part of the file would run. Being
+// declared with `let` further down put it in the temporal dead zone
+// at that point, throwing "Cannot access before initialization" and
+// aborting the rest of startup, which silently left Confirm/Cancel
+// unwired.
+let taxonomyRankingSortMode = "score-desc";
 
 // Strictly increasing, even for several items created within the same
 // millisecond (e.g. adding a handful of Reactions back to back) — this
@@ -5873,12 +5887,6 @@ let taxonomyRankingSearchQuery = "";
 // Independent, combinable (AND'd) toggle filters for the Performance
 // Ranking list — all false is "All" (no filtering), the default.
 let taxonomyRankingFilter = { locked: false, marked: false, unassigned: false };
-
-// Sort order for the Performance Ranking list — one of "score-desc"
-// (default), "score-asc", "az", "za". Separate from taxonomySortMode
-// (used by the individual Reactions/Engagements/Factors tabs, which
-// sort by creation order or name, never by score).
-let taxonomyRankingSortMode = "score-desc";
 
 // The Performance Ranking System (Section 5.4) — every Reaction AND
 // Engagement together in one score-sorted, vertically-scrolling list,
