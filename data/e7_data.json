@@ -16314,7 +16314,7 @@
       {
         "id": 1789199290163,
         "name": "PASSIVE : Cannot revive",
-        "value": 10,
+        "value": 9,
         "pinned": false,
         "locked": true,
         "marked": false,
@@ -18940,5 +18940,5 @@
     ]
   },
   "schemaVersion": 2,
-  "savedAt": "2026-09-17T08:40:57.408Z"
+  "savedAt": "2026-09-17T08:43:56.756Z"
 }
