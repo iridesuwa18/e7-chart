@@ -1,0 +1,17 @@
+{
+  "name": "E7 Quick Draft",
+  "short_name": "Quick Draft",
+  "description": "PVP Quick Draft companion for Epic Seven — opens straight into the draft board",
+  "start_url": "./quickdraft.html",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#04090f",
+  "theme_color": "#04090f",
+  "icons": [
+    { "src": "icon-192-qd.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "icon-512-qd.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
+    { "src": "icon-192-qd.png", "sizes": "192x192", "type": "image/png", "purpose": "maskable" },
+    { "src": "icon-512-qd.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ]
+}
