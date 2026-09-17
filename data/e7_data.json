@@ -16111,10 +16111,10 @@
       },
       {
         "id": 1789137120242,
-        "name": "Stackable Health & / or Defense",
+        "name": "ONGOING : Stackable Health & / or Defense",
         "value": 10,
         "pinned": false,
-        "locked": false,
+        "locked": true,
         "marked": false,
         "factorIds": [
           1788694866469,
@@ -18045,10 +18045,10 @@
       },
       {
         "id": 1789198804604,
-        "name": "Superhumanization (Undispellable) Buff",
+        "name": "UNDISPELLABLE : BUFF : Superhumanization (2x max HP)",
         "value": 10,
         "pinned": false,
-        "locked": false,
+        "locked": true,
         "marked": false,
         "factorIds": [
           1788772992919,
@@ -18940,5 +18940,5 @@
     ]
   },
   "schemaVersion": 2,
-  "savedAt": "2026-09-17T15:11:12.165Z"
+  "savedAt": "2026-09-17T15:16:30.059Z"
 }
