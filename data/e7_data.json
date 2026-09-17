@@ -15727,10 +15727,10 @@
       },
       {
         "id": 1788700730226,
-        "name": "Immune to Debuffs",
+        "name": "ONGOING : Immune to Debuffs",
         "value": 10,
         "pinned": false,
-        "locked": false,
+        "locked": true,
         "marked": false,
         "factorIds": [
           1788700781693
@@ -16849,10 +16849,10 @@
       },
       {
         "id": 1789300087249,
-        "name": "Cleanses fully upon being attacked / start of turn",
-        "value": 10,
+        "name": "PASSIVE : Cleanses fully upon being attacked / start of turn",
+        "value": 9.5,
         "pinned": false,
-        "locked": false,
+        "locked": true,
         "marked": false,
         "factorIds": [
           1788700781693,
@@ -18940,5 +18940,5 @@
     ]
   },
   "schemaVersion": 2,
-  "savedAt": "2026-09-17T08:43:56.756Z"
+  "savedAt": "2026-09-17T15:01:32.315Z"
 }
