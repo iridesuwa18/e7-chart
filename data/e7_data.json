@@ -17242,10 +17242,10 @@
       },
       {
         "id": 1788785954933,
-        "name": "Extra turn",
-        "value": 9.8,
+        "name": "EFFECT : Extra turn",
+        "value": 10,
         "pinned": false,
-        "locked": false,
+        "locked": true,
         "marked": false,
         "factorIds": [
           1788785891810
@@ -17826,10 +17826,10 @@
       },
       {
         "id": 1789137274178,
-        "name": "Time reversal",
+        "name": "EFFECT : Time reversal",
         "value": 10,
         "pinned": false,
-        "locked": false,
+        "locked": true,
         "marked": false,
         "factorIds": [
           1788785891810,
@@ -18940,5 +18940,5 @@
     ]
   },
   "schemaVersion": 2,
-  "savedAt": "2026-09-17T15:16:30.059Z"
+  "savedAt": "2026-09-17T15:18:15.510Z"
 }
