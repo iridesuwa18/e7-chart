@@ -18444,7 +18444,7 @@
         "name": "UNDISPELLABLE : BUFF : Lingering fragrance (Max HP + Reflect x5)",
         "value": 9.5,
         "pinned": false,
-        "locked": false,
+        "locked": true,
         "marked": false,
         "factorIds": [
           1788694866469,
@@ -18940,5 +18940,5 @@
     ]
   },
   "schemaVersion": 2,
-  "savedAt": "2026-09-18T06:54:27.853Z"
+  "savedAt": "2026-09-18T06:55:00.176Z"
 }
