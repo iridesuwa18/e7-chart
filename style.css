@@ -2999,16 +2999,55 @@ body.dot-mode .origin-dot:hover {
 }
 .taxonomy-ranking-row-mark.marked:hover { background: rgba(45,212,191,.32); }
 
-/* The row itself picks up a teal left-edge accent + faint tint when
-   marked — an inset box-shadow rather than a plain border so it still
-   shows up even when the row is ALSO .locked (solid gold background,
-   see below) instead of being painted over. */
+/* Marked rows (editing reminder) — the whole row fills with a
+   desaturated blue-teal, with muted dark-blue text for contrast
+   against it (rather than the usual light-on-dark theme colors).
+   A locked+marked row keeps this same blue fill but swaps its border
+   for a solid yellow outline, so "locked" reads as a border color
+   change rather than the usual solid-gold fill (which the marked
+   blue now takes over instead). */
 .taxonomy-ranking-row.marked {
-  box-shadow: inset 3px 0 0 0 var(--teal);
-  background: rgba(45,212,191,.07);
+  background: #6f9aa4;
+  border-color: #4f747d;
+  box-shadow: none;
+}
+.taxonomy-ranking-row.marked .taxonomy-ranking-row-name,
+.taxonomy-ranking-row.marked .taxonomy-ranking-row-icon {
+  color: #142832;
+}
+.taxonomy-ranking-row.marked .taxonomy-ranking-row-unassigned {
+  border-color: rgba(0,0,0,.3);
+  background: rgba(0,0,0,.08);
+  color: #142832;
+}
+.taxonomy-ranking-row.marked .taxonomy-ranking-row-edit,
+.taxonomy-ranking-row.marked .taxonomy-ranking-row-lock,
+.taxonomy-ranking-row.marked .taxonomy-ranking-row-score {
+  border-color: rgba(0,0,0,.3);
+  background: rgba(0,0,0,.08);
+  color: #142832;
+}
+.taxonomy-ranking-row.marked .taxonomy-ranking-row-edit:hover,
+.taxonomy-ranking-row.marked .taxonomy-ranking-row-lock:hover,
+.taxonomy-ranking-row.marked .taxonomy-ranking-row-score:hover {
+  background: rgba(0,0,0,.16);
 }
 .taxonomy-ranking-row.locked.marked {
-  box-shadow: inset 3px 0 0 0 var(--teal-dim);
+  background: #6f9aa4;
+  border: 2px solid var(--gold2);
+}
+/* Explicit triple-class selectors below so this wins the specificity
+   tie against .locked's own (black-text) child rules further down,
+   regardless of which block ends up later in the file. */
+.taxonomy-ranking-row.locked.marked .taxonomy-ranking-row-name,
+.taxonomy-ranking-row.locked.marked .taxonomy-ranking-row-icon,
+.taxonomy-ranking-row.locked.marked .taxonomy-ranking-row-unassigned,
+.taxonomy-ranking-row.locked.marked .taxonomy-ranking-row-edit,
+.taxonomy-ranking-row.locked.marked .taxonomy-ranking-row-lock,
+.taxonomy-ranking-row.locked.marked .taxonomy-ranking-row-score {
+  color: #142832;
+  border-color: rgba(0,0,0,.3);
+  background: rgba(0,0,0,.08);
 }
 
 /* A locked Reaction/Engagement — desaturated yellow, easy on the eyes,
