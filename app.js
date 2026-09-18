@@ -1151,6 +1151,7 @@ const fSsScore     = document.getElementById("f-ss-score");
     addFactor(val);
     renderFactorsPanel();
     renderQdFactorChips(); // Section 8.1 checklist — new Factor shows up immediately
+    if (typeof renderHeroFactorsButton === "function") renderHeroFactorsButton(); // keep Hero Factors' button/grid in sync with the Enemy Factors state it reads
   });
 
   // Search boxes for each Taxonomy tab — filters that tab's list by
@@ -1210,6 +1211,7 @@ const fSsScore     = document.getElementById("f-ss-score");
   wireTaxonomySearch("taxonomy-search-factors", "factors", renderFactorsPanel, val => {
     addFactor(val);
     renderQdFactorChips(); // Section 8.1 checklist — new Factor shows up immediately
+    if (typeof renderHeroFactorsButton === "function") renderHeroFactorsButton(); // keep Hero Factors' button/grid in sync with the Enemy Factors state it reads
   });
 
   // Ranking tab's search box — simpler than wireTaxonomySearch above
@@ -1442,6 +1444,7 @@ const fSsScore     = document.getElementById("f-ss-score");
   // just above, these are user-defined, so they're built fresh from the
   // taxonomy library rather than wired one-by-one here.
   renderQdFactorChips();
+  if (typeof renderHeroFactorsButton === "function") renderHeroFactorsButton(); // keep Hero Factors' button/grid in sync with the Enemy Factors state it reads
 
   document.getElementById("btn-quickdraft-autofill").addEventListener("click", autofillTopQuickDraftPick);
 
@@ -2863,6 +2866,7 @@ function clearQuickDraft() {
   // draft, new enemy" reasoning as the Ban Protect element above.
   qdTickedFactorIds.clear();
   renderQdFactorChips();
+  if (typeof renderHeroFactorsButton === "function") renderHeroFactorsButton(); // keep Hero Factors' button/grid in sync with the Enemy Factors state it reads
   saveQuickDraftModeLocal();
 
   // Reset the manual Selfish/Selfless override too (Section 9.4) — same
@@ -3550,6 +3554,7 @@ function renderQdFactorPriorityChips() {
       renderQdFactorPriorityChips(); // just this row — cheap, and avoids losing dropdown scroll/search state
       renderQuickDraft(); // filled slots' scores/(i) explanations shift with the boost
       if (quickDraftSuggestOpen) renderQuickDraftSuggestions();
+      if (typeof hfRefreshIfOpen === "function") hfRefreshIfOpen(); // prioritizing a Factor shifts Hero Factors scores too
     });
   });
 }
@@ -3644,6 +3649,7 @@ function renderQdFactorMenuList() {
       renderQdFactorPriorityChips(); // the ticked-Factor chip row above the dropdown needs updating too
       renderQuickDraft(); // refresh already-filled slots' scores/(i) explanations too, not just the suggestion panel
       if (quickDraftSuggestOpen) renderQuickDraftSuggestions();
+      if (typeof hfRefreshIfOpen === "function") hfRefreshIfOpen(); // Hero Factors grid re-ranks against the same tick
     });
   });
 }
@@ -5674,6 +5680,7 @@ function saveRenameModal() {
       duplicateFactor(id, newName);
       renderFactorsPanel();
       renderQdFactorChips();
+      if (typeof renderHeroFactorsButton === "function") renderHeroFactorsButton(); // keep Hero Factors' button/grid in sync with the Enemy Factors state it reads
     } else {
       duplicateTaxonomyItem(kind, id, newName);
       renderTaxonomyPanel(kind);
@@ -5683,6 +5690,7 @@ function saveRenameModal() {
       renameFactor(id, newName);
       renderFactorsPanel();
       renderQdFactorChips(); // Factor names show in the Quick Draft dropdown too
+      if (typeof renderHeroFactorsButton === "function") renderHeroFactorsButton(); // keep Hero Factors' button/grid in sync with the Enemy Factors state it reads
     } else {
       renameTaxonomyItem(kind, id, newName);
       renderTaxonomyPanel(kind);
@@ -5762,6 +5770,7 @@ function qdScheduleRankingSliderHeavyRefresh() {
     if (taxonomyRankingOverlayIsOpen()) renderTaxonomyRankingPanel();
     renderRteSection();
     if (quickDraftSuggestOpen) renderQuickDraftSuggestions();
+    if (typeof hfRefreshIfOpen === "function") hfRefreshIfOpen(); // a changed score can shift Hero Factors' ranking too
   });
 }
 
@@ -6436,6 +6445,7 @@ function renderFactorsPanel() {
       deleteFactor(Number(btn.dataset.id));
       renderFactorsPanel();
       renderQdFactorChips(); // Section 8.1 checklist — drop the deleted Factor's chip too
+      if (typeof renderHeroFactorsButton === "function") renderHeroFactorsButton(); // keep Hero Factors' button/grid in sync with the Enemy Factors state it reads
     });
   });
 }
@@ -7170,6 +7180,7 @@ function handleImportedFile(parsed) {
     renderTaxonomyPanel("reactions");
     renderFactorsPanel();
     renderQdFactorChips();
+    if (typeof renderHeroFactorsButton === "function") renderHeroFactorsButton(); // keep Hero Factors' button/grid in sync with the Enemy Factors state it reads
   }
 
   if (importedHeroes) {

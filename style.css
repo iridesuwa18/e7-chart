@@ -4738,3 +4738,146 @@ body.hide-labels .hero-dot-label {
   flex-direction: column;
   gap: 6px;
 }
+
+/* ══════════════════════════════════════
+   HERO FACTORS (hero-factors.js)
+   Reuses .qd-factor-menu-overlay/-panel, .qd-factor-menu-searchbar/
+   -search/-clear, .qd-factor-menu-list/-item, and .qd-factor-priority-chip
+   for everything the shared shell already covers — this section is only
+   the parts unique to this panel: a wider modal (more room for the grid)
+   and the grid/tile styling itself.
+══════════════════════════════════════ */
+.hf-panel { width: min(880px, 95vw); }
+
+.hf-factor-status {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 8px;
+  padding: 8px 10px;
+  margin-bottom: 8px;
+  border-radius: 8px;
+  border: 1px solid var(--border);
+  background: rgba(255,255,255,.03);
+}
+.hf-factor-status-text { font-size: 11.5px; color: var(--text-dim); flex: 1 1 200px; }
+
+.hf-filter-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  margin-bottom: 8px;
+}
+.hf-minscore-label {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-family: 'Crimson Pro', serif;
+  font-size: 12px;
+  color: var(--text-dim);
+}
+.hf-minscore-label input[type="number"] { width: 64px; }
+
+.hf-category-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-bottom: 8px;
+}
+
+.hf-details {
+  margin-bottom: 8px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 6px 8px;
+}
+.hf-details summary {
+  cursor: pointer;
+  font-family: 'Cinzel', serif;
+  font-size: 11px;
+  letter-spacing: .05em;
+  color: var(--gold2);
+  padding: 4px 2px;
+}
+.hf-details .qd-factor-menu-list { max-height: 180px; margin-top: 6px; }
+
+.hf-count {
+  flex-shrink: 0;
+  font-size: 10.5px;
+  color: var(--text-dim);
+  margin-bottom: 6px;
+}
+
+/* The grid itself — 8 columns' worth of room on a wide screen,
+   wrapping down as space shrinks, holding every hero that currently
+   matches rather than paginating. */
+.hf-grid {
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow-y: auto;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(64px, 1fr));
+  gap: 8px;
+  padding-bottom: 6px;
+}
+.hf-empty { grid-column: 1 / -1; color: var(--text-dim); font-style: italic; font-size: 12px; padding: 20px 0; text-align: center; }
+
+.hf-tile {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 3px;
+  padding: 6px 4px 5px;
+  border-radius: 8px;
+  border: 1.5px solid var(--border);
+  background: rgba(255,255,255,.02);
+  cursor: pointer;
+  transition: background .15s, border-color .15s, transform .1s;
+  position: relative;
+}
+.hf-tile:hover { background: rgba(255,255,255,.06); transform: translateY(-1px); }
+.hf-tile img {
+  width: 40px; height: 40px;
+  border-radius: 50%;
+  object-fit: cover;
+}
+.hf-tile-fallback {
+  width: 40px; height: 40px;
+  border-radius: 50%;
+  background: #0b1a2e;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 18px;
+}
+.hf-tile-name {
+  font-size: 9px;
+  line-height: 1.15;
+  text-align: center;
+  color: var(--text-dim);
+  max-width: 62px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.hf-tile-score {
+  position: absolute;
+  top: -4px;
+  right: -4px;
+  min-width: 18px;
+  padding: 1px 4px;
+  border-radius: 999px;
+  font-family: 'Cinzel', serif;
+  font-size: 9px;
+  font-weight: 700;
+  text-align: center;
+  line-height: 1.4;
+  border: 1px solid;
+}
+/* Score tiers — same rough color language as elsewhere in the app
+   (gold = best, teal = solid, dim = weak) so a glance at the grid
+   reads without checking each tile's tooltip. */
+.hf-tile.hf-tier-high .hf-tile-score { color: var(--gold2); border-color: var(--gold-dim); background: rgba(201,162,39,.16); }
+.hf-tile.hf-tier-mid  .hf-tile-score { color: var(--teal2); border-color: var(--teal-dim); background: rgba(45,212,191,.14); }
+.hf-tile.hf-tier-low  .hf-tile-score { color: var(--text-dim); border-color: var(--border); background: rgba(255,255,255,.05); }
+.hf-tile.hf-tier-high { border-color: rgba(201,162,39,.35); }
