@@ -16209,7 +16209,7 @@
         "name": "PASSIVE : Reacts to combat readiness",
         "value": 9.7,
         "pinned": false,
-        "locked": false,
+        "locked": true,
         "marked": false,
         "factorIds": [
           1789116681636,
@@ -18940,5 +18940,5 @@
     ]
   },
   "schemaVersion": 2,
-  "savedAt": "2026-09-18T06:41:57.080Z"
+  "savedAt": "2026-09-18T06:42:05.201Z"
 }
