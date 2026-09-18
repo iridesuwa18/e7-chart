@@ -16516,7 +16516,7 @@
       },
       {
         "id": 1789221525475,
-        "name": "Reacts to attack done to allies",
+        "name": "PASSIVE : Reacts to attack done to allies",
         "value": 8.6,
         "pinned": false,
         "locked": false,
@@ -16531,7 +16531,7 @@
       },
       {
         "id": 1789259042871,
-        "name": "Reacts to enemy non-attack skills",
+        "name": "PASSIVE : Reacts to enemy non-attack skills",
         "value": 8.6,
         "pinned": false,
         "locked": false,
@@ -18940,5 +18940,5 @@
     ]
   },
   "schemaVersion": 2,
-  "savedAt": "2026-09-18T07:53:05.097Z"
+  "savedAt": "2026-09-18T08:01:18.969Z"
 }
