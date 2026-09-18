@@ -16232,10 +16232,10 @@
       },
       {
         "id": 1789192070531,
-        "name": "Reduces the effect of Combat Readiness increases",
-        "value": 9,
+        "name": "PASSIVE : Reduces the effect of Combat Readiness increases",
+        "value": 9.5,
         "pinned": false,
-        "locked": false,
+        "locked": true,
         "marked": false,
         "factorIds": [
           1789116681636
@@ -16361,10 +16361,10 @@
       },
       {
         "id": 1789202456049,
-        "name": "Reduces the effect of Combat Readiness increases (provided by Speed)",
-        "value": 9,
+        "name": "PASSIVE : Reduces the effect of Combat Readiness increases (provided by Speed)",
+        "value": 9.5,
         "pinned": false,
-        "locked": false,
+        "locked": true,
         "marked": false,
         "factorIds": [
           1788773895734
@@ -16408,10 +16408,10 @@
       },
       {
         "id": 1789209126720,
-        "name": "Unaffected by effects that reduce Combat Readiness increases the caster receives.",
-        "value": 8,
+        "name": "PASSIVE : Unaffected by effects that reduce Combat Readiness increases the caster receives.",
+        "value": 9.5,
         "pinned": false,
-        "locked": false,
+        "locked": true,
         "marked": false,
         "factorIds": [
           1789209213432
@@ -16482,10 +16482,10 @@
       },
       {
         "id": 1789218520756,
-        "name": "Reduces the effect of decreased Combat Readiness debuffs inflicted on all allies",
-        "value": 8,
+        "name": "PASSIVE : Reduces the effect of decreased Combat Readiness debuffs inflicted on all allies",
+        "value": 9.5,
         "pinned": false,
-        "locked": false,
+        "locked": true,
         "marked": false,
         "factorIds": [
           1789209213432
@@ -16635,10 +16635,10 @@
       },
       {
         "id": 1789267956483,
-        "name": "No Souls if have buff to activate Soulburn",
-        "value": 8,
+        "name": "ONGOING : Does not cost Soul to activate soulburn (when buffed)",
+        "value": 10,
         "pinned": false,
-        "locked": false,
+        "locked": true,
         "marked": false,
         "factorIds": [
           1788784362484,
@@ -18940,5 +18940,5 @@
     ]
   },
   "schemaVersion": 2,
-  "savedAt": "2026-09-18T12:19:13.278Z"
+  "savedAt": "2026-09-18T12:24:44.048Z"
 }
