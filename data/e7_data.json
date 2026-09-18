@@ -16206,8 +16206,8 @@
       },
       {
         "id": 1789178573773,
-        "name": "Reacts to combat readiness",
-        "value": 9.8,
+        "name": "PASSIVE : Reacts to combat readiness",
+        "value": 9.7,
         "pinned": false,
         "locked": false,
         "marked": false,
@@ -18940,5 +18940,5 @@
     ]
   },
   "schemaVersion": 2,
-  "savedAt": "2026-09-18T06:41:10.907Z"
+  "savedAt": "2026-09-18T06:41:57.080Z"
 }
