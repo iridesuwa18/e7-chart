@@ -15924,10 +15924,10 @@
       },
       {
         "id": 1788786104653,
-        "name": "Reacts to dual attacks",
-        "value": 9,
+        "name": "PASSIVE : Reacts to dual attacks",
+        "value": 9.7,
         "pinned": false,
-        "locked": false,
+        "locked": true,
         "marked": false,
         "factorIds": [
           1788786300042
@@ -15935,10 +15935,10 @@
       },
       {
         "id": 1788785866916,
-        "name": "Reacts to extra attacks",
-        "value": 9,
+        "name": "PASSIVE : Reacts to extra attacks",
+        "value": 9.7,
         "pinned": false,
-        "locked": false,
+        "locked": true,
         "marked": false,
         "factorIds": [
           1788775944046
@@ -15994,10 +15994,10 @@
       },
       {
         "id": 1789115481250,
-        "name": "Stackable Damage",
-        "value": 8.5,
+        "name": "ONGOING : Stackable Damage",
+        "value": 10,
         "pinned": false,
-        "locked": false,
+        "locked": true,
         "marked": false,
         "factorIds": [
           1788785891810,
@@ -16194,10 +16194,10 @@
       },
       {
         "id": 1789178160509,
-        "name": "Damage prop to attack",
-        "value": 8.5,
+        "name": "DAMAGE : Prop to attack",
+        "value": 10,
         "pinned": false,
-        "locked": false,
+        "locked": true,
         "marked": false,
         "factorIds": [
           1788772992919,
@@ -16557,10 +16557,10 @@
       },
       {
         "id": 1789262656055,
-        "name": "Stackable Additional Damage",
-        "value": 8.5,
+        "name": "ONGOING : Stackable Additional Damage",
+        "value": 10,
         "pinned": false,
-        "locked": false,
+        "locked": true,
         "marked": false,
         "factorIds": [
           1788785891810,
@@ -18940,5 +18940,5 @@
     ]
   },
   "schemaVersion": 2,
-  "savedAt": "2026-09-18T07:41:17.286Z"
+  "savedAt": "2026-09-18T07:47:36.119Z"
 }
