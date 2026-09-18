@@ -15913,10 +15913,10 @@
       },
       {
         "id": 1788785760659,
-        "name": "Reacts to counterattacks",
-        "value": 9.8,
+        "name": "PASSIVE : Reacts to counterattacks",
+        "value": 9.7,
         "pinned": false,
-        "locked": false,
+        "locked": true,
         "marked": false,
         "factorIds": [
           1788775427431
@@ -16789,10 +16789,10 @@
       },
       {
         "id": 1789296721037,
-        "name": "Reflect damage passive",
-        "value": 9.8,
+        "name": "PASSIVE : Reflect damage",
+        "value": 9.5,
         "pinned": false,
-        "locked": false,
+        "locked": true,
         "marked": false,
         "factorIds": [
           1788694866469,
@@ -18940,5 +18940,5 @@
     ]
   },
   "schemaVersion": 2,
-  "savedAt": "2026-09-18T06:42:39.159Z"
+  "savedAt": "2026-09-18T06:44:56.914Z"
 }
