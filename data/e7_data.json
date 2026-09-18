@@ -17301,10 +17301,10 @@
       },
       {
         "id": 1788787229175,
-        "name": "Extinction",
-        "value": 9,
+        "name": "EFFECT : Extinction",
+        "value": 10,
         "pinned": false,
-        "locked": false,
+        "locked": true,
         "marked": false,
         "factorIds": [
           1788786928682
@@ -17790,10 +17790,10 @@
       },
       {
         "id": 1789136009020,
-        "name": "Dispel debuffs preventing movement (stun, sleep, fear)",
+        "name": "PASSIVE : Dispel debuffs preventing movement (stun, sleep, fear)",
         "value": 9,
         "pinned": false,
-        "locked": false,
+        "locked": true,
         "marked": false,
         "factorIds": [
           1789130156790
@@ -17943,10 +17943,10 @@
       },
       {
         "id": 1789195510119,
-        "name": "Evasion (Undispellable) Buff",
-        "value": 9,
+        "name": "UNDISPELLABLE : BUFF : Evasion",
+        "value": 9.5,
         "pinned": false,
-        "locked": false,
+        "locked": true,
         "marked": false,
         "factorIds": [
           1788700781693,
@@ -18940,5 +18940,5 @@
     ]
   },
   "schemaVersion": 2,
-  "savedAt": "2026-09-18T08:13:29.520Z"
+  "savedAt": "2026-09-18T11:48:38.951Z"
 }
