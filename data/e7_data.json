@@ -16623,10 +16623,10 @@
       },
       {
         "id": 1789267911314,
-        "name": "No Souls to activate first Soulburn",
-        "value": 8,
+        "name": "ONGOING : No Souls to activate first Soulburn",
+        "value": 10,
         "pinned": false,
-        "locked": false,
+        "locked": true,
         "marked": false,
         "factorIds": [
           1788784362484,
@@ -16916,7 +16916,7 @@
         "name": "BUFF : Invincibility",
         "value": 8,
         "pinned": false,
-        "locked": false,
+        "locked": true,
         "marked": false,
         "factorIds": [
           1788694866469,
@@ -18940,5 +18940,5 @@
     ]
   },
   "schemaVersion": 2,
-  "savedAt": "2026-09-18T13:22:48.235Z"
+  "savedAt": "2026-09-18T13:23:55.434Z"
 }
