@@ -16007,10 +16007,10 @@
       },
       {
         "id": 1789120795174,
-        "name": "Damage does not exceed % of HP",
-        "value": 9,
+        "name": "PASSIVE: Damage does not exceed % of HP",
+        "value": 9.5,
         "pinned": false,
-        "locked": false,
+        "locked": true,
         "marked": false,
         "factorIds": [
           1788694866469,
@@ -16742,10 +16742,10 @@
       },
       {
         "id": 1789287024068,
-        "name": "Decrease 100% Fighting Spirit",
-        "value": 9,
+        "name": "PASSIVE : Decrease 100% Fighting Spirit",
+        "value": 9.5,
         "pinned": false,
-        "locked": false,
+        "locked": true,
         "marked": false,
         "factorIds": [
           1788780896026
@@ -17030,10 +17030,10 @@
       },
       {
         "id": 1788773067411,
-        "name": "Dispel buffs",
-        "value": 9,
+        "name": "EFFECT : Dispel buffs",
+        "value": 4,
         "pinned": false,
-        "locked": false,
+        "locked": true,
         "marked": false,
         "factorIds": [
           1788773731924,
@@ -18940,5 +18940,5 @@
     ]
   },
   "schemaVersion": 2,
-  "savedAt": "2026-09-18T07:19:35.937Z"
+  "savedAt": "2026-09-18T07:25:16.261Z"
 }
