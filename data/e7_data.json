@@ -18429,10 +18429,10 @@
       },
       {
         "id": 1789277060195,
-        "name": "Ignore damage share buff",
-        "value": 9,
+        "name": "BUFF : Ignore damage share",
+        "value": 7,
         "pinned": false,
-        "locked": false,
+        "locked": true,
         "marked": false,
         "factorIds": [
           1788773130306,
@@ -18940,5 +18940,5 @@
     ]
   },
   "schemaVersion": 2,
-  "savedAt": "2026-09-18T07:47:36.119Z"
+  "savedAt": "2026-09-18T07:48:35.713Z"
 }
