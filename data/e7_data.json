@@ -15889,10 +15889,10 @@
       },
       {
         "id": 1788785002027,
-        "name": "Damage scaling Passive",
-        "value": 8,
+        "name": "PASSIVE : Damage scaling",
+        "value": 9,
         "pinned": false,
-        "locked": false,
+        "locked": true,
         "marked": false,
         "factorIds": [
           1788772992919,
@@ -16180,10 +16180,10 @@
       },
       {
         "id": 1789177894231,
-        "name": "Damage prop to injuries",
-        "value": 8,
+        "name": "DAMAGE : Prop to injuries",
+        "value": 10,
         "pinned": false,
-        "locked": false,
+        "locked": true,
         "marked": false,
         "factorIds": [
           1788772992919,
@@ -16573,10 +16573,10 @@
       },
       {
         "id": 1789263239648,
-        "name": "Increase burn damage passive",
-        "value": 8,
+        "name": "PASSIVE : Increase burn damage",
+        "value": 9,
         "pinned": false,
-        "locked": false,
+        "locked": true,
         "marked": false,
         "factorIds": [
           1789014978867,
@@ -18180,10 +18180,10 @@
       },
       {
         "id": 1789203279550,
-        "name": "Increase Damage prop to no.of debuffs",
-        "value": 8,
+        "name": "ONGOING : Increase Damage prop to no.of debuffs",
+        "value": 10,
         "pinned": false,
-        "locked": false,
+        "locked": true,
         "marked": false,
         "factorIds": [
           1789014978867,
@@ -18940,5 +18940,5 @@
     ]
   },
   "schemaVersion": 2,
-  "savedAt": "2026-09-18T07:37:22.485Z"
+  "savedAt": "2026-09-18T07:41:08.642Z"
 }
