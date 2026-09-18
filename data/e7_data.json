@@ -17748,10 +17748,10 @@
       },
       {
         "id": 1789135161839,
-        "name": "Block on enemies",
-        "value": 9.3,
+        "name": "DEBUFF : Block effect",
+        "value": 4.5,
         "pinned": false,
-        "locked": false,
+        "locked": true,
         "marked": false,
         "factorIds": [
           1788773731924,
@@ -18940,5 +18940,5 @@
     ]
   },
   "schemaVersion": 2,
-  "savedAt": "2026-09-18T06:55:00.176Z"
+  "savedAt": "2026-09-18T06:59:20.234Z"
 }
