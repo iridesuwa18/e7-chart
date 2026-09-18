@@ -15958,10 +15958,10 @@
       },
       {
         "id": 1789113568734,
-        "name": "Cannot crit / heavy blow",
-        "value": 7,
+        "name": "ONGOING : Cannot crit / heavy blow",
+        "value": 10,
         "pinned": false,
-        "locked": false,
+        "locked": true,
         "marked": false,
         "factorIds": [
           1788783127095,
@@ -16046,7 +16046,7 @@
       {
         "id": 1789130554431,
         "name": "Unaffected by Combat Readiness increase / decrease",
-        "value": 7,
+        "value": 10,
         "pinned": false,
         "locked": false,
         "marked": false,
@@ -17287,10 +17287,10 @@
       },
       {
         "id": 1788786428743,
-        "name": "Always crit (successful atk)",
-        "value": 7,
+        "name": "ONGOING : Always crit (successful atk)",
+        "value": 10,
         "pinned": false,
-        "locked": false,
+        "locked": true,
         "marked": false,
         "factorIds": [
           1788786571272,
@@ -18405,10 +18405,10 @@
       },
       {
         "id": 1789276598548,
-        "name": "Exploiting weak points",
+        "name": "BUFF : Exploiting weak points",
         "value": 7,
         "pinned": false,
-        "locked": false,
+        "locked": true,
         "marked": false,
         "factorIds": [
           1788772992919,
@@ -18940,5 +18940,5 @@
     ]
   },
   "schemaVersion": 2,
-  "savedAt": "2026-09-18T12:24:44.048Z"
+  "savedAt": "2026-09-18T12:26:55.243Z"
 }
