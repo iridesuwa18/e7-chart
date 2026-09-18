@@ -15738,10 +15738,10 @@
       },
       {
         "id": 1788771831892,
-        "name": "Damage sharing",
-        "value": 9.5,
+        "name": "ONGOING : Damage sharing",
+        "value": 10,
         "pinned": false,
-        "locked": false,
+        "locked": true,
         "marked": false,
         "factorIds": [
           1788772019318,
@@ -18940,5 +18940,5 @@
     ]
   },
   "schemaVersion": 2,
-  "savedAt": "2026-09-18T06:48:38.053Z"
+  "savedAt": "2026-09-18T06:49:20.818Z"
 }
