@@ -16542,10 +16542,10 @@
       },
       {
         "id": 1789259194029,
-        "name": "Attack equal to allies' highest attack",
-        "value": 8,
+        "name": "ONGOING : Attack equal to allies' highest attack",
+        "value": 10,
         "pinned": false,
-        "locked": false,
+        "locked": true,
         "marked": false,
         "factorIds": [
           1788700420912,
@@ -18940,5 +18940,5 @@
     ]
   },
   "schemaVersion": 2,
-  "savedAt": "2026-09-18T13:04:40.558Z"
+  "savedAt": "2026-09-18T13:10:50.365Z"
 }
