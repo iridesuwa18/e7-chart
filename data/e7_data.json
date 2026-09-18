@@ -16913,7 +16913,7 @@
       },
       {
         "id": 1788698917413,
-        "name": "Invincibility to allies",
+        "name": "BUFF : Invincibility",
         "value": 8,
         "pinned": false,
         "locked": false,
@@ -16948,10 +16948,10 @@
       },
       {
         "id": 1788700311844,
-        "name": "Ignore / penetrate defense",
-        "value": 8,
+        "name": "EFFECT : Ignore / penetrate defense",
+        "value": 10,
         "pinned": false,
-        "locked": false,
+        "locked": true,
         "marked": false,
         "factorIds": [
           1788701036557
@@ -17092,10 +17092,10 @@
       },
       {
         "id": 1788782920388,
-        "name": "Shields / barriers to allies",
-        "value": 8,
+        "name": "BUFF : Shields / barriers",
+        "value": 7.5,
         "pinned": false,
-        "locked": false,
+        "locked": true,
         "marked": false,
         "factorIds": [
           1788694866469,
@@ -17253,10 +17253,10 @@
       },
       {
         "id": 1788785627002,
-        "name": "Increase skill cooldown",
-        "value": 8,
+        "name": "EFFECT : Increase skill cooldown",
+        "value": 4.5,
         "pinned": false,
-        "locked": false,
+        "locked": true,
         "marked": false,
         "factorIds": [
           1788773895734,
@@ -17312,10 +17312,10 @@
       },
       {
         "id": 1788787121779,
-        "name": "Elemental advantage (Light > Dark)",
-        "value": 8,
+        "name": "EFFECT : Elemental advantage (Light > Dark)",
+        "value": 10,
         "pinned": false,
-        "locked": false,
+        "locked": true,
         "marked": false,
         "factorIds": [
           1788787028808
@@ -17554,10 +17554,10 @@
       },
       {
         "id": 1789118795470,
-        "name": "Skill nullifier to allies",
-        "value": 8,
+        "name": "BUFF : Skill nullifier",
+        "value": 7.2,
         "pinned": false,
-        "locked": false,
+        "locked": true,
         "marked": false,
         "factorIds": [
           1788694866469,
@@ -17856,10 +17856,10 @@
       },
       {
         "id": 1789175151105,
-        "name": "Elemental advantage (Dark > Light)",
-        "value": 8,
+        "name": "EFFECT : Elemental advantage (Dark > Light)",
+        "value": 10,
         "pinned": false,
-        "locked": false,
+        "locked": true,
         "marked": false,
         "factorIds": [
           1789175114611
@@ -18459,10 +18459,10 @@
       },
       {
         "id": 1789278130134,
-        "name": "Distribute health among allies",
-        "value": 8,
+        "name": "SKILL : Distribute health among allies",
+        "value": 10,
         "pinned": false,
-        "locked": false,
+        "locked": true,
         "marked": false,
         "factorIds": [
           1788694866469,
@@ -18940,5 +18940,5 @@
     ]
   },
   "schemaVersion": 2,
-  "savedAt": "2026-09-18T13:12:46.622Z"
+  "savedAt": "2026-09-18T13:22:48.235Z"
 }
