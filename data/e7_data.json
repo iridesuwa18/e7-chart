@@ -16100,10 +16100,10 @@
       },
       {
         "id": 1789136659023,
-        "name": "Additional damage reduction",
+        "name": "PASSIVE : Additional damage reduction",
         "value": 9,
         "pinned": false,
-        "locked": false,
+        "locked": true,
         "marked": false,
         "factorIds": [
           1788772019318
@@ -16287,10 +16287,10 @@
       },
       {
         "id": 1789198617409,
-        "name": "Attack scaling passive",
+        "name": "PASSIVE: Attack scaling",
         "value": 9,
         "pinned": false,
-        "locked": false,
+        "locked": true,
         "marked": false,
         "factorIds": [
           1788783127095,
@@ -17615,10 +17615,10 @@
       },
       {
         "id": 1789132181142,
-        "name": "AOE non-attack skills",
-        "value": 9,
+        "name": "SKILL : Non-attack AOE",
+        "value": 10,
         "pinned": true,
-        "locked": false,
+        "locked": true,
         "marked": false,
         "factorIds": [
           1788783127095,
@@ -18940,5 +18940,5 @@
     ]
   },
   "schemaVersion": 2,
-  "savedAt": "2026-09-18T07:02:26.115Z"
+  "savedAt": "2026-09-18T07:16:33.321Z"
 }
