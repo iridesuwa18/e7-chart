@@ -4849,6 +4849,14 @@ body.hide-labels .hero-dot-label {
   background: rgba(255,255,255,.03);
 }
 .hf-factor-status-text { font-size: 11.5px; color: var(--text-dim); flex: 1 1 200px; }
+.hf-factor-status-actions { display: flex; gap: 6px; flex-wrap: wrap; }
+
+/* Same .qd-factor-priority-chips row Quick Draft's own Enemy Factors
+   control uses, just placed inside this panel too so prioritizing a
+   ticked Factor doesn't require leaving it. Margin/gap already come
+   from .qd-factor-priority-chips; this only tweaks the bottom spacing
+   to match this panel's other rows. */
+.hf-priority-chips { margin-bottom: 8px; }
 
 .hf-filter-row {
   display: flex;

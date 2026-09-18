@@ -165,7 +165,9 @@ function hfClose() {
 // untied, prioritized, or a score/Factor edited) — cheap no-op unless
 // the panel is actually open right now.
 function hfRefreshIfOpen() {
-  if (hfMenuEl && hfMenuEl.style.display !== "none") renderHeroFactorsGrid();
+  if (!hfMenuEl || hfMenuEl.style.display === "none") return;
+  renderHfFactorStatus(); // ticks/priorities may have changed from outside this panel
+  renderHeroFactorsGrid();
 }
 
 // Builds/updates the "🧬 Hero Factors ▾" trigger button (mirrors
@@ -200,8 +202,108 @@ function hfFactorStatusHTML() {
   const label = n === 0 ? "🎯 Tick Enemy Factors" : "🎯 Edit Enemy Factors";
   return `
     <span class="hf-factor-status-text">${text}</span>
-    <button type="button" class="btn btn-ghost btn-xs" id="hf-edit-factors">${label}</button>
+    <div class="hf-factor-status-actions">
+      <button type="button" class="btn btn-ghost btn-xs" id="hf-edit-factors">${label}</button>
+      ${n > 0 ? `<button type="button" class="btn btn-ghost btn-xs" id="hf-clear-factors" title="Untick every Enemy Factor without leaving this panel">🗑 Clear Enemy Factors</button>` : ""}
+    </div>
   `;
+}
+
+// Rebuilds the status line + Clear button + prioritize-chip row and
+// rewires their handlers — called on full panel build and whenever
+// Enemy Factors state changes (ticked/untied/prioritized/cleared),
+// whether that happened right here or back in Quick Draft's own
+// picker (hfRefreshIfOpen). Kept separate from renderHeroFactorsPanel
+// so a tick change doesn't need to rebuild the whole panel (which
+// would cost the search box its focus).
+function renderHfFactorStatus() {
+  const statusEl = document.getElementById("hf-factor-status");
+  if (!statusEl) return;
+  statusEl.innerHTML = hfFactorStatusHTML();
+
+  document.getElementById("hf-edit-factors")?.addEventListener("click", () => {
+    // Jumps to the real Enemy Factors picker to change what's ticked —
+    // hides this panel first (rather than stacking two fullscreen
+    // overlays) but deliberately doesn't fully hfClose() it: instead,
+    // qdFactorMenuOnClose (app.js) is set so that whenever the Enemy
+    // Factors picker itself closes — ✕, backdrop tap, or Escape, it
+    // makes no difference which — Hero Factors reopens automatically
+    // with the new ticks already reflected, rather than the user
+    // landing back on whatever screen was open before Hero Factors in
+    // the first place.
+    if (hfMenuEl) hfMenuEl.style.display = "none"; // body stays "qd-factor-menu-open" the whole time — Enemy Factors just takes over the same lock
+    if (typeof qdFactorMenuOnClose !== "undefined") qdFactorMenuOnClose = () => hfOpen();
+    document.getElementById("qd-factor-menu-btn")?.click();
+  });
+
+  document.getElementById("hf-clear-factors")?.addEventListener("click", hfClearEnemyFactors);
+
+  renderHfPriorityChips();
+}
+
+// Unticks every Enemy Factor (and drops any priority stars with them)
+// right from this panel — no trip to Quick Draft's picker needed. Sets
+// the exact same qdTickedFactorIds/qdPrioritizedFactorIds state Quick
+// Draft itself reads, so its own button label, Factor list, priority-
+// chip row, filled slots, and live suggestions all fall back in step
+// with this panel rather than drifting out of sync.
+function hfClearEnemyFactors() {
+  if (qdTickedFactorIds.size === 0 && qdPrioritizedFactorIds.size === 0) return;
+  qdTickedFactorIds.clear();
+  qdPrioritizedFactorIds.clear();
+
+  if (typeof saveQuickDraftModeLocal === "function") saveQuickDraftModeLocal();
+  if (typeof renderQdFactorChips === "function") renderQdFactorChips(); // syncs Quick Draft's own button/list/priority-chip row even though its picker isn't open
+  if (typeof renderQuickDraft === "function") renderQuickDraft(); // filled slots' scores/(i) explanations fall back to plain kit score too
+  if (typeof quickDraftSuggestOpen !== "undefined" && quickDraftSuggestOpen && typeof renderQuickDraftSuggestions === "function") renderQuickDraftSuggestions();
+
+  renderHfFactorStatus();
+  renderHeroFactorsGrid();
+}
+
+// Alphabetical row of chips — one per currently-ticked Enemy Factor —
+// mirrors renderQdFactorPriorityChips' own row in Quick Draft (same
+// .qd-factor-priority-chip styling, same qdPrioritizedFactorIds state)
+// but lives right here too, so prioritizing doesn't require a trip to
+// Quick Draft's picker either. Ticking/unticking Factors themselves
+// still only happens there — this row can only prioritize what's
+// already ticked.
+function renderHfPriorityChips() {
+  const box = document.getElementById("hf-priority-chips");
+  if (!box) return;
+
+  if (qdTickedFactorIds.size === 0) {
+    box.innerHTML = "";
+    box.style.display = "none";
+    return;
+  }
+  box.style.display = "flex";
+
+  const tickedFactors = [...qdTickedFactorIds]
+    .map(id => taxonomy.factors.find(f => f.id === id))
+    .filter(Boolean)
+    .sort((a, b) => (a.name || "").toLowerCase().localeCompare((b.name || "").toLowerCase()));
+
+  box.innerHTML = tickedFactors.map(f => `
+    <button type="button" class="qd-factor-priority-chip${qdPrioritizedFactorIds.has(f.id) ? " active" : ""}" data-factor-id="${f.id}" title="${qdPrioritizedFactorIds.has(f.id) ? "Prioritized — click to remove the ×2 boost" : "Click to prioritize (doubles this Factor's score)"}">
+      ${qdPrioritizedFactorIds.has(f.id) ? "⭐ " : ""}${f.name || "(unnamed)"}
+    </button>
+  `).join("");
+
+  box.querySelectorAll(".qd-factor-priority-chip").forEach(chip => {
+    chip.addEventListener("click", () => {
+      const factorId = taxonomy.factors.find(f => String(f.id) === chip.dataset.factorId)?.id;
+      if (factorId === undefined) return;
+      if (qdPrioritizedFactorIds.has(factorId)) qdPrioritizedFactorIds.delete(factorId);
+      else qdPrioritizedFactorIds.add(factorId);
+
+      renderHfPriorityChips(); // just this row
+      if (typeof renderQdFactorPriorityChips === "function") renderQdFactorPriorityChips(); // keep Quick Draft's own chip row in sync too
+      if (typeof renderQuickDraft === "function") renderQuickDraft();
+      if (typeof quickDraftSuggestOpen !== "undefined" && quickDraftSuggestOpen && typeof renderQuickDraftSuggestions === "function") renderQuickDraftSuggestions();
+      renderHeroFactorsGrid();
+    });
+  });
 }
 
 function renderHfTagChecklist(kind) {
@@ -330,7 +432,8 @@ function renderHeroFactorsPanel() {
       <button type="button" class="qd-factor-menu-clear" id="hf-search-clear" title="Clear search" aria-label="Clear search">✕</button>
     </div>
 
-    <div class="hf-factor-status" id="hf-factor-status">${hfFactorStatusHTML()}</div>
+    <div class="hf-factor-status" id="hf-factor-status"></div>
+    <div class="qd-factor-priority-chips hf-priority-chips" id="hf-priority-chips" style="display:none"></div>
 
     <div class="hf-filter-row">
       <label class="hf-minscore-label">Min overall score
@@ -387,19 +490,7 @@ function renderHeroFactorsPanel() {
     renderHeroFactorsPanel();
   });
 
-  // Jumps to the real Enemy Factors picker to change what's ticked —
-  // hides this panel first (rather than stacking two fullscreen
-  // overlays) but deliberately doesn't fully hfClose() it: instead,
-  // qdFactorMenuOnClose (app.js) is set so that whenever the Enemy
-  // Factors picker itself closes — ✕, backdrop tap, or Escape, it makes
-  // no difference which — Hero Factors reopens automatically with the
-  // new ticks already reflected, rather than the user landing back on
-  // whatever screen was open before Hero Factors in the first place.
-  document.getElementById("hf-edit-factors")?.addEventListener("click", () => {
-    if (hfMenuEl) hfMenuEl.style.display = "none"; // body stays "qd-factor-menu-open" the whole time — Enemy Factors just takes over the same lock
-    if (typeof qdFactorMenuOnClose !== "undefined") qdFactorMenuOnClose = () => hfOpen();
-    document.getElementById("qd-factor-menu-btn")?.click();
-  });
+  renderHfFactorStatus(); // status text, Clear Enemy Factors button, and the prioritize-chip row
 
   renderHfCategoryChips();
 
