@@ -16162,10 +16162,10 @@
       },
       {
         "id": 1789177637826,
-        "name": "Reactive attack by passives (Not counter)",
-        "value": 8,
+        "name": "PASSIVE : Reactive attack (Not counter)",
+        "value": 9.7,
         "pinned": true,
-        "locked": false,
+        "locked": true,
         "marked": false,
         "factorIds": [
           1789177680699,
@@ -16337,10 +16337,10 @@
       },
       {
         "id": 1789201975789,
-        "name": "Reacts to soulburns",
-        "value": 8,
+        "name": "PASSIVE : Reacts to soulburns",
+        "value": 9.7,
         "pinned": false,
-        "locked": false,
+        "locked": true,
         "marked": false,
         "factorIds": [
           1788913836890
@@ -16372,10 +16372,10 @@
       },
       {
         "id": 1789202634207,
-        "name": "Reacts to allies' turns",
-        "value": 8,
+        "name": "PASSIVE : Reacts to allies' turns",
+        "value": 9.7,
         "pinned": false,
-        "locked": false,
+        "locked": true,
         "marked": false,
         "factorIds": [
           1788785891810
@@ -16471,10 +16471,10 @@
       },
       {
         "id": 1789217293880,
-        "name": "Reacts to extra turns",
-        "value": 8.5,
+        "name": "PASSIVE : Reacts to extra turns",
+        "value": 9.7,
         "pinned": false,
-        "locked": false,
+        "locked": true,
         "marked": false,
         "factorIds": [
           1788772861638
@@ -16493,10 +16493,10 @@
       },
       {
         "id": 1789221069112,
-        "name": "Reacts to enemy's AOE attacks",
-        "value": 8.6,
+        "name": "PASSIVE : Reacts to enemy's AOE attacks",
+        "value": 9.7,
         "pinned": false,
-        "locked": false,
+        "locked": true,
         "marked": false,
         "factorIds": [
           1788913802940
@@ -16517,9 +16517,9 @@
       {
         "id": 1789221525475,
         "name": "PASSIVE : Reacts to attack done to allies",
-        "value": 8.6,
+        "value": 9.7,
         "pinned": false,
-        "locked": false,
+        "locked": true,
         "marked": false,
         "factorIds": [
           1788775427431,
@@ -16532,9 +16532,9 @@
       {
         "id": 1789259042871,
         "name": "PASSIVE : Reacts to enemy non-attack skills",
-        "value": 8.6,
+        "value": 9.7,
         "pinned": false,
-        "locked": false,
+        "locked": true,
         "marked": false,
         "factorIds": [
           1789259075608
@@ -16599,10 +16599,10 @@
       },
       {
         "id": 1789264561709,
-        "name": "Reacts to enemy's death done by allies (not caster)",
-        "value": 8.6,
+        "name": "PASSIVE : Reacts to enemy's death done by allies (not caster)",
+        "value": 9.7,
         "pinned": false,
-        "locked": false,
+        "locked": true,
         "marked": false,
         "factorIds": [
           1788772992919,
@@ -16612,10 +16612,10 @@
       },
       {
         "id": 1789267292000,
-        "name": "Reacts to ally's extra turns",
-        "value": 8.5,
+        "name": "PASSIVE : Reacts to ally's extra turns",
+        "value": 9.7,
         "pinned": false,
-        "locked": false,
+        "locked": true,
         "marked": false,
         "factorIds": [
           1788785891810
@@ -16647,7 +16647,7 @@
       },
       {
         "id": 1789268154676,
-        "name": "Reacts to ally's AOE attacks",
+        "name": "PASSIVE : Reacts to ally's AOE attacks",
         "value": 7,
         "pinned": false,
         "locked": false,
@@ -16713,10 +16713,10 @@
       },
       {
         "id": 1789280827303,
-        "name": "Reacts to enemy's non-critical attacks",
-        "value": 8,
+        "name": "PASSIVE : Reacts to enemy's non-critical attacks",
+        "value": 9.7,
         "pinned": false,
-        "locked": false,
+        "locked": true,
         "marked": false,
         "factorIds": [
           1788774921178,
@@ -16731,10 +16731,10 @@
       },
       {
         "id": 1789286831746,
-        "name": "Reacts to allies' non-attack skills",
-        "value": 8,
+        "name": "PASSIVE : Reacts to allies' non-attack skills",
+        "value": 9.7,
         "pinned": false,
-        "locked": false,
+        "locked": true,
         "marked": false,
         "factorIds": [
           1788785891810
@@ -16778,10 +16778,10 @@
       },
       {
         "id": 1789296502290,
-        "name": "Reacts to enemy's attack with a buff",
-        "value": 8,
+        "name": "PASSIVE : Reacts to enemy's attack with a buff",
+        "value": 9.7,
         "pinned": false,
-        "locked": false,
+        "locked": true,
         "marked": false,
         "factorIds": [
           1788773731924
@@ -16823,10 +16823,10 @@
       },
       {
         "id": 1789299557625,
-        "name": "Reacts to poison and venom effects",
-        "value": 8,
+        "name": "PASSIVE : Reacts to poison and venom effects",
+        "value": 9.7,
         "pinned": false,
-        "locked": false,
+        "locked": true,
         "marked": false,
         "factorIds": [
           1789299573426
@@ -18940,5 +18940,5 @@
     ]
   },
   "schemaVersion": 2,
-  "savedAt": "2026-09-18T08:01:18.969Z"
+  "savedAt": "2026-09-18T08:13:16.924Z"
 }
