@@ -16046,7 +16046,7 @@
       {
         "id": 1789130554431,
         "name": "PASSIVE : Unaffected by Combat Readiness increase / decrease",
-        "value": 10,
+        "value": 9.7,
         "pinned": false,
         "locked": true,
         "marked": false,
@@ -16243,10 +16243,10 @@
       },
       {
         "id": 1789192490318,
-        "name": "Double attack and speed stats",
-        "value": 7.5,
+        "name": "UNIQUE : BUFF : Trauma (Attack and speed stats doubled)",
+        "value": 10,
         "pinned": false,
-        "locked": false,
+        "locked": true,
         "marked": false,
         "factorIds": [
           1788773895734,
@@ -16409,7 +16409,7 @@
       {
         "id": 1789209126720,
         "name": "PASSIVE : Unaffected by effects that reduce Combat Readiness increases the caster receives.",
-        "value": 9.5,
+        "value": 9.7,
         "pinned": false,
         "locked": true,
         "marked": false,
@@ -16419,10 +16419,10 @@
       },
       {
         "id": 1789209367308,
-        "name": "Cannot crit",
-        "value": 7.5,
+        "name": "ONGOING : Cannot crit",
+        "value": 10,
         "pinned": false,
-        "locked": false,
+        "locked": true,
         "marked": false,
         "factorIds": [
           1788783127095,
@@ -16680,10 +16680,10 @@
       },
       {
         "id": 1789276809428,
-        "name": "Unaffected by decreases to Combat Readiness",
-        "value": 8,
+        "name": "PASSIVE : Unaffected by decreases to Combat Readiness",
+        "value": 9.7,
         "pinned": false,
-        "locked": false,
+        "locked": true,
         "marked": false,
         "factorIds": [
           1789130596970
@@ -18307,10 +18307,10 @@
       },
       {
         "id": 1789218602674,
-        "name": "Unaffected by elemental disadvantage",
-        "value": 7.8,
+        "name": "EFFECT : Unaffected by elemental disadvantage",
+        "value": 10,
         "pinned": false,
-        "locked": false,
+        "locked": true,
         "marked": false,
         "factorIds": [
           1789218645455
@@ -18940,5 +18940,5 @@
     ]
   },
   "schemaVersion": 2,
-  "savedAt": "2026-09-18T12:57:53.676Z"
+  "savedAt": "2026-09-18T13:04:40.558Z"
 }
