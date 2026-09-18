@@ -16149,7 +16149,7 @@
       {
         "id": 1789177042422,
         "name": "PASSIVE : Increase Effect Resistance",
-        "value": 10,
+        "value": 9.7,
         "pinned": false,
         "locked": true,
         "marked": false,
@@ -18940,5 +18940,5 @@
     ]
   },
   "schemaVersion": 2,
-  "savedAt": "2026-09-18T06:40:32.554Z"
+  "savedAt": "2026-09-18T06:41:10.907Z"
 }
