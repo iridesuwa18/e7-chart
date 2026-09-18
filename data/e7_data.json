@@ -17323,10 +17323,10 @@
       },
       {
         "id": 1788912251007,
-        "name": "Undispellable Buffs (Not Unique)",
-        "value": 9,
+        "name": "UNDISPELLABLE : BUFFS : Global (Not Unique)",
+        "value": 9.5,
         "pinned": false,
-        "locked": false,
+        "locked": true,
         "marked": false,
         "factorIds": [
           1788912649792,
@@ -17444,10 +17444,10 @@
       },
       {
         "id": 1789114206059,
-        "name": "Indomitable (Undispellable) Buff",
-        "value": 8.8,
+        "name": "UNDISPELLABLE : BUFF : Indomitable",
+        "value": 9.5,
         "pinned": false,
-        "locked": false,
+        "locked": true,
         "marked": false,
         "factorIds": [
           1788694866469,
@@ -18249,10 +18249,10 @@
       },
       {
         "id": 1789210263222,
-        "name": "Pestilence (Undispellable) Buff",
-        "value": 8,
+        "name": "UNDISPELLABLE : BUFF : Pestilence (Inflict injuries)",
+        "value": 9.5,
         "pinned": false,
-        "locked": false,
+        "locked": true,
         "marked": false,
         "factorIds": [
           1788700420912,
@@ -18280,10 +18280,10 @@
       },
       {
         "id": 1789217387830,
-        "name": "Increase hit chance (Undispellable) buff",
-        "value": 9,
+        "name": "UNDISPELLABLE : BUFF :  Increase hit chance",
+        "value": 9.5,
         "pinned": false,
-        "locked": false,
+        "locked": true,
         "marked": false,
         "factorIds": [
           1788783127095,
@@ -18318,10 +18318,10 @@
       },
       {
         "id": 1789219311500,
-        "name": "Chain of Chiron (Undispellable) Buff to ally (4 random debuffs)",
-        "value": 8,
+        "name": "UNDISPELLABLE : BUFF : Chain of Chiron to ally (4 random debuffs)",
+        "value": 9.5,
         "pinned": false,
-        "locked": false,
+        "locked": true,
         "marked": false,
         "factorIds": [
           1788773731924,
@@ -18417,10 +18417,10 @@
       },
       {
         "id": 1789276945500,
-        "name": "Radiance (Undispellable) buff",
-        "value": 8,
+        "name": "UNDISPELLABLE : BUFF : Radiance (Dmg Reduction)",
+        "value": 9.5,
         "pinned": false,
-        "locked": false,
+        "locked": true,
         "marked": false,
         "factorIds": [
           1788694866469,
@@ -18538,10 +18538,10 @@
       },
       {
         "id": 1789299195538,
-        "name": "Ice Cream (Undispellable) Buff",
-        "value": 9,
+        "name": "UNDISPELLABLE : BUFF : Ice Cream",
+        "value": 9.5,
         "pinned": false,
-        "locked": false,
+        "locked": true,
         "marked": false,
         "factorIds": [
           1788694866469,
@@ -18557,10 +18557,10 @@
       },
       {
         "id": 1789299850224,
-        "name": "Special Friendship (Undispellable) Buff to Earth Ally",
-        "value": 8.6,
+        "name": "UNDISPELLABLE : BUFF : Special Friendship to Earth Ally",
+        "value": 9.5,
         "pinned": false,
-        "locked": false,
+        "locked": true,
         "marked": false,
         "factorIds": [
           1788772992919,
@@ -18940,5 +18940,5 @@
     ]
   },
   "schemaVersion": 2,
-  "savedAt": "2026-09-18T11:48:38.951Z"
+  "savedAt": "2026-09-18T11:54:35.457Z"
 }
