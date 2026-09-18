@@ -16648,9 +16648,9 @@
       {
         "id": 1789268154676,
         "name": "PASSIVE : Reacts to ally's AOE attacks",
-        "value": 7,
+        "value": 9.7,
         "pinned": false,
-        "locked": false,
+        "locked": true,
         "marked": false,
         "factorIds": [
           1788785891810
@@ -18940,5 +18940,5 @@
     ]
   },
   "schemaVersion": 2,
-  "savedAt": "2026-09-18T08:13:16.924Z"
+  "savedAt": "2026-09-18T08:13:29.520Z"
 }
