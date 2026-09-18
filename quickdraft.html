@@ -1144,6 +1144,7 @@
             <input type="text" id="taxonomy-new-reaction" readonly autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false" placeholder="Press &quot;+ Add&quot; to add new Reaction name." />
             <button type="button" class="btn btn-gold btn-sm" id="taxonomy-add-reaction">+ Add</button>
           </div>
+          <div class="taxonomy-add-category-chips" id="taxonomy-add-reaction-category-chips" style="display:none"></div>
           <div class="taxonomy-list" id="taxonomy-list-reactions"></div>
         </div>
 
@@ -1175,6 +1176,7 @@
             <input type="text" id="taxonomy-new-engagement" readonly autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false" placeholder="Press &quot;+ Add&quot; to add new Engagement name." />
             <button type="button" class="btn btn-gold btn-sm" id="taxonomy-add-engagement">+ Add</button>
           </div>
+          <div class="taxonomy-add-category-chips" id="taxonomy-add-engagement-category-chips" style="display:none"></div>
           <div class="taxonomy-list" id="taxonomy-list-engagements"></div>
         </div>
 
@@ -1239,6 +1241,10 @@
       <div class="form-group">
         <label>Name</label>
         <input type="text" id="rename-modal-input" autocomplete="off" spellcheck="false" />
+        <!-- Ranking Category quick-fill — Reactions/Engagements only; tap a
+             category to prefix the name with "CATEGORY : " instead of typing
+             it out. See openRenameModal/renderCategoryQuickfillRow in app.js. -->
+        <div class="rename-modal-category-chips" id="rename-modal-category-chips" style="display:none"></div>
       </div>
       <div class="modal-btns">
         <button class="btn btn-gold" id="rename-modal-save">Save</button>

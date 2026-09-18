@@ -1246,6 +1246,7 @@
             <input type="text" id="taxonomy-new-reaction" readonly autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false" placeholder="Press &quot;+ Add&quot; to add new Reaction name." />
             <button type="button" class="btn btn-gold btn-sm" id="taxonomy-add-reaction">+ Add</button>
           </div>
+          <div class="taxonomy-add-category-chips" id="taxonomy-add-reaction-category-chips" style="display:none"></div>
           <div class="taxonomy-list" id="taxonomy-list-reactions"></div>
         </div>
 
@@ -1277,6 +1278,7 @@
             <input type="text" id="taxonomy-new-engagement" readonly autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false" placeholder="Press &quot;+ Add&quot; to add new Engagement name." />
             <button type="button" class="btn btn-gold btn-sm" id="taxonomy-add-engagement">+ Add</button>
           </div>
+          <div class="taxonomy-add-category-chips" id="taxonomy-add-engagement-category-chips" style="display:none"></div>
           <div class="taxonomy-list" id="taxonomy-list-engagements"></div>
         </div>
 
@@ -1328,6 +1330,7 @@
       <div class="qd-factor-menu-header">
         <div class="qd-factor-menu-title">📊 Performance Ranking System</div>
         <div class="taxonomy-ranking-header-actions">
+          <button type="button" class="taxonomy-ranking-select-toggle" id="taxonomy-ranking-select-toggle" title="Select several rows to change their scores all at once">☑ Select</button>
           <button type="button" class="taxonomy-ranking-quicksave" id="taxonomy-ranking-quicksave" title="Save everything to GitHub right now">💾 Quick Save</button>
           <button type="button" class="qd-factor-menu-close" id="taxonomy-ranking-close" aria-label="Close">✕</button>
         </div>
@@ -1358,6 +1361,23 @@
         <button type="button" class="taxonomy-ranking-filter-chip" data-filter="locked" title="Show only locked scores">🔒 Locked</button>
         <button type="button" class="taxonomy-ranking-filter-chip" data-filter="marked" title="Show only items you've marked as edited">🔖 Marked</button>
         <button type="button" class="taxonomy-ranking-filter-chip" data-filter="unassigned" title="Show only items not yet assigned to any hero">⚠️ Unassigned</button>
+      </div>
+      <!-- Bulk score editor — only shown while "☑ Select" mode is on (see
+           taxonomyRankingSelectMode/taxonomyRankingSelected in app.js).
+           Locked rows are silently skipped when applying, same as every
+           other entry point into setTaxonomyItemValue. -->
+      <div class="taxonomy-ranking-bulk-bar" id="taxonomy-ranking-bulk-bar" style="display:none">
+        <span class="taxonomy-ranking-bulk-count" id="taxonomy-ranking-bulk-count">0 selected</span>
+        <button type="button" class="btn btn-ghost btn-xs" id="taxonomy-ranking-bulk-selectall">Select All</button>
+        <button type="button" class="btn btn-ghost btn-xs" id="taxonomy-ranking-bulk-clear">Clear</button>
+        <div class="taxonomy-ranking-bulk-set">
+          <input type="number" id="taxonomy-ranking-bulk-value" min="0" max="10" step="0.1" value="5.0" />
+          <button type="button" class="btn btn-gold btn-xs" id="taxonomy-ranking-bulk-apply" disabled>Set Score</button>
+        </div>
+        <div class="taxonomy-ranking-bulk-nudge">
+          <button type="button" class="btn btn-ghost btn-xs" id="taxonomy-ranking-bulk-minus" disabled>−0.5</button>
+          <button type="button" class="btn btn-ghost btn-xs" id="taxonomy-ranking-bulk-plus" disabled>+0.5</button>
+        </div>
       </div>
       <div class="taxonomy-ranking-list" id="taxonomy-ranking-list"></div>
     </div>
@@ -1397,6 +1417,11 @@
         <label>Name</label>
         <input type="text" id="rename-modal-input" autocomplete="off" spellcheck="false" />
         <div class="rename-modal-suggest" id="rename-modal-suggest" style="display:none"></div>
+        <!-- Ranking Category quick-fill — Reactions/Engagements only (Factors
+             have no category concept); tap a category to prefix the name with
+             "CATEGORY : " instead of typing it out. See openRenameModal /
+             renderCategoryQuickfillRow in app.js. -->
+        <div class="rename-modal-category-chips" id="rename-modal-category-chips" style="display:none"></div>
       </div>
       <div class="modal-btns">
         <button class="btn btn-gold" id="rename-modal-save">Save</button>

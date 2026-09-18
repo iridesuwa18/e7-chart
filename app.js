@@ -502,9 +502,52 @@ function wireTaxonomySearchClear(input, clearBtn, onChange) {
 // Enter) with text in it actually calls `onAdd` and re-locks. Escape,
 // or blurring away with nothing typed, also re-locks without adding
 // anything.
-function wireTaxonomyAddRow(addBtnId, inputId, label, onAdd) {
+// Ranking Categories (see hfCategoryOf/hfAllRankingCategories in
+// hero-factors.js) — a Reaction/Engagement named "CATEGORY : rest of the
+// name" belongs to CATEGORY. These two helpers let a category be
+// quick-tapped onto a name input instead of typed by hand every single
+// time: applyCategoryPrefixToInput does the actual insert/replace/toggle
+// on one input, renderCategoryQuickfillRow (re)draws the chip row that
+// calls it. Guarded with typeof checks throughout since hero-factors.js
+// (loaded after app.js) is what actually defines hfCategoryOf/
+// hfAllRankingCategories — safe here because every call site below only
+// runs later, in response to a user opening a modal or unlocking an
+// input, by which point hero-factors.js has long since finished loading.
+function applyCategoryPrefixToInput(input, cat) {
+  if (!input) return;
+  const raw = input.value || "";
+  const existingCat = typeof hfCategoryOf === "function" ? hfCategoryOf(raw) : null;
+  const rest = existingCat !== null ? raw.slice(raw.indexOf(":") + 1).replace(/^\s+/, "") : raw;
+  input.value = existingCat === cat ? rest : (rest ? `${cat} : ${rest}` : `${cat} : `);
+  // Programmatic value changes don't fire "input" on their own — dispatch
+  // one so anything listening for it (quick-add visibility, suggestions)
+  // reacts exactly as if this had been typed.
+  input.dispatchEvent(new Event("input", { bubbles: true }));
+  input.focus();
+  input.setSelectionRange(input.value.length, input.value.length);
+}
+
+function renderCategoryQuickfillRow(containerEl, input) {
+  if (!containerEl || !input) return;
+  const cats = typeof hfAllRankingCategories === "function" ? hfAllRankingCategories() : [];
+  if (!cats.length) { containerEl.innerHTML = ""; containerEl.style.display = "none"; return; }
+  containerEl.style.display = "flex";
+  const currentCat = typeof hfCategoryOf === "function" ? hfCategoryOf(input.value || "") : null;
+  containerEl.innerHTML = cats.map(cat => `
+    <button type="button" class="qd-factor-priority-chip${currentCat === cat ? " active" : ""}" data-cat="${escAttr(cat)}">${cat}</button>
+  `).join("");
+  containerEl.querySelectorAll(".qd-factor-priority-chip").forEach(chip => {
+    chip.addEventListener("click", () => {
+      applyCategoryPrefixToInput(input, chip.dataset.cat);
+      renderCategoryQuickfillRow(containerEl, input); // refresh which chip shows as active
+    });
+  });
+}
+
+function wireTaxonomyAddRow(addBtnId, inputId, label, onAdd, categoryChipsId) {
   const btn = document.getElementById(addBtnId);
   const input = document.getElementById(inputId);
+  const chipsBox = categoryChipsId ? document.getElementById(categoryChipsId) : null;
   if (!btn || !input) return;
   const lockedPlaceholder = `Press "+ Add" to add new ${label} name.`;
   const editingPlaceholder = `Type new ${label} name…`;
@@ -514,12 +557,14 @@ function wireTaxonomyAddRow(addBtnId, inputId, label, onAdd) {
     input.readOnly = true;
     input.placeholder = lockedPlaceholder;
     input.classList.add("taxonomy-new-locked");
+    if (chipsBox) { chipsBox.innerHTML = ""; chipsBox.style.display = "none"; }
   };
   const unlock = () => {
     input.readOnly = false;
     input.placeholder = editingPlaceholder;
     input.classList.remove("taxonomy-new-locked");
     input.focus();
+    if (chipsBox) renderCategoryQuickfillRow(chipsBox, input);
   };
 
   lock();
@@ -536,6 +581,11 @@ function wireTaxonomyAddRow(addBtnId, inputId, label, onAdd) {
     if (e.key === "Enter") { e.preventDefault(); btn.click(); }
     else if (e.key === "Escape") { e.preventDefault(); lock(); }
   });
+
+  // Keeps the chip row's "active" highlight matching whatever category
+  // prefix is actually typed right now, whether that got there by a
+  // click or by hand.
+  if (chipsBox) input.addEventListener("input", () => { if (!input.readOnly) renderCategoryQuickfillRow(chipsBox, input); });
 
   // Clicking "+ Add" while the field is focused-but-empty fires this
   // blur before the click's own listener runs; the timeout lets that
@@ -949,6 +999,15 @@ let qdPrioritizedFactorIds = new Set();
 // would hit them mid-TDZ and throw "Cannot access before initialization".
 let qdFactorMenuSearch = "";
 let qdFactorMenuEl = null;
+// One-shot hook fired the moment the Enemy Factors picker actually
+// closes (✕, backdrop tap, or Escape — every path runs through the same
+// closeMenu() in ensureQdFactorMenu below). Lets a caller that opened
+// this picker "on top of" something else — right now, Hero Factors'
+// "🎯 Edit Enemy Factors" shortcut — get control back afterward instead
+// of the picker simply vanishing with nothing to return to. Cleared
+// right before it's called so it can never accidentally double-fire or
+// leak into some unrelated later open/close of the same picker.
+let qdFactorMenuOnClose = null;
 
 // Quick-tap keyword chips shown under the Enemy Factors search bar —
 // common substrings so a frequent filter is one tap instead of typing.
@@ -1096,6 +1155,40 @@ const fSsScore     = document.getElementById("f-ss-score");
         renderTaxonomyRankingPanel();
       });
     });
+
+    // "☑ Select" — toggles multi-select mode on the list; turning it off
+    // also clears whatever was selected, so re-enabling it later always
+    // starts from a clean slate rather than an old, possibly-stale pick.
+    const selectToggleBtn = rankingOverlay.querySelector("#taxonomy-ranking-select-toggle");
+    if (selectToggleBtn) {
+      selectToggleBtn.addEventListener("click", () => {
+        taxonomyRankingSelectMode = !taxonomyRankingSelectMode;
+        if (!taxonomyRankingSelectMode) taxonomyRankingSelected.clear();
+        selectToggleBtn.classList.toggle("active", taxonomyRankingSelectMode);
+        renderTaxonomyRankingPanel();
+      });
+    }
+
+    // Bulk score editor — only meaningful once at least one row is
+    // selected (see renderTaxonomyRankingBulkBar, which disables these
+    // otherwise). "Select All"/"Clear" work against whatever's currently
+    // on screen (post filter/search), same scope the count itself uses.
+    rankingOverlay.querySelector("#taxonomy-ranking-bulk-selectall")?.addEventListener("click", () => {
+      rankingOverlay.querySelectorAll(".taxonomy-ranking-row").forEach(rowEl => {
+        taxonomyRankingSelected.add(taxonomyRankingSelKey(rowEl.dataset.kind, Number(rowEl.dataset.id)));
+      });
+      renderTaxonomyRankingPanel();
+    });
+    rankingOverlay.querySelector("#taxonomy-ranking-bulk-clear")?.addEventListener("click", () => {
+      taxonomyRankingSelected.clear();
+      renderTaxonomyRankingPanel();
+    });
+    rankingOverlay.querySelector("#taxonomy-ranking-bulk-apply")?.addEventListener("click", () => {
+      const val = Number(document.getElementById("taxonomy-ranking-bulk-value")?.value);
+      applyTaxonomyRankingBulk("set", Number.isFinite(val) ? val : 0);
+    });
+    rankingOverlay.querySelector("#taxonomy-ranking-bulk-minus")?.addEventListener("click", () => applyTaxonomyRankingBulk("delta", -0.5));
+    rankingOverlay.querySelector("#taxonomy-ranking-bulk-plus")?.addEventListener("click", () => applyTaxonomyRankingBulk("delta", 0.5));
   }
   // "Jump to Top" — the header/tabs stay fixed (see the CSS comment on
   // .taxonomy-modal-sticky) but the panel content itself, including the
@@ -1131,6 +1224,9 @@ const fSsScore     = document.getElementById("f-ss-score");
   // renderRenameModalSuggestions. Re-filters on every keystroke; hides
   // on blur (delayed so a click on a suggestion registers first).
   document.getElementById("rename-modal-input").addEventListener("input", renderRenameModalSuggestions);
+  document.getElementById("rename-modal-input").addEventListener("input", () => {
+    if (renameModalTarget) renderRenameModalCategoryChips(renameModalTarget.kind);
+  });
   document.getElementById("rename-modal-input").addEventListener("focus", renderRenameModalSuggestions);
   document.getElementById("rename-modal-input").addEventListener("blur", () => {
     setTimeout(hideRenameModalSuggestions, 150);
@@ -1140,13 +1236,13 @@ const fSsScore     = document.getElementById("f-ss-score");
     renderTaxonomyPanel("reactions");
     renderRteSection();
     remindToAddHeroes("reactions", item.id);
-  });
+  }, "taxonomy-add-reaction-category-chips");
   wireTaxonomyAddRow("taxonomy-add-engagement", "taxonomy-new-engagement", "Engagement", val => {
     const item = addTaxonomyItem("engagements", val);
     renderTaxonomyPanel("engagements");
     renderRteSection();
     remindToAddHeroes("engagements", item.id);
-  });
+  }, "taxonomy-add-engagement-category-chips");
   wireTaxonomyAddRow("taxonomy-add-factor", "taxonomy-new-factor", "Factor", val => {
     addFactor(val);
     renderFactorsPanel();
@@ -3494,6 +3590,15 @@ function ensureQdFactorMenu() {
   const closeMenu = () => {
     menu.style.display = "none";
     document.body.classList.remove("qd-factor-menu-open");
+    // If something (e.g. Hero Factors) asked to be resumed once this
+    // closes, do that now instead of just leaving the user with nothing
+    // open. Grabbed-and-cleared up front so the callback itself can
+    // safely open this same picker again later without re-triggering.
+    if (qdFactorMenuOnClose) {
+      const cb = qdFactorMenuOnClose;
+      qdFactorMenuOnClose = null;
+      cb();
+    }
   };
   closeBtn.addEventListener("click", closeMenu);
   // Tapping the dimmed backdrop (outside the panel) closes it too — but
@@ -5557,6 +5662,21 @@ function taxonomyKindLabel(kind) {
 
 let renameModalTarget = null; // { kind, id, mode: "rename"|"duplicate" } while open, else null
 
+// Ranking Category quick-fill under the rename modal's name field —
+// Reactions/Engagements only (Factors have no category concept). See
+// renderCategoryQuickfillRow above.
+function renderRenameModalCategoryChips(kind) {
+  const box = document.getElementById("rename-modal-category-chips");
+  if (!box) return;
+  const input = document.getElementById("rename-modal-input");
+  if ((kind === "reactions" || kind === "engagements") && input) {
+    renderCategoryQuickfillRow(box, input);
+  } else {
+    box.innerHTML = "";
+    box.style.display = "none";
+  }
+}
+
 function openRenameModal(kind, id, currentName) {
   renameModalTarget = { kind, id, mode: "rename" };
   document.getElementById("rename-modal-title").textContent = `Rename ${taxonomyKindLabel(kind)}`;
@@ -5564,6 +5684,7 @@ function openRenameModal(kind, id, currentName) {
   const input = document.getElementById("rename-modal-input");
   input.value = currentName || "";
   hideRenameModalSuggestions();
+  renderRenameModalCategoryChips(kind);
   document.getElementById("rename-modal-overlay").classList.add("open");
   input.focus();
   input.select();
@@ -5581,6 +5702,7 @@ function openDuplicateModal(kind, id, currentName) {
   const input = document.getElementById("rename-modal-input");
   input.value = currentName ? `${currentName} (copy)` : "";
   hideRenameModalSuggestions();
+  renderRenameModalCategoryChips(kind);
   document.getElementById("rename-modal-overlay").classList.add("open");
   input.focus();
   input.select();
@@ -5743,6 +5865,11 @@ function closeTaxonomyRankingOverlay() {
   if (!overlay) return;
   overlay.style.display = "none";
   document.body.classList.remove("qd-factor-menu-open");
+  // Select mode is a temporary "working on scores right now" state, not
+  // something worth remembering between visits — start clean next time.
+  taxonomyRankingSelectMode = false;
+  taxonomyRankingSelected.clear();
+  document.getElementById("taxonomy-ranking-select-toggle")?.classList.remove("active");
 }
 function taxonomyRankingOverlayIsOpen() {
   const overlay = document.getElementById("taxonomy-ranking-overlay");
@@ -5920,6 +6047,58 @@ let taxonomyRankingSearchQuery = "";
 // Ranking list — all false is "All" (no filtering), the default.
 let taxonomyRankingFilter = { locked: false, marked: false, unassigned: false };
 
+// "☑ Select" mode — lets several rows be picked at once so their scores
+// can be changed together via the bulk bar, rather than opening the
+// slider on each one individually. Selection is a set of "kind:id"
+// keys so a Reaction and an Engagement sharing a numeric id can never
+// collide. Both reset the moment Select mode is turned off, and the
+// selection is quietly pruned of anything filtered out of view or
+// deleted, so an old stale key can never sit around waiting to affect a
+// future selection.
+let taxonomyRankingSelectMode = false;
+let taxonomyRankingSelected = new Set();
+const taxonomyRankingSelKey = (kind, id) => `${kind}:${id}`;
+
+// Repaints just the bulk bar (count + enabled/disabled state of its
+// buttons) — cheap enough to call after every checkbox click without
+// re-rendering the whole list.
+function renderTaxonomyRankingBulkBar() {
+  const bar = document.getElementById("taxonomy-ranking-bulk-bar");
+  if (!bar) return;
+  if (!taxonomyRankingSelectMode) { bar.style.display = "none"; return; }
+  bar.style.display = "flex";
+  const n = taxonomyRankingSelected.size;
+  const countEl = document.getElementById("taxonomy-ranking-bulk-count");
+  if (countEl) countEl.textContent = `${n} selected`;
+  ["taxonomy-ranking-bulk-apply", "taxonomy-ranking-bulk-minus", "taxonomy-ranking-bulk-plus"].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.disabled = n === 0;
+  });
+}
+
+// Applies either an absolute value (mode "set") or a relative nudge
+// (mode "delta") to every currently-selected row. Locked items are
+// simply skipped — setTaxonomyItemValue already no-ops on them, but
+// checking here too means a locked row is never even counted as
+// "changed" for anyone watching. Re-renders the whole list afterward
+// (scores, and possibly filter membership if a filter like "score-asc"
+// sort is active) plus everything else a score change can affect.
+function applyTaxonomyRankingBulk(mode, amount) {
+  if (taxonomyRankingSelected.size === 0) return;
+  taxonomyRankingSelected.forEach(key => {
+    const [kind, idStr] = key.split(":");
+    const id = Number(idStr);
+    const item = taxonomy[kind]?.find(x => x.id === id);
+    if (!item || item.locked) return;
+    const next = mode === "delta" ? item.value + amount : amount;
+    setTaxonomyItemValue(kind, id, next);
+  });
+  renderTaxonomyRankingPanel();
+  renderRteSection();
+  if (quickDraftSuggestOpen) renderQuickDraftSuggestions();
+  if (typeof hfRefreshIfOpen === "function") hfRefreshIfOpen();
+}
+
 // The Performance Ranking System (Section 5.4) — every Reaction AND
 // Engagement together in one score-sorted, vertically-scrolling list,
 // so the whole taxonomy's scoring stays internally consistent at a
@@ -5965,6 +6144,14 @@ function renderTaxonomyRankingPanel() {
     chip.classList.toggle("active", !!taxonomyRankingFilter[chip.dataset.filter]);
   });
 
+  // Selection is only ever meaningful for what's actually on screen —
+  // drop anything that's been filtered/searched out (or deleted) so the
+  // bulk bar's count can't silently include rows the user can no longer
+  // even see.
+  const visibleKeys = new Set(combined.map(({ kind, item }) => taxonomyRankingSelKey(kind, item.id)));
+  [...taxonomyRankingSelected].forEach(key => { if (!visibleKeys.has(key)) taxonomyRankingSelected.delete(key); });
+  renderTaxonomyRankingBulkBar();
+
   const anyFilterActive = taxonomyRankingFilter.locked || taxonomyRankingFilter.marked || taxonomyRankingFilter.unassigned;
   if (combined.length === 0) {
     box.innerHTML = (taxonomy.reactions.length + taxonomy.engagements.length) === 0
@@ -5977,8 +6164,14 @@ function renderTaxonomyRankingPanel() {
 
   box.innerHTML = combined.map(({ kind, item, heroCount }) => {
     const icon = kind === "reactions" ? "⚡" : "🛡";
+    const key = taxonomyRankingSelKey(kind, item.id);
+    const selected = taxonomyRankingSelected.has(key);
+    const checkboxHtml = taxonomyRankingSelectMode
+      ? `<input type="checkbox" class="taxonomy-ranking-row-checkbox" data-kind="${kind}" data-id="${item.id}"${selected ? " checked" : ""} title="Select for bulk score editing" />`
+      : "";
     return `
-      <div class="taxonomy-ranking-row${item.locked ? " locked" : ""}${item.marked ? " marked" : ""}" data-kind="${kind}" data-id="${item.id}">
+      <div class="taxonomy-ranking-row${item.locked ? " locked" : ""}${item.marked ? " marked" : ""}${selected ? " selected" : ""}" data-kind="${kind}" data-id="${item.id}">
+        ${checkboxHtml}
         <span class="taxonomy-ranking-row-icon">${icon}</span>
         <span class="taxonomy-ranking-row-name">${item.name || "(unnamed)"}</span>
         ${heroCount === 0 ? `<span class="taxonomy-ranking-row-unassigned" title="Not assigned to any hero yet">⚠️ Unassigned</span>` : ""}
@@ -5989,6 +6182,40 @@ function renderTaxonomyRankingPanel() {
       </div>
     `;
   }).join("");
+
+  const toggleRowSelection = (kind, id, rowEl) => {
+    const key = taxonomyRankingSelKey(kind, id);
+    if (taxonomyRankingSelected.has(key)) taxonomyRankingSelected.delete(key); else taxonomyRankingSelected.add(key);
+    rowEl.classList.toggle("selected", taxonomyRankingSelected.has(key));
+    const cb = rowEl.querySelector(".taxonomy-ranking-row-checkbox");
+    if (cb) cb.checked = taxonomyRankingSelected.has(key);
+    renderTaxonomyRankingBulkBar();
+  };
+
+  box.querySelectorAll(".taxonomy-ranking-row-checkbox").forEach(cb => {
+    // The row itself also toggles selection below (for a bigger tap
+    // target) — stopPropagation here so a tap directly on the checkbox
+    // doesn't fire that handler too and cancel itself back out.
+    cb.addEventListener("click", e => e.stopPropagation());
+    cb.addEventListener("change", () => {
+      const rowEl = cb.closest(".taxonomy-ranking-row");
+      const key = taxonomyRankingSelKey(cb.dataset.kind, Number(cb.dataset.id));
+      if (cb.checked) taxonomyRankingSelected.add(key); else taxonomyRankingSelected.delete(key);
+      rowEl?.classList.toggle("selected", cb.checked);
+      renderTaxonomyRankingBulkBar();
+    });
+  });
+  // While Select mode is on, tapping anywhere on a row (other than one
+  // of its own action buttons or the checkbox, handled above) toggles
+  // its selection too — a bigger, easier target than the checkbox alone.
+  if (taxonomyRankingSelectMode) {
+    box.querySelectorAll(".taxonomy-ranking-row").forEach(rowEl => {
+      rowEl.addEventListener("click", e => {
+        if (e.target.closest(".taxonomy-ranking-row-checkbox, .taxonomy-ranking-row-score, .taxonomy-ranking-row-edit, .taxonomy-ranking-row-lock, .taxonomy-ranking-row-mark")) return;
+        toggleRowSelection(rowEl.dataset.kind, Number(rowEl.dataset.id), rowEl);
+      });
+    });
+  }
 
   box.querySelectorAll(".taxonomy-ranking-row-score").forEach(btn => {
     btn.addEventListener("click", () => qdShowRankingSlider(btn.dataset.kind, Number(btn.dataset.id)));

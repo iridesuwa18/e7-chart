@@ -279,23 +279,35 @@ function renderHeroFactorsGrid() {
     return;
   }
 
+  // Tiles themselves are no longer clickable — opening the full hero
+  // detail overlay from here was rarely useful and (worse) rendered
+  // BEHIND this fullscreen panel. In its place, a small (i) button opens
+  // the exact same "How This Score Was Calculated" explainer Quick
+  // Draft's own slot (i) buttons use (qdShowScoreExplainer, defined in
+  // app.js) — same breakdown, same ticked-Enemy-Factors state this grid
+  // is already scored against, just reached one tap earlier. It's
+  // rendered above every other .qd-factor-menu-overlay via #qd-score-
+  // explainer's z-index (see style.css) so it never ends up hidden
+  // behind this panel.
   gridEl.innerHTML = scored.map(({ hero: h, score, reasons }) => {
     const iconHTML = h.iconData ? `<img src="${h.iconData}" alt="">` : `<div class="hf-tile-fallback">⚔️</div>`;
     const tier = score >= 8 ? "hf-tier-high" : score >= 5 ? "hf-tier-mid" : "hf-tier-low";
     const titleText = [h.name || "Unnamed Hero", `Score ${score.toFixed(1)}`, ...reasons].join(" — ");
     return `
-      <button type="button" class="hf-tile ${tier}" data-hero-id="${h.id}" title="${escAttr(titleText)}">
+      <div class="hf-tile ${tier}" data-hero-id="${h.id}" title="${escAttr(titleText)}">
+        <button type="button" class="hf-tile-info-btn" data-hero-id="${h.id}" title="Why this score?" aria-label="Why this score?">ⓘ</button>
         ${iconHTML}
         <span class="hf-tile-score">${score.toFixed(1)}</span>
         <span class="hf-tile-name">${h.name || "Unnamed"}</span>
-      </button>
+      </div>
     `;
   }).join("");
 
-  gridEl.querySelectorAll(".hf-tile").forEach(btn => {
-    btn.addEventListener("click", () => {
+  gridEl.querySelectorAll(".hf-tile-info-btn").forEach(btn => {
+    btn.addEventListener("click", e => {
+      e.stopPropagation();
       const h = heroes.find(x => String(x.id) === btn.dataset.heroId);
-      if (h) openHeroDetails(h); // reuses the existing hero detail overlay — present on both index.html and quickdraft.html
+      if (h && typeof qdShowScoreExplainer === "function") qdShowScoreExplainer(h, "primary");
     });
   });
 }
@@ -376,10 +388,16 @@ function renderHeroFactorsPanel() {
   });
 
   // Jumps to the real Enemy Factors picker to change what's ticked —
-  // closes this panel first rather than stacking two fullscreen
-  // overlays; reopen Hero Factors afterward to see the new ranking.
+  // hides this panel first (rather than stacking two fullscreen
+  // overlays) but deliberately doesn't fully hfClose() it: instead,
+  // qdFactorMenuOnClose (app.js) is set so that whenever the Enemy
+  // Factors picker itself closes — ✕, backdrop tap, or Escape, it makes
+  // no difference which — Hero Factors reopens automatically with the
+  // new ticks already reflected, rather than the user landing back on
+  // whatever screen was open before Hero Factors in the first place.
   document.getElementById("hf-edit-factors")?.addEventListener("click", () => {
-    hfClose();
+    if (hfMenuEl) hfMenuEl.style.display = "none"; // body stays "qd-factor-menu-open" the whole time — Enemy Factors just takes over the same lock
+    if (typeof qdFactorMenuOnClose !== "undefined") qdFactorMenuOnClose = () => hfOpen();
     document.getElementById("qd-factor-menu-btn")?.click();
   });
 

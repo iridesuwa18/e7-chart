@@ -771,6 +771,13 @@ main {
   background: rgba(232,200,74,.15);
   color: #e8c84a;
 }
+/* A tapped/clicked chip keeps browser focus after the click ends, which
+   left a lingering yellow focus ring on it (looking like it was still
+   "active") until some other chip stole focus. Mouse/touch clicks now
+   get no outline at all; a real keyboard tab-focus still shows one via
+   :focus-visible, so keyboard navigation isn't hurt. */
+.qd-factor-priority-chip:focus { outline: none; }
+.qd-factor-priority-chip:focus-visible { outline: 2px solid #e8c84a; outline-offset: 1px; }
 
 .quickdraft-toolbar {
   display: flex;
@@ -926,6 +933,12 @@ body.qd-factor-menu-open { overflow: hidden; }
    coincidence to depend on — the admin gate should unconditionally
    win since it's the security check. */
 #admin-overlay { z-index: 700; }
+/* The score explainer (📖 "How This Score Was Calculated") can now be
+   opened from the Hero Factors grid's (i) buttons — another
+   .qd-factor-menu-overlay (z-index 500) that may already be open behind
+   it. Always win over any single .qd-factor-menu-overlay it was opened
+   on top of, the same reasoning as the rename modal above. */
+#qd-score-explainer { z-index: 550; }
 .qd-factor-menu-panel {
   width: min(720px, 92vw);
   height: min(88vh, 860px);
@@ -1097,6 +1110,80 @@ body.qd-factor-menu-open { overflow: hidden; }
   border-color: rgba(224,166,58,.5);
   background: rgba(224,166,58,.16);
   color: #e0a63a;
+}
+
+/* "☑ Select" toggle — lets several rows be picked at once so their
+   scores can all be changed together in one go (see the bulk bar
+   below), rather than opening the slider on each one individually. */
+.taxonomy-ranking-select-toggle {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  flex-shrink: 0;
+  white-space: nowrap;
+  border: 1.5px solid var(--border);
+  background: rgba(255,255,255,.04);
+  color: var(--text-dim);
+  font-family: 'Cinzel', serif;
+  font-weight: 700;
+  letter-spacing: .03em;
+  border-radius: 999px;
+  padding: 6px 13px;
+  font-size: 10.5px;
+  cursor: pointer;
+  transition: background .15s, border-color .15s, color .15s;
+}
+.taxonomy-ranking-select-toggle:hover { border-color: var(--gold-dim); color: var(--text); }
+.taxonomy-ranking-select-toggle.active {
+  border-color: var(--gold);
+  background: rgba(201,162,39,.18);
+  color: var(--gold2);
+}
+
+/* Bulk-edit bar — appears only while Select mode is on, holds the
+   running selected count and the controls to change every selected
+   row's score at once (an absolute "set to X" plus quick ±0.5 nudges).
+   Locked items are silently skipped when applied, same protection
+   setTaxonomyItemValue already gives every other entry point. */
+.taxonomy-ranking-bulk-bar {
+  display: none;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
+  padding: 8px 10px;
+  margin: 0 0 10px;
+  border-radius: 8px;
+  border: 1px solid rgba(201,162,39,.35);
+  background: rgba(201,162,39,.08);
+}
+.taxonomy-ranking-bulk-count {
+  font-size: 11px;
+  font-family: 'Cinzel', serif;
+  color: var(--gold2);
+  flex: 1 1 auto;
+  white-space: nowrap;
+}
+.taxonomy-ranking-bulk-set {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.taxonomy-ranking-bulk-set input[type="number"] { width: 64px; }
+.taxonomy-ranking-bulk-nudge { display: flex; gap: 4px; }
+
+/* Per-row select checkbox — only rendered while Select mode is on;
+   a larger-than-default hit target to match the rest of this list's
+   generously-tappable controls. */
+.taxonomy-ranking-row-checkbox {
+  flex-shrink: 0;
+  width: 17px;
+  height: 17px;
+  accent-color: var(--gold2, #e0c060);
+  cursor: pointer;
+}
+.taxonomy-ranking-row.selected {
+  border-color: var(--gold-dim);
+  background: rgba(201,162,39,.1);
 }
 
 .qd-factor-menu-searchbar {
@@ -4819,10 +4906,26 @@ body.hide-labels .hero-dot-label {
   overflow-y: auto;
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(64px, 1fr));
+  align-content: start; /* without this, a grid with only a row or two of
+    heroes stretches those rows to fill all the leftover vertical space
+    in the panel instead of hugging the top like every other list here */
   gap: 8px;
   padding-bottom: 6px;
 }
 .hf-empty { grid-column: 1 / -1; color: var(--text-dim); font-style: italic; font-size: 12px; padding: 20px 0; text-align: center; }
+
+/* Ranking Category quick-fill chips — reused (via .qd-factor-priority-chip)
+   under the Rename modal's name field and under each Taxonomy tab's
+   "add new" row, so a category like "PASSIVE" can be tapped onto the
+   name as a "PASSIVE : " prefix instead of typed by hand every time.
+   See renderCategoryQuickfillRow/applyCategoryPrefixToInput in app.js. */
+.rename-modal-category-chips,
+.taxonomy-add-category-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 5px;
+  margin-top: 8px;
+}
 
 .hf-tile {
   display: flex;
@@ -4833,11 +4936,9 @@ body.hide-labels .hero-dot-label {
   border-radius: 8px;
   border: 1.5px solid var(--border);
   background: rgba(255,255,255,.02);
-  cursor: pointer;
-  transition: background .15s, border-color .15s, transform .1s;
+  transition: background .15s, border-color .15s;
   position: relative;
 }
-.hf-tile:hover { background: rgba(255,255,255,.06); transform: translateY(-1px); }
 .hf-tile img {
   width: 40px; height: 40px;
   border-radius: 50%;
@@ -4881,3 +4982,32 @@ body.hide-labels .hero-dot-label {
 .hf-tile.hf-tier-mid  .hf-tile-score { color: var(--teal2); border-color: var(--teal-dim); background: rgba(45,212,191,.14); }
 .hf-tile.hf-tier-low  .hf-tile-score { color: var(--text-dim); border-color: var(--border); background: rgba(255,255,255,.05); }
 .hf-tile.hf-tier-high { border-color: rgba(201,162,39,.35); }
+
+/* (i) info button — sits at the tile's top-left corner (the score badge
+   already owns the top-right), opens the same "How This Score Was
+   Calculated" explainer used by Quick Draft's own slot (i) buttons.
+   A real <button>, not part of the tile's own click target, so tapping
+   it doesn't also trigger whatever the tile itself does. */
+.hf-tile-info-btn {
+  position: absolute;
+  top: -4px;
+  left: -4px;
+  width: 18px;
+  height: 18px;
+  min-width: 0;
+  padding: 0;
+  border-radius: 50%;
+  border: 1px solid var(--gold-dim);
+  background: rgba(11,26,46,.92);
+  color: var(--gold2);
+  font-size: 10px;
+  line-height: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: background .15s, transform .1s;
+  z-index: 1;
+}
+.hf-tile-info-btn:hover { background: rgba(201,162,39,.28); }
+.hf-tile-info-btn:active { transform: scale(.9); }
