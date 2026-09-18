@@ -15816,10 +15816,10 @@
       },
       {
         "id": 1788780217783,
-        "name": "Damage prop to lost health",
-        "value": 7,
+        "name": "DAMAGE : Prop to lost health",
+        "value": 10,
         "pinned": false,
-        "locked": false,
+        "locked": true,
         "marked": false,
         "factorIds": [
           1788694866469,
@@ -15828,10 +15828,10 @@
       },
       {
         "id": 1788780327120,
-        "name": "Damage prop to max health",
-        "value": 6.8,
+        "name": "DAMAGE :  Prop to max health",
+        "value": 10,
         "pinned": false,
-        "locked": false,
+        "locked": true,
         "marked": false,
         "factorIds": [
           1788780483075
@@ -15855,10 +15855,10 @@
       },
       {
         "id": 1788783157740,
-        "name": "Damage prop to defense",
-        "value": 7,
+        "name": "DAMAGE : Prop to defense",
+        "value": 10,
         "pinned": false,
-        "locked": false,
+        "locked": true,
         "marked": false,
         "factorIds": [
           1788783127095,
@@ -15983,10 +15983,10 @@
       },
       {
         "id": 1789115386205,
-        "name": "Damage prop to speed",
-        "value": 7,
+        "name": "DAMAGE : Prop to speed",
+        "value": 10,
         "pinned": false,
-        "locked": false,
+        "locked": true,
         "marked": false,
         "factorIds": [
           1788785891810
@@ -16271,10 +16271,10 @@
       },
       {
         "id": 1789198095367,
-        "name": "Increase Critical Hit Damage passive",
-        "value": 7.5,
+        "name": "PASSIVE : Increase Critical Hit Damage",
+        "value": 9,
         "pinned": false,
-        "locked": false,
+        "locked": true,
         "marked": false,
         "factorIds": [
           1788772992919,
@@ -16431,10 +16431,10 @@
       },
       {
         "id": 1789209408893,
-        "name": "Damage prop to target's current health",
-        "value": 6.8,
+        "name": "DAMAGE :  Prop to target's current health",
+        "value": 10,
         "pinned": false,
-        "locked": false,
+        "locked": true,
         "marked": false,
         "factorIds": [
           1788772992919,
@@ -16504,10 +16504,10 @@
       },
       {
         "id": 1789221117694,
-        "name": "Damage prop to target's max health",
-        "value": 6.8,
+        "name": "DAMAGE : Prop to target's max health",
+        "value": 10,
         "pinned": false,
-        "locked": false,
+        "locked": true,
         "marked": false,
         "factorIds": [
           1788700420912,
@@ -16925,10 +16925,10 @@
       },
       {
         "id": 1788698529505,
-        "name": "Damage limit to allies",
+        "name": "BUFF : Damage limit",
         "value": 7,
         "pinned": false,
-        "locked": false,
+        "locked": true,
         "marked": false,
         "factorIds": [
           1788694866469,
@@ -17128,10 +17128,10 @@
       },
       {
         "id": 1788783245423,
-        "name": "Damage increase with fewer enemies",
-        "value": 7,
+        "name": "ONGOING : Damage increase with fewer enemies",
+        "value": 10,
         "pinned": false,
-        "locked": false,
+        "locked": true,
         "marked": false,
         "factorIds": [
           1788772992919,
@@ -18079,10 +18079,10 @@
       },
       {
         "id": 1789200202866,
-        "name": "Increase Damage against Shields",
-        "value": 7.5,
+        "name": "ONGOING : Increase Damage against Shields",
+        "value": 10,
         "pinned": false,
-        "locked": false,
+        "locked": true,
         "marked": false,
         "factorIds": [
           1789135503443
@@ -18940,5 +18940,5 @@
     ]
   },
   "schemaVersion": 2,
-  "savedAt": "2026-09-18T07:25:16.261Z"
+  "savedAt": "2026-09-18T07:35:13.106Z"
 }
