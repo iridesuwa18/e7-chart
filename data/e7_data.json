@@ -18001,10 +18001,10 @@
       },
       {
         "id": 1789197666694,
-        "name": "Bind on enemies",
-        "value": 9,
+        "name": "DEBUFF : Bind effect",
+        "value": 4.5,
         "pinned": false,
-        "locked": false,
+        "locked": true,
         "marked": false,
         "factorIds": [
           1788700862798,
@@ -18940,5 +18940,5 @@
     ]
   },
   "schemaVersion": 2,
-  "savedAt": "2026-09-18T07:16:33.321Z"
+  "savedAt": "2026-09-18T07:19:35.937Z"
 }
