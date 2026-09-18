@@ -16019,7 +16019,7 @@
       },
       {
         "id": 1789121061181,
-        "name": "BUFF : Immortality effect",
+        "name": "BUFF : Immortality",
         "value": 7.5,
         "pinned": false,
         "locked": true,
@@ -17105,10 +17105,10 @@
       },
       {
         "id": 1788783099100,
-        "name": "Immunity Buff",
-        "value": 8,
+        "name": "BUFF : Immunity",
+        "value": 7.5,
         "pinned": false,
-        "locked": false,
+        "locked": true,
         "marked": false,
         "factorIds": [
           1788700781693
@@ -17907,10 +17907,10 @@
       },
       {
         "id": 1789178467146,
-        "name": "Swift attack buff",
-        "value": 8,
+        "name": "BUFF : Swift attack",
+        "value": 7.5,
         "pinned": false,
-        "locked": false,
+        "locked": true,
         "marked": false,
         "factorIds": [
           1788785891810
@@ -18382,10 +18382,10 @@
       },
       {
         "id": 1789267591247,
-        "name": "Spread debuffs",
-        "value": 8,
+        "name": "EFFECT : Spread debuffs",
+        "value": 10,
         "pinned": false,
-        "locked": false,
+        "locked": true,
         "marked": false,
         "factorIds": [
           1789014978867,
@@ -18940,5 +18940,5 @@
     ]
   },
   "schemaVersion": 2,
-  "savedAt": "2026-09-18T12:16:32.612Z"
+  "savedAt": "2026-09-18T12:19:13.278Z"
 }
