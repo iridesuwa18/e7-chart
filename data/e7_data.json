@@ -15777,7 +15777,7 @@
       },
       {
         "id": 1788774616004,
-        "name": "PASSIVE : Forced Provoke",
+        "name": "UNDISPELLABLE : BUFF: Ferocious Stand (Forced Provoke)",
         "value": 8.5,
         "pinned": false,
         "locked": false,
@@ -15801,10 +15801,10 @@
       },
       {
         "id": 1788775147348,
-        "name": "CR Passives",
-        "value": 8,
+        "name": "PASSIVE : CR Push",
+        "value": 9.5,
         "pinned": true,
-        "locked": false,
+        "locked": true,
         "marked": false,
         "factorIds": [
           1788772861638,
@@ -16124,10 +16124,10 @@
       },
       {
         "id": 1789174803141,
-        "name": "Defense scaling passive",
-        "value": 8,
+        "name": "PASSIVE : Defense scaling",
+        "value": 9,
         "pinned": false,
-        "locked": false,
+        "locked": true,
         "marked": false,
         "factorIds": [
           1788694866469,
@@ -16669,10 +16669,10 @@
       },
       {
         "id": 1789275305361,
-        "name": "Dispel stealth (passive)",
-        "value": 8,
+        "name": "PASSIVE : Dispel stealth",
+        "value": 10,
         "pinned": false,
-        "locked": false,
+        "locked": true,
         "marked": false,
         "factorIds": [
           1788773216100
@@ -16702,10 +16702,10 @@
       },
       {
         "id": 1789280776320,
-        "name": "Increase Speed Passive",
-        "value": 8,
+        "name": "PASSIVE : Increase Speed %",
+        "value": 9,
         "pinned": false,
-        "locked": false,
+        "locked": true,
         "marked": false,
         "factorIds": [
           1788785891810
@@ -16765,10 +16765,10 @@
       },
       {
         "id": 1789287545820,
-        "name": "Increase Defense Passive",
-        "value": 8.5,
+        "name": "PASSIVE : Increase Defense %",
+        "value": 9,
         "pinned": false,
-        "locked": false,
+        "locked": true,
         "marked": false,
         "factorIds": [
           1788694866469,
@@ -16811,7 +16811,7 @@
         "name": "PASSIVE : Stackable Attack",
         "value": 9,
         "pinned": false,
-        "locked": false,
+        "locked": true,
         "marked": false,
         "factorIds": [
           1788772992919,
@@ -18940,5 +18940,5 @@
     ]
   },
   "schemaVersion": 2,
-  "savedAt": "2026-09-18T12:37:23.194Z"
+  "savedAt": "2026-09-18T12:44:13.687Z"
 }
