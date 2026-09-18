@@ -17878,10 +17878,10 @@
       },
       {
         "id": 1789177107595,
-        "name": "Increase Effect Resistance Buff",
-        "value": 9.8,
+        "name": "BUFF : Increase Effect Resistance",
+        "value": 7.5,
         "pinned": false,
-        "locked": false,
+        "locked": true,
         "marked": false,
         "factorIds": [
           1788700781693,
@@ -18940,5 +18940,5 @@
     ]
   },
   "schemaVersion": 2,
-  "savedAt": "2026-09-17T15:18:15.510Z"
+  "savedAt": "2026-09-18T06:39:07.827Z"
 }
