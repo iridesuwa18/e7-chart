@@ -16073,10 +16073,10 @@
       },
       {
         "id": 1789134036840,
-        "name": "Decrease 100% focus",
-        "value": 8,
+        "name": "PASSIVE : Decrease 100% focus",
+        "value": 9.5,
         "pinned": false,
-        "locked": false,
+        "locked": true,
         "marked": false,
         "factorIds": [
           1789114895603
@@ -18940,5 +18940,5 @@
     ]
   },
   "schemaVersion": 2,
-  "savedAt": "2026-09-18T13:10:50.365Z"
+  "savedAt": "2026-09-18T13:12:46.622Z"
 }
