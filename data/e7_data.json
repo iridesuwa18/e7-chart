@@ -15789,10 +15789,10 @@
       },
       {
         "id": 1788775037126,
-        "name": "Increase Evasion to allies (passive)",
+        "name": "PASSIVE : Increase Evasion",
         "value": 9,
         "pinned": false,
-        "locked": false,
+        "locked": true,
         "marked": false,
         "factorIds": [
           1788774921178,
@@ -15970,10 +15970,10 @@
       },
       {
         "id": 1789113918721,
-        "name": "Increase Penetration Resistance passive",
+        "name": "PASSIVE : Increase Penetration Resistance",
         "value": 9,
         "pinned": false,
-        "locked": false,
+        "locked": true,
         "marked": false,
         "factorIds": [
           1788694866469,
@@ -16007,7 +16007,7 @@
       },
       {
         "id": 1789120795174,
-        "name": "PASSIVE: Damage does not exceed % of HP",
+        "name": "PASSIVE : Damage does not exceed % of HP",
         "value": 9.5,
         "pinned": false,
         "locked": true,
@@ -16045,10 +16045,10 @@
       },
       {
         "id": 1789130554431,
-        "name": "Unaffected by Combat Readiness increase / decrease",
+        "name": "PASSIVE : Unaffected by Combat Readiness increase / decrease",
         "value": 10,
         "pinned": false,
-        "locked": false,
+        "locked": true,
         "marked": false,
         "factorIds": [
           1789130596970
@@ -16287,7 +16287,7 @@
       },
       {
         "id": 1789198617409,
-        "name": "PASSIVE: Attack scaling",
+        "name": "PASSIVE : Attack scaling",
         "value": 9,
         "pinned": false,
         "locked": true,
@@ -16302,10 +16302,10 @@
       },
       {
         "id": 1789199188207,
-        "name": "Increase hit chance passive",
+        "name": "PASSIVE : Increase hit chance",
         "value": 9,
         "pinned": false,
-        "locked": false,
+        "locked": true,
         "marked": false,
         "factorIds": [
           1788783127095
@@ -16383,10 +16383,10 @@
       },
       {
         "id": 1789203511668,
-        "name": "Increase Effectiveness passive",
+        "name": "PASSIVE : Increase Effectiveness",
         "value": 9,
         "pinned": false,
-        "locked": false,
+        "locked": true,
         "marked": false,
         "factorIds": [
           1789014978867,
@@ -16395,10 +16395,10 @@
       },
       {
         "id": 1789203590553,
-        "name": "Increase Crit Hit Resistance passive",
+        "name": "PASSIVE : Increase Crit Hit Resistance",
         "value": 9,
         "pinned": false,
-        "locked": false,
+        "locked": true,
         "marked": false,
         "factorIds": [
           1788774921178,
@@ -16876,10 +16876,10 @@
       },
       {
         "id": 1789301614949,
-        "name": "Increase Max Health Passive",
+        "name": "PASSIVE : Increase Max Health",
         "value": 9,
         "pinned": false,
-        "locked": false,
+        "locked": true,
         "marked": false,
         "factorIds": [
           1788694866469,
@@ -18331,7 +18331,7 @@
       },
       {
         "id": 1789220573364,
-        "name": "Increase hit chance attack",
+        "name": "EFFECT : Increase hit chance on attacks",
         "value": 9,
         "pinned": false,
         "locked": false,
@@ -18940,5 +18940,5 @@
     ]
   },
   "schemaVersion": 2,
-  "savedAt": "2026-09-18T12:26:55.243Z"
+  "savedAt": "2026-09-18T12:29:35.790Z"
 }
