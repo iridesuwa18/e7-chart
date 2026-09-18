@@ -395,3 +395,16 @@ function renderHeroFactorsPanel() {
 
   renderHeroFactorsGrid();
 }
+
+// ── Self-init ────────────────────────────────────────────────────────
+// app.js calls renderHeroFactorsButton() itself whenever Enemy Factors
+// state changes later on — but on the very first page load, app.js's
+// top-level code (including its own initial wiring pass) finishes
+// running BEFORE this file is even fetched, since classic <script>
+// tags execute strictly in document order. Every one of those
+// typeof-guarded calls from app.js is therefore a silent no-op the
+// first time around — the button exists in the DOM but has no click
+// listener yet. This call is what actually wires it on load; by the
+// time this line runs, app.js (and the button it renders) is already
+// fully in place.
+renderHeroFactorsButton();
