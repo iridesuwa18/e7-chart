@@ -16218,10 +16218,10 @@
       },
       {
         "id": 1789191471240,
-        "name": "Increase Crit Hit Chance Passive",
-        "value": 8,
+        "name": "PASSIVE : Increase Crit Hit Chance %",
+        "value": 9,
         "pinned": false,
-        "locked": false,
+        "locked": true,
         "marked": false,
         "factorIds": [
           1788786571272,
@@ -16834,10 +16834,10 @@
       },
       {
         "id": 1789300053610,
-        "name": "Extra turn Passives",
-        "value": 8,
+        "name": "PASSIVE : Gains extra turn",
+        "value": 9.7,
         "pinned": false,
-        "locked": false,
+        "locked": true,
         "marked": false,
         "factorIds": [
           1788772861638,
@@ -18940,5 +18940,5 @@
     ]
   },
   "schemaVersion": 2,
-  "savedAt": "2026-09-18T12:44:13.687Z"
+  "savedAt": "2026-09-18T12:46:33.833Z"
 }
