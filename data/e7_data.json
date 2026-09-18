@@ -17498,10 +17498,10 @@
       },
       {
         "id": 1789116440535,
-        "name": "Stops all counterattacks",
-        "value": 9.8,
+        "name": "PASSIVE : Stops all counterattacks",
+        "value": 9.5,
         "pinned": false,
-        "locked": false,
+        "locked": true,
         "marked": false,
         "factorIds": [
           1788775427431
@@ -18940,5 +18940,5 @@
     ]
   },
   "schemaVersion": 2,
-  "savedAt": "2026-09-18T06:44:56.914Z"
+  "savedAt": "2026-09-18T06:46:55.351Z"
 }
