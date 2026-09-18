@@ -17531,10 +17531,10 @@
       },
       {
         "id": 1789117987794,
-        "name": "Ignore damage share",
-        "value": 9.6,
+        "name": "EFFECT : Ignore damage share",
+        "value": 10,
         "pinned": false,
-        "locked": false,
+        "locked": true,
         "marked": false,
         "factorIds": [
           1788773130306,
@@ -18940,5 +18940,5 @@
     ]
   },
   "schemaVersion": 2,
-  "savedAt": "2026-09-18T06:46:55.351Z"
+  "savedAt": "2026-09-18T06:48:38.053Z"
 }
