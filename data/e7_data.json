@@ -16937,10 +16937,10 @@
       },
       {
         "id": 1788700305259,
-        "name": "Seal enemies",
-        "value": 9,
+        "name": "DEBUFF : Seal effect",
+        "value": 4.5,
         "pinned": false,
-        "locked": false,
+        "locked": true,
         "marked": false,
         "factorIds": [
           1788700862798
@@ -16959,10 +16959,10 @@
       },
       {
         "id": 1788700350538,
-        "name": "Collapse on enemies",
-        "value": 7,
+        "name": "DEBUFF : Collapse effect",
+        "value": 4.5,
         "pinned": false,
-        "locked": false,
+        "locked": true,
         "marked": false,
         "factorIds": [
           1788700420912
@@ -17141,10 +17141,10 @@
       },
       {
         "id": 1788783359037,
-        "name": "Decrease defense to enemies",
-        "value": 7.5,
+        "name": "DEBUFF : Decrease defense effect",
+        "value": 4,
         "pinned": false,
-        "locked": false,
+        "locked": true,
         "marked": false,
         "factorIds": [
           1788701036557
@@ -17190,10 +17190,10 @@
       },
       {
         "id": 1788785181579,
-        "name": "Redirected Provoke to enemies",
-        "value": 7.5,
+        "name": "DEBUFF : Redirected Provoke effect",
+        "value": 4.5,
         "pinned": false,
-        "locked": false,
+        "locked": true,
         "marked": false,
         "factorIds": [
           1788694866469,
@@ -17384,10 +17384,10 @@
       },
       {
         "id": 1788924109560,
-        "name": "Stun enemies",
-        "value": 8.5,
+        "name": "DEBUFF : Stun effect",
+        "value": 4.5,
         "pinned": false,
-        "locked": false,
+        "locked": true,
         "marked": false,
         "factorIds": [
           1788700862798,
@@ -17397,10 +17397,10 @@
       },
       {
         "id": 1788927609636,
-        "name": "Decrease speed to enemies",
-        "value": 7.5,
+        "name": "DEBUFF : Decrease speed effect",
+        "value": 4,
         "pinned": false,
-        "locked": false,
+        "locked": true,
         "marked": false,
         "factorIds": [
           1788773895734
@@ -17520,10 +17520,10 @@
       },
       {
         "id": 1789116663470,
-        "name": "Restrict enemies",
-        "value": 7,
+        "name": "DEBUFF : Restrict effect",
+        "value": 4.5,
         "pinned": false,
-        "locked": false,
+        "locked": true,
         "marked": false,
         "factorIds": [
           1789116681636
@@ -17543,10 +17543,10 @@
       },
       {
         "id": 1789118612104,
-        "name": "Laceration on enemies",
-        "value": 8.5,
+        "name": "DEBUFF : Laceration effect",
+        "value": 4,
         "pinned": false,
-        "locked": false,
+        "locked": true,
         "marked": false,
         "factorIds": [
           1788700420912
@@ -17603,10 +17603,10 @@
       },
       {
         "id": 1789131692127,
-        "name": "Target on enemies",
-        "value": 9,
+        "name": "DEBUFF : Target effect",
+        "value": 4.5,
         "pinned": false,
-        "locked": false,
+        "locked": true,
         "marked": false,
         "factorIds": [
           1788783127095,
@@ -17652,10 +17652,10 @@
       },
       {
         "id": 1789132668882,
-        "name": "Sleep on enemies",
-        "value": 8,
+        "name": "DEBUFF : Sleep effect",
+        "value": 4.5,
         "pinned": false,
-        "locked": false,
+        "locked": true,
         "marked": false,
         "factorIds": [
           1788700862798,
@@ -17718,10 +17718,10 @@
       },
       {
         "id": 1789134890095,
-        "name": "Poison enemies",
-        "value": 7,
+        "name": "DEBUFF : Poison effect",
+        "value": 4,
         "pinned": false,
-        "locked": false,
+        "locked": true,
         "marked": false,
         "factorIds": [
           1788700420912,
@@ -17732,10 +17732,10 @@
       },
       {
         "id": 1789135004196,
-        "name": "Rupture to enemies",
-        "value": 8,
+        "name": "DEBUFF : Rupture effect",
+        "value": 4,
         "pinned": false,
-        "locked": false,
+        "locked": true,
         "marked": false,
         "factorIds": [
           1788701036557,
@@ -17801,10 +17801,10 @@
       },
       {
         "id": 1789136308091,
-        "name": "Fear on enemies",
-        "value": 9,
+        "name": "DEBUFF : Fear effect",
+        "value": 4.5,
         "pinned": false,
-        "locked": false,
+        "locked": true,
         "marked": false,
         "factorIds": [
           1788700862798,
@@ -17918,10 +17918,10 @@
       },
       {
         "id": 1789190654672,
-        "name": "Clone allies / enemies",
-        "value": 8,
+        "name": "SKILL : Clone allies / enemies",
+        "value": 10,
         "pinned": false,
-        "locked": false,
+        "locked": true,
         "marked": false,
         "factorIds": [
           1789190874660
@@ -17987,10 +17987,10 @@
       },
       {
         "id": 1789197410409,
-        "name": "Erosion to enemies (dmg 5% of lost hp)",
-        "value": 8,
+        "name": "DEBUFF : Erosion effect (dmg 5% of lost hp)",
+        "value": 4,
         "pinned": false,
-        "locked": false,
+        "locked": true,
         "marked": false,
         "factorIds": [
           1788700420912,
@@ -18132,10 +18132,10 @@
       },
       {
         "id": 1789201317168,
-        "name": "Silence enemies",
-        "value": 7.8,
+        "name": "DEBUFF : Silence effect",
+        "value": 4.5,
         "pinned": false,
-        "locked": false,
+        "locked": true,
         "marked": false,
         "factorIds": [
           1789201341223
@@ -18265,10 +18265,10 @@
       },
       {
         "id": 1789210423124,
-        "name": "Venom on enemies",
-        "value": 7,
+        "name": "DEBUFF : Venom effect",
+        "value": 4,
         "pinned": false,
-        "locked": false,
+        "locked": true,
         "marked": false,
         "factorIds": [
           1788700420912,
@@ -18369,10 +18369,10 @@
       },
       {
         "id": 1789259524816,
-        "name": "Vampiric Touch on enemies",
-        "value": 7,
+        "name": "DEBUFF : Vampiric Touch effect",
+        "value": 4,
         "pinned": false,
-        "locked": false,
+        "locked": true,
         "marked": false,
         "factorIds": [
           1788694866469,
@@ -18586,10 +18586,10 @@
       },
       {
         "id": 1789300460655,
-        "name": "Immobilize debuff to enemies",
-        "value": 9,
+        "name": "DEBUFF : Immobilize effect",
+        "value": 4.5,
         "pinned": false,
-        "locked": false,
+        "locked": true,
         "marked": false,
         "factorIds": [
           1788773895734
@@ -18940,5 +18940,5 @@
     ]
   },
   "schemaVersion": 2,
-  "savedAt": "2026-09-18T11:54:35.457Z"
+  "savedAt": "2026-09-18T12:03:25.494Z"
 }
