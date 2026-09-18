@@ -17178,10 +17178,10 @@
       },
       {
         "id": 1788785505206,
-        "name": "Dual attack",
-        "value": 7.5,
+        "name": "ATTACK : Dual",
+        "value": 10,
         "pinned": false,
-        "locked": false,
+        "locked": true,
         "marked": false,
         "factorIds": [
           1788772992919,
@@ -17459,10 +17459,10 @@
       },
       {
         "id": 1789115108791,
-        "name": "Decrease skill cooldown",
-        "value": 7.2,
+        "name": "EFFECT : Decrease skill cooldown",
+        "value": 10,
         "pinned": false,
-        "locked": false,
+        "locked": true,
         "marked": false,
         "factorIds": [
           1788785891810
@@ -18940,5 +18940,5 @@
     ]
   },
   "schemaVersion": 2,
-  "savedAt": "2026-09-18T12:56:43.985Z"
+  "savedAt": "2026-09-18T12:57:53.676Z"
 }
