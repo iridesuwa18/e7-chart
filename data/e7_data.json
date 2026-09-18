@@ -17069,10 +17069,10 @@
       },
       {
         "id": 1788780605209,
-        "name": "Ignore Effect Resistance",
-        "value": 9.5,
+        "name": "EFFECT : Ignore Effect Resistance",
+        "value": 10,
         "pinned": false,
-        "locked": false,
+        "locked": true,
         "marked": false,
         "factorIds": [
           1788779877239
@@ -18441,7 +18441,7 @@
       },
       {
         "id": 1789277487780,
-        "name": "Lingering fragrance (Undispellable) buffs",
+        "name": "UNDISPELLABLE : BUFF : Lingering fragrance (Max HP + Reflect x5)",
         "value": 9.5,
         "pinned": false,
         "locked": false,
@@ -18940,5 +18940,5 @@
     ]
   },
   "schemaVersion": 2,
-  "savedAt": "2026-09-18T06:49:20.818Z"
+  "savedAt": "2026-09-18T06:54:27.853Z"
 }
