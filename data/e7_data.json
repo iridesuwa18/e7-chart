@@ -19245,17 +19245,8 @@
         "id": 1788694866469,
         "name": "High Damage units",
         "pinned": false,
-        "priorityOrder": [
-          {
-            "kind": "reactions",
-            "id": 1788774616004
-          },
-          {
-            "kind": "reactions",
-            "id": 1788786348512
-          }
-        ],
-        "priorityLocked": true
+        "priorityOrder": [],
+        "priorityLocked": false
       },
       {
         "id": 1788700781693,
@@ -19729,5 +19720,5 @@
     ]
   },
   "schemaVersion": 2,
-  "savedAt": "2026-09-19T05:19:40.869Z"
+  "savedAt": "2026-09-19T05:20:09.516Z"
 }
