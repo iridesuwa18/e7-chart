@@ -17421,7 +17421,7 @@
         "name": "PASSIVE : Reacts to allies' inflicted with debuff preventing movement (stun, sleep or fear)",
         "value": 9.7,
         "pinned": false,
-        "locked": false,
+        "locked": true,
         "marked": false,
         "factorIds": [
           1789130156790,
@@ -19720,5 +19720,5 @@
     ]
   },
   "schemaVersion": 2,
-  "savedAt": "2026-09-19T05:20:09.516Z"
+  "savedAt": "2026-09-19T06:49:16.831Z"
 }
