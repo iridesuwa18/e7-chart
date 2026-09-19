@@ -10347,6 +10347,15 @@
         },
         {
           "refId": 1789819711494
+        },
+        {
+          "refId": 1788912251007
+        },
+        {
+          "refId": 1788783734183
+        },
+        {
+          "refId": 1789277060195
         }
       ],
       "selfishScore": 0,
@@ -20607,9 +20616,11 @@
       },
       {
         "id": 1789819711494,
-        "name": "UNDISPELLABLE : BUFF : Oasis All-Ride Pass",
+        "name": "UNDISPELLABLE : BUFF : Oasis All-Ride Pass (Free first soulburn)",
         "value": 9.5,
-        "factorIds": [],
+        "factorIds": [
+          1788784362484
+        ],
         "locked": true,
         "marked": false
       }
@@ -21094,5 +21105,5 @@
     ]
   },
   "schemaVersion": 2,
-  "savedAt": "2026-09-19T12:10:01.696Z"
+  "savedAt": "2026-09-19T12:12:39.265Z"
 }
