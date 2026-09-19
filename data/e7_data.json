@@ -9112,13 +9112,25 @@
         },
         {
           "refId": 1788783359037
+        },
+        {
+          "refId": 1788773060667
         }
       ],
       "selfishScore": 0,
       "selflessScore": 0.5,
       "needsRerating": false,
       "pvpTag": false,
-      "altStats": null,
+      "altStats": {
+        "selfishScore": 3,
+        "selflessScore": 0,
+        "selfSkillIds": [
+          "extraTurns",
+          "immobDebuff",
+          "immunity"
+        ],
+        "allySupport": []
+      },
       "selfSkillIds": [],
       "allySupport": [
         {
@@ -9165,11 +9177,47 @@
         "hType": "SUR",
         "hScore": 4
       },
-      "reactions": [],
-      "engagements": [],
-      "selfishScore": 0,
+      "reactions": [
+        {
+          "refId": 1789805067473
+        },
+        {
+          "refId": 1789120795174
+        },
+        {
+          "refId": 1789805220091
+        }
+      ],
+      "engagements": [
+        {
+          "refId": 1788773060667
+        },
+        {
+          "refId": 1789116549901
+        },
+        {
+          "refId": 1788773476896
+        },
+        {
+          "refId": 1788787229175
+        },
+        {
+          "refId": 1788785021751
+        },
+        {
+          "refId": 1789221204007
+        }
+      ],
+      "selfishScore": 2,
       "selflessScore": 0,
-      "needsRerating": true
+      "needsRerating": false,
+      "pvpTag": false,
+      "altStats": null,
+      "selfSkillIds": [
+        "spdCr",
+        "selfPassive"
+      ],
+      "allySupport": []
     },
     {
       "id": 1787782951542,
@@ -17604,6 +17652,35 @@
         "factorIds": [
           1788785891810
         ]
+      },
+      {
+        "id": 1789805067473,
+        "name": "DAMAGE : Prop to enemy's lost health",
+        "value": 10,
+        "pinned": false,
+        "locked": false,
+        "marked": false,
+        "factorIds": [
+          1788772992919,
+          1789259574556
+        ]
+      },
+      {
+        "id": 1789805220091,
+        "name": "PASSIVE : Reacts to ally's attacks",
+        "value": 9.7,
+        "pinned": false,
+        "locked": false,
+        "marked": false,
+        "factorIds": [
+          1788785891810,
+          1788773130306,
+          1788701036557,
+          1788700420912,
+          1788772992919,
+          1789259574556,
+          1788783127095
+        ]
       }
     ],
     "engagements": [
@@ -19925,5 +20002,5 @@
     ]
   },
   "schemaVersion": 2,
-  "savedAt": "2026-09-19T08:01:09.293Z"
+  "savedAt": "2026-09-19T08:09:38.999Z"
 }
