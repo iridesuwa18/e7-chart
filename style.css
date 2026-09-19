@@ -1388,6 +1388,10 @@ body.qd-factor-menu-open { overflow: hidden; }
   overflow: hidden;
   text-overflow: ellipsis;
 }
+/* Flags a Neutral (unrated Selfish/Selfless) hero showing up in a
+   Suggest column — it's not soft-blocked anymore (matches both sides),
+   but it isn't an actual rated pick for that side either. */
+.qd-neutral-badge { font-size: 10px; opacity: .8; }
 .qd-suggest-reasons {
   font-size: 9px;
   color: var(--text-dim);

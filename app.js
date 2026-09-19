@@ -1041,10 +1041,16 @@ function qdPickRandomFrom(pool, n) {
 function qdGenerateFakeEnemyTeam() {
   const draftedIds = new Set(quickDraft.filter(raw => raw !== null && raw !== undefined).map(raw => qdParsePick(raw).heroId));
   const available = heroes.filter(h => !draftedIds.has(h.id));
-  const selfishPool  = available.filter(h => qdHeroSide(h, "primary") === "selfish");
-  const selflessPool = available.filter(h => qdHeroSide(h, "primary") === "selfless");
+  // Neutral heroes match both sides (qdHeroMatchesSide), so the Selfish
+  // draw happens first and its picks are excluded from the Selfless
+  // pool — otherwise the same Neutral hero could be drawn into both
+  // halves of the fake team at once.
+  const selfishPool = available.filter(h => qdHeroMatchesSide(h, "primary", "selfish"));
+  const selfishPicks = qdPickRandomFrom(selfishPool, QD_SELFISH_TARGET);
+  const usedIds = new Set(selfishPicks.map(h => h.id));
+  const selflessPool = available.filter(h => !usedIds.has(h.id) && qdHeroMatchesSide(h, "primary", "selfless"));
   qdEnemyTeam = [
-    ...qdPickRandomFrom(selfishPool, QD_SELFISH_TARGET).map(hero => ({ hero, side: "selfish" })),
+    ...selfishPicks.map(hero => ({ hero, side: "selfish" })),
     ...qdPickRandomFrom(selflessPool, QD_SELFLESS_TARGET).map(hero => ({ hero, side: "selfless" })),
   ];
   renderQdEnemyTeam();
@@ -1055,20 +1061,25 @@ function renderQdEnemyTeam() {
   if (!box) return;
   const totalWanted = QD_SELFISH_TARGET + QD_SELFLESS_TARGET;
   if (!qdEnemyTeam.length) {
-    box.innerHTML = `<div class="qd-enemy-team-note">Not enough rated Selfish/Selfless heroes in your roster yet to build a fake team.</div>`;
+    box.innerHTML = `<div class="qd-enemy-team-note">Not enough eligible heroes (rated or Neutral) in your roster yet to build a fake team.</div>`;
     return;
   }
   const note = qdEnemyTeam.length < totalWanted
-    ? `<div class="qd-enemy-team-note">Only found ${qdEnemyTeam.length}/${totalWanted} — not enough rated Selfish/Selfless heroes left in your roster (outside your own Quick Draft team) for a full split.</div>`
+    ? `<div class="qd-enemy-team-note">Only found ${qdEnemyTeam.length}/${totalWanted} — not enough eligible heroes left in your roster (outside your own Quick Draft team) for a full split.</div>`
     : "";
   const slotsHTML = qdEnemyTeam.map(({ hero, side }) => {
     const portrait = hero.iconData ? `<img src="${hero.iconData}">` : "⚔️";
     const sideIcon = side === "selfish" ? "😈" : "🙏";
+    // Neutral heroes get drawn into whichever half still needs filling
+    // (qdHeroMatchesSide) — flag them here so it's clear this isn't
+    // actually a rated Selfish/Selfless pick, just one standing in.
+    const isNeutral = qdHeroSide(hero, "primary") === "neutral";
+    const neutralNote = isNeutral ? ` <span title="Neutral — unrated, standing in for this side">⚖️</span>` : "";
     return `
       <div class="qd-enemy-slot">
         <div class="qd-slot-portrait">${portrait}</div>
         <div class="qd-slot-name">${hero.name || "Unnamed"}</div>
-        <div class="qd-enemy-slot-side">${sideIcon} ${side === "selfish" ? "Selfish" : "Selfless"}</div>
+        <div class="qd-enemy-slot-side">${sideIcon} ${side === "selfish" ? "Selfish" : "Selfless"}${neutralNote}</div>
       </div>`;
   }).join("");
   box.innerHTML = note + slotsHTML;
@@ -2430,7 +2441,16 @@ function qdSuggestForNextSlot() {
        the time the team is full, or null once both quotas are already
        met (no further restriction) or nothing's actually forcing a
        specific side yet (both still have slack — see below).
-═══════════════════════════════════════ */
+
+   Neutral heroes (unrated — see above) are NOT soft-blocked from Quick
+   Draft: every side-matching check in this section goes through
+   qdHeroMatchesSide (never a raw `qdHeroSide(...) === "selfish"`/
+   "selfless"` comparison) so a Neutral hero satisfies BOTH sides —
+   it shows up in both Suggest columns, counts toward whichever quota
+   still needs it, and is eligible whenever Autofill/Rep. Curr. has
+   narrowed candidates down to one required side. qdHeroSide() itself
+   still returns the plain "neutral" classification (unchanged) so the
+   UI can mark it with its own ⚖️ indicator wherever a pick is shown. */
 function qdHeroSide(h, variant) {
   const src = (variant === "ghost" ? h?.altStats : h) || {};
   const selfless = Math.max(0, Math.min(10, Number(src.selflessScore) || 0));
@@ -2441,6 +2461,20 @@ function qdHeroSide(h, variant) {
   if (selfish > 0) return "selfish";
   return "neutral"; // unrated — score of 0 on both ends, e.g. a fresh legacy import (Section 2)
 }
+
+// Does this hero+variant qualify for `side` ("selfish" or "selfless")?
+// A Neutral hero (see qdHeroSide) matches EITHER side — it's eligible
+// wherever a Selfish or a Selfless hero would be, instead of being
+// invisible to both, since there's no reason an unrated hero should be
+// less usable in Quick Draft than a rated one. Use this everywhere a
+// side-match decides eligibility (Suggest columns, Autofill/Rep. Curr.
+// side-restriction, the fake enemy team); use the raw qdHeroSide only
+// where the exact classification itself needs to be shown or counted.
+function qdHeroMatchesSide(h, variant, side) {
+  const actual = qdHeroSide(h, variant);
+  return actual === side || actual === "neutral";
+}
+
 
 // Which side (if any) the NEXT empty slot in draftArr must fill to still
 // land on 3 Selfish + 2 Selfless once the team's full. Returns null when
@@ -2461,12 +2495,12 @@ function qdRequiredSideForDraft(draftArr) {
     const h = heroes.find(x => x.id === heroId);
     if (!h) return;
     const side = qdHeroSide(h, variant);
-    if (side === "selfless") selflessCount++;
-    else if (side === "selfish") selfishCount++;
-    // "neutral" (unrated) picks count toward neither quota — they're an
-    // edge case (see Section 2's "needs re-rating" flag) that shouldn't
-    // normally reach Autofill, but shouldn't silently distort the ratio
-    // math if one does.
+    // A drafted Neutral hero counts toward BOTH quotas (see
+    // qdHeroMatchesSide above) — it's just as valid a Selfish pick as
+    // a Selfless one, so it satisfies whichever side still needs it
+    // rather than being invisible to the ratio math entirely.
+    if (side === "selfless" || side === "neutral") selflessCount++;
+    if (side === "selfish"  || side === "neutral") selfishCount++;
   });
 
   const selflessNeeded = Math.max(0, QD_SELFLESS_TARGET - selflessCount);
@@ -2636,7 +2670,7 @@ function qdSimpleSuggestForSlot(nextIdx, draftArr, banProtectEl) {
   // old Autofill/mould code already used.
   const requiredSide = qdEffectiveRequiredSide(draftArrForQuota);
   if (requiredSide) {
-    const sideMatches = entries.filter(e => qdHeroSide(e.hero, e.variant) === requiredSide);
+    const sideMatches = entries.filter(e => qdHeroMatchesSide(e.hero, e.variant, requiredSide));
     if (sideMatches.length) entries = sideMatches;
   }
 
@@ -2919,7 +2953,7 @@ function qdSimulateChain(hero, variant, banProtectEl) {
     const requiredSide = qdRequiredSideForDraft(draftArr);
     let pool = suggestions;
     if (requiredSide) {
-      const sideMatches = suggestions.filter(e => qdHeroSide(e.hero, e.variant) === requiredSide);
+      const sideMatches = suggestions.filter(e => qdHeroMatchesSide(e.hero, e.variant, requiredSide));
       if (sideMatches.length) pool = sideMatches; // else relax, same fallback as Autofill
     }
 
@@ -3087,7 +3121,7 @@ function autofillTopQuickDraftPick() {
   const requiredSide = qdEffectiveRequiredSide(quickDraft);
   let pool = scored;
   if (requiredSide) {
-    const sideMatches = scored.filter(e => qdHeroSide(e.hero, e.variant) === requiredSide);
+    const sideMatches = scored.filter(e => qdHeroMatchesSide(e.hero, e.variant, requiredSide));
     // Open decision (Section 9.2/9.3), resolved: if the roster doesn't
     // have enough rated heroes on the required side, relax the ratio
     // rather than leaving Autofill stuck — fall through to the full,
@@ -3275,7 +3309,7 @@ function qdShowSlotInfo(btn, info) {
   const nameSuffix = info.variant === "ghost" ? " (Ghost)" : "";
   const sideLine = info.side === "selfish" ? "😈 Selfish"
     : info.side === "selfless" ? "🙏 Selfless"
-    : "Unrated (no Selfish/Selfless score set)";
+    : "⚖️ Neutral — unrated, counts toward either side's quota";
   const reasonLines = info.reasons.length
     ? info.reasons.map(r => `<div class="qd-slot-info-line">${r}</div>`).join("")
     : `<div class="qd-slot-info-line">Ranked by overall kit score — the average of every one of ${h.name || "this hero"}'s Reaction/Engagement scores. No Enemy Factors are currently ticked, so nothing more specific was being targeted.</div>`;
@@ -4029,11 +4063,18 @@ function qdSuggestRowHTML(s, rank) {
   );
   const topReasons = orderedReasons.slice(0, 2).join(" · ");
   const nameSuffix = s.variant === "ghost" ? " (Ghost)" : "";
+  // Neutral heroes now appear in both Selfless and Selfish columns
+  // (qdHeroMatchesSide) instead of neither — flag them here so it's
+  // clear this is an unrated stand-in, not an actual Selfless/Selfish
+  // rating on this side.
+  const neutralBadge = qdHeroSide(h, s.variant) === "neutral"
+    ? `<span class="qd-neutral-badge" title="Neutral — no Selfish/Selfless score set; counts toward either side">⚖️</span>`
+    : "";
   return `
     <div class="qd-suggest-row${rank === 0 ? " best" : ""}" data-id="${s.heroId}" data-variant="${s.variant}">
       <div class="qd-suggest-portrait">${portrait}</div>
       <div class="qd-suggest-info">
-        <div class="qd-suggest-name">${rank === 0 ? "👑 " : ""}${h.name || "Unnamed"}${nameSuffix}</div>
+        <div class="qd-suggest-name">${rank === 0 ? "👑 " : ""}${h.name || "Unnamed"}${nameSuffix} ${neutralBadge}</div>
         <div class="qd-suggest-reasons" data-expanded="0">${topReasons}</div>
       </div>
       <div class="qd-suggest-score">${s.score.toFixed(1)}</div>
@@ -4092,10 +4133,14 @@ function renderQuickDraftSuggestionsInner(nextIdx, listElSelfless, listElSelfish
     // get their own independently-scrollable list, so the ratio of each
     // in the draft can be chosen deliberately rather than picked from
     // one blended ranking. This only PARTITIONS qdSuggestForNextSlot's
-    // output by side (Section 8's Factor/quadrant ranking is untouched);
-    // a "neutral" (unrated, see Section 2) hero shows in neither column.
-    const selflessRows = scored.filter(s => qdHeroSide(s.hero, s.variant) === "selfless");
-    const selfishRows  = scored.filter(s => qdHeroSide(s.hero, s.variant) === "selfish");
+    // output by side (Section 8's Factor/quadrant ranking is untouched).
+    // A "neutral" (unrated, see Section 2) hero is no longer soft-
+    // blocked from Quick Draft — it matches BOTH sides
+    // (qdHeroMatchesSide) and shows up in both columns, each row
+    // flagged with a ⚖️ so it's clear it's an unrated stand-in rather
+    // than an actual Selfless/Selfish rating.
+    const selflessRows = scored.filter(s => qdHeroMatchesSide(s.hero, s.variant, "selfless"));
+    const selfishRows  = scored.filter(s => qdHeroMatchesSide(s.hero, s.variant, "selfish"));
     qdRenderSuggestColumn(listElSelfless, selflessRows, "No Selfless-rated heroes match right now.", panel);
     qdRenderSuggestColumn(listElSelfish,  selfishRows,  "No Selfish-rated heroes match right now.", panel);
   }
