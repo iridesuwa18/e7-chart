@@ -10338,10 +10338,45 @@
         "hScore": 2
       },
       "reactions": [],
-      "engagements": [],
+      "engagements": [
+        {
+          "refId": 1788772163166
+        },
+        {
+          "refId": 1788782920388
+        },
+        {
+          "refId": 1789819711494
+        }
+      ],
       "selfishScore": 0,
-      "selflessScore": 0,
-      "needsRerating": true
+      "selflessScore": 1.17,
+      "needsRerating": false,
+      "pvpTag": false,
+      "altStats": null,
+      "selfSkillIds": [],
+      "allySupport": [
+        {
+          "healing": 0,
+          "passive": 0,
+          "buffCount": 4
+        },
+        {
+          "healing": 0,
+          "passive": 0,
+          "buffCount": 4
+        },
+        {
+          "healing": 0,
+          "passive": 0,
+          "buffCount": 3
+        },
+        {
+          "healing": 0,
+          "passive": 0,
+          "buffCount": 3
+        }
+      ]
     },
     {
       "id": 1787869191346,
@@ -18603,7 +18638,7 @@
         "name": "UNIQUE : BUFF : Knowledge of the Stars (Add. Dmg Increase %)",
         "value": 10,
         "pinned": false,
-        "locked": false,
+        "locked": true,
         "marked": false,
         "factorIds": [
           1788785891810,
@@ -18657,7 +18692,7 @@
         "name": "DAMAGE : Prop to caster's injuries",
         "value": 10,
         "pinned": false,
-        "locked": false,
+        "locked": true,
         "marked": false,
         "factorIds": [
           1788772992919,
@@ -20569,6 +20604,14 @@
           1788701036557,
           1788783127095
         ]
+      },
+      {
+        "id": 1789819711494,
+        "name": "UNDISPELLABLE : BUFF : Oasis All-Ride Pass",
+        "value": 9.5,
+        "factorIds": [],
+        "locked": true,
+        "marked": false
       }
     ],
     "factors": [
@@ -21051,5 +21094,5 @@
     ]
   },
   "schemaVersion": 2,
-  "savedAt": "2026-09-19T12:01:53.511Z"
+  "savedAt": "2026-09-19T12:10:01.696Z"
 }
