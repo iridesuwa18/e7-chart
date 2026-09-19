@@ -16776,6 +16776,71 @@
         "lifesteal"
       ],
       "allySupport": []
+    },
+    {
+      "id": 1789809967636,
+      "name": "Uncharted Pioneer Politis",
+      "rarity": "5r",
+      "role": "Ranger",
+      "element": "Ice",
+      "notes": "",
+      "iconData": "https://raw.githubusercontent.com/iridesuwa18/e7-chart/main/assets/heroes/uncharted-pioneer-politis.webp",
+      "locked": true,
+      "pvpTag": false,
+      "altStats": null,
+      "selfishScore": 0,
+      "selflessScore": 0.67,
+      "selfSkillIds": [],
+      "allySupport": [
+        {
+          "healing": 0,
+          "passive": 0,
+          "buffCount": 2
+        },
+        {
+          "healing": 0,
+          "passive": 0,
+          "buffCount": 2
+        },
+        {
+          "healing": 0,
+          "passive": 0,
+          "buffCount": 2
+        },
+        {
+          "healing": 0,
+          "passive": 0,
+          "buffCount": 2
+        }
+      ],
+      "reactions": [],
+      "engagements": [],
+      "_x": 50,
+      "_y": 53.35
+    },
+    {
+      "id": 1789810080226,
+      "name": "Haru",
+      "rarity": "5ml",
+      "role": "Warrior",
+      "element": "Ice",
+      "notes": "",
+      "iconData": "https://raw.githubusercontent.com/iridesuwa18/e7-chart/main/assets/heroes/haru.webp",
+      "locked": true,
+      "pvpTag": false,
+      "altStats": null,
+      "selfishScore": 3,
+      "selflessScore": 0,
+      "selfSkillIds": [
+        "lifesteal",
+        "selfPassive",
+        "shields"
+      ],
+      "allySupport": [],
+      "reactions": [],
+      "engagements": [],
+      "_x": 50,
+      "_y": 35
     }
   ],
   "draftData": {
@@ -19903,15 +19968,16 @@
         "id": 1789804268742,
         "name": "BUFF : Escort",
         "value": 7,
+        "pinned": false,
+        "locked": true,
+        "marked": false,
         "factorIds": [
           1788700781693,
           1788772019318,
           1788694866469,
           1788772214825,
           1788913802940
-        ],
-        "locked": true,
-        "marked": false
+        ]
       },
       {
         "id": 1789807507695,
@@ -20409,5 +20475,5 @@
     ]
   },
   "schemaVersion": 2,
-  "savedAt": "2026-09-19T09:05:13.249Z"
+  "savedAt": "2026-09-19T09:28:06.125Z"
 }
