@@ -104,12 +104,6 @@
       flex-direction: column;
       min-height: 0;
     }
-    .taxonomy-jump-top-btn {
-      display: block;
-      margin: 8px 0;
-      width: 100%;
-    }
-
     /* Taxonomy search box — filters the currently active tab's list */
     .taxonomy-search {
       width: 100%;
@@ -1101,6 +1095,10 @@
        admin-side screen for managing the shared library, separate from any
        individual hero's edit screen (Section 5.1/5.2). -->
   <div class="overlay" id="taxonomy-overlay">
+    <!-- Floating "back to top" button — see index.html for the full
+         explanation; kept in sync here since this file carries its own
+         copy of the modal markup. -->
+    <button type="button" class="modal-scroll-top-btn" id="taxonomy-scroll-top-btn" title="Jump to top" aria-label="Jump to top">↑</button>
     <div class="modal taxonomy-modal" id="taxonomy-modal">
       <div class="taxonomy-modal-sticky">
         <div class="details-modal-header">
@@ -1109,8 +1107,6 @@
         </div>
 
         <p class="taxonomy-cr-note">Increase and Decrease of Combat Readiness through an attack or non-attack skills will not be listed here.</p>
-
-        <button type="button" class="btn btn-ghost btn-sm taxonomy-jump-top-btn" id="taxonomy-jump-top">↑ Jump to Top</button>
 
         <div class="taxonomy-tabs">
           <button type="button" class="taxonomy-tab active" data-tab="reactions">Reactions</button>
@@ -1127,6 +1123,10 @@
             <div class="taxonomy-search-wrap">
               <input type="text" class="taxonomy-search" id="taxonomy-search-reactions" autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false" placeholder="🔍 Search Reactions…" />
               <button type="button" class="taxonomy-search-clear" id="taxonomy-search-reactions-clear" title="Clear search" aria-label="Clear search">✕</button>
+              <!-- Cross-tab match: shows Engagements that match this search
+                   so you don't have to repeat it on the other tab by hand.
+                   See renderTaxonomyCrossSuggest in app.js. -->
+              <div class="rename-modal-suggest" id="taxonomy-search-reactions-suggest" style="display:none"></div>
             </div>
             <button type="button" class="btn btn-gold btn-sm taxonomy-quickadd-btn" id="taxonomy-quickadd-reactions" style="display:none" title="Add &quot;[search text]&quot; as a new Reaction">+</button>
             <select class="taxonomy-sort-select" id="taxonomy-sort-reactions" title="Sort order">
@@ -1159,6 +1159,10 @@
             <div class="taxonomy-search-wrap">
               <input type="text" class="taxonomy-search" id="taxonomy-search-engagements" autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false" placeholder="🔍 Search Engagements…" />
               <button type="button" class="taxonomy-search-clear" id="taxonomy-search-engagements-clear" title="Clear search" aria-label="Clear search">✕</button>
+              <!-- Cross-tab match: shows Reactions that match this search
+                   so you don't have to repeat it on the other tab by hand.
+                   See renderTaxonomyCrossSuggest in app.js. -->
+              <div class="rename-modal-suggest" id="taxonomy-search-engagements-suggest" style="display:none"></div>
             </div>
             <button type="button" class="btn btn-gold btn-sm taxonomy-quickadd-btn" id="taxonomy-quickadd-engagements" style="display:none" title="Add &quot;[search text]&quot; as a new Engagement">+</button>
             <select class="taxonomy-sort-select" id="taxonomy-sort-engagements" title="Sort order">
@@ -1242,9 +1246,14 @@
   <div class="overlay" id="rename-modal-overlay">
     <div class="modal" id="rename-modal" style="max-width:380px">
       <div class="modal-title" id="rename-modal-title">Rename</div>
-      <div class="form-group">
+      <div class="form-group rename-modal-input-wrap">
         <label>Name</label>
         <input type="text" id="rename-modal-input" autocomplete="off" spellcheck="false" />
+        <!-- Live "does something like this already exist?" dropdown —
+             was missing from this file (present in index.html), so this
+             cross-check silently did nothing on the Quick Draft page.
+             See renderRenameModalSuggestions in app.js. -->
+        <div class="rename-modal-suggest" id="rename-modal-suggest" style="display:none"></div>
         <!-- Ranking Category quick-fill — Reactions/Engagements only; tap a
              category to prefix the name with "CATEGORY : " instead of typing
              it out. See openRenameModal/renderCategoryQuickfillRow in app.js. -->

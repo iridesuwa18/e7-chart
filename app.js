@@ -1214,19 +1214,22 @@ const modalDelete  = document.getElementById("modal-delete");
 const saveStatus   = document.getElementById("save-status");
 const fSsScore     = document.getElementById("f-ss-score");
 
-// Shows/hides the floating "↑ jump to top" button on the Add/Edit Hero
-// overlay as it's scrolled, and wires its click to scroll back to 0.
-// Wired once here at startup (the button and overlay are both static
-// markup, present whether or not the modal is currently open), rather
-// than re-wired every time the modal opens.
-function wireModalScrollTopBtn() {
-  const scrollBtn = document.getElementById("modal-scroll-top-btn");
-  if (!overlay || !scrollBtn) return;
-  overlay.addEventListener("scroll", () => {
-    scrollBtn.classList.toggle("visible", overlay.scrollTop > 240);
+// Shows/hides a floating "↑ jump to top" button as its scroll container
+// is scrolled, and wires its click to scroll that same container back to
+// 0. Shared by the Add/Edit Hero overlay (scrollEl is the overlay itself)
+// and the Taxonomy modal (scrollEl is .taxonomy-body — the header/tabs
+// above it are sticky and never scroll, so tying this to the whole modal
+// would never fire). Wired once here at startup (buttons and containers
+// are both static markup, present whether or not their modal is
+// currently open), rather than re-wired every time a modal opens.
+function wireScrollTopBtn(scrollEl, btnId, threshold = 240) {
+  const scrollBtn = document.getElementById(btnId);
+  if (!scrollEl || !scrollBtn) return;
+  scrollEl.addEventListener("scroll", () => {
+    scrollBtn.classList.toggle("visible", scrollEl.scrollTop > threshold);
   });
   scrollBtn.addEventListener("click", () => {
-    overlay.scrollTo({ top: 0, behavior: "smooth" });
+    scrollEl.scrollTo({ top: 0, behavior: "smooth" });
   });
 }
 
@@ -1265,10 +1268,12 @@ function wireModalScrollTopBtn() {
   // Auto-load from server for ALL visitors on page open (no password needed)
   autoLoadFromServer();
 
-  // Floating "↑ jump to top" button for the Add/Edit Hero overlay — only
-  // shows once scrolled down a bit, so it's not just permanently sitting
-  // over the form on short screens/short forms.
-  wireModalScrollTopBtn();
+  // Floating "↑ jump to top" buttons — only show once scrolled down a
+  // bit, so they're not just permanently sitting over content on short
+  // screens/short forms. The Taxonomy modal's panels tend to be shorter
+  // than the Add/Edit Hero form, so it gets a lower threshold.
+  wireScrollTopBtn(overlay, "modal-scroll-top-btn");
+  wireScrollTopBtn(document.querySelector(".taxonomy-modal .taxonomy-body"), "taxonomy-scroll-top-btn", 120);
 
   // Double-click the brand emblem to reveal admin controls (Save/Load/Add Hero)
   document.querySelector(".brand-emblem").addEventListener("dblclick", () => {
@@ -1367,24 +1372,6 @@ function wireModalScrollTopBtn() {
     rankingOverlay.querySelector("#taxonomy-ranking-bulk-minus")?.addEventListener("click", () => applyTaxonomyRankingBulk("delta", -0.5));
     rankingOverlay.querySelector("#taxonomy-ranking-bulk-plus")?.addEventListener("click", () => applyTaxonomyRankingBulk("delta", 0.5));
   }
-  // "Jump to Top" — the header/tabs stay fixed (see the CSS comment on
-  // .taxonomy-modal-sticky) but the panel content itself, including the
-  // search bar sitting near the top of whichever tab is open, scrolls
-  // inside .taxonomy-body. Scrolling that back to 0 is all "back to my
-  // search bar" needs, and it works the same regardless of which of
-  // the 3 tabs is currently active since each has the same layout.
-  // Guarded with a null-check: quickdraft.html carries its own separate
-  // copy of this modal's markup, so any button added to one HTML file
-  // and not the other must never be assumed present — an unguarded
-  // .addEventListener on a missing element throws and silently kills
-  // every bit of button-wiring code still queued after it.
-  const jumpTopBtn = document.getElementById("taxonomy-jump-top");
-  if (jumpTopBtn) {
-    jumpTopBtn.addEventListener("click", () => {
-      document.querySelector(".taxonomy-modal .taxonomy-body").scrollTo({ top: 0, behavior: "smooth" });
-    });
-  }
-
   // Rename modal (opened by each row's ✏️ button) — can be triggered
   // from inside the Performance Ranking overlay, where an accidental
   // outside tap while renaming shouldn't silently discard the edit. So,
@@ -1449,10 +1436,19 @@ function wireModalScrollTopBtn() {
       taxonomySearchQuery[kind] = input.value;
       renderFn(kind === "factors" ? undefined : kind);
       syncQuickAdd();
+      renderTaxonomyCrossSuggest(kind);
     };
     input.addEventListener("input", apply);
     wireTaxonomySearchClear(input, clearBtn, apply);
     syncQuickAdd();
+    // Cross-tab suggestions (Reactions ↔ Engagements only — see
+    // TAXONOMY_CROSS_KIND) re-show on focus in case there's already text
+    // left over from a previous visit, and hide on blur, delayed so a
+    // mousedown on a suggestion registers first.
+    if (TAXONOMY_CROSS_KIND[kind]) {
+      input.addEventListener("focus", () => renderTaxonomyCrossSuggest(kind));
+      input.addEventListener("blur", () => setTimeout(() => hideTaxonomyCrossSuggest(kind), 150));
+    }
     if (quickAddBtn && onQuickAdd) {
       quickAddBtn.addEventListener("click", () => {
         const val = input.value.trim();
@@ -6251,6 +6247,73 @@ function closeTaxonomyRankingOverlay() {
 function taxonomyRankingOverlayIsOpen() {
   const overlay = document.getElementById("taxonomy-ranking-overlay");
   return !!overlay && overlay.style.display !== "none";
+}
+
+// Which Taxonomy kind's list a given tab's search box cross-checks —
+// Reactions search surfaces Engagements matches and vice versa. Factors
+// have no counterpart (same reasoning as renderRenameModalSuggestions
+// below) so they're simply absent from this map.
+const TAXONOMY_CROSS_KIND = { reactions: "engagements", engagements: "reactions" };
+
+// Live "it's actually on the other tab" dropdown under a Reactions/
+// Engagements search box — lets someone searching Reactions for
+// something that's actually named on the Engagements tab (or vice
+// versa) jump straight there instead of having to repeat the search by
+// hand on the other tab. Matches ONLY the other kind's list — the
+// current tab's own matches are already the list rendered below the
+// search box, so mirroring them here too would just be noise.
+function renderTaxonomyCrossSuggest(kind) {
+  const otherKind = TAXONOMY_CROSS_KIND[kind];
+  if (!otherKind) return;
+  const box = document.getElementById(`taxonomy-search-${kind}-suggest`);
+  if (!box) return;
+
+  const q = (taxonomySearchQuery[kind] || "").trim().toLowerCase();
+  if (!q) { box.style.display = "none"; box.innerHTML = ""; return; }
+
+  const matches = taxonomy[otherKind].filter(item => (item.name || "").toLowerCase().includes(q));
+  if (!matches.length) { box.style.display = "none"; box.innerHTML = ""; return; }
+
+  // Same "starts with" priority then alphabetical as the rename modal's
+  // version, capped a bit tighter (6 vs 8) since this sits right above a
+  // list that's already showing this tab's own matches underneath it.
+  matches.sort((a, b) => {
+    const an = (a.name || "").toLowerCase(), bn = (b.name || "").toLowerCase();
+    const aStarts = an.startsWith(q) ? 0 : 1, bStarts = bn.startsWith(q) ? 0 : 1;
+    return aStarts - bStarts || an.localeCompare(bn);
+  });
+
+  const otherLabel = otherKind === "reactions" ? "Reactions" : "Engagements";
+  const icon = otherKind === "reactions" ? "⚡" : "🛡";
+  box.innerHTML = matches.slice(0, 6).map(item => `
+    <div class="rename-modal-suggest-item" data-kind="${otherKind}" data-id="${item.id}">
+      <span class="rename-modal-suggest-item-icon">${icon}</span>
+      <span class="rename-modal-suggest-item-name">${item.name || "(unnamed)"}</span>
+      <span class="rename-modal-suggest-item-score">in ${otherLabel}</span>
+    </div>
+  `).join("");
+
+  // mousedown (not click), same reasoning as renderRenameModalSuggestions
+  // below — fires before the input's blur so the jump isn't cancelled by
+  // the dropdown closing out from under the click.
+  box.querySelectorAll(".rename-modal-suggest-item").forEach(row => {
+    row.addEventListener("mousedown", e => {
+      e.preventDefault();
+      const targetKind = row.dataset.kind;
+      const targetId = Number(row.dataset.id);
+      hideTaxonomyCrossSuggest(kind);
+      switchTaxonomyTab(targetKind);
+      taxonomyJumpToRow(targetKind, targetId);
+    });
+  });
+
+  box.style.display = "block";
+}
+function hideTaxonomyCrossSuggest(kind) {
+  const box = document.getElementById(`taxonomy-search-${kind}-suggest`);
+  if (!box) return;
+  box.style.display = "none";
+  box.innerHTML = "";
 }
 
 // Case-insensitive substring match against the current tab's search box.

@@ -2151,6 +2151,26 @@ body.dot-mode .origin-dot:hover {
 .modal-scroll-top-btn:hover { background: var(--bg2, #1a1b22); }
 .modal-scroll-top-btn.visible { display: flex; opacity: 1; }
 
+/* Above ~560px the modal is narrower than the viewport (.overlay centers
+   it), so right:14px lands in the empty gutter beside the card. Below
+   that the modal fills almost the full width (.overlay's own padding is
+   only 16px), so there's no gutter left — top:50%/right:14px instead
+   lands the button directly on top of whatever field is vertically
+   centered on screen. Drop it to a bottom-right corner there instead:
+   still floating, but only ever overlapping the one corner rather than
+   drifting over live content as you scroll. */
+@media (max-width: 559px) {
+  .modal-scroll-top-btn {
+    top: auto;
+    bottom: 18px;
+    right: 14px;
+    transform: none;
+    width: 38px;
+    height: 38px;
+    font-size: 16px;
+  }
+}
+
 .modal {
   background: var(--bg3);
   border: 1px solid var(--border);
