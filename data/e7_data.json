@@ -19722,7 +19722,7 @@
         "name": "PASSIVE : Reacts to enemy with a barrier",
         "value": 9.7,
         "pinned": false,
-        "locked": false,
+        "locked": true,
         "marked": false,
         "factorIds": [
           1789135503443
@@ -19733,7 +19733,7 @@
         "name": "PASSIVE : Reacts to critical attacks done to allies",
         "value": 9.7,
         "pinned": false,
-        "locked": false,
+        "locked": true,
         "marked": false,
         "factorIds": [
           1788774921178
@@ -19744,7 +19744,7 @@
         "name": "PASSIVE : Increase Speed % (scaled w enemy debuffs)",
         "value": 9,
         "pinned": false,
-        "locked": false,
+        "locked": true,
         "marked": false,
         "factorIds": [
           1788785891810,
@@ -19756,7 +19756,7 @@
         "name": "PASSIVE : Reacts to ally's attacks inflicting a debuff",
         "value": 9.7,
         "pinned": false,
-        "locked": false,
+        "locked": true,
         "marked": false,
         "factorIds": [
           1789014978867
@@ -19767,7 +19767,7 @@
         "name": "PASSIVE : Cleanses fully upon ally taking too much damage",
         "value": 9.5,
         "pinned": false,
-        "locked": false,
+        "locked": true,
         "marked": false,
         "factorIds": [
           1788700781693,
@@ -19780,7 +19780,7 @@
         "name": "PASSIVE : Increases Combat Readiness received",
         "value": 9.7,
         "pinned": false,
-        "locked": false,
+        "locked": true,
         "marked": false,
         "factorIds": [
           1788785891810,
@@ -21706,7 +21706,7 @@
         "name": "UNDISPELLABLE : BUFF : Mind's Eye (Inflict injuries)",
         "value": 9.5,
         "pinned": false,
-        "locked": false,
+        "locked": true,
         "marked": false,
         "factorIds": [
           1788772992919,
@@ -21720,7 +21720,7 @@
         "name": "EFFECT : Increase crit chance on attacks",
         "value": 9,
         "pinned": false,
-        "locked": false,
+        "locked": true,
         "marked": false,
         "factorIds": [
           1788772992919,
@@ -21734,7 +21734,7 @@
         "name": "EFFECT : Increase Damage prop to diff of enemy and caster's max health",
         "value": 10,
         "pinned": false,
-        "locked": false,
+        "locked": true,
         "marked": false,
         "factorIds": [
           1788700420912,
@@ -21746,7 +21746,7 @@
         "name": "BUFF : Reflect",
         "value": 7,
         "pinned": false,
-        "locked": false,
+        "locked": true,
         "marked": false,
         "factorIds": [
           1788694866469,
@@ -22241,5 +22241,5 @@
     ]
   },
   "schemaVersion": 2,
-  "savedAt": "2026-09-19T23:45:47.635Z"
+  "savedAt": "2026-09-19T23:46:00.563Z"
 }
