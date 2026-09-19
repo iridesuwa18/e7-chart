@@ -7686,6 +7686,9 @@
         },
         {
           "refId": 1788780327120
+        },
+        {
+          "refId": 1788771831892
         }
       ],
       "engagements": [
@@ -7712,6 +7715,9 @@
         },
         {
           "refId": 1789115108791
+        },
+        {
+          "refId": 1789804268742
         }
       ],
       "selfishScore": 0,
@@ -8991,11 +8997,68 @@
         "hType": "SUR",
         "hScore": 3
       },
-      "reactions": [],
-      "engagements": [],
+      "reactions": [
+        {
+          "refId": 1788771831892
+        }
+      ],
+      "engagements": [
+        {
+          "refId": 1788924109560
+        },
+        {
+          "refId": 1788773060667
+        },
+        {
+          "refId": 1788785377663
+        },
+        {
+          "refId": 1789116663470
+        },
+        {
+          "refId": 1789132233866
+        },
+        {
+          "refId": 1788785954933
+        },
+        {
+          "refId": 1788783734183
+        },
+        {
+          "refId": 1789118896007
+        },
+        {
+          "refId": 1789804268742
+        }
+      ],
       "selfishScore": 0,
-      "selflessScore": 0,
-      "needsRerating": true
+      "selflessScore": 0.5,
+      "needsRerating": false,
+      "pvpTag": false,
+      "altStats": null,
+      "selfSkillIds": [],
+      "allySupport": [
+        {
+          "healing": 0,
+          "passive": 0,
+          "buffCount": 3
+        },
+        {
+          "healing": 0,
+          "passive": 0,
+          "buffCount": 1
+        },
+        {
+          "healing": 0,
+          "passive": 0,
+          "buffCount": 1
+        },
+        {
+          "healing": 0,
+          "passive": 0,
+          "buffCount": 1
+        }
+      ]
     },
     {
       "id": 1787782746066,
@@ -19295,6 +19358,20 @@
           1788700420912,
           1788773130306
         ]
+      },
+      {
+        "id": 1789804268742,
+        "name": "BUFF : Escort",
+        "value": 7,
+        "factorIds": [
+          1788700781693,
+          1788772019318,
+          1788694866469,
+          1788772214825,
+          1788913802940
+        ],
+        "locked": false,
+        "marked": false
       }
     ],
     "factors": [
@@ -19777,5 +19854,5 @@
     ]
   },
   "schemaVersion": 2,
-  "savedAt": "2026-09-19T07:25:12.927Z"
+  "savedAt": "2026-09-19T07:53:05.070Z"
 }
