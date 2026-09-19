@@ -16813,8 +16813,25 @@
           "buffCount": 2
         }
       ],
-      "reactions": [],
-      "engagements": [],
+      "reactions": [
+        {
+          "refId": 1789805973741
+        },
+        {
+          "refId": 1789810411965
+        }
+      ],
+      "engagements": [
+        {
+          "refId": 1788773060667
+        },
+        {
+          "refId": 1788773067411
+        },
+        {
+          "refId": 1789221204007
+        }
+      ],
       "_x": 50,
       "_y": 53.35
     },
@@ -18168,18 +18185,50 @@
       },
       {
         "id": 1789805973741,
-        "name": "UNIQUE : BUFF : Overload (Attack and speed increase)",
+        "name": "UNIQUE : BUFF : Offensive Mission (Increase Atk, 10 atks to complete)",
         "value": 10,
         "pinned": false,
         "locked": false,
         "marked": false,
         "factorIds": [
-          1788773895734,
           1788785891810,
           1788701036557,
           1788772992919,
           1788700420912,
-          1788783127095
+          1788783127095,
+          1788912649792,
+          1789130156790
+        ]
+      },
+      {
+        "id": 1789810411965,
+        "name": "UNIQUE : BUFF : Defensive Mission (Increase Max HP, 10 atks (by enemy) to complete)",
+        "value": 10,
+        "pinned": false,
+        "locked": false,
+        "marked": false,
+        "factorIds": [
+          1788694866469,
+          1788774099692,
+          1788912649792,
+          1789130156790
+        ]
+      },
+      {
+        "id": 1789810510961,
+        "name": "UNIQUE : BUFF : Knowledge of the Stars (Add. Dmg Increase %)",
+        "value": 10,
+        "pinned": false,
+        "locked": false,
+        "marked": false,
+        "factorIds": [
+          1788785891810,
+          1788701036557,
+          1788772992919,
+          1788700420912,
+          1788783127095,
+          1788912649792,
+          1789130156790
         ]
       }
     ],
@@ -20518,5 +20567,5 @@
     ]
   },
   "schemaVersion": 2,
-  "savedAt": "2026-09-19T09:30:56.022Z"
+  "savedAt": "2026-09-19T09:35:44.128Z"
 }
