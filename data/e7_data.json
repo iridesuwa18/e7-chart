@@ -10767,11 +10767,71 @@
         "hType": "SUR",
         "hScore": 4
       },
-      "reactions": [],
-      "engagements": [],
+      "reactions": [
+        {
+          "refId": 1788780327120
+        },
+        {
+          "refId": 1789822575429
+        },
+        {
+          "refId": 1789177637826
+        },
+        {
+          "refId": 1788786348512
+        },
+        {
+          "refId": 1788772502540
+        }
+      ],
+      "engagements": [
+        {
+          "refId": 1788785021751
+        },
+        {
+          "refId": 1788773060667
+        },
+        {
+          "refId": 1788773067411
+        },
+        {
+          "refId": 1788786124368
+        },
+        {
+          "refId": 1789132233866
+        },
+        {
+          "refId": 1788783359037
+        }
+      ],
       "selfishScore": 0,
-      "selflessScore": 0,
-      "needsRerating": true
+      "selflessScore": 0.75,
+      "needsRerating": false,
+      "pvpTag": false,
+      "altStats": null,
+      "selfSkillIds": [],
+      "allySupport": [
+        {
+          "healing": 0,
+          "passive": 20,
+          "buffCount": 1
+        },
+        {
+          "healing": 0,
+          "passive": 20,
+          "buffCount": 0
+        },
+        {
+          "healing": 0,
+          "passive": 20,
+          "buffCount": 0
+        },
+        {
+          "healing": 0,
+          "passive": 20,
+          "buffCount": 0
+        }
+      ]
     },
     {
       "id": 1787870072197,
@@ -18927,6 +18987,17 @@
         "factorIds": [
           1789135503443
         ]
+      },
+      {
+        "id": 1789822575429,
+        "name": "PASSIVE : Reacts to critical attacks done to allies",
+        "value": 9.7,
+        "pinned": false,
+        "locked": false,
+        "marked": false,
+        "factorIds": [
+          1788774921178
+        ]
       }
     ],
     "engagements": [
@@ -21348,5 +21419,5 @@
     ]
   },
   "schemaVersion": 2,
-  "savedAt": "2026-09-19T12:53:41.971Z"
+  "savedAt": "2026-09-19T12:59:41.666Z"
 }
