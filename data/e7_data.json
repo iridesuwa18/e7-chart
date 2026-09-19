@@ -10474,11 +10474,53 @@
         "hType": "SST",
         "hScore": 4
       },
-      "reactions": [],
-      "engagements": [],
-      "selfishScore": 0,
+      "reactions": [
+        {
+          "refId": 1789178160509
+        },
+        {
+          "refId": 1789209367308
+        },
+        {
+          "refId": 1788775147348
+        },
+        {
+          "refId": 1789821141616
+        }
+      ],
+      "engagements": [
+        {
+          "refId": 1789198537752
+        },
+        {
+          "refId": 1788773476896
+        },
+        {
+          "refId": 1788772268160
+        },
+        {
+          "refId": 1788787229175
+        },
+        {
+          "refId": 1788786336798
+        },
+        {
+          "refId": 1788700311844
+        },
+        {
+          "refId": 1789200202866
+        }
+      ],
+      "selfishScore": 2,
       "selflessScore": 0,
-      "needsRerating": true
+      "needsRerating": false,
+      "pvpTag": false,
+      "altStats": null,
+      "selfSkillIds": [
+        "spdCr",
+        "lifesteal"
+      ],
+      "allySupport": []
     },
     {
       "id": 1787869503206,
@@ -18748,6 +18790,17 @@
           1789259574556,
           1788772401653
         ]
+      },
+      {
+        "id": 1789821141616,
+        "name": "PASSIVE : Reacts to enemy with a barrier",
+        "value": 9.7,
+        "pinned": false,
+        "locked": false,
+        "marked": false,
+        "factorIds": [
+          1789135503443
+        ]
       }
     ],
     "engagements": [
@@ -21155,5 +21208,5 @@
     ]
   },
   "schemaVersion": 2,
-  "savedAt": "2026-09-19T12:26:56.389Z"
+  "savedAt": "2026-09-19T12:34:53.532Z"
 }
