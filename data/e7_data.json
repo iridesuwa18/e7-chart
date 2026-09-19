@@ -8269,6 +8269,9 @@
         },
         {
           "refId": 1788780605209
+        },
+        {
+          "refId": 1789780745436
         }
       ],
       "selfishScore": 4,
@@ -8306,11 +8309,50 @@
         "hType": "SUR",
         "hScore": 7
       },
-      "reactions": [],
-      "engagements": [],
-      "selfishScore": 0,
+      "reactions": [
+        {
+          "refId": 1789191471240
+        },
+        {
+          "refId": 1789203590553
+        },
+        {
+          "refId": 1789217068833
+        },
+        {
+          "refId": 1789287545820
+        }
+      ],
+      "engagements": [
+        {
+          "refId": 1789115108791
+        },
+        {
+          "refId": 1789781047289
+        },
+        {
+          "refId": 1788783359037
+        },
+        {
+          "refId": 1788700311844
+        },
+        {
+          "refId": 1789781190883
+        },
+        {
+          "refId": 1789781312465
+        }
+      ],
+      "selfishScore": 2,
       "selflessScore": 0,
-      "needsRerating": true
+      "needsRerating": false,
+      "pvpTag": false,
+      "altStats": null,
+      "selfSkillIds": [
+        "spdCr",
+        "selfPassive"
+      ],
+      "allySupport": []
     },
     {
       "id": 1787781348871,
@@ -18724,6 +18766,9 @@
         "id": 1789778422443,
         "name": "DEBUFF : Magic Nail Effect",
         "value": 4,
+        "pinned": false,
+        "locked": true,
+        "marked": false,
         "factorIds": [
           1789014978867,
           1788773731924,
@@ -18732,9 +18777,7 @@
           1789191623914,
           1789135503443,
           1788783127095
-        ],
-        "locked": true,
-        "marked": false
+        ]
       },
       {
         "id": 1789779659755,
@@ -18751,351 +18794,538 @@
           1788700420912,
           1788701036557
         ]
+      },
+      {
+        "id": 1789780745436,
+        "name": "DEBUFF : Frostbite Effect",
+        "value": 4.5,
+        "factorIds": [
+          1788773130306,
+          1788774033143,
+          1788786248167,
+          1788701036557,
+          1788700420912
+        ],
+        "locked": false,
+        "marked": false
+      },
+      {
+        "id": 1789781047289,
+        "name": "ONGOING : Damage increase with more hits",
+        "value": 10,
+        "pinned": false,
+        "locked": false,
+        "marked": false,
+        "factorIds": [
+          1788772992919,
+          1788783430365,
+          1788773130306
+        ]
+      },
+      {
+        "id": 1789781190883,
+        "name": "EFFECT : Attacks using an elemental advantage",
+        "value": 10,
+        "pinned": false,
+        "locked": false,
+        "marked": false,
+        "factorIds": [
+          1788772992919,
+          1788700420912,
+          1789218645455
+        ]
+      },
+      {
+        "id": 1789781312465,
+        "name": "EFFECT : Gain souls from attacks",
+        "value": 10,
+        "pinned": false,
+        "locked": false,
+        "marked": false,
+        "factorIds": [
+          1788784362484
+        ]
       }
     ],
     "factors": [
       {
         "id": 1788694866469,
         "name": "High Damage units",
-        "pinned": false
+        "pinned": false,
+        "priorityOrder": [],
+        "priorityLocked": false
       },
       {
         "id": 1788700781693,
         "name": "Debuffers",
-        "pinned": false
+        "pinned": false,
+        "priorityOrder": [],
+        "priorityLocked": false
       },
       {
         "id": 1788700862798,
         "name": "Enemy Passives",
-        "pinned": false
+        "pinned": false,
+        "priorityOrder": [],
+        "priorityLocked": false
       },
       {
         "id": 1788701036557,
         "name": "High Defense units",
-        "pinned": false
+        "pinned": false,
+        "priorityOrder": [],
+        "priorityLocked": false
       },
       {
         "id": 1788700420912,
         "name": "High HP units",
-        "pinned": false
+        "pinned": false,
+        "priorityOrder": [],
+        "priorityLocked": false
       },
       {
         "id": 1788772401653,
         "name": "Injuries",
-        "pinned": false
+        "pinned": false,
+        "priorityOrder": [],
+        "priorityLocked": false
       },
       {
         "id": 1788772019318,
         "name": "Additional / fixed damage",
-        "pinned": false
+        "pinned": false,
+        "priorityOrder": [],
+        "priorityLocked": false
       },
       {
         "id": 1788772214825,
         "name": "Single target attacks",
-        "pinned": false
+        "pinned": false,
+        "priorityOrder": [],
+        "priorityLocked": false
       },
       {
         "id": 1788772861638,
         "name": "Extra turns",
-        "pinned": false
+        "pinned": false,
+        "priorityOrder": [],
+        "priorityLocked": false
       },
       {
         "id": 1788772992919,
         "name": "Low HP units",
-        "pinned": false
+        "pinned": false,
+        "priorityOrder": [],
+        "priorityLocked": false
       },
       {
         "id": 1788773216100,
         "name": "Stealth units",
-        "pinned": false
+        "pinned": false,
+        "priorityOrder": [],
+        "priorityLocked": false
       },
       {
         "id": 1788773130306,
         "name": "Front Defenders",
-        "pinned": false
+        "pinned": false,
+        "priorityOrder": [],
+        "priorityLocked": false
       },
       {
         "id": 1788773731924,
         "name": "Buffers",
-        "pinned": false
+        "pinned": false,
+        "priorityOrder": [],
+        "priorityLocked": false
       },
       {
         "id": 1788773895734,
         "name": "Speed units",
-        "pinned": false
+        "pinned": false,
+        "priorityOrder": [],
+        "priorityLocked": false
       },
       {
         "id": 1788774033143,
         "name": "Damage Sharing",
-        "pinned": false
+        "pinned": false,
+        "priorityOrder": [],
+        "priorityLocked": false
       },
       {
         "id": 1788774099692,
         "name": "High Single Damage attacks",
-        "pinned": false
+        "pinned": false,
+        "priorityOrder": [],
+        "priorityLocked": false
       },
       {
         "id": 1788774921178,
         "name": "Critical attacks",
-        "pinned": false
+        "pinned": false,
+        "priorityOrder": [],
+        "priorityLocked": false
       },
       {
         "id": 1788775944046,
         "name": "Extra attacks",
-        "pinned": false
+        "pinned": false,
+        "priorityOrder": [],
+        "priorityLocked": false
       },
       {
         "id": 1788775427431,
         "name": "Counterattacks",
-        "pinned": false
+        "pinned": false,
+        "priorityOrder": [],
+        "priorityLocked": false
       },
       {
         "id": 1788780324713,
         "name": "High Hit chance units",
-        "pinned": false
+        "pinned": false,
+        "priorityOrder": [],
+        "priorityLocked": false
       },
       {
         "id": 1788779877239,
         "name": "High Effect Resistance units",
-        "pinned": false
+        "pinned": false,
+        "priorityOrder": [],
+        "priorityLocked": false
       },
       {
         "id": 1788780483075,
         "name": "Decrease Attack",
-        "pinned": false
+        "pinned": false,
+        "priorityOrder": [],
+        "priorityLocked": false
       },
       {
         "id": 1788780896026,
         "name": "Fighting Spirit",
-        "pinned": false
+        "pinned": false,
+        "priorityOrder": [],
+        "priorityLocked": false
       },
       {
         "id": 1788783430365,
         "name": "No tank team",
-        "pinned": false
+        "pinned": false,
+        "priorityOrder": [],
+        "priorityLocked": false
       },
       {
         "id": 1788783127095,
         "name": "Evasion units",
-        "pinned": false
+        "pinned": false,
+        "priorityOrder": [],
+        "priorityLocked": false
       },
       {
         "id": 1788784362484,
         "name": "Low soulburn teams",
-        "pinned": false
+        "pinned": false,
+        "priorityOrder": [],
+        "priorityLocked": false
       },
       {
         "id": 1788783972533,
         "name": "Low / no resource units",
-        "pinned": false
+        "pinned": false,
+        "priorityOrder": [],
+        "priorityLocked": false
       },
       {
         "id": 1788785891810,
         "name": "Slow units",
-        "pinned": false
+        "pinned": false,
+        "priorityOrder": [],
+        "priorityLocked": false
       },
       {
         "id": 1788786300042,
         "name": "Dual attacks",
-        "pinned": false
+        "pinned": false,
+        "priorityOrder": [],
+        "priorityLocked": false
       },
       {
         "id": 1788786248167,
         "name": "Damage reduction",
-        "pinned": false
+        "pinned": false,
+        "priorityOrder": [],
+        "priorityLocked": false
       },
       {
         "id": 1788786571272,
         "name": "Critical Hit Resistance",
-        "pinned": false
+        "pinned": false,
+        "priorityOrder": [],
+        "priorityLocked": false
       },
       {
         "id": 1788786928682,
         "name": "Revive units",
-        "pinned": false
+        "pinned": false,
+        "priorityOrder": [],
+        "priorityLocked": false
       },
       {
         "id": 1788787028808,
         "name": "Dark units",
-        "pinned": false
+        "pinned": false,
+        "priorityOrder": [],
+        "priorityLocked": false
       },
       {
         "id": 1788912649792,
         "name": "Buff dispellers",
-        "pinned": false
+        "pinned": false,
+        "priorityOrder": [],
+        "priorityLocked": false
       },
       {
         "id": 1788912501579,
         "name": "Decrease buff duration effects",
-        "pinned": false
+        "pinned": false,
+        "priorityOrder": [],
+        "priorityLocked": false
       },
       {
         "id": 1788913802940,
         "name": "AOE attacks",
-        "pinned": false
+        "pinned": false,
+        "priorityOrder": [],
+        "priorityLocked": false
       },
       {
         "id": 1788913836890,
         "name": "High Soulburn teams",
-        "pinned": false
+        "pinned": false,
+        "priorityOrder": [],
+        "priorityLocked": false
       },
       {
         "id": 1789014978867,
         "name": "Low effect resistance team",
-        "pinned": false
+        "pinned": false,
+        "priorityOrder": [],
+        "priorityLocked": false
       },
       {
         "id": 1789015311206,
         "name": "Mid Damage units",
-        "pinned": false
+        "pinned": false,
+        "priorityOrder": [],
+        "priorityLocked": false
       },
       {
         "id": 1789113605205,
         "name": "Reacts to crit (i.e counters)",
-        "pinned": false
+        "pinned": false,
+        "priorityOrder": [],
+        "priorityLocked": false
       },
       {
         "id": 1789113473631,
         "name": "High Penetration units",
-        "pinned": false
+        "pinned": false,
+        "priorityOrder": [],
+        "priorityLocked": false
       },
       {
         "id": 1789114895603,
         "name": "Focus",
-        "pinned": false
+        "pinned": false,
+        "priorityOrder": [],
+        "priorityLocked": false
       },
       {
         "id": 1789116366949,
         "name": "Non-crit resistant units",
-        "pinned": false
+        "pinned": false,
+        "priorityOrder": [],
+        "priorityLocked": false
       },
       {
         "id": 1789116584346,
         "name": "Healers / Lifesteal / Absorb Damage",
-        "pinned": false
+        "pinned": false,
+        "priorityOrder": [],
+        "priorityLocked": false
       },
       {
         "id": 1789116681636,
         "name": "High / Increase Combat Readiness Units",
-        "pinned": false
+        "pinned": false,
+        "priorityOrder": [],
+        "priorityLocked": false
       },
       {
         "id": 1789130156790,
         "name": "Prevent movement debuffers (stun, sleep, fear)",
-        "pinned": false
+        "pinned": false,
+        "priorityOrder": [],
+        "priorityLocked": false
       },
       {
         "id": 1789130596970,
         "name": "Decrease combat readiness skills",
-        "pinned": false
+        "pinned": false,
+        "priorityOrder": [],
+        "priorityLocked": false
       },
       {
         "id": 1789132845858,
         "name": "Decrease debuff duration effects",
-        "pinned": false
+        "pinned": false,
+        "priorityOrder": [],
+        "priorityLocked": false
       },
       {
         "id": 1789135503443,
         "name": "Shield / barrier units",
-        "pinned": false
+        "pinned": false,
+        "priorityOrder": [],
+        "priorityLocked": false
       },
       {
         "id": 1789137334079,
         "name": "Increase cooldown units",
-        "pinned": false
+        "pinned": false,
+        "priorityOrder": [],
+        "priorityLocked": false
       },
       {
         "id": 1789137341208,
         "name": "Long cooldown units",
-        "pinned": false
+        "pinned": false,
+        "priorityOrder": [],
+        "priorityLocked": false
       },
       {
         "id": 1789175114611,
         "name": "Light units",
-        "pinned": false
+        "pinned": false,
+        "priorityOrder": [],
+        "priorityLocked": false
       },
       {
         "id": 1789177680699,
         "name": "Cannot counter effects",
-        "pinned": false
+        "pinned": false,
+        "priorityOrder": [],
+        "priorityLocked": false
       },
       {
         "id": 1789190874660,
         "name": "All rounder pick",
-        "pinned": false
+        "pinned": false,
+        "priorityOrder": [],
+        "priorityLocked": false
       },
       {
         "id": 1789191623914,
         "name": "No shield team",
-        "pinned": false
+        "pinned": false,
+        "priorityOrder": [],
+        "priorityLocked": false
       },
       {
         "id": 1789200928831,
         "name": "High resource units (Fighting Spirit/Focus)",
-        "pinned": false
+        "pinned": false,
+        "priorityOrder": [],
+        "priorityLocked": false
       },
       {
         "id": 1789201341223,
         "name": "Strong non-basic skills",
-        "pinned": false
+        "pinned": false,
+        "priorityOrder": [],
+        "priorityLocked": false
       },
       {
         "id": 1789209213432,
         "name": "Prevention of combat readiness skills (e.g. restrict)",
-        "pinned": false
+        "pinned": false,
+        "priorityOrder": [],
+        "priorityLocked": false
       },
       {
         "id": 1789218645455,
         "name": "Counter element units",
-        "pinned": false
+        "pinned": false,
+        "priorityOrder": [],
+        "priorityLocked": false
       },
       {
         "id": 1789220943266,
         "name": "Lack of buffers team",
-        "pinned": false
+        "pinned": false,
+        "priorityOrder": [],
+        "priorityLocked": false
       },
       {
         "id": 1789259075608,
         "name": "Non-attack skills",
-        "pinned": false
+        "pinned": false,
+        "priorityOrder": [],
+        "priorityLocked": false
       },
       {
         "id": 1789259574556,
         "name": "Low defense units",
-        "pinned": false
+        "pinned": false,
+        "priorityOrder": [],
+        "priorityLocked": false
       },
       {
         "id": 1789276871897,
         "name": "Immortality units",
-        "pinned": false
+        "pinned": false,
+        "priorityOrder": [],
+        "priorityLocked": false
       },
       {
         "id": 1789278159333,
         "name": "Cannot heal / unhealable effects",
-        "pinned": false
+        "pinned": false,
+        "priorityOrder": [],
+        "priorityLocked": false
       },
       {
         "id": 1789280899424,
         "name": "Non-critical attacks",
-        "pinned": false
+        "pinned": false,
+        "priorityOrder": [],
+        "priorityLocked": false
       },
       {
         "id": 1789287399739,
         "name": "Anti-soulburn teams",
-        "pinned": false
+        "pinned": false,
+        "priorityOrder": [],
+        "priorityLocked": false
       },
       {
         "id": 1789297548874,
         "name": "Cleansers / Debuff Dispellers",
-        "pinned": false
+        "pinned": false,
+        "priorityOrder": [],
+        "priorityLocked": false
       },
       {
         "id": 1789299573426,
         "name": "Poison / venom units",
-        "pinned": false
+        "pinned": false,
+        "priorityOrder": [],
+        "priorityLocked": false
       }
     ]
   },
   "schemaVersion": 2,
-  "savedAt": "2026-09-19T01:17:14.581Z"
+  "savedAt": "2026-09-19T01:29:43.399Z"
 }
