@@ -6436,6 +6436,9 @@
         },
         {
           "refId": 1788700311844
+        },
+        {
+          "refId": 1788773060667
         }
       ],
       "selfishScore": 5,
@@ -11032,6 +11035,9 @@
         },
         {
           "refId": 1789217623138
+        },
+        {
+          "refId": 1788773060667
         }
       ],
       "selfishScore": 2,
@@ -11108,11 +11114,52 @@
       "hType_legacy": "SUR",
       "hScore_legacy": 4,
       "altStats_legacy": null,
-      "reactions": [],
-      "engagements": [],
-      "selfishScore": 0,
+      "reactions": [
+        {
+          "refId": 1788780327120
+        },
+        {
+          "refId": 1789824095726
+        },
+        {
+          "refId": 1789824221868
+        },
+        {
+          "refId": 1789177637826
+        },
+        {
+          "refId": 1789209367308
+        }
+      ],
+      "engagements": [
+        {
+          "refId": 1788924109560
+        },
+        {
+          "refId": 1788773060667
+        },
+        {
+          "refId": 1788785377663
+        },
+        {
+          "refId": 1789132233866
+        },
+        {
+          "refId": 1789118795470
+        },
+        {
+          "refId": 1788700311844
+        }
+      ],
+      "selfishScore": 1,
       "selflessScore": 0,
-      "needsRerating": true
+      "needsRerating": false,
+      "pvpTag": false,
+      "altStats": null,
+      "selfSkillIds": [
+        "immobDebuff"
+      ],
+      "allySupport": []
     },
     {
       "id": 1787898942394,
@@ -19154,6 +19201,29 @@
         "factorIds": [
           1788774921178
         ]
+      },
+      {
+        "id": 1789824095726,
+        "name": "PASSIVE : Increase Speed % (scaled w enemy debuffs)",
+        "value": 9,
+        "pinned": false,
+        "locked": false,
+        "marked": false,
+        "factorIds": [
+          1788785891810,
+          1789014978867
+        ]
+      },
+      {
+        "id": 1789824221868,
+        "name": "PASSIVE : Reacts to ally's attacks inflicting a debuff",
+        "value": 9.7,
+        "pinned": false,
+        "locked": false,
+        "marked": false,
+        "factorIds": [
+          1789014978867
+        ]
       }
     ],
     "engagements": [
@@ -21575,5 +21645,5 @@
     ]
   },
   "schemaVersion": 2,
-  "savedAt": "2026-09-19T13:18:22.795Z"
+  "savedAt": "2026-09-19T13:27:06.666Z"
 }
