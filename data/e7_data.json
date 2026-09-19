@@ -9669,6 +9669,9 @@
         },
         {
           "refId": 1788783245423
+        },
+        {
+          "refId": 1789134498394
         }
       ],
       "selfishScore": 1,
@@ -9689,7 +9692,7 @@
       "element": "Ice",
       "notes": "",
       "iconData": "https://raw.githubusercontent.com/iridesuwa18/e7-chart/main/assets/heroes/aria.webp",
-      "locked": false,
+      "locked": true,
       "_x": 50,
       "_y": 50,
       "hidden": true,
@@ -9710,8 +9713,33 @@
       ],
       "engagements": [],
       "selfishScore": 0,
-      "selflessScore": 0,
-      "needsRerating": true
+      "selflessScore": 0.83,
+      "needsRerating": false,
+      "pvpTag": false,
+      "altStats": null,
+      "selfSkillIds": [],
+      "allySupport": [
+        {
+          "healing": 0,
+          "passive": 0,
+          "buffCount": 4
+        },
+        {
+          "healing": 0,
+          "passive": 0,
+          "buffCount": 2
+        },
+        {
+          "healing": 0,
+          "passive": 0,
+          "buffCount": 2
+        },
+        {
+          "healing": 0,
+          "passive": 0,
+          "buffCount": 2
+        }
+      ]
     },
     {
       "id": 1787783897592,
@@ -20336,5 +20364,5 @@
     ]
   },
   "schemaVersion": 2,
-  "savedAt": "2026-09-19T08:51:28.092Z"
+  "savedAt": "2026-09-19T08:52:39.893Z"
 }
