@@ -11941,11 +11941,44 @@
       "hType_legacy": "SUR",
       "hScore_legacy": 4,
       "altStats_legacy": null,
-      "reactions": [],
-      "engagements": [],
-      "selfishScore": 0,
+      "reactions": [
+        {
+          "refId": 1788775147348
+        },
+        {
+          "refId": 1789802616723
+        },
+        {
+          "refId": 1789827636619
+        },
+        {
+          "refId": 1789178573773
+        }
+      ],
+      "engagements": [
+        {
+          "refId": 1788772163166
+        },
+        {
+          "refId": 1788783734183
+        },
+        {
+          "refId": 1789117987794
+        },
+        {
+          "refId": 1788785954933
+        }
+      ],
+      "selfishScore": 2,
       "selflessScore": 0,
-      "needsRerating": true
+      "needsRerating": false,
+      "pvpTag": false,
+      "altStats": null,
+      "selfSkillIds": [
+        "extraTurns",
+        "spdCr"
+      ],
+      "allySupport": []
     },
     {
       "id": 1787900920551,
@@ -19681,6 +19714,19 @@
           1789130156790,
           1789209213432
         ]
+      },
+      {
+        "id": 1789827636619,
+        "name": "PASSIVE : Increases Combat Readiness received",
+        "value": 9.7,
+        "pinned": false,
+        "locked": false,
+        "marked": false,
+        "factorIds": [
+          1788785891810,
+          1789130596970,
+          1788773895734
+        ]
       }
     ],
     "engagements": [
@@ -22114,5 +22160,5 @@
     ]
   },
   "schemaVersion": 2,
-  "savedAt": "2026-09-19T14:17:55.060Z"
+  "savedAt": "2026-09-19T14:22:42.445Z"
 }
