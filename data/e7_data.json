@@ -9063,7 +9063,7 @@
     {
       "id": 1787782746066,
       "name": "Ran",
-      "rarity": "5ml",
+      "rarity": "5r",
       "role": "Thief",
       "element": "Ice",
       "notes": "",
@@ -9077,11 +9077,71 @@
       "hType_legacy": "SUR",
       "hScore_legacy": 5,
       "altStats_legacy": null,
-      "reactions": [],
-      "engagements": [],
+      "reactions": [
+        {
+          "refId": 1789115386205
+        },
+        {
+          "refId": 1789804843091
+        }
+      ],
+      "engagements": [
+        {
+          "refId": 1788700311844
+        },
+        {
+          "refId": 1788783099100
+        },
+        {
+          "refId": 1789118795470
+        },
+        {
+          "refId": 1788783734183
+        },
+        {
+          "refId": 1788785954933
+        },
+        {
+          "refId": 1788773067411
+        },
+        {
+          "refId": 1789780745436
+        },
+        {
+          "refId": 1789116663470
+        },
+        {
+          "refId": 1788783359037
+        }
+      ],
       "selfishScore": 0,
-      "selflessScore": 0,
-      "needsRerating": true
+      "selflessScore": 0.5,
+      "needsRerating": false,
+      "pvpTag": false,
+      "altStats": null,
+      "selfSkillIds": [],
+      "allySupport": [
+        {
+          "healing": 0,
+          "passive": 0,
+          "buffCount": 3
+        },
+        {
+          "healing": 0,
+          "passive": 0,
+          "buffCount": 1
+        },
+        {
+          "healing": 0,
+          "passive": 0,
+          "buffCount": 1
+        },
+        {
+          "healing": 0,
+          "passive": 0,
+          "buffCount": 1
+        }
+      ]
     },
     {
       "id": 1787782852199,
@@ -17533,6 +17593,17 @@
           1788772992919,
           1788785891810
         ]
+      },
+      {
+        "id": 1789804843091,
+        "name": "DAMAGE : Prop to caster and enemy's speed",
+        "value": 10,
+        "pinned": false,
+        "locked": false,
+        "marked": false,
+        "factorIds": [
+          1788785891810
+        ]
       }
     ],
     "engagements": [
@@ -19854,5 +19925,5 @@
     ]
   },
   "schemaVersion": 2,
-  "savedAt": "2026-09-19T07:54:06.181Z"
+  "savedAt": "2026-09-19T08:00:49.830Z"
 }
