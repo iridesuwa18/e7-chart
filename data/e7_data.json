@@ -17586,7 +17586,7 @@
         "name": "DAMAGE :  Prop to current health ratio",
         "value": 10,
         "pinned": false,
-        "locked": false,
+        "locked": true,
         "marked": false,
         "factorIds": [
           1788780483075,
@@ -17599,7 +17599,7 @@
         "name": "DAMAGE : Prop to caster and enemy's speed",
         "value": 10,
         "pinned": false,
-        "locked": false,
+        "locked": true,
         "marked": false,
         "factorIds": [
           1788785891810
@@ -19421,7 +19421,7 @@
         "name": "ONGOING : Increase Damage against buffs",
         "value": 10,
         "pinned": false,
-        "locked": false,
+        "locked": true,
         "marked": false,
         "factorIds": [
           1789135503443,
@@ -19441,7 +19441,7 @@
           1788772214825,
           1788913802940
         ],
-        "locked": false,
+        "locked": true,
         "marked": false
       }
     ],
@@ -19925,5 +19925,5 @@
     ]
   },
   "schemaVersion": 2,
-  "savedAt": "2026-09-19T08:00:49.830Z"
+  "savedAt": "2026-09-19T08:01:00.094Z"
 }
