@@ -8222,11 +8222,67 @@
         "hType": "SST",
         "hScore": 4
       },
-      "reactions": [],
-      "engagements": [],
-      "selfishScore": 0,
+      "reactions": [
+        {
+          "refId": 1788786288554
+        },
+        {
+          "refId": 1789209367308
+        },
+        {
+          "refId": 1788780327120
+        },
+        {
+          "refId": 1789301614949
+        },
+        {
+          "refId": 1789267911314
+        }
+      ],
+      "engagements": [
+        {
+          "refId": 1788786124368
+        },
+        {
+          "refId": 1788787229175
+        },
+        {
+          "refId": 1788772268160
+        },
+        {
+          "refId": 1788700311844
+        },
+        {
+          "refId": 1789779659755
+        },
+        {
+          "refId": 1788773476896
+        },
+        {
+          "refId": 1788773060667
+        },
+        {
+          "refId": 1788785377663
+        },
+        {
+          "refId": 1789116663470
+        },
+        {
+          "refId": 1788780605209
+        }
+      ],
+      "selfishScore": 4,
       "selflessScore": 0,
-      "needsRerating": true
+      "needsRerating": false,
+      "pvpTag": false,
+      "altStats": null,
+      "selfSkillIds": [
+        "immobDebuff",
+        "spdCr",
+        "lifesteal",
+        "selfPassive"
+      ],
+      "allySupport": []
     },
     {
       "id": 1787781249575,
@@ -16944,7 +17000,7 @@
       },
       {
         "id": 1789301614949,
-        "name": "PASSIVE : Increase Max Health",
+        "name": "PASSIVE : Increase (Max) Health %",
         "value": 9,
         "pinned": false,
         "locked": true,
@@ -18679,6 +18735,22 @@
         ],
         "locked": true,
         "marked": false
+      },
+      {
+        "id": 1789779659755,
+        "name": "UNIQUE : DEBUFF : Omen (3 stacks)",
+        "value": 10,
+        "pinned": false,
+        "locked": false,
+        "marked": false,
+        "factorIds": [
+          1788912649792,
+          1788700781693,
+          1788779877239,
+          1788783127095,
+          1788700420912,
+          1788701036557
+        ]
       }
     ],
     "factors": [
@@ -19025,5 +19097,5 @@
     ]
   },
   "schemaVersion": 2,
-  "savedAt": "2026-09-19T00:56:08.201Z"
+  "savedAt": "2026-09-19T01:05:01.758Z"
 }
