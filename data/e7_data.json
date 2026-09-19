@@ -11661,6 +11661,9 @@
         },
         {
           "refId": 1789132233866
+        },
+        {
+          "refId": 1788773060667
         }
       ],
       "selfishScore": 1,
@@ -12101,6 +12104,9 @@
         },
         {
           "refId": 1788927609636
+        },
+        {
+          "refId": 1788773060667
         }
       ],
       "selfishScore": 3,
@@ -15818,12 +15824,63 @@
         "hType": "SUR",
         "hScore": 3
       },
-      "reactions": [],
-      "engagements": [],
+      "reactions": [
+        {
+          "refId": 1789822575429
+        }
+      ],
+      "engagements": [
+        {
+          "refId": 1789860911056
+        },
+        {
+          "refId": 1788924109560
+        },
+        {
+          "refId": 1788782920388
+        },
+        {
+          "refId": 1788773060667
+        }
+      ],
       "selfishScore": 0,
-      "selflessScore": 0,
-      "needsRerating": true,
-      "hidden": true
+      "selflessScore": 0.75,
+      "needsRerating": false,
+      "hidden": true,
+      "pvpTag": false,
+      "altStats": {
+        "selfishScore": 3,
+        "selflessScore": 0,
+        "selfSkillIds": [
+          "decCr",
+          "immobDebuff",
+          "shields"
+        ],
+        "allySupport": []
+      },
+      "selfSkillIds": [],
+      "allySupport": [
+        {
+          "healing": 0,
+          "passive": 0,
+          "buffCount": 3
+        },
+        {
+          "healing": 0,
+          "passive": 0,
+          "buffCount": 2
+        },
+        {
+          "healing": 0,
+          "passive": 0,
+          "buffCount": 2
+        },
+        {
+          "healing": 0,
+          "passive": 0,
+          "buffCount": 2
+        }
+      ]
     },
     {
       "id": 1787751756995,
@@ -21685,24 +21742,26 @@
         "id": 1789819711494,
         "name": "UNDISPELLABLE : BUFF : Oasis All-Ride Pass (Free first soulburn)",
         "value": 9.5,
+        "pinned": false,
+        "locked": true,
+        "marked": false,
         "factorIds": [
           1788784362484
-        ],
-        "locked": true,
-        "marked": false
+        ]
       },
       {
         "id": 1789820571559,
         "name": "UNDISPELLABLE : BUFF : Mind's Eye (Inflict injuries)",
         "value": 9.5,
+        "pinned": false,
+        "locked": false,
+        "marked": false,
         "factorIds": [
           1788772992919,
           1788773130306,
           1788700420912,
           1789191623914
-        ],
-        "locked": false,
-        "marked": false
+        ]
       },
       {
         "id": 1789822205497,
@@ -21728,6 +21787,25 @@
         "factorIds": [
           1788700420912,
           1788773130306
+        ]
+      },
+      {
+        "id": 1789860911056,
+        "name": "BUFF : Reflect",
+        "value": 7,
+        "pinned": false,
+        "locked": false,
+        "marked": false,
+        "factorIds": [
+          1788694866469,
+          1788774099692,
+          1788783127095,
+          1788775427431,
+          1788772214825,
+          1788774921178,
+          1788775944046,
+          1788786300042,
+          1788913802940
         ]
       }
     ],
@@ -22211,5 +22289,5 @@
     ]
   },
   "schemaVersion": 2,
-  "savedAt": "2026-09-19T14:36:21.754Z"
+  "savedAt": "2026-09-19T23:37:29.000Z"
 }
