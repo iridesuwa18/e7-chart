@@ -12003,10 +12003,48 @@
         "hScore": 2
       },
       "reactions": [],
-      "engagements": [],
+      "engagements": [
+        {
+          "refId": 1788772163166
+        },
+        {
+          "refId": 1788772268160
+        },
+        {
+          "refId": 1788782920388
+        },
+        {
+          "refId": 1788783099100
+        }
+      ],
       "selfishScore": 0,
-      "selflessScore": 0,
-      "needsRerating": true
+      "selflessScore": 2,
+      "needsRerating": false,
+      "pvpTag": false,
+      "altStats": null,
+      "selfSkillIds": [],
+      "allySupport": [
+        {
+          "healing": 40,
+          "passive": 0,
+          "buffCount": 2
+        },
+        {
+          "healing": 40,
+          "passive": 0,
+          "buffCount": 2
+        },
+        {
+          "healing": 40,
+          "passive": 0,
+          "buffCount": 2
+        },
+        {
+          "healing": 40,
+          "passive": 0,
+          "buffCount": 2
+        }
+      ]
     },
     {
       "id": 1787901124465,
@@ -22160,5 +22198,5 @@
     ]
   },
   "schemaVersion": 2,
-  "savedAt": "2026-09-19T14:22:42.445Z"
+  "savedAt": "2026-09-19T14:25:14.362Z"
 }
