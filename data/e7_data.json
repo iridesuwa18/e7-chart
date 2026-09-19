@@ -153,6 +153,9 @@
         },
         {
           "refId": 1788780122184
+        },
+        {
+          "refId": 1789826227790
         }
       ],
       "engagements": [
@@ -11552,9 +11555,15 @@
       "altStats_legacy": null,
       "reactions": [],
       "engagements": [],
-      "selfishScore": 0,
+      "selfishScore": 1,
       "selflessScore": 0,
-      "needsRerating": true
+      "needsRerating": false,
+      "pvpTag": false,
+      "altStats": null,
+      "selfSkillIds": [
+        "spdCr"
+      ],
+      "allySupport": []
     },
     {
       "id": 1787899940540,
@@ -19443,6 +19452,19 @@
         "factorIds": [
           1789014978867
         ]
+      },
+      {
+        "id": 1789826227790,
+        "name": "PASSIVE : Cleanses fully upon ally taking too much damage",
+        "value": 9.5,
+        "pinned": false,
+        "locked": false,
+        "marked": false,
+        "factorIds": [
+          1788700781693,
+          1789130156790,
+          1789209213432
+        ]
       }
     ],
     "engagements": [
@@ -21876,5 +21898,5 @@
     ]
   },
   "schemaVersion": 2,
-  "savedAt": "2026-09-19T13:55:29.443Z"
+  "savedAt": "2026-09-19T13:57:20.621Z"
 }
