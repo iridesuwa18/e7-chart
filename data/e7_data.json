@@ -10426,6 +10426,18 @@
         },
         {
           "refId": 1789820571559
+        },
+        {
+          "refId": 1788785505206
+        },
+        {
+          "refId": 1788773067411
+        },
+        {
+          "refId": 1788783486720
+        },
+        {
+          "refId": 1788772268160
         }
       ],
       "selfishScore": 3,
@@ -19019,7 +19031,7 @@
       },
       {
         "id": 1788785505206,
-        "name": "ATTACK : Dual",
+        "name": "ATTACK : Dual attack",
         "value": 10,
         "pinned": false,
         "locked": true,
@@ -21143,5 +21155,5 @@
     ]
   },
   "schemaVersion": 2,
-  "savedAt": "2026-09-19T12:24:28.703Z"
+  "savedAt": "2026-09-19T12:26:00.012Z"
 }
