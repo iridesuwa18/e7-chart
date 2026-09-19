@@ -61,7 +61,7 @@ let hasUnsavedChanges = false;
 let taxonomy = {
   reactions:   [], // [{ id, name, factorIds: [] }]
   engagements: [], // [{ id, name, factorIds: [] }]
-  factors:     [], // [{ id, name }]
+  factors:     [], // [{ id, name, priorityOrder: [{kind,id}], priorityLocked }]
 };
 
 // Sort order per Taxonomy tab (Reactions/Engagements/Factors) —
@@ -129,8 +129,75 @@ function normalizeTaxonomy(t) {
     engagements: cleanList(t.engagements).map(x => ({ id: x.id, name: x.name, value: x.value, pinned: x.pinned, locked: x.locked, marked: x.marked, factorIds: x.factorIds })),
     factors:     (Array.isArray(t.factors) ? t.factors : [])
       .filter(x => x && typeof x === "object" && x.id !== undefined)
-      .map(x => ({ id: x.id, name: typeof x.name === "string" ? x.name : "", pinned: !!x.pinned })),
+      .map(x => ({
+        id: x.id,
+        name: typeof x.name === "string" ? x.name : "",
+        pinned: !!x.pinned,
+        // Manual priority order (see toggleFactorPriority) — a hand-
+        // picked click order, {kind,id} pairs pointing at one of this
+        // Factor's own tagged Reactions/Engagements. Stale entries
+        // (item since untagged/deleted) are filtered here rather than
+        // trusted; qdFactorRankedBreakdown filters again at read time
+        // for the same reason, since a tag can be untagged from this
+        // Factor without ever going through this normalizer again.
+        priorityOrder: Array.isArray(x.priorityOrder)
+          ? x.priorityOrder
+              .filter(p => p && (p.kind === "reactions" || p.kind === "engagements") && p.id !== undefined)
+              .map(p => ({ kind: p.kind, id: p.id }))
+          : [],
+        priorityLocked: !!x.priorityLocked,
+      })),
   };
+}
+
+// Factor-tag clipboard — lets one Reaction/Engagement's tagged Factors
+// be copied and pasted onto another (either kind, either direction,
+// since Factors are one shared library). Session-only, not saved/
+// exported: just a convenience for tagging several items alike without
+// re-picking each Factor from the search box every time. Paste is
+// additive (unions into the target's existing tags) rather than a
+// destructive overwrite, so pasting can never silently drop a tag the
+// target already had.
+let taxonomyFactorClipboard = null; // { factorIds: number[], sourceName: string } | null
+
+function copyTaxonomyFactors(kind, id) {
+  const item = taxonomy[kind]?.find(x => x.id === id);
+  if (!item) return;
+  taxonomyFactorClipboard = { factorIds: [...item.factorIds], sourceName: item.name || "(unnamed)" };
+}
+
+// Unions the clipboard's Factor ids onto the target item — ids it's
+// already tagged with are simply skipped, never duplicated.
+function pasteTaxonomyFactors(kind, id) {
+  if (!taxonomyFactorClipboard) return;
+  const toAdd = taxonomyFactorClipboard.factorIds;
+  taxonomy = {
+    ...taxonomy,
+    [kind]: taxonomy[kind].map(x => {
+      if (x.id !== id) return x;
+      const merged = [...x.factorIds];
+      toAdd.forEach(fid => { if (!merged.includes(fid)) merged.push(fid); });
+      return { ...x, factorIds: merged };
+    }),
+  };
+}
+
+// Updates every rendered Paste-Factors button's enabled state, label,
+// and tooltip to match the current clipboard — used instead of a full
+// panel re-render after a copy, so it doesn't reset which rows' Factor-
+// chip strips are open on either tab.
+function refreshPasteFactorButtons() {
+  document.querySelectorAll(".taxonomy-row-pastefactorsbtn").forEach(btn => {
+    if (taxonomyFactorClipboard) {
+      btn.disabled = false;
+      btn.textContent = `📥 Paste Factors (${taxonomyFactorClipboard.factorIds.length})`;
+      btn.title = `Add the ${taxonomyFactorClipboard.factorIds.length} Factor(s) copied from "${taxonomyFactorClipboard.sourceName}" — merges in, doesn't remove existing tags`;
+    } else {
+      btn.disabled = true;
+      btn.textContent = `📥 Paste Factors`;
+      btn.title = "Copy Factors from a Reaction or Engagement first";
+    }
+  });
 }
 
 // Pin/unpin a Reaction, Engagement, or Factor (`kind` is "reactions",
@@ -230,9 +297,18 @@ function toggleTaxonomyItemMarked(kind, id) {
 }
 
 // Deleting a Reaction/Engagement also strips it from every hero that
-// referenced it (Section 5 DoD: "cleanly un-links from all heroes").
+// referenced it (Section 5 DoD: "cleanly un-links from all heroes"),
+// and from every Factor's manual priority order that happened to
+// include it (see toggleFactorPriority) — a deleted tag can't stay
+// "prioritized" for a Factor that no longer even has it tagged.
 function deleteTaxonomyItem(kind, id) {
-  taxonomy = { ...taxonomy, [kind]: taxonomy[kind].filter(x => x.id !== id) };
+  taxonomy = {
+    ...taxonomy,
+    [kind]: taxonomy[kind].filter(x => x.id !== id),
+    factors: taxonomy.factors.map(f => (f.priorityOrder && f.priorityOrder.length)
+      ? { ...f, priorityOrder: f.priorityOrder.filter(p => !(p.kind === kind && p.id === id)) }
+      : f),
+  };
   const heroField = kind === "reactions" ? "reactions" : "engagements";
   heroes = heroes.map(h => {
     if (!Array.isArray(h[heroField]) || !h[heroField].some(r => (r.refId ?? r) === id)) return h;
@@ -255,6 +331,12 @@ function convertTaxonomyItemKind(fromKind, id) {
     ...taxonomy,
     [fromKind]: taxonomy[fromKind].filter(x => x.id !== id),
     [toKind]: [...taxonomy[toKind], item],
+    // Any Factor that had this tag manually prioritized keeps it
+    // prioritized (same id, same rank) — just re-labeled under its new
+    // kind, so a re-categorization doesn't quietly reset the order.
+    factors: taxonomy.factors.map(f => (f.priorityOrder && f.priorityOrder.length)
+      ? { ...f, priorityOrder: f.priorityOrder.map(p => (p.kind === fromKind && p.id === id) ? { kind: toKind, id } : p) }
+      : f),
   };
 
   heroes = heroes.map(h => {
@@ -288,13 +370,20 @@ function untagFactor(kind, itemId, factorId) {
   taxonomy = {
     ...taxonomy,
     [kind]: taxonomy[kind].map(x => x.id === itemId ? { ...x, factorIds: x.factorIds.filter(f => f !== factorId) } : x),
+    // Untagging a Reaction/Engagement from a Factor also drops it from
+    // that Factor's manual priority order, if it was in there — a
+    // priority pick only ever makes sense for a tag actually assigned
+    // to this Factor.
+    factors: taxonomy.factors.map(f => f.id === factorId
+      ? { ...f, priorityOrder: (f.priorityOrder || []).filter(p => !(p.kind === kind && p.id === itemId)) }
+      : f),
   };
   saveLocal();
 }
 
 /* ── Factors CRUD ── */
 function addFactor(name) {
-  const item = { id: newTaxonomyId(), name: String(name || "").trim() };
+  const item = { id: newTaxonomyId(), name: String(name || "").trim(), priorityOrder: [], priorityLocked: false };
   taxonomy = { ...taxonomy, factors: [...taxonomy.factors, item] };
   saveLocal();
   return item;
@@ -308,11 +397,13 @@ function renameFactor(id, name) {
 // Duplicates a Factor under a new name, carrying over its tags: any
 // Reaction/Engagement that had the original tagged also gets the new
 // copy tagged, so the duplicate behaves identically until you choose
-// to tag it differently.
+// to tag it differently. Starts with a fresh, unlocked, empty priority
+// order — same "don't silently carry over" reasoning as a duplicated
+// Reaction/Engagement not inheriting its original's lock.
 function duplicateFactor(id, newName) {
   const original = taxonomy.factors.find(f => f.id === id);
   if (!original) return null;
-  const copy = { id: newTaxonomyId(), name: String(newName || "").trim() };
+  const copy = { id: newTaxonomyId(), name: String(newName || "").trim(), priorityOrder: [], priorityLocked: false };
   taxonomy = {
     ...taxonomy,
     reactions:   taxonomy.reactions.map(r => r.factorIds.includes(id) ? { ...r, factorIds: [...r.factorIds, copy.id] } : r),
@@ -330,6 +421,60 @@ function deleteFactor(id) {
     engagements: taxonomy.engagements.map(e => ({ ...e, factorIds: e.factorIds.filter(f => f !== id) })),
     factors:     taxonomy.factors.filter(f => f.id !== id),
   };
+  saveLocal();
+}
+
+// ── Manual priority order within a Factor ──────────────────────────
+// A hand-picked alternative to the automatic score-based "ranked %
+// spread" system (see qdFactorRankedBreakdown) — the moment a Factor
+// has at least one tag manually added here, that click order takes
+// over completely for THIS Factor: the first tag added is worth the
+// full ×2 multiplier, the last worth ×1, spread evenly for whatever
+// falls in between (exactly the same ×1–×2 percentage-spread math the
+// automatic system already used — see qdFactorRankedBreakdown — just
+// driven by hand-picked order instead of raw score). Every other tag
+// tagged to this Factor but left out of the order simply stays at
+// ×1 (unboosted), same as an unranked tag always has been. Clearing
+// the order (clearFactorPriority) reverts this Factor straight back
+// to the automatic system — nothing else to toggle.
+//
+// Toggling a tag already in the order removes it; nothing else is
+// renumbered by hand, the remaining entries just shift up to fill the
+// gap, same as splicing out of any ordered list.
+//
+// Both this and clearFactorPriority are hard no-ops while the
+// Factor's order is locked (toggleFactorPriorityLock) — same "can't be
+// bypassed by any caller, present or future" defense-in-depth pattern
+// as a locked Reaction/Engagement score (see setTaxonomyItemValue).
+function toggleFactorPriority(factorId, kind, itemId) {
+  const factor = taxonomy.factors.find(f => f.id === factorId);
+  if (!factor || factor.priorityLocked) return;
+  const order = Array.isArray(factor.priorityOrder) ? factor.priorityOrder : [];
+  const exists = order.some(p => p.kind === kind && p.id === itemId);
+  const nextOrder = exists
+    ? order.filter(p => !(p.kind === kind && p.id === itemId))
+    : [...order, { kind, id: itemId }];
+  taxonomy = { ...taxonomy, factors: taxonomy.factors.map(f => f.id === factorId ? { ...f, priorityOrder: nextOrder } : f) };
+  saveLocal();
+}
+
+// Resets a Factor's manual priority order back to empty — it falls
+// straight back to the automatic score-based ranking the next time
+// anything reads qdFactorRankedBreakdown for it. A no-op while locked.
+function clearFactorPriority(factorId) {
+  const factor = taxonomy.factors.find(f => f.id === factorId);
+  if (!factor || factor.priorityLocked || !(factor.priorityOrder && factor.priorityOrder.length)) return;
+  taxonomy = { ...taxonomy, factors: taxonomy.factors.map(f => f.id === factorId ? { ...f, priorityOrder: [] } : f) };
+  saveLocal();
+}
+
+// Locks/unlocks a Factor's manual priority order. Purely a "don't let
+// me accidentally reshuffle this one" safeguard, not a permissions
+// system — same spirit as a locked Reaction/Engagement score — but
+// enforced here (not just in the UI) so toggleFactorPriority/
+// clearFactorPriority can never be bypassed by any caller while it's on.
+function toggleFactorPriorityLock(factorId) {
+  taxonomy = { ...taxonomy, factors: taxonomy.factors.map(f => f.id === factorId ? { ...f, priorityLocked: !f.priorityLocked } : f) };
   saveLocal();
 }
 
@@ -2529,7 +2674,12 @@ function qdSuggestForNextIdx(nextIdx, draftArr, banProtectEl) {
 //      at the top down to 0% at the bottom, across however many
 //      DISTINCT scores are tagged to the Factor — tags sharing the
 //      same score share the same percentage (see
-//      qdFactorRankedBaseScores).
+//      qdFactorRankedBaseScores). If the Factor has a manual priority
+//      order set instead (🗂 Taxonomy > Factors — see
+//      toggleFactorPriority), that hand-picked click order is used in
+//      its place: the same 100%-to-0% spread, just by click order
+//      instead of score, and only across the tags actually added to
+//      it — everything else tagged to the Factor stays at 0%.
 //   2. That percentage is a bonus multiplier on the tag's own score:
 //      0% → ×1 (unchanged), 100% → ×2 (doubled), linear in between.
 //      This is the tag's new "ranked" base score for this Factor.
@@ -2566,12 +2716,41 @@ function qdSuggestForNextIdx(nextIdx, draftArr, banProtectEl) {
 // directly so a person can see exactly where every tag landed, not
 // just the ones a given hero happens to hold.
 function qdFactorRankedBreakdown(factorId) {
+  const factor = taxonomy.factors.find(f => f.id === factorId);
   const { reactions, engagements } = taxonomyItemsForFactor(factorId);
   const items = [
     ...reactions.map(r => ({ key: `reactions:${r.id}`, kind: "reactions", id: r.id, name: r.name || "(unnamed)", value: r.value })),
     ...engagements.map(e => ({ key: `engagements:${e.id}`, kind: "engagements", id: e.id, name: e.name || "(unnamed)", value: e.value })),
   ];
   if (items.length === 0) return [];
+
+  // A manual priority order (🗂 Taxonomy > Factors — see
+  // toggleFactorPriority) takes over from the automatic score-based
+  // ranking below the moment this Factor has at least one tag added to
+  // it. Stale entries pointing at a tag that's since been untagged
+  // from this Factor or deleted outright are skipped here rather than
+  // trusted, on top of the cleanup untagFactor/deleteTaxonomyItem
+  // already do — belt and suspenders, since a leftover reference could
+  // otherwise silently keep boosting a tag no longer even part of this
+  // Factor.
+  const manualOrder = (Array.isArray(factor?.priorityOrder) ? factor.priorityOrder : [])
+    .filter(p => items.some(it => it.kind === p.kind && it.id === p.id));
+
+  if (manualOrder.length > 0) {
+    const lastIdx = manualOrder.length - 1;
+    const rankIndexOf = new Map(manualOrder.map((p, idx) => [`${p.kind}:${p.id}`, idx]));
+    return items.map(it => {
+      const idx = rankIndexOf.get(it.key);
+      const isManualPriority = idx !== undefined;
+      // Same ×1–×2 percentage-spread math as the automatic system
+      // below — just driven by click-order rank instead of score rank
+      // — and, unlike that system, a tag left OUT of the order simply
+      // stays unboosted (0%) rather than being ranked against anything.
+      const percentage = isManualPriority ? (lastIdx > 0 ? 1 - idx / lastIdx : 1) : 0;
+      const multiplier = 1 + percentage;
+      return { ...it, percentage, multiplier, rankedScore: it.value * multiplier, isManualPriority, priorityRank: isManualPriority ? idx + 1 : null };
+    }).sort((a, b) => b.rankedScore - a.rankedScore || a.name.localeCompare(b.name));
+  }
 
   // Distinct values only, so tags that tie on score land on the exact
   // same rank slot (and so the same %) instead of being spread apart
@@ -2586,7 +2765,7 @@ function qdFactorRankedBreakdown(factorId) {
     // rank against, so it's simply the top: 100%.
     const percentage = lastIdx > 0 ? 1 - idx / lastIdx : 1;
     const multiplier = 1 + percentage; // 0% → ×1, 100% → ×2
-    return { ...it, percentage, multiplier, rankedScore: it.value * multiplier };
+    return { ...it, percentage, multiplier, rankedScore: it.value * multiplier, isManualPriority: false, priorityRank: null };
   }).sort((a, b) => b.rankedScore - a.rankedScore || a.name.localeCompare(b.name));
 }
 
@@ -3269,25 +3448,31 @@ function qdScoreExplainerFactorDetailHtml(entry) {
       ? rankedItems.map(it => {
           const held = matchedKeys.has(it.key);
           const icon = it.kind === "reactions" ? "⚡" : "🛡";
+          const priorityBadge = it.isManualPriority ? ` ⭐#${it.priorityRank}` : "";
           return `
             <div class="qd-score-explainer-rank-row${held ? " held" : ""}">
-              <span class="qd-score-explainer-rank-name">${held ? "✅ " : ""}${icon} ${it.name}</span>
+              <span class="qd-score-explainer-rank-name">${held ? "✅ " : ""}${icon} ${it.name}${priorityBadge}</span>
               <span class="qd-score-explainer-rank-nums">${it.value.toFixed(1)} × ${it.multiplier.toFixed(2)} (${Math.round(it.percentage * 100)}%) = <strong>${it.rankedScore.toFixed(1)}</strong></span>
             </div>
           `;
         }).join("")
       : `<div class="qd-score-explainer-rank-empty">Nothing is tagged to this Factor yet.</div>`;
 
+    const usesManualPriority = rankedItems.some(it => it.isManualPriority);
+    const rankStepText = usesManualPriority
+      ? `Using this Factor's manually-set priority order (🗂 Taxonomy) — hand-picked tags below are ranked ×2 down to ×1 by click order; every other tag tagged to this Factor stays ×1.`
+      : `Ranked ${rankedItems.length} tag${rankedItems.length === 1 ? "" : "s"} tagged to this Factor below, highest → lowest ranked score.`;
+
     const stepsForFactorHtml = b ? `
       <div class="qd-score-explainer-factor-steps">
-        <div>① Ranked ${rankedItems.length} tag${rankedItems.length === 1 ? "" : "s"} tagged to this Factor below, highest → lowest ranked score.</div>
+        <div>① ${rankStepText}</div>
         <div>② Each tag's ranked score = its own base score × its rank multiplier (both shown next to it below).</div>
         <div>③ ${name} holds ${b.matchedItems.length}: ${b.matchedItems.map(it => `${it.name} (${it.rankedScore.toFixed(1)})`).join(" + ")} → ${b.totalPoints.toFixed(1)} ÷ ${b.matchedItems.length} = <strong>${b.factorScore.toFixed(1)}</strong></div>
         <div>④ ${b.isPrioritized ? `Prioritized ⭐ → ${b.factorScore.toFixed(1)} × 2 = <strong>${b.finalFactorScore.toFixed(1)}</strong>` : `Not prioritized → stays <strong>${b.finalFactorScore.toFixed(1)}</strong>`}</div>
       </div>
     ` : `
       <div class="qd-score-explainer-factor-steps">
-        <div>① Ranked ${rankedItems.length} tag${rankedItems.length === 1 ? "" : "s"} tagged to this Factor below, highest → lowest ranked score.</div>
+        <div>① ${rankStepText}</div>
         <div>${name} holds none of them — this Factor contributes <strong>nothing</strong> to its score.</div>
       </div>
     `;
@@ -3328,7 +3513,7 @@ function qdScoreExplainerContent(entry) {
 
   const stepsHtml = factorMode ? `
     <ol class="qd-score-explainer-steps">
-      <li><strong>Rank every tag.</strong> For each ticked Enemy Factor, every Reaction/Engagement tagged to it (across the whole roster, not just ${name}'s own) is ranked by its own fixed score, highest → lowest. That rank becomes a percentage spread evenly from <strong>100%</strong> at the top down to <strong>0%</strong> at the bottom — tags that tie on score share the same percentage.</li>
+      <li><strong>Rank every tag.</strong> For each ticked Enemy Factor, every Reaction/Engagement tagged to it (across the whole roster, not just ${name}'s own) is ranked by its own fixed score, highest → lowest. That rank becomes a percentage spread evenly from <strong>100%</strong> at the top down to <strong>0%</strong> at the bottom — tags that tie on score share the same percentage. If that Factor has a manual priority order set instead (🗂 Taxonomy > Factors), that hand-picked click order is used in its place — the tags added to it are spread the same <strong>100%</strong>-to-<strong>0%</strong> way by click order, and every other tag tagged to the Factor stays at <strong>0%</strong>.</li>
       <li><strong>Turn the % into a multiplier.</strong> 0% → ×1 (score unchanged), 100% → ×2 (score doubled), scaling linearly in between. This gives every tag a new "ranked" score for that Factor.</li>
       <li><strong>Score ${name} for that Factor.</strong> Add up the ranked scores of only the tags ${name} actually holds for that Factor, then divide by how many of those tags it holds — the average of its own matches.</li>
       <li><strong>Double it if prioritized.</strong> If that Factor is marked as a priority (⭐), this score is simply doubled — independently of any other prioritized Factor, so prioritizing more than one doesn't shrink either one's doubling.</li>
@@ -4767,6 +4952,46 @@ function toggleDetBreakdown(btnId, boxId, h, isAlt) {
   box.style.display = opening ? "block" : "none";
 }
 
+// Renders every Reaction and Engagement attached to a hero, each with
+// its current fixed taxonomy score, for the details view's REACTION /
+// ENGAGE ⓘ toggle. Ghost shares the exact same reactions/engagements
+// as the main build (see the Section 6 comment above heroAltXAxis), so
+// this one list serves both the main and ghost toggle buttons. Sorted
+// highest-score-first within each group; names wrap instead of
+// truncating since some taxonomy names run long.
+function heroReactionEngageBreakdownHTML(h) {
+  function group(kind, label) {
+    const list = Array.isArray(h?.[kind]) ? h[kind] : [];
+    if (!list.length) return `<div class="det-breakdown-group"><div class="det-breakdown-group-title">${label}</div><div class="det-breakdown-empty">None attached.</div></div>`;
+    const rows = list
+      .map(item => {
+        const refId = item?.refId ?? item;
+        return { name: taxonomyName(kind, refId), value: taxonomyValue(kind, refId) };
+      })
+      .sort((a, b) => b.value - a.value)
+      .map(r => `
+        <div class="det-breakdown-row det-breakdown-row-re">
+          <span class="det-breakdown-re-name">${r.name}</span>
+          <span class="det-breakdown-re-value">${r.value.toFixed(1)}</span>
+        </div>`)
+      .join("");
+    return `<div class="det-breakdown-group"><div class="det-breakdown-group-title">${label} (${list.length})</div>${rows}</div>`;
+  }
+  return group("reactions", "Reactions") + group("engagements", "Engagements");
+}
+
+// Same lazy-fill-on-open pattern as toggleDetBreakdown, but for the
+// combined Reaction/Engage list rather than the Selfish/Selfless
+// checklist — kept separate since it takes no isAlt flag (both toggle
+// buttons show the exact same shared list).
+function toggleDetReactionEngageBreakdown(boxId, h) {
+  const box = document.getElementById(boxId);
+  if (!box) return;
+  const opening = box.style.display === "none";
+  if (opening) box.innerHTML = heroReactionEngageBreakdownHTML(h);
+  box.style.display = opening ? "block" : "none";
+}
+
 /* ═══════════════════════════════════════
    HERO DETAILS (read-only view)
 ═══════════════════════════════════════ */
@@ -4805,7 +5030,14 @@ function openHeroDetails(h) {
         <div class="det-field-value"><span class="det-score-pill">${vStr}</span></div>
         <div class="det-breakdown" id="det-ss-breakdown" style="display:none"></div>
       </div>
-      <div class="det-field"><div class="det-field-label">REACTION / ENGAGE</div><div class="det-field-value"><span class="det-score-pill">${hStr}</span></div></div>
+      <div class="det-field det-field-full">
+        <div class="det-field-label">REACTION / ENGAGE <button type="button" class="det-info-btn" id="det-re-info-btn" title="See every Reaction/Engagement attached to this hero">ⓘ</button></div>
+        <div class="det-field-value">
+          <span class="det-score-pill" title="Average of every Reaction attached to this hero">Reaction ${(computeReactionScore(h) ?? 0).toFixed(1)}</span>
+          <span class="det-score-pill" style="margin-left:6px">Engage ${(computeEngageScore(h) ?? 0).toFixed(1)}</span>
+        </div>
+        <div class="det-breakdown det-breakdown-scroll" id="det-re-breakdown" style="display:none"></div>
+      </div>
       <div class="det-field det-field-full"><div class="det-field-label">NOTES</div><div class="det-field-value det-notes">${h.notes || '<span style="opacity:.45;font-style:italic">No notes.</span>'}</div></div>
     </div>
     ${h.altStats ? `
@@ -4817,7 +5049,7 @@ function openHeroDetails(h) {
           <div class="det-field-value"><span class="det-score-pill" style="border-color:rgba(224,64,251,.4);color:#e040fb;background:rgba(224,64,251,.1)">${(() => { const a = heroAltYAxis(h); return (a.value === 0 ? "Neutral" : (a.side === "SELFISH" ? "Selfish" : "Selfless")) + " " + a.value; })()}</span></div>
           <div class="det-breakdown" id="det-alt-ss-breakdown" style="display:none"></div>
         </div>
-        <div class="det-field"><div class="det-field-label">REACTION / ENGAGE</div><div class="det-field-value"><span class="det-score-pill" style="border-color:rgba(224,64,251,.4);color:#e040fb;background:rgba(224,64,251,.1)">${(() => { const a = heroAltXAxis(h); return (a.side === "REACTION" ? "Reaction" : "Engage") + " " + a.value; })()}</span></div></div>
+        <div class="det-field"><div class="det-field-label">REACTION / ENGAGE <button type="button" class="det-info-btn" id="det-alt-re-info-btn" title="See every Reaction/Engagement attached to this hero">ⓘ</button></div><div class="det-field-value"><span class="det-score-pill" style="border-color:rgba(224,64,251,.4);color:#e040fb;background:rgba(224,64,251,.1)">R ${(computeReactionScore(h) ?? 0).toFixed(1)}</span> <span class="det-score-pill" style="border-color:rgba(224,64,251,.4);color:#e040fb;background:rgba(224,64,251,.1);margin-left:4px">E ${(computeEngageScore(h) ?? 0).toFixed(1)}</span><div class="det-breakdown det-breakdown-scroll" id="det-alt-re-breakdown" style="display:none"></div></div></div>
         <div class="det-field"><div class="det-field-label">GHOST AVG</div><div class="det-field-value"><span class="det-score-pill" style="border-color:rgba(224,64,251,.4);color:#e040fb;background:rgba(224,64,251,.1)">${heroAltDisplayAvg(h)}</span></div></div>
         <div class="det-field" style="border-color:rgba(224,64,251,.3);background:rgba(224,64,251,.06)"><div class="det-field-label" style="color:#e040fb">TOTAL AVG</div><div class="det-field-value"><span class="det-score-pill" style="border-color:rgba(224,64,251,.5);color:#f0a0ff;background:rgba(224,64,251,.18);font-size:13px">${+((xa.value + ya.value + heroAltXAxis(h).value + heroAltYAxis(h).value) / 4).toFixed(1)}</span></div></div>
       </div>
@@ -4830,6 +5062,12 @@ function openHeroDetails(h) {
   );
   document.getElementById("det-alt-ss-info-btn")?.addEventListener("click", () =>
     toggleDetBreakdown("det-alt-ss-info-btn", "det-alt-ss-breakdown", h, true)
+  );
+  document.getElementById("det-re-info-btn")?.addEventListener("click", () =>
+    toggleDetReactionEngageBreakdown("det-re-breakdown", h)
+  );
+  document.getElementById("det-alt-re-info-btn")?.addEventListener("click", () =>
+    toggleDetReactionEngageBreakdown("det-alt-re-breakdown", h)
   );
 
   // Draft section — fetch draft-enriched data from window.chartHeroes
@@ -5622,6 +5860,13 @@ function applyTaxonomySort(kind, items) {
   if (mode === "az") cmp = (a, b) => (a.name || "").localeCompare(b.name || "", undefined, { sensitivity: "base" });
   else if (mode === "za") cmp = (a, b) => (b.name || "").localeCompare(a.name || "", undefined, { sensitivity: "base" });
   else if (mode === "newest") cmp = (a, b) => b.id - a.id;
+  // Score sort — only meaningful for Reactions/Engagements (Factors
+  // carry no `value`, so both items sort equal and the pinned/id order
+  // below decides ties). Ties within the same score fall back to
+  // oldest-first so re-sorting doesn't visually shuffle equal-score
+  // rows every render.
+  else if (mode === "score-desc") cmp = (a, b) => (Number(b.value) || 0) - (Number(a.value) || 0) || a.id - b.id;
+  else if (mode === "score-asc") cmp = (a, b) => (Number(a.value) || 0) - (Number(b.value) || 0) || a.id - b.id;
   else cmp = (a, b) => a.id - b.id; // "oldest" (default)
   // Pinned items always float to the top, ahead of the chosen sort
   // mode — the mode still governs ordering *within* the pinned group
@@ -6275,6 +6520,8 @@ function renderTaxonomyPanel(kind) {
           <button type="button" class="taxonomy-row-lockbtn${item.locked ? " locked" : ""}" data-kind="${kind}" data-id="${item.id}" title="${item.locked ? "Locked — click to unlock" : "Lock this score so it can't be changed"}">${qdLockIconSvg(item.locked)}</button>
         </div>
         <button type="button" class="btn btn-ghost btn-xs taxonomy-row-tagbtn" data-kind="${kind}" data-id="${item.id}">🏷 Factors (${item.factorIds.length})</button>
+        <button type="button" class="btn btn-ghost btn-xs taxonomy-row-copyfactorsbtn" data-kind="${kind}" data-id="${item.id}" title="Copy this ${label}'s tagged Factors, to paste onto another Reaction or Engagement">📋 Copy Factors</button>
+        <button type="button" class="btn btn-ghost btn-xs taxonomy-row-pastefactorsbtn" data-kind="${kind}" data-id="${item.id}"${taxonomyFactorClipboard ? "" : " disabled"} title="${taxonomyFactorClipboard ? `Add the ${taxonomyFactorClipboard.factorIds.length} Factor(s) copied from &quot;${taxonomyFactorClipboard.sourceName}&quot; — merges in, doesn't remove existing tags` : "Copy Factors from a Reaction or Engagement first"}">📥 Paste Factors${taxonomyFactorClipboard ? ` (${taxonomyFactorClipboard.factorIds.length})` : ""}</button>
         <button type="button" class="btn btn-ghost btn-xs taxonomy-row-herobtn" data-kind="${kind}" data-id="${item.id}" title="Search a hero and add this ${label} to them instantly, without opening their edit screen">➕ Add to Hero${heroCount ? ` (${heroCount})` : ""}</button>
         <button type="button" class="btn btn-ghost btn-xs taxonomy-row-convertbtn" data-kind="${kind}" data-id="${item.id}" title="Move this ${label} to ${otherLabel}s — keeps its value, Factor tags, and every hero it's linked to">⇄ Make ${otherLabel}</button>
         <button type="button" class="taxonomy-row-delete" data-kind="${kind}" data-id="${item.id}" title="Delete — un-links from every hero that holds it">✕</button>
@@ -6333,6 +6580,30 @@ function renderTaxonomyPanel(kind) {
   });
   box.querySelectorAll(".taxonomy-row-tagbtn").forEach(btn => {
     btn.addEventListener("click", () => toggleTaxonomyRowFactors(btn.dataset.kind, Number(btn.dataset.id)));
+  });
+  box.querySelectorAll(".taxonomy-row-copyfactorsbtn").forEach(btn => {
+    btn.addEventListener("click", () => {
+      copyTaxonomyFactors(btn.dataset.kind, Number(btn.dataset.id));
+      // Update every Paste button in-place (both tabs, including rows
+      // whose Factor-chip strip is currently open) rather than a full
+      // re-render, so copying doesn't collapse anything you had open.
+      refreshPasteFactorButtons();
+    });
+  });
+  box.querySelectorAll(".taxonomy-row-pastefactorsbtn").forEach(btn => {
+    btn.addEventListener("click", () => {
+      if (!taxonomyFactorClipboard) return;
+      const kind = btn.dataset.kind, id = Number(btn.dataset.id);
+      // Re-rendering the panel resets every row's Factor-chip strip back
+      // to closed (it's always emitted with display:none, see the row
+      // template above) — so remember whether this one was open and
+      // reopen it afterward, otherwise pasting silently closes whatever
+      // you were looking at.
+      const wasOpen = document.getElementById(`taxonomy-factors-${kind}-${id}`)?.style.display !== "none";
+      pasteTaxonomyFactors(kind, id);
+      renderTaxonomyPanel(kind);
+      if (wasOpen) toggleTaxonomyRowFactors(kind, id);
+    });
   });
   box.querySelectorAll(".taxonomy-row-herobtn").forEach(btn => {
     btn.addEventListener("click", () => toggleTaxonomyRowHeroes(btn.dataset.kind, Number(btn.dataset.id)));
@@ -6603,7 +6874,24 @@ function renderTaxonomyHeroSearch(kind, id) {
   if (query) searchInput.focus({ preventScroll: true }); // restore focus/cursor after a re-render
 }
 
-// Factors panel (5.2) — plain create/rename/delete, no tagging UI here.
+// Refreshes every place a Factor's scoring might already be on screen
+// — filled Quick Draft slots, its live suggestion panel (if open), and
+// Hero Factors' grid (if open) — after a priority order/lock change
+// below. Safe to call unconditionally: every one of these is already a
+// no-op if that Factor isn't currently ticked or that panel isn't open.
+function qdRefreshFactorScoreViews() {
+  renderQuickDraft();
+  if (quickDraftSuggestOpen) renderQuickDraftSuggestions();
+  if (typeof hfRefreshIfOpen === "function") hfRefreshIfOpen();
+}
+
+// Factors panel (5.2) — create/rename/delete, plus each Factor's own
+// manual priority order: click one of the chips below (each one of
+// this Factor's tagged Reactions/Engagements) to add it to the
+// priority queue, click again to remove it. Click ORDER is the
+// priority order — first click is worth the full ×2, each one after
+// spreads evenly down to ×1 for however many are queued (see
+// toggleFactorPriority/qdFactorRankedBreakdown for the actual math).
 function renderFactorsPanel() {
   const box = document.getElementById("taxonomy-list-factors");
   const items = applyTaxonomySort("factors", taxonomy.factors.filter(f => taxonomyMatchesSearch("factors", f.name)));
@@ -6619,17 +6907,49 @@ function renderFactorsPanel() {
     // by the tag-picker on those rows, so this can never drift out of
     // sync with what's really assigned.
     const tagged = taxonomyItemsForFactor(f.id);
-    // Sorted highest-score-first within each type — with the score now
-    // shown on every chip (below), that ordering makes it easy to scan
-    // "which of this Factor's tags actually carries weight" instead of
-    // having to compare numbers scattered in whatever order they were
-    // originally tagged.
-    const chips = [
-      ...[...tagged.reactions].sort((a, b) => b.value - a.value)
-        .map(r => `<span class="taxonomy-factor-tag reaction" title="Reaction — score ${r.value.toFixed(1)}">⚡ ${r.name || "(unnamed)"} <span class="taxonomy-factor-tag-score">${r.value.toFixed(1)}</span></span>`),
-      ...[...tagged.engagements].sort((a, b) => b.value - a.value)
-        .map(e => `<span class="taxonomy-factor-tag engagement" title="Engagement — score ${e.value.toFixed(1)}">🛡 ${e.name || "(unnamed)"} <span class="taxonomy-factor-tag-score">${e.value.toFixed(1)}</span></span>`),
-    ];
+    const priorityOrder = Array.isArray(f.priorityOrder) ? f.priorityOrder : [];
+    const priorityCount = priorityOrder.length;
+    const rankOf = (kind, id) => {
+      const idx = priorityOrder.findIndex(p => p.kind === kind && p.id === id);
+      return idx === -1 ? null : idx;
+    };
+    const multiplierForRank = idx => priorityCount > 1 ? 2 - idx / (priorityCount - 1) : 2;
+
+    // Priority picks float to the front in click order (so the queue
+    // reads top-to-bottom exactly the way it'll score); everything
+    // else falls back to the old highest-score-first ordering, now
+    // interleaved across both types rather than Reactions-then-
+    // Engagements, since with priority picks in play "what carries the
+    // most weight" is no longer purely a per-type question.
+    const allTagged = [
+      ...tagged.reactions.map(r => ({ kind: "reactions", item: r, icon: "⚡" })),
+      ...tagged.engagements.map(e => ({ kind: "engagements", item: e, icon: "🛡" })),
+    ].sort((a, b) => {
+      const ra = rankOf(a.kind, a.item.id), rb = rankOf(b.kind, b.item.id);
+      if (ra !== null && rb !== null) return ra - rb;
+      if (ra !== null) return -1;
+      if (rb !== null) return 1;
+      return b.item.value - a.item.value;
+    });
+
+    const chips = allTagged.map(({ kind, item, icon }) => {
+      const rank = rankOf(kind, item.id);
+      const isPriority = rank !== null;
+      const mult = isPriority ? multiplierForRank(rank) : null;
+      const kindClass = kind === "reactions" ? "reaction" : "engagement";
+      const priorityBadge = isPriority ? `<span class="taxonomy-factor-tag-priority">⭐#${rank + 1} ×${mult.toFixed(2)}</span>` : "";
+      const title = f.priorityLocked
+        ? "This Factor's priority order is locked — unlock it first to change"
+        : isPriority
+          ? `Priority #${rank + 1} (×${mult.toFixed(2)}) — click to remove from the priority order`
+          : "Click to add to this Factor's priority order";
+      return `<button type="button" class="taxonomy-factor-tag ${kindClass}${isPriority ? " priority" : ""}${f.priorityLocked ? " locked" : ""}" data-factor-id="${f.id}" data-kind="${kind}" data-item-id="${item.id}" title="${escAttr(title)}">${icon} ${item.name || "(unnamed)"} <span class="taxonomy-factor-tag-score">${item.value.toFixed(1)}</span>${priorityBadge}</button>`;
+    });
+
+    const priorityHint = priorityCount === 0
+      ? "Click a tag below to prioritize it — first click doubles its score (×2), later clicks spread evenly down to ×1. Leave none clicked to keep ranking automatically by score."
+      : `🎯 Priority order (${priorityCount}) — click a tag to add/remove.`;
+
     return `
     <div class="taxonomy-row${f.pinned ? " pinned" : ""}" data-id="${f.id}">
       <div class="taxonomy-row-main">
@@ -6644,6 +6964,15 @@ function renderFactorsPanel() {
       <div class="taxonomy-factor-tags">
         ${chips.length ? chips.join("") : `<div class="taxonomy-empty-note">Not tagged to any Reaction/Engagement yet.</div>`}
       </div>
+      ${chips.length ? `
+      <div class="taxonomy-factor-priority-bar">
+        <span class="taxonomy-factor-priority-hint">${priorityHint}</span>
+        <div class="taxonomy-factor-priority-actions">
+          ${priorityCount > 0 && !f.priorityLocked ? `<button type="button" class="btn btn-ghost btn-xs" data-clear-priority="${f.id}">✕ Clear priority</button>` : ""}
+          <button type="button" class="btn btn-ghost btn-xs taxonomy-factor-lock-btn${f.priorityLocked ? " locked" : ""}" data-lock-priority="${f.id}" title="${f.priorityLocked ? "Unlock — allow the priority order to change again" : "Lock — prevent this Factor's priority order from changing"}">${f.priorityLocked ? "🔒 Locked" : "🔓 Lock order"}</button>
+        </div>
+      </div>
+      ` : ""}
     </div>
   `;
   }).join("");
@@ -6673,6 +7002,26 @@ function renderFactorsPanel() {
       renderFactorsPanel();
       renderQdFactorChips(); // Section 8.1 checklist — drop the deleted Factor's chip too
       if (typeof renderHeroFactorsButton === "function") renderHeroFactorsButton(); // keep Hero Factors' button/grid in sync with the Enemy Factors state it reads
+    });
+  });
+  box.querySelectorAll(".taxonomy-factor-tag").forEach(btn => {
+    btn.addEventListener("click", () => {
+      toggleFactorPriority(Number(btn.dataset.factorId), btn.dataset.kind, Number(btn.dataset.itemId));
+      renderFactorsPanel();
+      qdRefreshFactorScoreViews();
+    });
+  });
+  box.querySelectorAll("[data-clear-priority]").forEach(btn => {
+    btn.addEventListener("click", () => {
+      clearFactorPriority(Number(btn.dataset.clearPriority));
+      renderFactorsPanel();
+      qdRefreshFactorScoreViews();
+    });
+  });
+  box.querySelectorAll("[data-lock-priority]").forEach(btn => {
+    btn.addEventListener("click", () => {
+      toggleFactorPriorityLock(Number(btn.dataset.lockPriority));
+      renderFactorsPanel();
     });
   });
 }

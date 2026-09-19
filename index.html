@@ -260,6 +260,47 @@
     }
     .det-breakdown-row { padding: 2px 0; }
     .det-breakdown-empty { color: #607a90; font-style: italic; }
+    /* Reaction/Engage breakdown — can list a lot of items, so it scrolls
+       vertically instead of stretching the whole modal, and long
+       taxonomy names wrap onto their own lines instead of overflowing
+       or getting clipped next to the score. */
+    .det-breakdown-scroll {
+      max-height: 220px;
+      overflow-y: auto;
+      overflow-x: hidden;
+    }
+    .det-breakdown-group { margin-bottom: 8px; }
+    .det-breakdown-group:last-child { margin-bottom: 0; }
+    .det-breakdown-group-title {
+      font-family: 'Cinzel', serif;
+      font-size: 9px;
+      letter-spacing: .12em;
+      text-transform: uppercase;
+      color: #c9a227;
+      margin-bottom: 3px;
+    }
+    .det-breakdown-row-re {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 8px;
+      padding: 3px 0;
+      border-bottom: 1px solid rgba(255,255,255,0.05);
+    }
+    .det-breakdown-row-re:last-child { border-bottom: none; }
+    .det-breakdown-re-name {
+      flex: 1;
+      overflow-wrap: anywhere;
+      word-break: break-word;
+      white-space: normal;
+      line-height: 1.35;
+    }
+    .det-breakdown-re-value {
+      flex: 0 0 auto;
+      color: var(--gold2, #c9a227);
+      font-family: 'Cinzel', serif;
+      font-size: 11px;
+    }
     .taxonomy-factor-search-results {
       display: flex;
       flex-wrap: wrap;
@@ -1232,6 +1273,8 @@
               <option value="newest">Newest first</option>
               <option value="az">A → Z</option>
               <option value="za">Z → A</option>
+              <option value="score-desc">Score high → low</option>
+              <option value="score-asc">Score low → high</option>
             </select>
           </div>
           <div class="taxonomy-quickfill-row" id="taxonomy-search-reactions-quickfill">
@@ -1264,6 +1307,8 @@
               <option value="newest">Newest first</option>
               <option value="az">A → Z</option>
               <option value="za">Z → A</option>
+              <option value="score-desc">Score high → low</option>
+              <option value="score-asc">Score low → high</option>
             </select>
           </div>
           <div class="taxonomy-quickfill-row" id="taxonomy-search-engagements-quickfill">

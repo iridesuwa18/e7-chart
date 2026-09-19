@@ -3301,7 +3301,12 @@ input[type=number].qd-ranking-slider-value-input {
   background: rgba(255,255,255,.03);
   color: var(--text-dim);
   white-space: nowrap;
+  cursor: pointer;
+  transition: background .15s, border-color .15s, color .15s;
 }
+.taxonomy-factor-tag:hover { border-color: var(--gold-dim); color: var(--text); }
+.taxonomy-factor-tag:focus { outline: none; }
+.taxonomy-factor-tag:focus-visible { outline: 2px solid #e8c84a; outline-offset: 1px; }
 .taxonomy-factor-tag.reaction {
   border-color: rgba(100,181,246,.4);
   color: #90caf9;
@@ -3312,6 +3317,18 @@ input[type=number].qd-ranking-slider-value-input {
   color: #ce93d8;
   background: rgba(186,104,200,.08);
 }
+/* A manually prioritized tag (see toggleFactorPriority) — gold accent
+   wins over the reaction/engagement color above regardless of type,
+   so "this one's in the priority order" reads at a glance. */
+.taxonomy-factor-tag.priority {
+  border-color: #e8c84a;
+  background: rgba(232,200,74,.16);
+  color: #e8c84a;
+}
+.taxonomy-factor-tag.locked {
+  cursor: not-allowed;
+  opacity: .8;
+}
 .taxonomy-factor-tag-score {
   display: inline-block;
   margin-left: 4px;
@@ -3321,6 +3338,34 @@ input[type=number].qd-ranking-slider-value-input {
   color: var(--gold, #c9a227);
   font-weight: 700;
 }
+.taxonomy-factor-tag-priority {
+  display: inline-block;
+  margin-left: 4px;
+  padding: 0 4px;
+  border-radius: 6px;
+  background: rgba(232,200,74,.28);
+  color: #e8c84a;
+  font-weight: 700;
+}
+/* Status line + Clear/Lock controls under a Factor's tag chips —
+   click a chip above to add/remove it from the priority queue, this
+   row explains what's currently going on and lets it be reset/locked. */
+.taxonomy-factor-priority-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 6px;
+}
+.taxonomy-factor-priority-hint { font-size: 10px; color: var(--text-dim); flex: 1 1 200px; }
+.taxonomy-factor-priority-actions { display: flex; gap: 6px; flex-wrap: wrap; }
+.taxonomy-factor-lock-btn.locked {
+  border-color: #b8a463;
+  background: rgba(217,201,138,.2);
+  color: #d9c98a;
+}
+.taxonomy-factor-lock-btn.locked:hover { background: rgba(217,201,138,.32); }
 .taxonomy-factor-chip {
   font-family: 'Cinzel', serif;
   font-size: 9px;
