@@ -8560,7 +8560,11 @@
       "engagements": [],
       "selfishScore": 0,
       "selflessScore": 0,
-      "needsRerating": true
+      "needsRerating": false,
+      "pvpTag": false,
+      "altStats": null,
+      "selfSkillIds": [],
+      "allySupport": []
     },
     {
       "id": 1787781893966,
@@ -19446,5 +19450,5 @@
     ]
   },
   "schemaVersion": 2,
-  "savedAt": "2026-09-19T01:52:03.138Z"
+  "savedAt": "2026-09-19T01:52:40.002Z"
 }
