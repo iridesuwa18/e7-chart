@@ -16841,6 +16841,49 @@
       "engagements": [],
       "_x": 50,
       "_y": 35
+    },
+    {
+      "id": 1789810217865,
+      "name": "Renoa",
+      "rarity": "5ml",
+      "role": "Ranger",
+      "element": "Dark",
+      "notes": "",
+      "iconData": "https://raw.githubusercontent.com/iridesuwa18/e7-chart/main/assets/heroes/renoa.webp",
+      "locked": true,
+      "pvpTag": false,
+      "altStats": null,
+      "selfishScore": 2,
+      "selflessScore": 0,
+      "selfSkillIds": [
+        "immunity",
+        "spdCr"
+      ],
+      "allySupport": [],
+      "reactions": [],
+      "engagements": [],
+      "_x": 50,
+      "_y": 40
+    },
+    {
+      "id": 1789810247777,
+      "name": "Meilin",
+      "rarity": "5ml",
+      "role": "Thief",
+      "element": "Fire",
+      "notes": "",
+      "iconData": "https://raw.githubusercontent.com/iridesuwa18/e7-chart/main/assets/heroes/meilin.webp",
+      "locked": true,
+      "pvpTag": false,
+      "altStats": null,
+      "selfishScore": 0,
+      "selflessScore": 0,
+      "selfSkillIds": [],
+      "allySupport": [],
+      "reactions": [],
+      "engagements": [],
+      "_x": 50,
+      "_y": 50
     }
   ],
   "draftData": {
@@ -20475,5 +20518,5 @@
     ]
   },
   "schemaVersion": 2,
-  "savedAt": "2026-09-19T09:28:06.125Z"
+  "savedAt": "2026-09-19T09:30:56.022Z"
 }
