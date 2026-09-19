@@ -7155,85 +7155,6 @@
       ]
     },
     {
-      "id": 1787485873709,
-      "name": "Schniel",
-      "rarity": "5r",
-      "role": "Soul Weaver",
-      "element": "Earth",
-      "notes": "",
-      "iconData": "https://raw.githubusercontent.com/iridesuwa18/e7-chart/main/assets/heroes/schniel.webp",
-      "locked": true,
-      "_x": 50,
-      "_y": 50,
-      "hidden": true,
-      "vType_legacy": "TNK",
-      "vScore_legacy": 8,
-      "hType_legacy": "SUR",
-      "hScore_legacy": 9,
-      "altStats_legacy": {
-        "vType": "SPD",
-        "vScore": 4,
-        "hType": "SUR",
-        "hScore": 9
-      },
-      "reactions": [
-        {
-          "refId": 1789299557625
-        }
-      ],
-      "engagements": [
-        {
-          "refId": 1788772163166
-        },
-        {
-          "refId": 1788783099100
-        },
-        {
-          "refId": 1789114206059
-        },
-        {
-          "refId": 1788786336798
-        },
-        {
-          "refId": 1788783486720
-        },
-        {
-          "refId": 1788782920388
-        },
-        {
-          "refId": 1789221204007
-        }
-      ],
-      "selfishScore": 0,
-      "selflessScore": 1,
-      "needsRerating": false,
-      "pvpTag": false,
-      "altStats": null,
-      "selfSkillIds": [],
-      "allySupport": [
-        {
-          "healing": 0,
-          "passive": 0,
-          "buffCount": 3
-        },
-        {
-          "healing": 0,
-          "passive": 0,
-          "buffCount": 3
-        },
-        {
-          "healing": 0,
-          "passive": 0,
-          "buffCount": 3
-        },
-        {
-          "healing": 0,
-          "passive": 0,
-          "buffCount": 3
-        }
-      ]
-    },
-    {
       "id": 1787485980143,
       "name": "Young Senya",
       "rarity": "5ml",
@@ -12068,7 +11989,11 @@
         "hType": "SUR",
         "hScore": 7
       },
-      "reactions": [],
+      "reactions": [
+        {
+          "refId": 1789299557625
+        }
+      ],
       "engagements": [
         {
           "refId": 1788783099100
@@ -22258,5 +22183,5 @@
     ]
   },
   "schemaVersion": 2,
-  "savedAt": "2026-09-19T14:29:28.497Z"
+  "savedAt": "2026-09-19T14:31:01.371Z"
 }
