@@ -16928,8 +16928,28 @@
         "spdCr"
       ],
       "allySupport": [],
-      "reactions": [],
-      "engagements": [],
+      "reactions": [
+        {
+          "refId": 1788783157740
+        },
+        {
+          "refId": 1789811107027
+        },
+        {
+          "refId": 1788700730226
+        }
+      ],
+      "engagements": [
+        {
+          "refId": 1789811251855
+        },
+        {
+          "refId": 1789811348216
+        },
+        {
+          "refId": 1788773476896
+        }
+      ],
       "_x": 50,
       "_y": 40
     },
@@ -18281,6 +18301,20 @@
           1788912649792,
           1789130156790
         ]
+      },
+      {
+        "id": 1789811107027,
+        "name": "PASSIVE : Multi-attacks (Dirge Bullets)",
+        "value": 10,
+        "factorIds": [
+          1788700420912,
+          1788701036557,
+          1788783127095,
+          1788772992919,
+          1788700781693
+        ],
+        "locked": false,
+        "marked": false
       }
     ],
     "engagements": [
@@ -20149,6 +20183,38 @@
         ],
         "locked": false,
         "marked": false
+      },
+      {
+        "id": 1789811251855,
+        "name": "UNIQUE : BUFF : Dirge Bullet (Speed and Crit Dmg) x10",
+        "value": 10,
+        "factorIds": [
+          1788700420912,
+          1788701036557,
+          1788783127095,
+          1788772992919,
+          1788700781693,
+          1788785891810,
+          1788912649792
+        ],
+        "locked": false,
+        "marked": false
+      },
+      {
+        "id": 1789811348216,
+        "name": "ONGOING : Damage increase with no.of Dirge bullets",
+        "value": 10,
+        "pinned": false,
+        "locked": false,
+        "marked": false,
+        "factorIds": [
+          1788772992919,
+          1788783430365,
+          1788773130306,
+          1788700420912,
+          1788701036557,
+          1788783127095
+        ]
       }
     ],
     "factors": [
@@ -20631,5 +20697,5 @@
     ]
   },
   "schemaVersion": 2,
-  "savedAt": "2026-09-19T09:43:03.798Z"
+  "savedAt": "2026-09-19T09:51:08.683Z"
 }
