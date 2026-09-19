@@ -10700,11 +10700,50 @@
         "hType": "SUR",
         "hScore": 7
       },
-      "reactions": [],
-      "engagements": [],
-      "selfishScore": 0,
+      "reactions": [
+        {
+          "refId": 1789200895728
+        }
+      ],
+      "engagements": [
+        {
+          "refId": 1789220573364
+        },
+        {
+          "refId": 1789822205497
+        },
+        {
+          "refId": 1789802432023
+        },
+        {
+          "refId": 1788772163166
+        },
+        {
+          "refId": 1788783734183
+        },
+        {
+          "refId": 1789201902743
+        },
+        {
+          "refId": 1788785954933
+        },
+        {
+          "refId": 1788771803084
+        },
+        {
+          "refId": 1788698917413
+        }
+      ],
+      "selfishScore": 2,
       "selflessScore": 0,
-      "needsRerating": true
+      "needsRerating": false,
+      "pvpTag": false,
+      "altStats": null,
+      "selfSkillIds": [
+        "spdCr",
+        "shields"
+      ],
+      "allySupport": []
     },
     {
       "id": 1787869970026,
@@ -20813,6 +20852,20 @@
         ],
         "locked": false,
         "marked": false
+      },
+      {
+        "id": 1789822205497,
+        "name": "EFFECT : Increase crit chance on attacks",
+        "value": 9,
+        "pinned": false,
+        "locked": false,
+        "marked": false,
+        "factorIds": [
+          1788772992919,
+          1789116366949,
+          1788786571272,
+          1789191623914
+        ]
       }
     ],
     "factors": [
@@ -21295,5 +21348,5 @@
     ]
   },
   "schemaVersion": 2,
-  "savedAt": "2026-09-19T12:45:12.495Z"
+  "savedAt": "2026-09-19T12:53:41.971Z"
 }
