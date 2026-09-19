@@ -6313,6 +6313,21 @@ function renderTaxonomyCrossSuggest(kind) {
       const targetId = Number(row.dataset.id);
       hideTaxonomyCrossSuggest(kind);
       switchTaxonomyTab(targetKind);
+      // Fill the destination tab's search bar with the picked name so the
+      // list narrows to it right away (no scrolling/↑ needed to find it).
+      // Dispatching a real "input" event reuses the search box's own
+      // handler: it updates the filter, re-renders the list, and syncs the
+      // clear (✕) and quick-add buttons.
+      const pickedItem = taxonomy[targetKind]?.find(x => x.id === targetId);
+      const targetInput = document.getElementById(`taxonomy-search-${targetKind}`);
+      if (pickedItem && targetInput) {
+        targetInput.value = pickedItem.name || "";
+        targetInput.dispatchEvent(new Event("input", { bubbles: true }));
+        // The input event also refreshes the destination's own cross-tab
+        // dropdown; that box is only meant to appear while typing/focused,
+        // so hide it (the search box isn't focused here).
+        hideTaxonomyCrossSuggest(targetKind);
+      }
       taxonomyJumpToRow(targetKind, targetId);
     });
   });
