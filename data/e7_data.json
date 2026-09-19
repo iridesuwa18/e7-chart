@@ -2221,6 +2221,9 @@
       "reactions": [
         {
           "refId": 1789130098781
+        },
+        {
+          "refId": 1789794549575
         }
       ],
       "engagements": [
@@ -8763,11 +8766,65 @@
       "hType_legacy": "SUR",
       "hScore_legacy": 4,
       "altStats_legacy": null,
-      "reactions": [],
-      "engagements": [],
+      "reactions": [
+        {
+          "refId": 1788780327120
+        },
+        {
+          "refId": 1789130098781
+        },
+        {
+          "refId": 1789794549575
+        }
+      ],
+      "engagements": [
+        {
+          "refId": 1788783359037
+        },
+        {
+          "refId": 1789136009020
+        },
+        {
+          "refId": 1788772163166
+        },
+        {
+          "refId": 1788783099100
+        },
+        {
+          "refId": 1788782920388
+        },
+        {
+          "refId": 1788783486720
+        }
+      ],
       "selfishScore": 0,
-      "selflessScore": 0,
-      "needsRerating": true
+      "selflessScore": 0.5,
+      "needsRerating": false,
+      "pvpTag": false,
+      "altStats": null,
+      "selfSkillIds": [],
+      "allySupport": [
+        {
+          "healing": 0,
+          "passive": 0,
+          "buffCount": 3
+        },
+        {
+          "healing": 0,
+          "passive": 0,
+          "buffCount": 1
+        },
+        {
+          "healing": 0,
+          "passive": 0,
+          "buffCount": 1
+        },
+        {
+          "healing": 0,
+          "passive": 0,
+          "buffCount": 1
+        }
+      ]
     },
     {
       "id": 1787782356925,
@@ -17301,6 +17358,18 @@
         "factorIds": [
           1788913836890
         ]
+      },
+      {
+        "id": 1789794549575,
+        "name": "PASSIVE : Reacts to allies' inflicted with debuff preventing movement (stun, sleep or fear)",
+        "value": 9.7,
+        "pinned": false,
+        "locked": false,
+        "marked": false,
+        "factorIds": [
+          1789130156790,
+          1788700781693
+        ]
       }
     ],
     "engagements": [
@@ -19594,5 +19663,5 @@
     ]
   },
   "schemaVersion": 2,
-  "savedAt": "2026-09-19T05:01:08.683Z"
+  "savedAt": "2026-09-19T05:11:11.940Z"
 }
