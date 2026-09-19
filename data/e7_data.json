@@ -9910,11 +9910,49 @@
       "hType_legacy": "SUR",
       "hScore_legacy": 5,
       "altStats_legacy": null,
-      "reactions": [],
-      "engagements": [],
-      "selfishScore": 0,
+      "reactions": [
+        {
+          "refId": 1789816415608
+        },
+        {
+          "refId": 1789177637826
+        }
+      ],
+      "engagements": [
+        {
+          "refId": 1788785181579
+        },
+        {
+          "refId": 1789201317168
+        },
+        {
+          "refId": 1788783359037
+        },
+        {
+          "refId": 1788927609636
+        },
+        {
+          "refId": 1788773060667
+        },
+        {
+          "refId": 1788785021751
+        },
+        {
+          "refId": 1788773067411
+        },
+        {
+          "refId": 1789132233866
+        }
+      ],
+      "selfishScore": 1,
       "selflessScore": 0,
-      "needsRerating": true
+      "needsRerating": false,
+      "pvpTag": false,
+      "altStats": null,
+      "selfSkillIds": [
+        "immobDebuff"
+      ],
+      "allySupport": []
     },
     {
       "id": 1787784177295,
@@ -18377,6 +18415,17 @@
           1788772992919,
           1788700781693
         ]
+      },
+      {
+        "id": 1789816415608,
+        "name": "PASSIVE : Reacts to enemy's attack with (redirected) provoke",
+        "value": 9.7,
+        "pinned": false,
+        "locked": false,
+        "marked": false,
+        "factorIds": [
+          1789014978867
+        ]
       }
     ],
     "engagements": [
@@ -20761,5 +20810,5 @@
     ]
   },
   "schemaVersion": 2,
-  "savedAt": "2026-09-19T11:10:46.924Z"
+  "savedAt": "2026-09-19T11:19:19.206Z"
 }
