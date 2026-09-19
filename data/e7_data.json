@@ -10539,11 +10539,7 @@
       "hType_legacy": "SUR",
       "hScore_legacy": 7,
       "altStats_legacy": null,
-      "reactions": [
-        {
-          "refId": 1789199188207
-        }
-      ],
+      "reactions": [],
       "engagements": [
         {
           "refId": 1788773067411
@@ -10559,6 +10555,9 @@
         },
         {
           "refId": 1788700311844
+        },
+        {
+          "refId": 1789220573364
         }
       ],
       "selfishScore": 2,
@@ -21235,5 +21234,5 @@
     ]
   },
   "schemaVersion": 2,
-  "savedAt": "2026-09-19T12:37:34.112Z"
+  "savedAt": "2026-09-19T12:38:01.008Z"
 }
