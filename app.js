@@ -1442,10 +1442,10 @@ function wireScrollTopBtn(scrollEl, btnId, threshold = 240) {
     wireTaxonomySearchClear(input, clearBtn, apply);
     syncQuickAdd();
     // Cross-tab suggestions (Reactions ↔ Engagements only — see
-    // TAXONOMY_CROSS_KIND) re-show on focus in case there's already text
+    // taxonomyCrossKind) re-show on focus in case there's already text
     // left over from a previous visit, and hide on blur, delayed so a
     // mousedown on a suggestion registers first.
-    if (TAXONOMY_CROSS_KIND[kind]) {
+    if (taxonomyCrossKind(kind)) {
       input.addEventListener("focus", () => renderTaxonomyCrossSuggest(kind));
       input.addEventListener("blur", () => setTimeout(() => hideTaxonomyCrossSuggest(kind), 150));
     }
@@ -6252,8 +6252,18 @@ function taxonomyRankingOverlayIsOpen() {
 // Which Taxonomy kind's list a given tab's search box cross-checks —
 // Reactions search surfaces Engagements matches and vice versa. Factors
 // have no counterpart (same reasoning as renderRenameModalSuggestions
-// below) so they're simply absent from this map.
-const TAXONOMY_CROSS_KIND = { reactions: "engagements", engagements: "reactions" };
+// below) so they return null. A function declaration on purpose, not a
+// const object — init() (far above, near the top of the file) calls
+// this synchronously while wiring up the search boxes, and a const this
+// far down would still be in its temporal dead zone at that point,
+// throwing and silently killing every bit of button-wiring code queued
+// after it in init(). Function declarations are hoisted whole, so this
+// is safe to call from anywhere regardless of file position.
+function taxonomyCrossKind(kind) {
+  if (kind === "reactions") return "engagements";
+  if (kind === "engagements") return "reactions";
+  return null;
+}
 
 // Live "it's actually on the other tab" dropdown under a Reactions/
 // Engagements search box — lets someone searching Reactions for
@@ -6263,7 +6273,7 @@ const TAXONOMY_CROSS_KIND = { reactions: "engagements", engagements: "reactions"
 // current tab's own matches are already the list rendered below the
 // search box, so mirroring them here too would just be noise.
 function renderTaxonomyCrossSuggest(kind) {
-  const otherKind = TAXONOMY_CROSS_KIND[kind];
+  const otherKind = taxonomyCrossKind(kind);
   if (!otherKind) return;
   const box = document.getElementById(`taxonomy-search-${kind}-suggest`);
   if (!box) return;
