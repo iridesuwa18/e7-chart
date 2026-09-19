@@ -57,7 +57,7 @@ body::before {
 }
 
 /* ── Scrollbar ── */
-::-webkit-scrollbar { width: 5px; }
+::-webkit-scrollbar { width: 5px; height: 5px; }
 ::-webkit-scrollbar-track { background: var(--bg2); }
 ::-webkit-scrollbar-thumb { background: var(--gold-dim); border-radius: 3px; }
 
@@ -2159,6 +2159,19 @@ body.dot-mode .origin-dot:hover {
    centered on screen. Drop it to a bottom-right corner there instead:
    still floating, but only ever overlapping the one corner rather than
    drifting over live content as you scroll. */
+/* Desktop only: the Taxonomy modal is a fixed-width card centered in a
+   much wider overlay, so the default right:14px pins its ↑ button to the
+   far edge of the screen, nowhere near the modal. Anchor it just outside
+   the modal's right edge instead (modal max-width 640px → half is 320px,
+   + 12px gap). min() keeps it on-screen when the viewport is only a bit
+   wider than the modal. Mobile (<560px) keeps the corner placement below. */
+@media (min-width: 560px) {
+  #taxonomy-scroll-top-btn {
+    right: auto;
+    left: min(calc(50% + 332px), calc(100% - 56px));
+  }
+}
+
 @media (max-width: 559px) {
   .modal-scroll-top-btn {
     top: auto;
