@@ -8372,10 +8372,21 @@
       "hScore_legacy": 5,
       "altStats_legacy": null,
       "reactions": [],
-      "engagements": [],
-      "selfishScore": 0,
+      "engagements": [
+        {
+          "refId": 1788912251007
+        }
+      ],
+      "selfishScore": 2,
       "selflessScore": 0,
-      "needsRerating": true
+      "needsRerating": false,
+      "pvpTag": false,
+      "altStats": null,
+      "selfSkillIds": [
+        "immunity",
+        "spdCr"
+      ],
+      "allySupport": []
     },
     {
       "id": 1787781478944,
@@ -17611,7 +17622,7 @@
       },
       {
         "id": 1789114206059,
-        "name": "UNDISPELLABLE : BUFF : Indomitable",
+        "name": "UNDISPELLABLE : BUFF : Indomitable (Def and Eff Resist)",
         "value": 9.5,
         "pinned": false,
         "locked": true,
@@ -18845,6 +18856,19 @@
         "factorIds": [
           1788784362484
         ]
+      },
+      {
+        "id": 1789781631045,
+        "name": "UNDISPELLABLE : BUFF : Demon Mode (No debuff + Ignore ER)",
+        "value": 9.5,
+        "pinned": false,
+        "locked": false,
+        "marked": false,
+        "factorIds": [
+          1788700781693,
+          1788912649792,
+          1788779877239
+        ]
       }
     ],
     "factors": [
@@ -19327,5 +19351,5 @@
     ]
   },
   "schemaVersion": 2,
-  "savedAt": "2026-09-19T01:29:43.399Z"
+  "savedAt": "2026-09-19T01:35:06.859Z"
 }
