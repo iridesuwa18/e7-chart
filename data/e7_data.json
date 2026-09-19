@@ -9973,9 +9973,17 @@
       "altStats_legacy": null,
       "reactions": [],
       "engagements": [],
-      "selfishScore": 0,
+      "selfishScore": 3,
       "selflessScore": 0,
-      "needsRerating": true
+      "needsRerating": false,
+      "pvpTag": false,
+      "altStats": null,
+      "selfSkillIds": [
+        "decCr",
+        "immobDebuff",
+        "spdCr"
+      ],
+      "allySupport": []
     },
     {
       "id": 1787784259231,
@@ -20810,5 +20818,5 @@
     ]
   },
   "schemaVersion": 2,
-  "savedAt": "2026-09-19T11:19:19.206Z"
+  "savedAt": "2026-09-19T11:21:07.228Z"
 }
