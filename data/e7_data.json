@@ -9804,10 +9804,40 @@
       "hScore_legacy": 5,
       "altStats_legacy": null,
       "reactions": [],
-      "engagements": [],
-      "selfishScore": 0,
+      "engagements": [
+        {
+          "refId": 1788924109560
+        },
+        {
+          "refId": 1788773060667
+        },
+        {
+          "refId": 1789132813412
+        },
+        {
+          "refId": 1789132181142
+        },
+        {
+          "refId": 1788927609636
+        },
+        {
+          "refId": 1788785736229
+        },
+        {
+          "refId": 1788780377530
+        }
+      ],
+      "selfishScore": 3,
       "selflessScore": 0,
-      "needsRerating": true
+      "needsRerating": false,
+      "pvpTag": false,
+      "altStats": null,
+      "selfSkillIds": [
+        "decCr",
+        "decSpd",
+        "immobDebuff"
+      ],
+      "allySupport": []
     },
     {
       "id": 1787783970567,
@@ -16906,7 +16936,7 @@
           "refId": 1789810928314
         }
       ],
-      "_x": 94.5,
+      "_x": 5.5,
       "_y": 35,
       "needsRerating": false
     },
@@ -16950,7 +16980,7 @@
           "refId": 1788773476896
         }
       ],
-      "_x": 50,
+      "_x": 0,
       "_y": 40
     },
     {
@@ -18306,15 +18336,16 @@
         "id": 1789811107027,
         "name": "PASSIVE : Multi-attacks (Dirge Bullets)",
         "value": 10,
+        "pinned": false,
+        "locked": false,
+        "marked": false,
         "factorIds": [
           1788700420912,
           1788701036557,
           1788783127095,
           1788772992919,
           1788700781693
-        ],
-        "locked": false,
-        "marked": false
+        ]
       }
     ],
     "engagements": [
@@ -20175,19 +20206,23 @@
         "id": 1789810928314,
         "name": "BUFF : Morale",
         "value": 7.5,
+        "pinned": false,
+        "locked": false,
+        "marked": false,
         "factorIds": [
           1788772992919,
           1788783127095,
           1788700420912,
           1788701036557
-        ],
-        "locked": false,
-        "marked": false
+        ]
       },
       {
         "id": 1789811251855,
         "name": "UNIQUE : BUFF : Dirge Bullet (Speed and Crit Dmg) x10",
         "value": 10,
+        "pinned": false,
+        "locked": false,
+        "marked": false,
         "factorIds": [
           1788700420912,
           1788701036557,
@@ -20196,9 +20231,7 @@
           1788700781693,
           1788785891810,
           1788912649792
-        ],
-        "locked": false,
-        "marked": false
+        ]
       },
       {
         "id": 1789811348216,
@@ -20697,5 +20730,5 @@
     ]
   },
   "schemaVersion": 2,
-  "savedAt": "2026-09-19T10:10:55.336Z"
+  "savedAt": "2026-09-19T11:07:00.293Z"
 }
