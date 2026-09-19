@@ -1101,10 +1101,20 @@ body.qd-factor-menu-open { overflow: hidden; }
   background: rgba(217,201,138,.18);
   color: #d9c98a;
 }
+.taxonomy-ranking-filter-chip[data-filter="unlocked"].active {
+  border-color: #6ea0c9;
+  background: rgba(110,160,201,.16);
+  color: #8fbbdf;
+}
 .taxonomy-ranking-filter-chip[data-filter="marked"].active {
   border-color: var(--teal);
   background: rgba(45,212,191,.18);
   color: var(--teal2);
+}
+.taxonomy-ranking-filter-chip[data-filter="unmarked"].active {
+  border-color: #8a8a9a;
+  background: rgba(140,140,160,.16);
+  color: #c2c2d0;
 }
 .taxonomy-ranking-filter-chip[data-filter="unassigned"].active {
   border-color: rgba(224,166,58,.5);
@@ -2107,6 +2117,40 @@ body.dot-mode .origin-dot:hover {
 }
 .overlay.open { display: flex; }
 
+/* Floating scroll-to-top button for the Add/Edit Hero overlay — fixed
+   so it stays put on screen while .overlay's content scrolls beneath
+   it (its backdrop-filter above makes .overlay the containing block
+   for position:fixed descendants, but since .overlay itself never
+   moves — it's pinned inset:0 — the button still reads as "fixed on
+   screen" to the eye). Sits just left of where the browser/overlay
+   scrollbar renders, vertically centered so it's reachable from
+   anywhere in a long scroll. Hidden by default; app.js toggles
+   .visible once the overlay has scrolled down a bit. */
+.modal-scroll-top-btn {
+  display: none;
+  position: fixed;
+  top: 50%;
+  right: 14px;
+  transform: translateY(-50%);
+  width: 42px;
+  height: 42px;
+  border-radius: 50%;
+  align-items: center;
+  justify-content: center;
+  background: var(--bg3);
+  border: 1px solid var(--gold-dim);
+  color: var(--gold2);
+  font-size: 18px;
+  line-height: 1;
+  cursor: pointer;
+  z-index: 5;
+  box-shadow: 0 6px 18px rgba(0,0,0,.55);
+  opacity: 0;
+  transition: opacity .15s ease, transform .15s ease, background .15s ease;
+}
+.modal-scroll-top-btn:hover { background: var(--bg2, #1a1b22); }
+.modal-scroll-top-btn.visible { display: flex; opacity: 1; }
+
 .modal {
   background: var(--bg3);
   border: 1px solid var(--border);
@@ -2584,6 +2628,10 @@ body.dot-mode .origin-dot:hover {
   color: var(--bg);
   border-color: var(--gold);
 }
+/* "Copy Ally 1 to All Below" — sits above the ally rows now (see
+   renderSsAllyRows in app.js), so give it its own bottom margin to
+   separate it from Ally 1's row right underneath. */
+#ss-ally-copy-first { display: block; margin-bottom: 10px; }
 .ss-ally-row {
   border: 1px solid var(--border);
   border-radius: 4px;
@@ -2724,6 +2772,54 @@ body.dot-mode .origin-dot:hover {
   flex-shrink: 0;
   text-align: center;
 }
+/* Cross-kind search hint — when a Reaction search also matches
+   something over in Engagements (or vice versa), this note+chips row
+   renders below the normal results so it's obvious which library the
+   match actually lives in, without re-typing the search a second
+   time in the other box. */
+.rte-cross-hint {
+  display: block;
+  width: 100%;
+  margin-top: 6px;
+  padding-top: 6px;
+  border-top: 1px dashed var(--border);
+}
+.rte-cross-hint-label {
+  display: block;
+  font-family: 'Cinzel', serif;
+  font-size: 9px;
+  letter-spacing: .12em;
+  text-transform: uppercase;
+  color: var(--text-dim);
+  margin-bottom: 5px;
+}
+.rte-cross-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-family: 'Crimson Pro', serif;
+  font-size: 12px;
+  color: var(--text);
+  background: rgba(255,255,255,.03);
+  border: 1px dashed var(--gold-dim);
+  border-radius: 4px;
+  padding: 4px 8px;
+  margin: 0 6px 6px 0;
+  cursor: pointer;
+}
+.rte-cross-chip:hover { border-style: solid; border-color: var(--gold-dim); color: var(--gold2); }
+.rte-cross-chip-assigned { border-style: solid; opacity: .85; }
+/* Brief flash on an assigned row after "jumping" to it (from a
+   cross-kind hint, or any future jump-to-item action), so the eye
+   lands on the right one instead of it just quietly being there. */
+.rte-jump-highlight {
+  animation: rteJumpFlash 1.5s ease;
+}
+@keyframes rteJumpFlash {
+  0%   { background: rgba(201,162,39,.35); border-color: var(--gold); }
+  100% { background: rgba(255,255,255,.02); }
+}
+
 .rte-manage-hint {
   font-family: 'Crimson Pro', serif;
   font-style: italic;

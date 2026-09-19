@@ -811,6 +811,12 @@
 
   <!-- ADD / EDIT MODAL -->
   <div class="overlay" id="modal-overlay">
+    <!-- Floating "back to top" button — hidden until the overlay is
+         scrolled down (see wireModalScrollTopBtn in app.js), sits fixed
+         next to the scrollbar so a long Add/Edit Hero form (Reactions &
+         Engagements, Selfish/Selfless, etc.) is never a long manual
+         scroll back up. -->
+    <button type="button" class="modal-scroll-top-btn" id="modal-scroll-top-btn" title="Jump to top" aria-label="Jump to top">↑</button>
     <div class="modal" id="modal">
       <div class="modal-title" id="modal-title">ADD HERO</div>
 
@@ -1399,12 +1405,15 @@
       </div>
       <!-- Filter chips — independent toggles (AND'd together, not
            radio buttons), so e.g. Locked + Marked can be combined to
-           find things that are both. None active = "All", the default.
-           See taxonomyRankingFilter/renderTaxonomyRankingPanel in
-           app.js. -->
+           find things that are both, or Unlocked + Unmarked to find
+           what's still free to bulk-edit. None active = "All", the
+           default. See taxonomyRankingFilter/renderTaxonomyRankingPanel
+           in app.js. -->
       <div class="taxonomy-ranking-filter-row" id="taxonomy-ranking-filter-row">
         <button type="button" class="taxonomy-ranking-filter-chip" data-filter="locked" title="Show only locked scores">🔒 Locked</button>
+        <button type="button" class="taxonomy-ranking-filter-chip" data-filter="unlocked" title="Show only scores that are NOT locked">🔓 Unlocked</button>
         <button type="button" class="taxonomy-ranking-filter-chip" data-filter="marked" title="Show only items you've marked as edited">🔖 Marked</button>
+        <button type="button" class="taxonomy-ranking-filter-chip" data-filter="unmarked" title="Show only items you have NOT marked as edited">🏳️ Unmarked</button>
         <button type="button" class="taxonomy-ranking-filter-chip" data-filter="unassigned" title="Show only items not yet assigned to any hero">⚠️ Unassigned</button>
       </div>
       <!-- Bulk score editor — only shown while "☑ Select" mode is on (see

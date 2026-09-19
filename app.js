@@ -1214,6 +1214,22 @@ const modalDelete  = document.getElementById("modal-delete");
 const saveStatus   = document.getElementById("save-status");
 const fSsScore     = document.getElementById("f-ss-score");
 
+// Shows/hides the floating "↑ jump to top" button on the Add/Edit Hero
+// overlay as it's scrolled, and wires its click to scroll back to 0.
+// Wired once here at startup (the button and overlay are both static
+// markup, present whether or not the modal is currently open), rather
+// than re-wired every time the modal opens.
+function wireModalScrollTopBtn() {
+  const scrollBtn = document.getElementById("modal-scroll-top-btn");
+  if (!overlay || !scrollBtn) return;
+  overlay.addEventListener("scroll", () => {
+    scrollBtn.classList.toggle("visible", overlay.scrollTop > 240);
+  });
+  scrollBtn.addEventListener("click", () => {
+    overlay.scrollTo({ top: 0, behavior: "smooth" });
+  });
+}
+
 /* ═══════════════════════════════════════
    INIT
 ═══════════════════════════════════════ */
@@ -1248,6 +1264,11 @@ const fSsScore     = document.getElementById("f-ss-score");
 
   // Auto-load from server for ALL visitors on page open (no password needed)
   autoLoadFromServer();
+
+  // Floating "↑ jump to top" button for the Add/Edit Hero overlay — only
+  // shows once scrolled down a bit, so it's not just permanently sitting
+  // over the form on short screens/short forms.
+  wireModalScrollTopBtn();
 
   // Double-click the brand emblem to reveal admin controls (Save/Load/Add Hero)
   document.querySelector(".brand-emblem").addEventListener("dblclick", () => {
@@ -1302,8 +1323,8 @@ const fSsScore     = document.getElementById("f-ss-score");
     // otherwise it prompts the same password modal (now above this
     // overlay — see #admin-overlay's z-index).
     rankingOverlay.querySelector("#taxonomy-ranking-quicksave")?.addEventListener("click", () => openAdminGate("save"));
-    // Locked/Marked/Unassigned filter chips — each toggles independently
-    // and they combine (AND), see taxonomyRankingFilter.
+    // Locked/Unlocked/Marked/Unmarked/Unassigned filter chips — each
+    // toggles independently and they combine (AND), see taxonomyRankingFilter.
     rankingOverlay.querySelectorAll(".taxonomy-ranking-filter-chip").forEach(chip => {
       chip.addEventListener("click", () => {
         const key = chip.dataset.filter;
@@ -5599,11 +5620,14 @@ function renderSsAllyRows(prefill) {
   box.innerHTML = rows.join("");
   // "Copy Ally 1 to all below" — only useful with 2+ allies on screen.
   // Rendered here (not static markup) so it only appears/disappears as
-  // ssAllyCount changes, same lifecycle as the rows themselves.
+  // ssAllyCount changes, same lifecycle as the rows themselves. Placed
+  // at the very top of the ally rows (right below the 0-4 ally-count
+  // buttons above) rather than after the rows, since it's an action
+  // you reach for before filling anything in below it.
   const copyBtnHTML = ssAllyCount > 1
     ? `<button type="button" class="btn btn-ghost btn-sm" id="ss-ally-copy-first">⧉ Copy Ally 1 to All Below</button>`
     : "";
-  box.insertAdjacentHTML("beforeend", copyBtnHTML);
+  box.insertAdjacentHTML("afterbegin", copyBtnHTML);
   const copyBtn = document.getElementById("ss-ally-copy-first");
   if (copyBtn) copyBtn.addEventListener("click", ssCopyFirstAllyToRest);
 
@@ -5798,6 +5822,9 @@ function renderRteAssignedList(kind, target) {
 // kind+target so main/ghost and Reactions/Engagements don't collide.
 let rteAddSearchQuery = {};
 
+// The other kind — Reactions look across at Engagements and vice versa.
+function otherRteKind(kind) { return kind === "reactions" ? "engagements" : "reactions"; }
+
 function renderRteAddSearch(kind, target) {
   const prefix = rteIdPrefix(target);
   const inputId   = kind === "reactions" ? prefix + "add-reaction-search"  : prefix + "add-engagement-search";
@@ -5808,6 +5835,45 @@ function renderRteAddSearch(kind, target) {
 
   const key = `${kind}-${target}`;
   const label = kind === "reactions" ? "Reaction" : "Engagement";
+  const otherKind = otherRteKind(kind);
+  const otherLabel = otherKind === "reactions" ? "Reaction" : "Engagement";
+
+  // Cross-kind hint: while searching Reactions, also check whether the
+  // typed text matches anything over in the Engagements library (and
+  // vice versa) — so mis-guessing which list something lives in doesn't
+  // mean re-typing the same search a second time in the other box.
+  // Clicking a hint chip adds that item under its own kind (if it isn't
+  // already assigned) and jumps straight to it there.
+  const crossHintHTML = (q) => {
+    if (!q) return "";
+    const otherAssignedIds = new Set(rteModalArray(otherKind, target).map(x => x?.refId ?? x));
+    const crossMatches = taxonomy[otherKind].filter(item => item.name.toLowerCase().includes(q)).slice(0, 5);
+    if (!crossMatches.length) return "";
+    return `
+      <div class="rte-cross-hint">
+        <span class="rte-cross-hint-label">↔ Also found in ${otherLabel}s:</span>
+        ${crossMatches.map(item => {
+          const already = otherAssignedIds.has(item.id);
+          return `<button type="button" class="rte-cross-chip${already ? " rte-cross-chip-assigned" : ""}" data-kind="${otherKind}" data-ref-id="${item.id}" title="${already ? `Already assigned — jump to it in ${otherLabel}s` : `Add to ${otherLabel}s and jump to it`}">${already ? "→" : "+"} ${escAttr(item.name)} (${item.value.toFixed(1)})</button>`;
+        }).join("")}
+      </div>`;
+  };
+
+  const wireCrossHintChips = () => {
+    resultsBox.querySelectorAll(".rte-cross-chip").forEach(chip => {
+      chip.addEventListener("click", () => {
+        const crossKind = chip.dataset.kind;
+        const refId = Number(chip.dataset.refId);
+        const alreadyAssigned = rteModalArray(crossKind, target).some(x => (x?.refId ?? x) === refId);
+        if (!alreadyAssigned) {
+          setRteModalArray(crossKind, target, [...rteModalArray(crossKind, target), { refId }]);
+        }
+        rteAddSearchQuery[key] = ""; // clear this search now that it's been handled
+        renderRteSection(target);
+        rteJumpToAssigned(crossKind, refId, target);
+      });
+    });
+  };
 
   const renderResults = () => {
     const q = (rteAddSearchQuery[key] || "").trim().toLowerCase();
@@ -5819,9 +5885,10 @@ function renderRteAddSearch(kind, target) {
         : `<div class="rte-empty-note">Every ${label} is already assigned.</div>`;
       return;
     }
-    resultsBox.innerHTML = candidates.length
+    const ownResultsHTML = candidates.length
       ? candidates.map(item => `<button type="button" class="taxonomy-factor-chip" data-ref-id="${item.id}">+ ${escAttr(item.name)} (${item.value.toFixed(1)})</button>`).join("")
       : `<div class="rte-empty-note">No matching ${label}s.</div>`;
+    resultsBox.innerHTML = ownResultsHTML + crossHintHTML(q);
     resultsBox.querySelectorAll(".taxonomy-factor-chip").forEach(chip => {
       chip.addEventListener("click", () => {
         const refId = Number(chip.dataset.refId);
@@ -5830,6 +5897,7 @@ function renderRteAddSearch(kind, target) {
         renderRteSection(target);
       });
     });
+    wireCrossHintChips();
   };
 
   // The input itself is static markup (see index.html), not rebuilt on
@@ -5852,6 +5920,20 @@ function renderRteAddSearch(kind, target) {
   input.value = query;
   renderResults();
   if (query) input.focus({ preventScroll: true }); // restore focus/cursor after a re-render
+}
+
+// Scrolls the given Reaction/Engagement's assigned row into view and
+// flashes it, so clicking a cross-kind hint chip (or any other "jump
+// to it" action) actually lands the eye on the right row instead of
+// just silently adding it somewhere off-screen. Called right after a
+// render, so the row already exists in the DOM.
+function rteJumpToAssigned(kind, refId, target) {
+  const list = rteListEl(kind, target);
+  const row = list?.querySelector(`.rte-assigned-row[data-ref-id="${refId}"]`);
+  if (!row) return;
+  row.scrollIntoView({ behavior: "smooth", block: "center" });
+  row.classList.add("rte-jump-highlight");
+  setTimeout(() => row.classList.remove("rte-jump-highlight"), 1500);
 }
 
 function removeRteItem(kind, refId, target) {
@@ -6094,8 +6176,13 @@ function saveRenameModal() {
       renderQdFactorChips();
       if (typeof renderHeroFactorsButton === "function") renderHeroFactorsButton(); // keep Hero Factors' button/grid in sync with the Enemy Factors state it reads
     } else {
-      duplicateTaxonomyItem(kind, id, newName);
+      const copy = duplicateTaxonomyItem(kind, id, newName);
       renderTaxonomyPanel(kind);
+      // Jump straight to the new copy — it lands at the end of the
+      // array (see duplicateTaxonomyItem), so without this it's just
+      // silently added wherever the current sort/pin order puts it,
+      // and finding it means scrolling/hunting for the new name.
+      if (copy) taxonomyJumpToRow(kind, copy.id);
     }
   } else {
     if (kind === "factors") {
@@ -6171,6 +6258,32 @@ function taxonomyMatchesSearch(kind, name) {
   const q = (taxonomySearchQuery[kind] || "").trim().toLowerCase();
   if (!q) return true;
   return (name || "").toLowerCase().includes(q);
+}
+
+// Scrolls a Reaction/Engagement's row into view in the Taxonomy Manager
+// and flashes it — used right after duplicating one (see saveRenameModal)
+// so the new copy is immediately visible instead of needing to be hunted
+// down in whatever order/position it landed at. If the panel's current
+// search text would hide the row (e.g. the copy was given a name that no
+// longer matches an old filter), the filter is cleared first so "jump to
+// it" can't land on nothing.
+function taxonomyJumpToRow(kind, id) {
+  const item = taxonomy[kind]?.find(x => x.id === id);
+  if (!item) return;
+  if (!taxonomyMatchesSearch(kind, item.name)) {
+    taxonomySearchQuery[kind] = "";
+    const input = document.getElementById(`taxonomy-search-${kind}`);
+    if (input) input.value = "";
+    const clearBtn = document.getElementById(`taxonomy-search-${kind}-clear`);
+    if (clearBtn) clearBtn.style.display = "none";
+    renderTaxonomyPanel(kind);
+  }
+  const box = document.getElementById(kind === "reactions" ? "taxonomy-list-reactions" : "taxonomy-list-engagements");
+  const row = box?.querySelector(`.taxonomy-row[data-id="${id}"]`);
+  if (!row) return;
+  row.scrollIntoView({ behavior: "smooth", block: "center" });
+  row.classList.add("rte-jump-highlight");
+  setTimeout(() => row.classList.remove("rte-jump-highlight"), 1500);
 }
 
 let qdRankingSliderEl = null;
@@ -6335,7 +6448,11 @@ let taxonomyRankingSearchQuery = "";
 
 // Independent, combinable (AND'd) toggle filters for the Performance
 // Ranking list — all false is "All" (no filtering), the default.
-let taxonomyRankingFilter = { locked: false, marked: false, unassigned: false };
+// unlocked/unmarked are the inverse of locked/marked, not just a UI
+// mirror of the same state — e.g. Locked finds rows to double-check
+// before a big rebalance, Unlocked finds the rows that are still free
+// to bulk-edit.
+let taxonomyRankingFilter = { locked: false, marked: false, unassigned: false, unlocked: false, unmarked: false };
 
 // "☑ Select" mode — lets several rows be picked at once so their scores
 // can be changed together via the bulk bar, rather than opening the
@@ -6410,7 +6527,9 @@ function renderTaxonomyRankingPanel() {
     .map(x => ({ ...x, heroCount: heroesLinkedToTaxonomyItem(x.kind, x.item.id).length }))
     .filter(({ item }) => !q || (item.name || "").toLowerCase().includes(q))
     .filter(({ item }) => !taxonomyRankingFilter.locked || item.locked)
+    .filter(({ item }) => !taxonomyRankingFilter.unlocked || !item.locked)
     .filter(({ item }) => !taxonomyRankingFilter.marked || item.marked)
+    .filter(({ item }) => !taxonomyRankingFilter.unmarked || !item.marked)
     .filter(({ heroCount }) => !taxonomyRankingFilter.unassigned || heroCount === 0)
     .sort((a, b) => {
       const an = (a.item.name || "").toLowerCase(), bn = (b.item.name || "").toLowerCase();
@@ -6442,7 +6561,8 @@ function renderTaxonomyRankingPanel() {
   [...taxonomyRankingSelected].forEach(key => { if (!visibleKeys.has(key)) taxonomyRankingSelected.delete(key); });
   renderTaxonomyRankingBulkBar();
 
-  const anyFilterActive = taxonomyRankingFilter.locked || taxonomyRankingFilter.marked || taxonomyRankingFilter.unassigned;
+  const anyFilterActive = taxonomyRankingFilter.locked || taxonomyRankingFilter.marked || taxonomyRankingFilter.unassigned
+    || taxonomyRankingFilter.unlocked || taxonomyRankingFilter.unmarked;
   if (combined.length === 0) {
     box.innerHTML = (taxonomy.reactions.length + taxonomy.engagements.length) === 0
       ? `<div class="taxonomy-empty-note">No Reactions or Engagements yet — add some in their own tabs first.</div>`
