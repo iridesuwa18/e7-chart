@@ -9971,8 +9971,34 @@
       "hType_legacy": "SUR",
       "hScore_legacy": 3,
       "altStats_legacy": null,
-      "reactions": [],
-      "engagements": [],
+      "reactions": [
+        {
+          "refId": 1789134378369
+        }
+      ],
+      "engagements": [
+        {
+          "refId": 1788773476896
+        },
+        {
+          "refId": 1789132181142
+        },
+        {
+          "refId": 1789132668882
+        },
+        {
+          "refId": 1788783359037
+        },
+        {
+          "refId": 1788773067411
+        },
+        {
+          "refId": 1788785627002
+        },
+        {
+          "refId": 1788785021751
+        }
+      ],
       "selfishScore": 3,
       "selflessScore": 0,
       "needsRerating": false,
@@ -20818,5 +20844,5 @@
     ]
   },
   "schemaVersion": 2,
-  "savedAt": "2026-09-19T11:21:07.228Z"
+  "savedAt": "2026-09-19T11:24:15.974Z"
 }
