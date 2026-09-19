@@ -12119,13 +12119,44 @@
       "engagements": [
         {
           "refId": 1788772268160
+        },
+        {
+          "refId": 1788783359037
+        },
+        {
+          "refId": 1788773060667
+        },
+        {
+          "refId": 1788698917413
+        },
+        {
+          "refId": 1788783734183
+        },
+        {
+          "refId": 1788772163166
         }
       ],
       "selfishScore": 2,
       "selflessScore": 0,
       "needsRerating": false,
       "pvpTag": false,
-      "altStats": null,
+      "altStats": {
+        "selfishScore": 0,
+        "selflessScore": 0.33,
+        "selfSkillIds": [],
+        "allySupport": [
+          {
+            "healing": 0,
+            "passive": 0,
+            "buffCount": 2
+          },
+          {
+            "healing": 0,
+            "passive": 0,
+            "buffCount": 2
+          }
+        ]
+      },
       "selfSkillIds": [
         "lifesteal",
         "shields"
@@ -22252,5 +22283,5 @@
     ]
   },
   "schemaVersion": 2,
-  "savedAt": "2026-09-19T23:51:58.065Z"
+  "savedAt": "2026-09-19T23:54:14.042Z"
 }
