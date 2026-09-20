@@ -15663,11 +15663,39 @@
         "hType": "SUR",
         "hScore": 7
       },
-      "reactions": [],
-      "engagements": [],
-      "selfishScore": 0,
+      "reactions": [
+        {
+          "refId": 1789115386205
+        }
+      ],
+      "engagements": [
+        {
+          "refId": 1789884684632
+        },
+        {
+          "refId": 1788783734183
+        },
+        {
+          "refId": 1789118896007
+        },
+        {
+          "refId": 1788782920388
+        },
+        {
+          "refId": 1789220573364
+        }
+      ],
+      "selfishScore": 3,
       "selflessScore": 0,
-      "needsRerating": true
+      "needsRerating": false,
+      "pvpTag": false,
+      "altStats": null,
+      "selfSkillIds": [
+        "decCr",
+        "spdCr",
+        "shields"
+      ],
+      "allySupport": []
     },
     {
       "id": 1787964013003,
@@ -23840,6 +23868,22 @@
           1789191623914,
           1789259574556
         ]
+      },
+      {
+        "id": 1789884684632,
+        "name": "UNIQUE : BUFF : (Neo) Phantom Sword",
+        "value": 10,
+        "factorIds": [
+          1788773130306,
+          1788774033143,
+          1788786248167,
+          1788701036557,
+          1788700420912,
+          1788700781693,
+          1788912649792
+        ],
+        "locked": false,
+        "marked": false
       }
     ],
     "factors": [
@@ -24322,5 +24366,5 @@
     ]
   },
   "schemaVersion": 2,
-  "savedAt": "2026-09-20T06:09:37.902Z"
+  "savedAt": "2026-09-20T06:13:51.596Z"
 }
