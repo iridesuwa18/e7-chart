@@ -13099,14 +13099,43 @@
         "hType": "SUR",
         "hScore": 6
       },
-      "reactions": [],
-      "engagements": [],
-      "selfishScore": 0,
+      "reactions": [
+        {
+          "refId": 1788783157740
+        }
+      ],
+      "engagements": [
+        {
+          "refId": 1788773476896
+        },
+        {
+          "refId": 1788786124368
+        },
+        {
+          "refId": 1788783486720
+        },
+        {
+          "refId": 1788785954933
+        },
+        {
+          "refId": 1788773060667
+        },
+        {
+          "refId": 1788700311844
+        },
+        {
+          "refId": 1788913999604
+        }
+      ],
+      "selfishScore": 2,
       "selflessScore": 0,
       "needsRerating": false,
       "pvpTag": false,
       "altStats": null,
-      "selfSkillIds": [],
+      "selfSkillIds": [
+        "decCr",
+        "extraTurns"
+      ],
       "allySupport": []
     },
     {
@@ -22852,5 +22881,5 @@
     ]
   },
   "schemaVersion": 2,
-  "savedAt": "2026-09-20T00:42:56.427Z"
+  "savedAt": "2026-09-20T00:45:58.643Z"
 }
