@@ -13297,8 +13297,18 @@
       "reactions": [],
       "engagements": [],
       "selfishScore": 0,
-      "selflessScore": 0,
-      "needsRerating": true
+      "selflessScore": 0.17,
+      "needsRerating": false,
+      "pvpTag": false,
+      "altStats": null,
+      "selfSkillIds": [],
+      "allySupport": [
+        {
+          "healing": 0,
+          "passive": 0,
+          "buffCount": 2
+        }
+      ]
     },
     {
       "id": 1787909335993,
@@ -22974,5 +22984,5 @@
     ]
   },
   "schemaVersion": 2,
-  "savedAt": "2026-09-20T00:53:29.609Z"
+  "savedAt": "2026-09-20T00:55:44.601Z"
 }
