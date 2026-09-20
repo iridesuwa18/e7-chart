@@ -19016,11 +19016,37 @@
       "hType_legacy": "SUR",
       "hScore_legacy": 5,
       "altStats_legacy": null,
-      "reactions": [],
-      "engagements": [],
-      "selfishScore": 0,
+      "reactions": [
+        {
+          "refId": 1789217068833
+        },
+        {
+          "refId": 1789203590553
+        },
+        {
+          "refId": 1789209367308
+        }
+      ],
+      "engagements": [
+        {
+          "refId": 1788924109560
+        },
+        {
+          "refId": 1788783359037
+        },
+        {
+          "refId": 1789198537752
+        }
+      ],
+      "selfishScore": 1,
       "selflessScore": 0,
-      "needsRerating": true
+      "needsRerating": false,
+      "pvpTag": false,
+      "altStats": null,
+      "selfSkillIds": [
+        "selfPassive"
+      ],
+      "allySupport": []
     },
     {
       "id": 1787969094645,
@@ -19039,11 +19065,44 @@
       "hType_legacy": "SUR",
       "hScore_legacy": 3,
       "altStats_legacy": null,
-      "reactions": [],
-      "engagements": [],
+      "reactions": [
+        {
+          "refId": 1788786348512
+        },
+        {
+          "refId": 1789301614949
+        },
+        {
+          "refId": 1788780327120
+        }
+      ],
+      "engagements": [
+        {
+          "refId": 1788782920388
+        },
+        {
+          "refId": 1788783099100
+        },
+        {
+          "refId": 1788772163166
+        },
+        {
+          "refId": 1788914238894
+        }
+      ],
       "selfishScore": 0,
-      "selflessScore": 0,
-      "needsRerating": true
+      "selflessScore": 0.42,
+      "needsRerating": false,
+      "pvpTag": false,
+      "altStats": null,
+      "selfSkillIds": [],
+      "allySupport": [
+        {
+          "healing": 0,
+          "passive": 30,
+          "buffCount": 2
+        }
+      ]
     },
     {
       "id": 1787969830395,
@@ -26416,5 +26475,5 @@
     ]
   },
   "schemaVersion": 2,
-  "savedAt": "2026-09-20T11:54:19.829Z"
+  "savedAt": "2026-09-20T11:58:09.173Z"
 }
