@@ -21609,7 +21609,7 @@
         "name": "PASSIVE : Immune to debuffs preventing movement (stun, sleep)",
         "value": 9.5,
         "pinned": false,
-        "locked": false,
+        "locked": true,
         "marked": false,
         "factorIds": [
           1789130156790,
@@ -21621,7 +21621,7 @@
         "name": "PASSIVE : Immune to decreased hit chance",
         "value": 9.5,
         "pinned": false,
-        "locked": false,
+        "locked": true,
         "marked": false,
         "factorIds": [
           1788783127095,
@@ -23605,7 +23605,7 @@
         "name": "EFFECT : Stealing and granting buffs",
         "value": 9,
         "pinned": false,
-        "locked": false,
+        "locked": true,
         "marked": false,
         "factorIds": [
           1788773731924,
@@ -23617,7 +23617,7 @@
         "name": "ONGOING : Increase Damage on crits",
         "value": 10,
         "pinned": false,
-        "locked": false,
+        "locked": true,
         "marked": false,
         "factorIds": [
           1788772992919,
@@ -24105,5 +24105,5 @@
     ]
   },
   "schemaVersion": 2,
-  "savedAt": "2026-09-20T05:46:51.255Z"
+  "savedAt": "2026-09-20T05:47:03.098Z"
 }
