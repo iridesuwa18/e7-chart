@@ -15885,11 +15885,44 @@
         "hType": "SUR",
         "hScore": 2
       },
-      "reactions": [],
-      "engagements": [],
-      "selfishScore": 0,
+      "reactions": [
+        {
+          "refId": 1788775147348
+        },
+        {
+          "refId": 1789886773536
+        }
+      ],
+      "engagements": [
+        {
+          "refId": 1789132181142
+        },
+        {
+          "refId": 1789201317168
+        },
+        {
+          "refId": 1788772163166
+        },
+        {
+          "refId": 1789118795470
+        },
+        {
+          "refId": 1788773067411
+        },
+        {
+          "refId": 1789132233866
+        }
+      ],
+      "selfishScore": 2,
       "selflessScore": 0,
-      "needsRerating": true
+      "needsRerating": false,
+      "pvpTag": false,
+      "altStats": null,
+      "selfSkillIds": [
+        "decCr",
+        "spdCr"
+      ],
+      "allySupport": []
     },
     {
       "id": 1787964312318,
@@ -21950,6 +21983,18 @@
           1788783127095,
           1788700781693
         ]
+      },
+      {
+        "id": 1789886773536,
+        "name": "PASSIVE : Immune to debuffs preventing movement (stun)",
+        "value": 9.5,
+        "pinned": false,
+        "locked": false,
+        "marked": false,
+        "factorIds": [
+          1789130156790,
+          1788700781693
+        ]
       }
     ],
     "engagements": [
@@ -24458,5 +24503,5 @@
     ]
   },
   "schemaVersion": 2,
-  "savedAt": "2026-09-20T06:43:33.043Z"
+  "savedAt": "2026-09-20T06:47:24.954Z"
 }
