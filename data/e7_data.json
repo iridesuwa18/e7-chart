@@ -19894,12 +19894,52 @@
         "hType": "SUR",
         "hScore": 5
       },
-      "reactions": [],
-      "engagements": [],
-      "selfishScore": 0,
+      "reactions": [
+        {
+          "refId": 1788780327120
+        },
+        {
+          "refId": 1788775147348
+        },
+        {
+          "refId": 1788785760659
+        },
+        {
+          "refId": 1788786348512
+        },
+        {
+          "refId": 1789262656055
+        }
+      ],
+      "engagements": [
+        {
+          "refId": 1788783486720
+        },
+        {
+          "refId": 1788783099100
+        },
+        {
+          "refId": 1789115108791
+        },
+        {
+          "refId": 1788773060667
+        },
+        {
+          "refId": 1789221204007
+        }
+      ],
+      "selfishScore": 4,
       "selflessScore": 0,
-      "needsRerating": true,
-      "hidden": true
+      "needsRerating": false,
+      "hidden": true,
+      "altStats": null,
+      "selfSkillIds": [
+        "immunity",
+        "spdCr",
+        "lifesteal",
+        "selfPassive"
+      ],
+      "allySupport": []
     },
     {
       "id": 1787971563798,
@@ -26985,5 +27025,5 @@
     ]
   },
   "schemaVersion": 2,
-  "savedAt": "2026-09-20T12:35:24.793Z"
+  "savedAt": "2026-09-20T12:38:40.097Z"
 }
