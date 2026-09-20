@@ -20555,35 +20555,18 @@
           "refId": 1788783359037
         }
       ],
-      "selfishScore": 0,
-      "selflessScore": 0.83,
+      "selfishScore": 3,
+      "selflessScore": 0,
       "needsRerating": false,
       "hidden": true,
       "pvpTag": false,
       "altStats": null,
-      "selfSkillIds": [],
-      "allySupport": [
-        {
-          "healing": 25,
-          "passive": 0,
-          "buffCount": 0
-        },
-        {
-          "healing": 25,
-          "passive": 0,
-          "buffCount": 0
-        },
-        {
-          "healing": 25,
-          "passive": 0,
-          "buffCount": 0
-        },
-        {
-          "healing": 25,
-          "passive": 0,
-          "buffCount": 0
-        }
-      ]
+      "selfSkillIds": [
+        "spdCr",
+        "lifesteal",
+        "selfPassive"
+      ],
+      "allySupport": []
     },
     {
       "id": 1787972931767,
@@ -27477,5 +27460,5 @@
     ]
   },
   "schemaVersion": 2,
-  "savedAt": "2026-09-20T13:15:12.790Z"
+  "savedAt": "2026-09-20T13:15:45.479Z"
 }
