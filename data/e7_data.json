@@ -13427,11 +13427,44 @@
       "hType_legacy": "SUR",
       "hScore_legacy": 5,
       "altStats_legacy": null,
-      "reactions": [],
-      "engagements": [],
-      "selfishScore": 0,
+      "reactions": [
+        {
+          "refId": 1789866244151
+        },
+        {
+          "refId": 1789866279099
+        }
+      ],
+      "engagements": [
+        {
+          "refId": 1789194988679
+        },
+        {
+          "refId": 1788772268160
+        },
+        {
+          "refId": 1788773060667
+        },
+        {
+          "refId": 1788783359037
+        },
+        {
+          "refId": 1788785736229
+        },
+        {
+          "refId": 1788783486720
+        }
+      ],
+      "selfishScore": 2,
       "selflessScore": 0,
-      "needsRerating": true
+      "needsRerating": false,
+      "pvpTag": false,
+      "altStats": null,
+      "selfSkillIds": [
+        "immunity",
+        "lifesteal"
+      ],
+      "allySupport": []
     },
     {
       "id": 1787909792862,
@@ -20572,6 +20605,30 @@
           1789130596970,
           1788773895734
         ]
+      },
+      {
+        "id": 1789866244151,
+        "name": "PASSIVE : Immune to debuffs preventing movement (stun, sleep)",
+        "value": 9.5,
+        "pinned": false,
+        "locked": false,
+        "marked": false,
+        "factorIds": [
+          1789130156790,
+          1788700781693
+        ]
+      },
+      {
+        "id": 1789866279099,
+        "name": "PASSIVE : Immune to decreased hit chance",
+        "value": 9.5,
+        "pinned": false,
+        "locked": false,
+        "marked": false,
+        "factorIds": [
+          1788783127095,
+          1788700781693
+        ]
       }
     ],
     "engagements": [
@@ -23050,5 +23107,5 @@
     ]
   },
   "schemaVersion": 2,
-  "savedAt": "2026-09-20T01:02:00.331Z"
+  "savedAt": "2026-09-20T01:05:53.570Z"
 }
