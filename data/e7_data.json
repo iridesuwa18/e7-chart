@@ -16692,11 +16692,31 @@
       "hType_legacy": "SST",
       "hScore_legacy": 3,
       "altStats_legacy": null,
-      "reactions": [],
-      "engagements": [],
-      "selfishScore": 0,
+      "reactions": [
+        {
+          "refId": 1789221117694
+        }
+      ],
+      "engagements": [
+        {
+          "refId": 1788780377530
+        },
+        {
+          "refId": 1788772163166
+        },
+        {
+          "refId": 1788783734183
+        }
+      ],
+      "selfishScore": 1,
       "selflessScore": 0,
-      "needsRerating": true
+      "needsRerating": false,
+      "pvpTag": false,
+      "altStats": null,
+      "selfSkillIds": [
+        "decCr"
+      ],
+      "allySupport": []
     },
     {
       "id": 1787965747973,
@@ -16721,11 +16741,53 @@
         "hType": "SST",
         "hScore": 4
       },
-      "reactions": [],
-      "engagements": [],
-      "selfishScore": 0,
+      "reactions": [
+        {
+          "refId": 1789217068833
+        },
+        {
+          "refId": 1789301614949
+        },
+        {
+          "refId": 1789287545820
+        },
+        {
+          "refId": 1788786348512
+        },
+        {
+          "refId": 1789221525475
+        }
+      ],
+      "engagements": [
+        {
+          "refId": 1789015361909
+        },
+        {
+          "refId": 1788772163166
+        },
+        {
+          "refId": 1789133085456
+        },
+        {
+          "refId": 1788783734183
+        },
+        {
+          "refId": 1788782920388
+        },
+        {
+          "refId": 1788773067411
+        }
+      ],
+      "selfishScore": 3,
       "selflessScore": 0,
-      "needsRerating": true
+      "needsRerating": false,
+      "altStats": null,
+      "selfSkillIds": [
+        "lifesteal",
+        "selfPassive",
+        "shields"
+      ],
+      "allySupport": []
     },
     {
       "id": 1787965852915,
@@ -21818,7 +21880,7 @@
       },
       {
         "id": 1789221117694,
-        "name": "DAMAGE : Prop to target's max health",
+        "name": "DAMAGE : Prop to enemy / target's max health",
         "value": 10,
         "pinned": false,
         "locked": true,
@@ -25035,5 +25097,5 @@
     ]
   },
   "schemaVersion": 2,
-  "savedAt": "2026-09-20T07:45:37.284Z"
+  "savedAt": "2026-09-20T07:51:12.571Z"
 }
