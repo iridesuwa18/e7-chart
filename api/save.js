@@ -4,7 +4,7 @@
 // Env vars required: GITHUB_TOKEN, ADMIN_PASSWORD
 
 const REPO   = "iridesuwa18/e7-chart";
-const BRANCH = "main";
+const BRANCH = "data"; // data-only branch — Vercel deploys are disabled for it (see vercel.json)
 const PATH   = "data/e7_data.json";
 
 export default async function handler(req, res) {
