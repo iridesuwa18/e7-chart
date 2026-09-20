@@ -13295,7 +13295,17 @@
       "hScore_legacy": 2,
       "altStats_legacy": null,
       "reactions": [],
-      "engagements": [],
+      "engagements": [
+        {
+          "refId": 1788783734183
+        },
+        {
+          "refId": 1789276598548
+        },
+        {
+          "refId": 1788783359037
+        }
+      ],
       "selfishScore": 0,
       "selflessScore": 0.17,
       "needsRerating": false,
@@ -22984,5 +22994,5 @@
     ]
   },
   "schemaVersion": 2,
-  "savedAt": "2026-09-20T00:55:44.601Z"
+  "savedAt": "2026-09-20T00:56:23.470Z"
 }
