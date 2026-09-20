@@ -12495,11 +12495,75 @@
         "hType": "SUR",
         "hScore": 5
       },
-      "reactions": [],
-      "engagements": [],
+      "reactions": [
+        {
+          "refId": 1789298129096
+        },
+        {
+          "refId": 1789191471240
+        },
+        {
+          "refId": 1788786104653
+        },
+        {
+          "refId": 1788775147348
+        }
+      ],
+      "engagements": [
+        {
+          "refId": 1788785505206
+        },
+        {
+          "refId": 1789116663470
+        },
+        {
+          "refId": 1788772163166
+        },
+        {
+          "refId": 1788786124368
+        },
+        {
+          "refId": 1788782920388
+        }
+      ],
       "selfishScore": 0,
-      "selflessScore": 0,
-      "needsRerating": true
+      "selflessScore": 1,
+      "needsRerating": false,
+      "pvpTag": false,
+      "altStats": {
+        "selfishScore": 4,
+        "selflessScore": 0,
+        "selfSkillIds": [
+          "extraTurns",
+          "immobDebuff",
+          "spdCr",
+          "shields"
+        ],
+        "allySupport": []
+      },
+      "selfSkillIds": [],
+      "allySupport": [
+        {
+          "healing": 0,
+          "passive": 0,
+          "buffCount": 3
+        },
+        {
+          "healing": 0,
+          "passive": 0,
+          "buffCount": 3
+        },
+        {
+          "healing": 0,
+          "passive": 0,
+          "buffCount": 3
+        },
+        {
+          "healing": 0,
+          "passive": 0,
+          "buffCount": 3
+        }
+      ]
     },
     {
       "id": 1787908170174,
@@ -22463,5 +22527,5 @@
     ]
   },
   "schemaVersion": 2,
-  "savedAt": "2026-09-20T00:09:16.656Z"
+  "savedAt": "2026-09-20T00:13:20.435Z"
 }
