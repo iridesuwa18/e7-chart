@@ -16957,11 +16957,37 @@
       "hType_legacy": "SUR",
       "hScore_legacy": 4,
       "altStats_legacy": null,
-      "reactions": [],
-      "engagements": [],
-      "selfishScore": 0,
+      "reactions": [
+        {
+          "refId": 1789805067473
+        }
+      ],
+      "engagements": [
+        {
+          "refId": 1789198537752
+        },
+        {
+          "refId": 1788783359037
+        },
+        {
+          "refId": 1789132233866
+        },
+        {
+          "refId": 1789014762306
+        },
+        {
+          "refId": 1788783734183
+        }
+      ],
+      "selfishScore": 1,
       "selflessScore": 0,
-      "needsRerating": true
+      "needsRerating": false,
+      "pvpTag": false,
+      "altStats": null,
+      "selfSkillIds": [
+        "spdCr"
+      ],
+      "allySupport": []
     },
     {
       "id": 1787966171066,
@@ -16980,11 +17006,29 @@
       "hType_legacy": "SUR",
       "hScore_legacy": 6,
       "altStats_legacy": null,
-      "reactions": [],
-      "engagements": [],
-      "selfishScore": 0,
+      "reactions": [
+        {
+          "refId": 1789191471240
+        },
+        {
+          "refId": 1789805067473
+        }
+      ],
+      "engagements": [
+        {
+          "refId": 1788783734183
+        }
+      ],
+      "selfishScore": 2,
       "selflessScore": 0,
-      "needsRerating": true
+      "needsRerating": false,
+      "pvpTag": false,
+      "altStats": null,
+      "selfSkillIds": [
+        "decCr",
+        "spdCr"
+      ],
+      "allySupport": []
     },
     {
       "id": 1787966234475,
@@ -17008,11 +17052,34 @@
         "hType": "SUR",
         "hScore": 4
       },
-      "reactions": [],
-      "engagements": [],
-      "selfishScore": 0,
+      "reactions": [
+        {
+          "refId": 1788772502540
+        }
+      ],
+      "engagements": [
+        {
+          "refId": 1788914238894
+        },
+        {
+          "refId": 1788780430787
+        },
+        {
+          "refId": 1789115108791
+        },
+        {
+          "refId": 1788783486720
+        }
+      ],
+      "selfishScore": 1,
       "selflessScore": 0,
-      "needsRerating": true
+      "needsRerating": false,
+      "pvpTag": false,
+      "altStats": null,
+      "selfSkillIds": [
+        "spdCr"
+      ],
+      "allySupport": []
     },
     {
       "id": 1787966315746,
@@ -22662,11 +22729,12 @@
         "id": 1789887036388,
         "name": "PASSIVE : Immune to silence",
         "value": 9,
+        "pinned": false,
+        "locked": false,
+        "marked": false,
         "factorIds": [
           1789887059571
-        ],
-        "locked": false,
-        "marked": false
+        ]
       }
     ],
     "engagements": [
@@ -24682,6 +24750,9 @@
         "id": 1789884684632,
         "name": "UNIQUE : BUFF : (Neo) Phantom Sword",
         "value": 10,
+        "pinned": false,
+        "locked": false,
+        "marked": false,
         "factorIds": [
           1788773130306,
           1788774033143,
@@ -24690,20 +24761,19 @@
           1788700420912,
           1788700781693,
           1788912649792
-        ],
-        "locked": false,
-        "marked": false
+        ]
       },
       {
         "id": 1789888954878,
         "name": "DEBUFF : Stigma",
         "value": 4,
+        "pinned": false,
+        "locked": false,
+        "marked": false,
         "factorIds": [
           1789116584346,
           1789116681636
-        ],
-        "locked": false,
-        "marked": false
+        ]
       }
     ],
     "factors": [
@@ -25186,11 +25256,12 @@
       {
         "id": 1789887059571,
         "name": "Silence units",
+        "pinned": false,
         "priorityOrder": [],
         "priorityLocked": false
       }
     ]
   },
   "schemaVersion": 2,
-  "savedAt": "2026-09-20T08:00:46.053Z"
+  "savedAt": "2026-09-20T09:47:35.603Z"
 }
