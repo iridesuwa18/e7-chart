@@ -14767,34 +14767,6 @@
       "allySupport": []
     },
     {
-      "id": 1787962612752,
-      "name": "Domininel",
-      "rarity": "4",
-      "role": "Mage",
-      "element": "Ice",
-      "notes": "",
-      "iconData": "https://raw.githubusercontent.com/iridesuwa18/e7-chart/main/assets/heroes/domininel.webp",
-      "locked": true,
-      "_x": 50,
-      "_y": 50,
-      "hidden": true,
-      "vType_legacy": "TNK",
-      "vScore_legacy": 5,
-      "hType_legacy": "SUR",
-      "hScore_legacy": 4,
-      "altStats_legacy": {
-        "vType": "SPD",
-        "vScore": 7,
-        "hType": "SUR",
-        "hScore": 4
-      },
-      "reactions": [],
-      "engagements": [],
-      "selfishScore": 0,
-      "selflessScore": 0,
-      "needsRerating": true
-    },
-    {
       "id": 1787962659353,
       "name": "Romann",
       "rarity": "4",
@@ -14812,10 +14784,30 @@
       "hScore_legacy": 4,
       "altStats_legacy": null,
       "reactions": [],
-      "engagements": [],
-      "selfishScore": 0,
+      "engagements": [
+        {
+          "refId": 1788773060667
+        },
+        {
+          "refId": 1788773067411
+        },
+        {
+          "refId": 1789116663470
+        },
+        {
+          "refId": 1789134890095
+        }
+      ],
+      "selfishScore": 2,
       "selflessScore": 0,
-      "needsRerating": true
+      "needsRerating": false,
+      "pvpTag": false,
+      "altStats": null,
+      "selfSkillIds": [
+        "decCr",
+        "spdCr"
+      ],
+      "allySupport": []
     },
     {
       "id": 1787962726131,
@@ -23846,5 +23838,5 @@
     ]
   },
   "schemaVersion": 2,
-  "savedAt": "2026-09-20T05:09:58.553Z"
+  "savedAt": "2026-09-20T05:14:06.627Z"
 }
