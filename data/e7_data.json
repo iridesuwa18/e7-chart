@@ -17831,11 +17831,65 @@
         "hType": "SUR",
         "hScore": 2
       },
-      "reactions": [],
-      "engagements": [],
+      "reactions": [
+        {
+          "refId": 1789177042422
+        },
+        {
+          "refId": 1788786348512
+        },
+        {
+          "refId": 1789301614949
+        }
+      ],
+      "engagements": [
+        {
+          "refId": 1788772268160
+        },
+        {
+          "refId": 1788786336798
+        },
+        {
+          "refId": 1788772163166
+        },
+        {
+          "refId": 1789015361909
+        },
+        {
+          "refId": 1789115108791
+        },
+        {
+          "refId": 1789132668882
+        }
+      ],
       "selfishScore": 0,
-      "selflessScore": 0,
-      "needsRerating": true
+      "selflessScore": 3.17,
+      "needsRerating": false,
+      "pvpTag": false,
+      "altStats": null,
+      "selfSkillIds": [],
+      "allySupport": [
+        {
+          "healing": 50,
+          "passive": 0,
+          "buffCount": 6
+        },
+        {
+          "healing": 50,
+          "passive": 0,
+          "buffCount": 4
+        },
+        {
+          "healing": 50,
+          "passive": 0,
+          "buffCount": 4
+        },
+        {
+          "healing": 50,
+          "passive": 0,
+          "buffCount": 4
+        }
+      ]
     },
     {
       "id": 1787967405873,
@@ -25689,5 +25743,5 @@
     ]
   },
   "schemaVersion": 2,
-  "savedAt": "2026-09-20T10:18:23.597Z"
+  "savedAt": "2026-09-20T10:21:39.072Z"
 }
