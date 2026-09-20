@@ -18947,11 +18947,57 @@
         "hType": "SUR",
         "hScore": 5
       },
-      "reactions": [],
-      "engagements": [],
-      "selfishScore": 0,
+      "reactions": [
+        {
+          "refId": 1789217068833
+        },
+        {
+          "refId": 1789203511668
+        },
+        {
+          "refId": 1789191471240
+        }
+      ],
+      "engagements": [
+        {
+          "refId": 1788783359037
+        },
+        {
+          "refId": 1788772268160
+        },
+        {
+          "refId": 1788786124368
+        },
+        {
+          "refId": 1789115108791
+        },
+        {
+          "refId": 1788912738063
+        },
+        {
+          "refId": 1789176410307
+        },
+        {
+          "refId": 1788927609636
+        },
+        {
+          "refId": 1789116663470
+        },
+        {
+          "refId": 1788783734183
+        }
+      ],
+      "selfishScore": 3,
       "selflessScore": 0,
-      "needsRerating": true
+      "needsRerating": false,
+      "pvpTag": false,
+      "altStats": null,
+      "selfSkillIds": [
+        "decSpd",
+        "spdCr",
+        "lifesteal"
+      ],
+      "allySupport": []
     },
     {
       "id": 1787968917669,
@@ -26370,5 +26416,5 @@
     ]
   },
   "schemaVersion": 2,
-  "savedAt": "2026-09-20T11:50:43.679Z"
+  "savedAt": "2026-09-20T11:54:19.829Z"
 }
