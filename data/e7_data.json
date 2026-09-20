@@ -22506,6 +22506,48 @@
       "_x": 3.5,
       "_y": 30,
       "needsRerating": false
+    },
+    {
+      "id": 1789905823813,
+      "name": "Mirsa",
+      "rarity": "3",
+      "role": "Thief",
+      "element": "Light",
+      "notes": "",
+      "iconData": "https://raw.githubusercontent.com/iridesuwa18/e7-chart/main/assets/heroes/mirsa.webp",
+      "locked": true,
+      "pvpTag": false,
+      "altStats": null,
+      "selfishScore": 3,
+      "selflessScore": 0,
+      "selfSkillIds": [
+        "decSpd",
+        "spdCr",
+        "selfPassive"
+      ],
+      "allySupport": [],
+      "reactions": [
+        {
+          "refId": 1788775037126
+        },
+        {
+          "refId": 1789115386205
+        }
+      ],
+      "engagements": [
+        {
+          "refId": 1788927609636
+        },
+        {
+          "refId": 1789201317168
+        },
+        {
+          "refId": 1789115108791
+        }
+      ],
+      "_x": 2.5,
+      "_y": 35,
+      "needsRerating": false
     }
   ],
   "draftData": {
@@ -26549,5 +26591,5 @@
     ]
   },
   "schemaVersion": 2,
-  "savedAt": "2026-09-20T12:02:52.122Z"
+  "savedAt": "2026-09-20T12:05:43.909Z"
 }
