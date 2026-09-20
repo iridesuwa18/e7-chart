@@ -14249,10 +14249,38 @@
         "hScore": 6
       },
       "reactions": [],
-      "engagements": [],
-      "selfishScore": 0,
+      "engagements": [
+        {
+          "refId": 1788783359037
+        },
+        {
+          "refId": 1788785736229
+        },
+        {
+          "refId": 1788786336798
+        },
+        {
+          "refId": 1788783734183
+        },
+        {
+          "refId": 1788772268160
+        },
+        {
+          "refId": 1789133085456
+        },
+        {
+          "refId": 1789259524816
+        }
+      ],
+      "selfishScore": 1,
       "selflessScore": 0,
-      "needsRerating": true
+      "needsRerating": false,
+      "pvpTag": false,
+      "altStats": null,
+      "selfSkillIds": [
+        "lifesteal"
+      ],
+      "allySupport": []
     },
     {
       "id": 1787960952313,
@@ -14277,10 +14305,54 @@
         "hScore": 2
       },
       "reactions": [],
-      "engagements": [],
+      "engagements": [
+        {
+          "refId": 1788785736229
+        },
+        {
+          "refId": 1788772268160
+        },
+        {
+          "refId": 1788698917413
+        },
+        {
+          "refId": 1789115108791
+        },
+        {
+          "refId": 1788773067411
+        },
+        {
+          "refId": 1789177107595
+        }
+      ],
       "selfishScore": 0,
-      "selflessScore": 0,
-      "needsRerating": true
+      "selflessScore": 1.42,
+      "needsRerating": false,
+      "pvpTag": false,
+      "altStats": null,
+      "selfSkillIds": [],
+      "allySupport": [
+        {
+          "healing": 30,
+          "passive": 0,
+          "buffCount": 2
+        },
+        {
+          "healing": 30,
+          "passive": 0,
+          "buffCount": 1
+        },
+        {
+          "healing": 30,
+          "passive": 0,
+          "buffCount": 1
+        },
+        {
+          "healing": 30,
+          "passive": 0,
+          "buffCount": 1
+        }
+      ]
     },
     {
       "id": 1787961639767,
@@ -23538,5 +23610,5 @@
     ]
   },
   "schemaVersion": 2,
-  "savedAt": "2026-09-20T02:06:50.090Z"
+  "savedAt": "2026-09-20T02:11:26.580Z"
 }
