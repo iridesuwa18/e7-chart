@@ -499,6 +499,79 @@ let lastHeroLinkedToTaxonomy = null;
 // tagging it onto Reactions/Engagements without re-searching its name.
 let lastHeroViewedInEdit = null;
 
+/* ── Undispellable buffs auto-link ──
+   Any Reaction/Engagement named "UNDISPELLABLE : BUFF : …" (BUFFS also
+   accepted) is a permanent, can't-be-stripped buff — so a hero given
+   one is automatically also added to the shared Engagement named
+   "UNDISPELLABLE : BUFFS : Global (Not unique)". Names are compared
+   case-insensitively with spacing around the colons ignored, so small
+   typing differences don't break it. */
+const UNDISPELLABLE_GLOBAL_NAME = "UNDISPELLABLE : BUFFS : Global (Not unique)";
+
+function undispellableNorm(name) {
+  return String(name || "").toLowerCase().replace(/\s+/g, " ").replace(/\s*:\s*/g, ":").trim();
+}
+
+// True when this library item's name carries the "UNDISPELLABLE : BUFF :" tag.
+function isUndispellableBuffItem(kind, id) {
+  const item = taxonomy[kind]?.find(x => x.id === id);
+  return !!item && /undispellable:buffs?:/.test(undispellableNorm(item.name));
+}
+
+// Finds the global Engagement: exact name first; if it isn't there,
+// "relocate" it by looking for a renamed/reworded copy (an Engagement
+// whose name still mentions undispellable + buffs + global). Returns
+// null when neither turns anything up.
+function findUndispellableGlobalEngagement() {
+  const want = undispellableNorm(UNDISPELLABLE_GLOBAL_NAME);
+  const list = taxonomy.engagements || [];
+  return list.find(e => undispellableNorm(e.name) === want)
+    || list.find(e => {
+         const n = undispellableNorm(e.name);
+         return n.includes("undispellable") && n.includes("buffs") && n.includes("global");
+       })
+    || null;
+}
+
+function warnUndispellableGlobalMissing(heroName, itemName) {
+  alert(
+    `Couldn't find the Engagement "${UNDISPELLABLE_GLOBAL_NAME}" (I also searched for a renamed version and found none).\n\n` +
+    `${heroName || "The hero"} was added to "${itemName || "that item"}", but NOT to the global Undispellable Buffs engagement.\n\n` +
+    `Please create an Engagement with that exact name (or rename the existing one back), then add the hero to it.`
+  );
+}
+
+// Taxonomy-tab path: after a hero is linked, also link them to the
+// global Undispellable engagement when the item they were just added to
+// is an "UNDISPELLABLE : BUFF :" one.
+function autoLinkUndispellableGlobal(heroId, kind, refId) {
+  if (!isUndispellableBuffItem(kind, refId)) return;
+  const target = findUndispellableGlobalEngagement();
+  const hero = heroes.find(h => h.id === heroId);
+  if (!target) {
+    warnUndispellableGlobalMissing(hero?.name, taxonomy[kind]?.find(x => x.id === refId)?.name);
+    return;
+  }
+  if (kind === "engagements" && target.id === refId) return; // this IS the global one
+  addHeroTaxonomyLink(heroId, "engagements", target.id); // no-ops if already linked
+}
+
+// Hero-editor path: same rule, applied to the in-progress Engagements
+// list of the hero being edited (saved when they hit Save Changes).
+function autoAddUndispellableGlobalToModal(kind, refId) {
+  if (!isUndispellableBuffItem(kind, refId)) return;
+  const target = findUndispellableGlobalEngagement();
+  if (!target) {
+    const nameEl = document.getElementById("f-name");
+    warnUndispellableGlobalMissing(nameEl?.value?.trim(), taxonomy[kind]?.find(x => x.id === refId)?.name);
+    return;
+  }
+  if (kind === "engagements" && target.id === refId) return;
+  if (!modalEngagements.some(x => (x?.refId ?? x) === target.id)) {
+    modalEngagements = [...modalEngagements, { refId: target.id }];
+  }
+}
+
 function addHeroTaxonomyLink(heroId, kind, refId) {
   let didLink = false;
   heroes = heroes.map(h => {
@@ -510,6 +583,7 @@ function addHeroTaxonomyLink(heroId, kind, refId) {
   });
   if (didLink) lastHeroLinkedToTaxonomy = heroId;
   saveLocal();
+  if (didLink) autoLinkUndispellableGlobal(heroId, kind, refId);
 }
 
 function removeHeroTaxonomyLink(heroId, kind, refId) {
@@ -5863,6 +5937,7 @@ function renderRteAddSearch(kind, target) {
         const alreadyAssigned = rteModalArray(crossKind, target).some(x => (x?.refId ?? x) === refId);
         if (!alreadyAssigned) {
           setRteModalArray(crossKind, target, [...rteModalArray(crossKind, target), { refId }]);
+          autoAddUndispellableGlobalToModal(crossKind, refId);
         }
         rteAddSearchQuery[key] = ""; // clear this search now that it's been handled
         renderRteSection(target);
@@ -5889,6 +5964,7 @@ function renderRteAddSearch(kind, target) {
       chip.addEventListener("click", () => {
         const refId = Number(chip.dataset.refId);
         setRteModalArray(kind, target, [...rteModalArray(kind, target), { refId }]);
+        autoAddUndispellableGlobalToModal(kind, refId);
         rteAddSearchQuery[key] = ""; // clear after a successful add
         renderRteSection(target);
       });
