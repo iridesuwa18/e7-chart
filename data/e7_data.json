@@ -16811,11 +16811,58 @@
         "hType": "SUR",
         "hScore": 5
       },
-      "reactions": [],
-      "engagements": [],
-      "selfishScore": 0,
+      "reactions": [
+        {
+          "refId": 1789203511668
+        },
+        {
+          "refId": 1789301614949
+        },
+        {
+          "refId": 1789198095367
+        },
+        {
+          "refId": 1789287545820
+        }
+      ],
+      "engagements": [
+        {
+          "refId": 1789220911164
+        },
+        {
+          "refId": 1789217623138
+        },
+        {
+          "refId": 1788783486720
+        },
+        {
+          "refId": 1788783734183
+        },
+        {
+          "refId": 1789132233866
+        },
+        {
+          "refId": 1788927609636
+        },
+        {
+          "refId": 1788786124368
+        },
+        {
+          "refId": 1788772268160
+        }
+      ],
+      "selfishScore": 4,
       "selflessScore": 0,
-      "needsRerating": true
+      "needsRerating": false,
+      "pvpTag": false,
+      "altStats": null,
+      "selfSkillIds": [
+        "decCr",
+        "decSpd",
+        "spdCr",
+        "lifesteal"
+      ],
+      "allySupport": []
     },
     {
       "id": 1787965981357,
@@ -22252,7 +22299,7 @@
       },
       {
         "id": 1789301614949,
-        "name": "PASSIVE : Increase (Max) Health %",
+        "name": "PASSIVE : Increase Health / Max Health %",
         "value": 9,
         "pinned": false,
         "locked": true,
@@ -25097,5 +25144,5 @@
     ]
   },
   "schemaVersion": 2,
-  "savedAt": "2026-09-20T07:51:12.571Z"
+  "savedAt": "2026-09-20T07:56:20.996Z"
 }
