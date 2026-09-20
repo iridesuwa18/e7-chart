@@ -19379,11 +19379,31 @@
       "hType_legacy": "SUR",
       "hScore_legacy": 5,
       "altStats_legacy": null,
-      "reactions": [],
-      "engagements": [],
-      "selfishScore": 0,
+      "reactions": [
+        {
+          "refId": 1789866244151
+        },
+        {
+          "refId": 1789906352539
+        }
+      ],
+      "engagements": [
+        {
+          "refId": 1788785954933
+        },
+        {
+          "refId": 1788773060667
+        }
+      ],
+      "selfishScore": 1,
       "selflessScore": 0,
-      "needsRerating": true
+      "needsRerating": false,
+      "pvpTag": false,
+      "altStats": null,
+      "selfSkillIds": [
+        "extraTurns"
+      ],
+      "allySupport": []
     },
     {
       "id": 1787970368150,
@@ -24114,7 +24134,7 @@
         "name": "PASSIVE : Immune to debuffs preventing movement (stun)",
         "value": 9.5,
         "pinned": false,
-        "locked": false,
+        "locked": true,
         "marked": false,
         "factorIds": [
           1789130156790,
@@ -24126,10 +24146,21 @@
         "name": "PASSIVE : Immune to silence",
         "value": 9,
         "pinned": false,
-        "locked": false,
+        "locked": true,
         "marked": false,
         "factorIds": [
           1789887059571
+        ]
+      },
+      {
+        "id": 1789906352539,
+        "name": "PASSIVE : Immune to provoke",
+        "value": 9,
+        "pinned": false,
+        "locked": true,
+        "marked": false,
+        "factorIds": [
+          1789906362408
         ]
       }
     ],
@@ -26133,7 +26164,7 @@
         "name": "ONGOING : Increase Damage by 300% on low HP units (30% of max hp)",
         "value": 10,
         "pinned": false,
-        "locked": false,
+        "locked": true,
         "marked": false,
         "factorIds": [
           1788772992919,
@@ -26147,7 +26178,7 @@
         "name": "UNIQUE : BUFF : (Neo) Phantom Sword",
         "value": 10,
         "pinned": false,
-        "locked": false,
+        "locked": true,
         "marked": false,
         "factorIds": [
           1788773130306,
@@ -26164,7 +26195,7 @@
         "name": "DEBUFF : Stigma",
         "value": 4,
         "pinned": false,
-        "locked": false,
+        "locked": true,
         "marked": false,
         "factorIds": [
           1789116584346,
@@ -26182,7 +26213,7 @@
           1788786571272,
           1788700420912
         ],
-        "locked": false,
+        "locked": true,
         "marked": false
       }
     ],
@@ -26669,9 +26700,15 @@
         "pinned": false,
         "priorityOrder": [],
         "priorityLocked": false
+      },
+      {
+        "id": 1789906362408,
+        "name": "Provoke units",
+        "priorityOrder": [],
+        "priorityLocked": false
       }
     ]
   },
   "schemaVersion": 2,
-  "savedAt": "2026-09-20T12:10:30.990Z"
+  "savedAt": "2026-09-20T12:13:04.261Z"
 }
