@@ -16255,6 +16255,9 @@
       "engagements": [
         {
           "refId": 1788927609636
+        },
+        {
+          "refId": 1789888954878
         }
       ],
       "selfishScore": 4,
@@ -24302,6 +24305,17 @@
         ],
         "locked": false,
         "marked": false
+      },
+      {
+        "id": 1789888954878,
+        "name": "DEBUFF : Stigma",
+        "value": 4,
+        "factorIds": [
+          1789116584346,
+          1789116681636
+        ],
+        "locked": false,
+        "marked": false
       }
     ],
     "factors": [
@@ -24790,5 +24804,5 @@
     ]
   },
   "schemaVersion": 2,
-  "savedAt": "2026-09-20T07:21:48.411Z"
+  "savedAt": "2026-09-20T07:25:54.643Z"
 }
