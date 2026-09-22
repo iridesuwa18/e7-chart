@@ -24875,34 +24875,37 @@
         "id": 1789909320565,
         "name": "PASSIVE : Decrease amount recovered of enemies",
         "value": 9,
+        "pinned": false,
+        "locked": false,
+        "marked": false,
         "factorIds": [
           1789116584346
-        ],
-        "locked": false,
-        "marked": false
+        ]
       },
       {
         "id": 1789909547114,
         "name": "PASSIVE : Stackable Effectiveness",
         "value": 9,
+        "pinned": false,
+        "locked": false,
+        "marked": false,
         "factorIds": [
           1789014978867,
           1788779877239
-        ],
-        "locked": false,
-        "marked": false
+        ]
       },
       {
         "id": 1789909971786,
         "name": "PASSIVE : Absorb Damage for allies' attacks",
         "value": 9,
+        "pinned": false,
+        "locked": false,
+        "marked": false,
         "factorIds": [
           1788694866469,
           1788772019318,
           1788774099692
-        ],
-        "locked": false,
-        "marked": false
+        ]
       },
       {
         "id": 1789910078254,
@@ -26960,20 +26963,24 @@
         "id": 1789903984901,
         "name": "UNDISPELLABLE : BUFF : Torrent (Add. Dmg)",
         "value": 9.5,
+        "pinned": false,
+        "locked": true,
+        "marked": false,
         "factorIds": [
           1788701036557,
           1788772992919,
           1788786248167,
           1788786571272,
           1788700420912
-        ],
-        "locked": true,
-        "marked": false
+        ]
       },
       {
         "id": 1789908496795,
         "name": "UNDISPELLABLE : BUFF : Promotion (Atk, Def, Max HP x 5%)",
         "value": 9.5,
+        "pinned": false,
+        "locked": true,
+        "marked": false,
         "factorIds": [
           1788694866469,
           1788701036557,
@@ -26983,9 +26990,7 @@
           1788783127095,
           1788700781693,
           1788912649792
-        ],
-        "locked": true,
-        "marked": false
+        ]
       }
     ],
     "factors": [
@@ -27035,8 +27040,21 @@
         "id": 1788772019318,
         "name": "Additional / fixed damage",
         "pinned": false,
-        "priorityOrder": [],
-        "priorityLocked": false
+        "priorityOrder": [
+          {
+            "kind": "reactions",
+            "id": 1789136659023
+          },
+          {
+            "kind": "engagements",
+            "id": 1788782920388
+          },
+          {
+            "kind": "reactions",
+            "id": 1789121061181
+          }
+        ],
+        "priorityLocked": true
       },
       {
         "id": 1788772214825,
@@ -27475,11 +27493,12 @@
       {
         "id": 1789906362408,
         "name": "Provoke units",
+        "pinned": false,
         "priorityOrder": [],
         "priorityLocked": false
       }
     ]
   },
   "schemaVersion": 2,
-  "savedAt": "2026-09-20T13:33:28.592Z"
+  "savedAt": "2026-09-22T06:34:57.198Z"
 }
