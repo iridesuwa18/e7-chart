@@ -5014,6 +5014,23 @@ body.hide-labels .hero-dot-label {
 ══════════════════════════════════════ */
 .hf-panel { width: min(880px, 95vw); }
 
+/* Everything below the header/close-button scrolls together as one
+   unit. Previously the grid alone tried to scroll (flex:1 + min-height:0)
+   while the header/filters/Reactions+Engagements <details> above it sat
+   fixed — so on a small screen, opening both <details> could add more
+   height than the panel had left, squeezing the grid down to nothing
+   with no way to reach it. Wrapping the whole body in one scrollable
+   flex child means the panel always has *something* to scroll, however
+   tall the expanded lists get, and the heroes below are always reachable. */
+.hf-scroll-body {
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  display: flex;
+  flex-direction: column;
+}
+
 .hf-factor-status {
   display: flex;
   align-items: center;
@@ -5087,9 +5104,10 @@ body.hide-labels .hero-dot-label {
    wrapping down as space shrinks, holding every hero that currently
    matches rather than paginating. */
 .hf-grid {
-  flex: 1 1 auto;
-  min-height: 0;
-  overflow-y: auto;
+  flex: 1 0 auto;
+  min-height: 160px; /* keeps a usable strip of heroes visible/scrollable-to
+    even when the Reactions/Engagements lists above are both expanded,
+    instead of getting squeezed down to nothing */
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(64px, 1fr));
   align-content: start; /* without this, a grid with only a row or two of

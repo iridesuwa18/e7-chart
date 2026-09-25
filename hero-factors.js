@@ -427,41 +427,43 @@ function renderHeroFactorsPanel() {
       <button type="button" class="qd-factor-menu-close" id="hf-close" aria-label="Close">✕</button>
     </div>
 
-    <div class="qd-factor-menu-searchbar">
-      <input type="text" class="taxonomy-search qd-factor-menu-search" id="hf-search" autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false" placeholder="🔍 Search hero name…" />
-      <button type="button" class="qd-factor-menu-clear" id="hf-search-clear" title="Clear search" aria-label="Clear search">✕</button>
-    </div>
-
-    <div class="hf-factor-status" id="hf-factor-status"></div>
-    <div class="qd-factor-priority-chips hf-priority-chips" id="hf-priority-chips" style="display:none"></div>
-
-    <div class="hf-filter-row">
-      <label class="hf-minscore-label">Min overall score
-        <input type="number" id="hf-min-score" min="0" max="10" step="0.5" value="${hfFilters.minScore}" />
-      </label>
-      <button type="button" class="btn btn-ghost btn-xs" id="hf-clear-filters">✕ Clear filters</button>
-    </div>
-
-    <div class="hf-category-chips" id="hf-category-chips"><!-- Ranking Categories --></div>
-
-    <details class="hf-details">
-      <summary>⚡ Reactions${hfFilters.reactionIds.size ? ` (${hfFilters.reactionIds.size})` : ""}</summary>
+    <div class="hf-scroll-body" id="hf-scroll-body">
       <div class="qd-factor-menu-searchbar">
-        <input type="text" class="taxonomy-search qd-factor-menu-search" id="hf-reaction-search" autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false" placeholder="🔍 Search Reactions…" />
+        <input type="text" class="taxonomy-search qd-factor-menu-search" id="hf-search" autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false" placeholder="🔍 Search hero name…" />
+        <button type="button" class="qd-factor-menu-clear" id="hf-search-clear" title="Clear search" aria-label="Clear search">✕</button>
       </div>
-      <div class="qd-factor-menu-list" id="hf-reaction-list"></div>
-    </details>
 
-    <details class="hf-details">
-      <summary>🛡 Engagements${hfFilters.engagementIds.size ? ` (${hfFilters.engagementIds.size})` : ""}</summary>
-      <div class="qd-factor-menu-searchbar">
-        <input type="text" class="taxonomy-search qd-factor-menu-search" id="hf-engagement-search" autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false" placeholder="🔍 Search Engagements…" />
+      <div class="hf-factor-status" id="hf-factor-status"></div>
+      <div class="qd-factor-priority-chips hf-priority-chips" id="hf-priority-chips" style="display:none"></div>
+
+      <div class="hf-filter-row">
+        <label class="hf-minscore-label">Min overall score
+          <input type="number" id="hf-min-score" min="0" max="10" step="0.5" value="${hfFilters.minScore}" />
+        </label>
+        <button type="button" class="btn btn-ghost btn-xs" id="hf-clear-filters">✕ Clear filters</button>
       </div>
-      <div class="qd-factor-menu-list" id="hf-engagement-list"></div>
-    </details>
 
-    <div class="hf-count" id="hf-count"></div>
-    <div class="hf-grid" id="hf-grid"></div>
+      <div class="hf-category-chips" id="hf-category-chips"><!-- Ranking Categories --></div>
+
+      <details class="hf-details">
+        <summary>⚡ Reactions${hfFilters.reactionIds.size ? ` (${hfFilters.reactionIds.size})` : ""}</summary>
+        <div class="qd-factor-menu-searchbar">
+          <input type="text" class="taxonomy-search qd-factor-menu-search" id="hf-reaction-search" autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false" placeholder="🔍 Search Reactions…" />
+        </div>
+        <div class="qd-factor-menu-list" id="hf-reaction-list"></div>
+      </details>
+
+      <details class="hf-details">
+        <summary>🛡 Engagements${hfFilters.engagementIds.size ? ` (${hfFilters.engagementIds.size})` : ""}</summary>
+        <div class="qd-factor-menu-searchbar">
+          <input type="text" class="taxonomy-search qd-factor-menu-search" id="hf-engagement-search" autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false" placeholder="🔍 Search Engagements…" />
+        </div>
+        <div class="qd-factor-menu-list" id="hf-engagement-list"></div>
+      </details>
+
+      <div class="hf-count" id="hf-count"></div>
+      <div class="hf-grid" id="hf-grid"></div>
+    </div>
   `;
 
   document.getElementById("hf-close").addEventListener("click", hfClose);
