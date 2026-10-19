@@ -392,6 +392,18 @@
     <!-- CHART AREA -->
     <div class="chart-column">
 
+      <!-- HERO EQUIPMENT & ARTIFACTS drawer — sits above Quick Draft and
+           opens the same way (expands in normal flow). Built/wired by
+           hero-gear.js (renderHeroGear); data lives in app.js's heroGear
+           and is saved to GitHub with everything else. -->
+      <button class="quickdraft-handle hg-handle" id="hero-gear-handle" title="Hero Equipment and Artifacts">
+        <span class="quickdraft-handle-label">🛡 Hero Equipment and Artifacts</span>
+        <span class="quickdraft-handle-chevron" id="hero-gear-chevron">▾</span>
+      </button>
+      <div class="quickdraft-drawer hg-drawer" id="hero-gear-drawer">
+        <div class="quickdraft-inner hg-inner" id="hero-gear-body"></div>
+      </div>
+
       <!-- QUICK DRAFT drawer — hidden above the chart; opening it pushes
            the chart down since everything here shares normal flow. -->
       <button class="quickdraft-handle" id="quickdraft-handle" title="Quick Draft">
@@ -1491,6 +1503,7 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
   <script src="app.js"></script>
   <script src="hero-factors.js"></script>
+  <script src="hero-gear.js"></script>
 
   <!-- ═══ DRAFT PANEL ═══ -->
   <div id="draft-panel" class="draft-panel" style="display:none">

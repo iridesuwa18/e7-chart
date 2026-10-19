@@ -2,7 +2,7 @@
    Bump CACHE_NAME any time you change index.html / app.js / style.css,
    otherwise Android may keep serving the old cached versions even after
    you push new files to GitHub. */
-const CACHE_NAME = "e7-draft-v5";
+const CACHE_NAME = "e7-draft-v6";
 
 const SHELL_FILES = [
   "./index.html",
@@ -24,7 +24,7 @@ const SHELL_FILES = [
 // whatever was cached from before the fix shipped. Falls back to cache
 // only when the network is unreachable (offline).
 const NETWORK_FIRST_FILES = new Set([
-  "index.html", "quickdraft.html", "app.js", "manifest.json", "manifest-quickdraft.json",
+  "index.html", "quickdraft.html", "app.js", "hero-gear.js", "manifest.json", "manifest-quickdraft.json",
 ]);
 const NETWORK_FIRST_TIMEOUT_MS = 3000;
 

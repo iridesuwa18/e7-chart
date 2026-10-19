@@ -5215,3 +5215,29 @@ body.hide-labels .hero-dot-label {
 }
 .hf-tile-info-btn:hover { background: rgba(201,162,39,.28); }
 .hf-tile-info-btn:active { transform: scale(.9); }
+
+
+/* ══════════════════════════════════════
+   HERO EQUIPMENT & ARTIFACTS drawer (hero-gear.js)
+   Reuses .quickdraft-handle/-drawer/-inner; this only adds the
+   taller scrolling body and the per-class sections.
+══════════════════════════════════════ */
+.hg-handle { margin-bottom: 8px; }
+.hg-drawer.open { max-height: 75vh; }
+.hg-inner { max-height: 75vh; overflow-y: auto; -webkit-overflow-scrolling: touch; }
+.hg-class { border-bottom: 1px solid var(--border); padding: 8px 0 10px; }
+.hg-class:last-child { border-bottom: 0; }
+.hg-class-title { font-family: 'Cinzel', serif; color: var(--gold2); font-size: 13px; letter-spacing: .08em; margin-bottom: 6px; }
+.hg-section { margin: 6px 0 8px 6px; }
+.hg-section-head { display: flex; align-items: center; gap: 8px; font-size: 12px; color: var(--text); font-weight: 600; margin-bottom: 4px; }
+.hg-row { display: flex; align-items: flex-start; gap: 6px; margin: 3px 0; }
+.hg-text { flex: 1; min-width: 0; font-size: 12px; line-height: 1.4; white-space: pre-wrap; overflow-wrap: anywhere; background: var(--bg3); border: 1px solid var(--border); border-radius: 6px; padding: 5px 8px; }
+.hg-text.hg-note { color: var(--text-dim); font-style: italic; }
+.hg-text.hg-empty { color: var(--text-dim); opacity: .6; }
+.hg-input { flex: 1; min-width: 0; font: inherit; font-size: 12px; color: var(--text); background: var(--bg); border: 1px solid var(--gold-dim); border-radius: 6px; padding: 5px 8px; resize: vertical; }
+.hg-icon-btn { background: transparent; border: 1px solid var(--border); color: var(--text); border-radius: 6px; width: 28px; height: 28px; cursor: pointer; font-size: 12px; flex: none; }
+.hg-icon-btn:hover { border-color: var(--gold); background: rgba(201,162,39,.12); }
+.hg-icon-btn.hg-del:hover { border-color: #c0392b; background: rgba(192,57,43,.18); }
+.hg-add { width: auto; padding: 0 8px; font-weight: 700; }
+body.qd-companion .hg-handle,
+body.qd-companion .hg-drawer { display: none !important; }

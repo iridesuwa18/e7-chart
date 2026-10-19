@@ -44,6 +44,56 @@ let selectedId = null;
 // Ranking overlay (see updateTaxonomySaveReminder further down).
 let hasUnsavedChanges = false;
 
+// ── Hero Equipment & Artifacts notes (hero-gear.js) ─────────────────
+// One entry per class: free-text section notes plus a list of entries
+// for Equipment and for Artifacts. Saved to GitHub as its own top-level
+// `heroGear` key (alongside heroes/draftData/taxonomy) and included in
+// Export/Import. Shape:
+//   { Knight: { equipment: { note: "", items: [{ id, text }] },
+//               artifacts: { note: "", items: [{ id, text }] } }, ... }
+const GEAR_CLASSES = ["Warrior", "Knight", "Thief", "Ranger", "Mage", "Soul Weaver"];
+function emptyHeroGear() {
+  const out = {};
+  GEAR_CLASSES.forEach(c => { out[c] = { equipment: { note: "", items: [] }, artifacts: { note: "", items: [] } }; });
+  return out;
+}
+function normalizeHeroGear(raw) {
+  const out = emptyHeroGear();
+  if (!raw || typeof raw !== "object") return out;
+  GEAR_CLASSES.forEach(c => {
+    ["equipment", "artifacts"].forEach(kind => {
+      const sec = raw[c] && raw[c][kind];
+      if (!sec || typeof sec !== "object") return;
+      out[c][kind].note = typeof sec.note === "string" ? sec.note : "";
+      out[c][kind].items = (Array.isArray(sec.items) ? sec.items : [])
+        .filter(it => it && typeof it.text === "string")
+        .map((it, i) => ({ id: it.id ?? (Date.now() + i), text: it.text }));
+    });
+  });
+  return out;
+}
+// Additive merge for file Import — never overwrites what's already there.
+function mergeHeroGearAdditive(current, incoming) {
+  const out = normalizeHeroGear(current);
+  const inc = normalizeHeroGear(incoming);
+  let added = 0;
+  GEAR_CLASSES.forEach(c => {
+    ["equipment", "artifacts"].forEach(kind => {
+      if (!out[c][kind].note && inc[c][kind].note) { out[c][kind].note = inc[c][kind].note; added++; }
+      const have = new Set(out[c][kind].items.map(it => it.text.trim().toLowerCase()));
+      inc[c][kind].items.forEach(it => {
+        const key = it.text.trim().toLowerCase();
+        if (have.has(key)) return;
+        have.add(key);
+        out[c][kind].items.push({ ...it, id: Date.now() + Math.floor(Math.random() * 1e6) });
+        added++;
+      });
+    });
+  });
+  return { merged: out, added };
+}
+let heroGear = emptyHeroGear();
+
 /* ═══════════════════════════════════════
    REACTION / ENGAGEMENT / FACTOR TAXONOMY
    (Rebuild Spec Section 1.1)
@@ -7851,6 +7901,8 @@ async function autoLoadFromServer() {
     // Normalized *before* heroes below so Section 10.2's dangling-ref
     // cleanup has the real library to check against.
     taxonomy = normalizeTaxonomy(data.taxonomy);
+    heroGear = normalizeHeroGear(data.heroGear);
+    if (typeof renderHeroGear === "function") renderHeroGear();
 
     if (Array.isArray(data.heroes)) {
       const migrated = migrateHeroTypes(data.heroes);
@@ -7969,6 +8021,7 @@ function exportToFile() {
     schemaVersion: SCHEMA_VERSION,
     heroes,
     taxonomy,
+    heroGear,
     exportedAt: new Date().toISOString(),
   };
   const blob = new Blob([JSON.stringify(payload, null, 2)], { type: "application/json" });
@@ -8070,9 +8123,22 @@ function handleImportedFile(parsed) {
     ? parsed.taxonomy
     : null;
 
-  if (!importedHeroes && !importedTaxonomy) {
-    setStatus("❌ That file doesn't contain heroes or a taxonomy library");
+  const importedGear = !isBareHeroArray && parsed?.heroGear && typeof parsed.heroGear === "object" ? parsed.heroGear : null;
+
+  if (!importedHeroes && !importedTaxonomy && !importedGear) {
+    setStatus("❌ That file doesn't contain heroes, a taxonomy library, or equipment/artifact notes");
     return;
+  }
+
+  if (importedGear) {
+    const { merged, added } = mergeHeroGearAdditive(heroGear, importedGear);
+    heroGear = merged;
+    if (added > 0) saveLocal();
+    if (typeof renderHeroGear === "function") renderHeroGear();
+    if (!importedHeroes && !importedTaxonomy) {
+      setStatus(added > 0 ? `✅ Imported ${added} equipment/artifact note${added === 1 ? "" : "s"}` : "⚠️ Nothing new — those equipment/artifact notes are already here");
+      return;
+    }
   }
 
   let taxonomyAddedCount = 0;
@@ -8250,6 +8316,7 @@ async function saveToServer(password) {
         heroes,
         draftData: window.chartDraftData || null,
         taxonomy,
+        heroGear,
         password,
       }),
     });
@@ -8310,6 +8377,8 @@ async function loadFromServer(password) {
       // Section 10.2 — taxonomy normalized first so dangling-ref
       // cleanup below has the real library to check heroes against.
       taxonomy = normalizeTaxonomy(data.taxonomy);
+      heroGear = normalizeHeroGear(data.heroGear);
+      if (typeof renderHeroGear === "function") renderHeroGear();
       const migrated = migrateHeroTypes(data.heroes);
       heroes = cleanDanglingTaxonomyRefs(migrated, taxonomy);
       saveLocal();
