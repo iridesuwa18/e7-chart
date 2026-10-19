@@ -27511,11 +27511,41 @@
     "Warrior": {
       "equipment": {
         "note": "",
-        "items": []
+        "items": [
+          {
+            "id": 1792400103670,
+            "text": "Weakening set possible but might lack artifacts "
+          },
+          {
+            "id": 1792400317076,
+            "text": "Lifesteal sets trial (?)"
+          }
+        ]
       },
       "artifacts": {
-        "note": "",
-        "items": []
+        "note": "Burns, Bleeds, stuns etc ",
+        "items": [
+          {
+            "id": 1792399973515,
+            "text": "Champion's Trophy"
+          },
+          {
+            "id": 1792399998077,
+            "text": "Cradle of Life"
+          },
+          {
+            "id": 1792400016815,
+            "text": "Indestructible Gaiters"
+          },
+          {
+            "id": 1792400044188,
+            "text": "Junkyard Dog"
+          },
+          {
+            "id": 1792400211856,
+            "text": "CR pushes and increase dmg artifacts"
+          }
+        ]
       }
     },
     "Knight": {
@@ -27591,5 +27621,5 @@
     }
   },
   "schemaVersion": 2,
-  "savedAt": "2026-10-19T08:50:23.127Z"
+  "savedAt": "2026-10-19T08:59:03.540Z"
 }
