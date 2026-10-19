@@ -27582,21 +27582,85 @@
     "Thief": {
       "equipment": {
         "note": "",
-        "items": []
+        "items": [
+          {
+            "id": 1792400493248,
+            "text": "Riposte set for evasive units"
+          },
+          {
+            "id": 1792400511412,
+            "text": "Weakening set for debuffers"
+          }
+        ]
       },
       "artifacts": {
-        "note": "",
-        "items": []
+        "note": "Debuff artifacts as follows:",
+        "items": [
+          {
+            "id": 1792400371852,
+            "text": "Alabastron"
+          },
+          {
+            "id": 1792400394973,
+            "text": "Torn Sleeve"
+          },
+          {
+            "id": 1792400467178,
+            "text": "Evasive artifacts "
+          }
+        ]
       }
     },
     "Ranger": {
       "equipment": {
         "note": "",
-        "items": []
+        "items": [
+          {
+            "id": 1792400827671,
+            "text": "Weakening Set can be possible for most units"
+          }
+        ]
       },
       "artifacts": {
         "note": "",
-        "items": []
+        "items": [
+          {
+            "id": 1792400633977,
+            "text": "An Assassin's Pledge"
+          },
+          {
+            "id": 1792400674929,
+            "text": "Elegiac Candle"
+          },
+          {
+            "id": 1792400688521,
+            "text": "Gifted Pen (2nd basic skill)"
+          },
+          {
+            "id": 1792400707061,
+            "text": "Ms Confile"
+          },
+          {
+            "id": 1792400724144,
+            "text": "Old Gardening Shears "
+          },
+          {
+            "id": 1792400747714,
+            "text": "Seal of Capture"
+          },
+          {
+            "id": 1792400758840,
+            "text": "Song of Stars"
+          },
+          {
+            "id": 1792400772126,
+            "text": "Sphere of Inferno"
+          },
+          {
+            "id": 1792400784566,
+            "text": "Star of the Deep Sea"
+          }
+        ]
       }
     },
     "Mage": {
@@ -27621,5 +27685,5 @@
     }
   },
   "schemaVersion": 2,
-  "savedAt": "2026-10-19T08:59:03.540Z"
+  "savedAt": "2026-10-19T09:07:13.791Z"
 }
