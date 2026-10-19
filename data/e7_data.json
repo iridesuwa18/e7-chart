@@ -27511,37 +27511,41 @@
     "Warrior": {
       "equipment": {
         "note": "",
-        "items": [
-          {
-            "id": 1792399507664,
-            "text": "Weakening set if char has debuffs"
-          },
-          {
-            "id": 1792399591421,
-            "text": "Revenge set might be okay to speed up"
-          },
-          {
-            "id": 1792399618385,
-            "text": "HP and Eff Resist good for tankers"
-          },
-          {
-            "id": 1792399632400,
-            "text": "Counter set for niche units only (Iseria Landy Charlotte)"
-          }
-        ]
+        "items": []
       },
       "artifacts": {
-        "note": "Damage protection, shields, HP/DEF, buffs",
+        "note": "",
         "items": []
       }
     },
     "Knight": {
       "equipment": {
         "note": "",
-        "items": []
+        "items": [
+          {
+            "id": 1792399721141,
+            "text": "Weakening set if char has debuffs"
+          },
+          {
+            "id": 1792399742222,
+            "text": "Revenge set might be okay to speed up"
+          },
+          {
+            "id": 1792399750905,
+            "text": "HP and Eff Resist good for tankers"
+          },
+          {
+            "id": 1792399760247,
+            "text": "Counter set for niche units only (Iseria Landy Charlotte)"
+          },
+          {
+            "id": 1792399773010,
+            "text": "Protection set for specific high HP units"
+          }
+        ]
       },
       "artifacts": {
-        "note": "",
+        "note": "Damage protection, shields, HP/DEF, buffs",
         "items": []
       }
     },
@@ -27587,5 +27591,5 @@
     }
   },
   "schemaVersion": 2,
-  "savedAt": "2026-10-19T08:48:13.031Z"
+  "savedAt": "2026-10-19T08:50:23.127Z"
 }
