@@ -27666,24 +27666,60 @@
     "Mage": {
       "equipment": {
         "note": "",
-        "items": []
+        "items": [
+          {
+            "id": 1792401017183,
+            "text": "Weakening set is possible for most units"
+          }
+        ]
       },
       "artifacts": {
         "note": "",
-        "items": []
+        "items": [
+          {
+            "id": 1792400898102,
+            "text": "Abyssal Crown"
+          },
+          {
+            "id": 1792400918531,
+            "text": "Bloody Rose"
+          },
+          {
+            "id": 1792400943752,
+            "text": "Magic Bubble Maker"
+          },
+          {
+            "id": 1792400965690,
+            "text": "Scroll of Shadows"
+          },
+          {
+            "id": 1792400995460,
+            "text": "Sira Ren"
+          }
+        ]
       }
     },
     "Soul Weaver": {
       "equipment": {
-        "note": "",
-        "items": []
+        "note": "Probably units here need speed the most",
+        "items": [
+          {
+            "id": 1792401147886,
+            "text": "Speed gear is probably necessary"
+          }
+        ]
       },
       "artifacts": {
         "note": "",
-        "items": []
+        "items": [
+          {
+            "id": 1792401120486,
+            "text": "Mostly healing, dispels, buff artifacts"
+          }
+        ]
       }
     }
   },
   "schemaVersion": 2,
-  "savedAt": "2026-10-19T09:07:13.791Z"
+  "savedAt": "2026-10-19T09:12:53.665Z"
 }
