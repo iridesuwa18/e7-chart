@@ -27507,6 +27507,85 @@
       }
     ]
   },
+  "heroGear": {
+    "Warrior": {
+      "equipment": {
+        "note": "",
+        "items": [
+          {
+            "id": 1792399507664,
+            "text": "Weakening set if char has debuffs"
+          },
+          {
+            "id": 1792399591421,
+            "text": "Revenge set might be okay to speed up"
+          },
+          {
+            "id": 1792399618385,
+            "text": "HP and Eff Resist good for tankers"
+          },
+          {
+            "id": 1792399632400,
+            "text": "Counter set for niche units only (Iseria Landy Charlotte)"
+          }
+        ]
+      },
+      "artifacts": {
+        "note": "Damage protection, shields, HP/DEF, buffs",
+        "items": []
+      }
+    },
+    "Knight": {
+      "equipment": {
+        "note": "",
+        "items": []
+      },
+      "artifacts": {
+        "note": "",
+        "items": []
+      }
+    },
+    "Thief": {
+      "equipment": {
+        "note": "",
+        "items": []
+      },
+      "artifacts": {
+        "note": "",
+        "items": []
+      }
+    },
+    "Ranger": {
+      "equipment": {
+        "note": "",
+        "items": []
+      },
+      "artifacts": {
+        "note": "",
+        "items": []
+      }
+    },
+    "Mage": {
+      "equipment": {
+        "note": "",
+        "items": []
+      },
+      "artifacts": {
+        "note": "",
+        "items": []
+      }
+    },
+    "Soul Weaver": {
+      "equipment": {
+        "note": "",
+        "items": []
+      },
+      "artifacts": {
+        "note": "",
+        "items": []
+      }
+    }
+  },
   "schemaVersion": 2,
-  "savedAt": "2026-09-22T06:46:01.232Z"
+  "savedAt": "2026-10-19T08:48:13.031Z"
 }
