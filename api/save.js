@@ -28,7 +28,7 @@ export default async function handler(req, res) {
   if (!body.password || body.password !== adminPassword)
     return res.status(401).json({ error: "Incorrect password. Admin access only." });
 
-  const { heroes, draftData, taxonomy } = body;
+  const { heroes, draftData, taxonomy, heroGear } = body;
   if (!Array.isArray(heroes))
     return res.status(400).json({ error: "heroes must be an array" });
 
@@ -47,6 +47,9 @@ export default async function handler(req, res) {
     // contract as draftData above: the caller (app.js) is expected to
     // always send its current in-memory taxonomy, not just diffs.
     taxonomy: taxonomy || { reactions: [], engagements: [], factors: [] },
+    // Hero Equipment & Artifacts notes (hero-gear.js) — same blind-
+    // overwrite contract as taxonomy: caller sends its full current copy.
+    heroGear: heroGear || {},
     schemaVersion: 2,
     savedAt,
   }, null, 2);

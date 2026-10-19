@@ -40,6 +40,7 @@ export default async function handler(req, res) {
       heroes:    parsed.heroes    || [],
       draftData: parsed.draftData || null,
       taxonomy:  parsed.taxonomy  || { reactions: [], engagements: [], factors: [] },
+      heroGear:  parsed.heroGear  || {},
       // Rebuild Spec Section 10.1/10.2 — pass the stored schema marker
       // straight through so the client can tell a genuinely old blob
       // (written before this field existed) apart from a current one.

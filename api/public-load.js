@@ -31,6 +31,7 @@ export default async function handler(req, res) {
       heroes:    parsed.heroes    || [],
       draftData: parsed.draftData || null,
       taxonomy:  parsed.taxonomy  || { reactions: [], engagements: [], factors: [] },
+      heroGear:  parsed.heroGear  || {},
       // See api/load.js — same Section 10 schema-marker passthrough,
       // needed here too since this is the endpoint every visitor's
       // page load actually calls (autoLoadFromServer).
