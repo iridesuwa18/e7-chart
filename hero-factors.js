@@ -85,11 +85,15 @@ function hfHeroMatchesCategory(h, cat) {
 
 // The single filtered + scored + sorted list the grid renders from.
 // Filters (name search, Reaction/Engagement ticks, Ranking Category
-// ticks, min score) are ANDed together first; scoring/ordering is
+// ticks, min score) are ANDed together first — and ticked Reactions/
+// Engagements are themselves ALL required (a hero must hold every
+// ticked one); scoring/ordering is
 // layered on top exactly the way the feature was asked for — Factor
 // mode (any Enemy Factor ticked) ranks by qdSimpleScoreEntry's Factor
-// score and drops any hero that doesn't match EVERY ticked Factor, falling back to plain overall kit score when nothing's
-// ticked. NOTE: with Factors ticked, a hero must match ALL of them.
+// score and drops any hero matching none of the ticked Factors at
+// all (same exclusion Quick Draft's own suggestion list already
+// applies), falling back to plain overall kit score when nothing's
+// ticked.
 function hfFilteredHeroes() {
   let list = heroes.slice();
 
@@ -98,10 +102,10 @@ function hfFilteredHeroes() {
     list = list.filter(h => (h.name || "").toLowerCase().includes(q));
   }
   if (hfFilters.reactionIds.size) {
-    list = list.filter(h => [...hfFilters.reactionIds].some(id => hfHeroHasTag(h, "reactions", id)));
+    list = list.filter(h => [...hfFilters.reactionIds].every(id => hfHeroHasTag(h, "reactions", id)));
   }
   if (hfFilters.engagementIds.size) {
-    list = list.filter(h => [...hfFilters.engagementIds].some(id => hfHeroHasTag(h, "engagements", id)));
+    list = list.filter(h => [...hfFilters.engagementIds].every(id => hfHeroHasTag(h, "engagements", id)));
   }
   if (hfFilters.categories.size) {
     list = list.filter(h => [...hfFilters.categories].some(cat => hfHeroMatchesCategory(h, cat)));
@@ -113,11 +117,7 @@ function hfFilteredHeroes() {
   const factorMode = qdTickedFactorIds.size > 0;
   const scored = list.map(h => {
     const entry = factorMode ? qdSimpleScoreEntry(h, "primary") : null;
-    if (factorMode && !entry) return null; // no match on any ticked Factor — excluded
-    // Ticked Enemy Factors act as a strict filter here: a hero must
-    // match EVERY ticked Factor to be shown (matchedCount comes from
-    // qdFactorEntryForHero), not just at least one.
-    if (factorMode && entry.matchedCount !== qdTickedFactorIds.size) return null;
+    if (factorMode && !entry) return null; // no match on any ticked Factor — excluded, same as Quick Draft's own list
     return {
       hero: h,
       score: entry ? entry.score : qdOverallKitScore(h, "primary"),
@@ -200,7 +200,7 @@ function hfFactorStatusHTML() {
   const n = qdTickedFactorIds.size;
   const text = n === 0
     ? "No Enemy Factors ticked — ranking by plain overall kit score."
-    : `🎯 Showing only heroes that match ${n === 1 ? "the ticked Enemy Factor" : `all ${n} ticked Enemy Factors`}, ranked by Quick Draft's Factor scoring.`;
+    : `🎯 Ranking by ${n} ticked Enemy Factor${n === 1 ? "" : "s"} — same scoring as Quick Draft's own suggestions.`;
   const label = n === 0 ? "🎯 Tick Enemy Factors" : "🎯 Edit Enemy Factors";
   return `
     <span class="hf-factor-status-text">${text}</span>
