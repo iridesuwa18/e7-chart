@@ -88,10 +88,8 @@ function hfHeroMatchesCategory(h, cat) {
 // ticks, min score) are ANDed together first; scoring/ordering is
 // layered on top exactly the way the feature was asked for — Factor
 // mode (any Enemy Factor ticked) ranks by qdSimpleScoreEntry's Factor
-// score and drops any hero matching none of the ticked Factors at
-// all (same exclusion Quick Draft's own suggestion list already
-// applies), falling back to plain overall kit score when nothing's
-// ticked.
+// score and drops any hero that doesn't match EVERY ticked Factor, falling back to plain overall kit score when nothing's
+// ticked. NOTE: with Factors ticked, a hero must match ALL of them.
 function hfFilteredHeroes() {
   let list = heroes.slice();
 
@@ -115,7 +113,11 @@ function hfFilteredHeroes() {
   const factorMode = qdTickedFactorIds.size > 0;
   const scored = list.map(h => {
     const entry = factorMode ? qdSimpleScoreEntry(h, "primary") : null;
-    if (factorMode && !entry) return null; // no match on any ticked Factor — excluded, same as Quick Draft's own list
+    if (factorMode && !entry) return null; // no match on any ticked Factor — excluded
+    // Ticked Enemy Factors act as a strict filter here: a hero must
+    // match EVERY ticked Factor to be shown (matchedCount comes from
+    // qdFactorEntryForHero), not just at least one.
+    if (factorMode && entry.matchedCount !== qdTickedFactorIds.size) return null;
     return {
       hero: h,
       score: entry ? entry.score : qdOverallKitScore(h, "primary"),
@@ -198,7 +200,7 @@ function hfFactorStatusHTML() {
   const n = qdTickedFactorIds.size;
   const text = n === 0
     ? "No Enemy Factors ticked — ranking by plain overall kit score."
-    : `🎯 Ranking by ${n} ticked Enemy Factor${n === 1 ? "" : "s"} — same scoring as Quick Draft's own suggestions.`;
+    : `🎯 Showing only heroes that match ${n === 1 ? "the ticked Enemy Factor" : `all ${n} ticked Enemy Factors`}, ranked by Quick Draft's Factor scoring.`;
   const label = n === 0 ? "🎯 Tick Enemy Factors" : "🎯 Edit Enemy Factors";
   return `
     <span class="hf-factor-status-text">${text}</span>
