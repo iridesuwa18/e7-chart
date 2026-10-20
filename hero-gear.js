@@ -71,6 +71,18 @@ function hgClassHeroes(cls) {
     .sort((a, b) => String(a.name).localeCompare(String(b.name)));
 }
 
+// Keep the hero's original id type (number) when toggling from a data-attribute string.
+function classHeroesId(cls, idStr) {
+  return hgClassHeroes(cls).find(h => String(h.id) === idStr)?.id ?? idStr;
+}
+
+// A hero can sit in only ONE planner row per class. Returns the (1-based)
+// number of the first row OTHER than `exceptRowId` that already has them, or 0.
+function hgHeroRowElsewhere(rows, heroId, exceptRowId) {
+  const i = rows.findIndex(r => String(r.id) !== String(exceptRowId) && r.heroIds.some(x => String(x) === String(heroId)));
+  return i + 1;
+}
+
 function hgPlannerHTML(cls) {
   const editing = !!hgPlannerDraft[cls];
   const rows = editing ? hgPlannerDraft[cls] : heroGear[cls].planner;
@@ -80,33 +92,33 @@ function hgPlannerHTML(cls) {
 
   const head = `<div class="hg-section-head">Equipment Planner
     ${editing
-      ? `<button type="button" class="hg-icon-btn hg-add" ${cAttr} data-act="plan-add" title="Add row">＋</button>
-         <button type="button" class="hg-icon-btn hg-add hg-save" ${cAttr} data-act="plan-save" title="Save planner">💾 Save</button>
-         <button type="button" class="hg-icon-btn hg-add" ${cAttr} data-act="plan-cancel" title="Cancel">✕ Cancel</button>`
-      : `<button type="button" class="hg-icon-btn" ${cAttr} data-act="plan-edit" title="Edit planner">✏️</button>`}
+      ? `<button type="button" class="hg-pill" ${cAttr} data-act="plan-add">＋ Row</button>
+         <button type="button" class="hg-pill hg-save" ${cAttr} data-act="plan-save">💾 Save</button>
+         <button type="button" class="hg-pill" ${cAttr} data-act="plan-cancel">✕ Cancel</button>`
+      : `<button type="button" class="hg-pill" ${cAttr} data-act="plan-edit">✏️ Edit</button>`}
   </div>`;
 
   const cols = `<div class="hg-plan-row hg-plan-cols"><div>Gear Set</div><div>Artifact Type</div><div>Assigned heroes</div></div>`;
 
   const body = rows.length === 0
-    ? `<div class="hg-text hg-empty">${editing ? "No rows yet — press ＋ to add one." : "No planner rows yet — press ✏️ to start."}</div>`
-    : rows.map(r => {
+    ? `<div class="hg-text hg-empty">${editing ? "No rows yet — press ＋ Row to add one." : "No planner rows yet — press ✏️ Edit to start."}</div>`
+    : rows.map((r, idx) => {
+        const names = r.heroIds.map(nameOf).filter(Boolean);
         if (!editing) {
-          const names = r.heroIds.map(nameOf).filter(Boolean);
           return `<div class="hg-plan-row">
-            <div class="hg-text${r.gearSet ? "" : " hg-empty"}">${hgEsc(r.gearSet || "—")}</div>
-            <div class="hg-text${r.artifactType ? "" : " hg-empty"}">${hgEsc(r.artifactType || "—")}</div>
-            <div class="hg-text${names.length ? "" : " hg-empty"}">${names.length ? hgEsc(names.join(", ")) : "—"}</div>
+            <div class="hg-text${r.gearSet ? "" : " hg-empty"}" data-label="Gear Set">${hgEsc(r.gearSet || "—")}</div>
+            <div class="hg-text${r.artifactType ? "" : " hg-empty"}" data-label="Artifact Type">${hgEsc(r.artifactType || "—")}</div>
+            <div class="hg-text${names.length ? "" : " hg-empty"}" data-label="Heroes">${names.length ? hgEsc(names.join(", ")) : "—"}</div>
           </div>`;
         }
-        const chips = classHeroes.length
-          ? classHeroes.map(h => `<button type="button" class="hg-chip${r.heroIds.some(x => String(x) === String(h.id)) ? " on" : ""}" ${cAttr} data-act="plan-hero" data-row="${r.id}" data-hero="${hgEsc(h.id)}">${hgEsc(h.name)}</button>`).join("")
-          : `<span class="hg-text hg-empty">No ${hgEsc(cls)} heroes added yet</span>`;
+        const picked = r.heroIds.map(id => nameOf(id) ? `<span class="hg-tag">${hgEsc(nameOf(id))}<button type="button" class="hg-tag-x" ${cAttr} data-act="plan-unhero" data-row="${r.id}" data-hero="${hgEsc(id)}" title="Remove">✕</button></span>` : "").join("");
         return `<div class="hg-plan-row">
-          <input type="text" class="hg-input hg-plan-in" ${cAttr} data-row="${r.id}" data-f="gearSet" value="${hgEsc(r.gearSet)}" placeholder="Gear set">
-          <input type="text" class="hg-input hg-plan-in" ${cAttr} data-row="${r.id}" data-f="artifactType" value="${hgEsc(r.artifactType)}" placeholder="Artifact type">
-          <div class="hg-plan-heroes">${chips}
-            <button type="button" class="hg-icon-btn hg-del" ${cAttr} data-act="plan-del" data-row="${r.id}" title="Delete row">🗑</button>
+          <input type="text" class="hg-input hg-plan-in" ${cAttr} data-row="${r.id}" data-f="gearSet" value="${hgEsc(r.gearSet)}" placeholder="Gear set" aria-label="Gear set">
+          <input type="text" class="hg-input hg-plan-in" ${cAttr} data-row="${r.id}" data-f="artifactType" value="${hgEsc(r.artifactType)}" placeholder="Artifact type" aria-label="Artifact type">
+          <div class="hg-plan-heroes">
+            ${picked}
+            <button type="button" class="hg-pill" ${cAttr} data-act="plan-pick" data-row="${r.id}">＋ Heroes</button>
+            <button type="button" class="hg-icon-btn hg-del" ${cAttr} data-act="plan-del" data-row="${r.id}" title="Delete row #${idx + 1}">🗑</button>
           </div>
         </div>`;
       }).join("");
@@ -123,9 +135,16 @@ function hgPlannerClick(btn) {
   } else if (act === "plan-cancel") {
     delete hgPlannerDraft[cls];
   } else if (act === "plan-save") {
-    // Blank rows (no text, no heroes) are dropped rather than saved.
+    // Blank rows are dropped; a hero can only live in one row, so any
+    // duplicate from older data is kept in its first row only.
+    const seen = new Set();
     heroGear[cls].planner = draft
-      .map(r => ({ ...r, gearSet: r.gearSet.trim(), artifactType: r.artifactType.trim() }))
+      .map(r => ({
+        ...r,
+        gearSet: r.gearSet.trim(),
+        artifactType: r.artifactType.trim(),
+        heroIds: r.heroIds.filter(id => !seen.has(String(id)) && seen.add(String(id))),
+      }))
       .filter(r => r.gearSet || r.artifactType || r.heroIds.length);
     delete hgPlannerDraft[cls];
     hgMarkChanged();
@@ -135,19 +154,106 @@ function hgPlannerClick(btn) {
     draft.push({ id: Date.now() + Math.floor(Math.random() * 1000), gearSet: "", artifactType: "", heroIds: [] });
   } else if (act === "plan-del") {
     hgPlannerDraft[cls] = draft.filter(r => String(r.id) !== row);
-  } else if (act === "plan-hero") {
+  } else if (act === "plan-unhero") {
     const r = draft.find(x => String(x.id) === row);
-    if (!r) return;
-    const i = r.heroIds.findIndex(x => String(x) === hero);
-    if (i >= 0) r.heroIds.splice(i, 1);
-    else r.heroIds.push(classHeroesId(cls, hero));
+    if (r) r.heroIds = r.heroIds.filter(x => String(x) !== hero);
+  } else if (act === "plan-pick") {
+    hgOpenPicker(cls, row);
+    return; // popup handles its own rendering
   }
   renderHeroGear();
 }
 
-// Keep the hero's original id type (number) when toggling from a data-attribute string.
-function classHeroesId(cls, idStr) {
-  return hgClassHeroes(cls).find(h => String(h.id) === idStr)?.id ?? idStr;
+// ── Hero picker popup ──────────────────────────────────────────────
+// A fullscreen sheet on phones / centered modal on desktop (it reuses the
+// Enemy Factors picker's look) listing every hero of the class, so a long
+// roster never pushes the planner off-screen. Toggles write straight into
+// the planner's working copy; heroes already used in another row are greyed
+// out and can't be picked again.
+let hgPickerEl = null;
+let hgPickerCtx = null; // { cls, rowId, search }
+
+function hgEnsurePicker() {
+  if (hgPickerEl) return hgPickerEl;
+  const el = document.createElement("div");
+  el.className = "qd-factor-menu-overlay hg-picker";
+  el.style.display = "none";
+  el.innerHTML = `
+    <div class="qd-factor-menu-panel">
+      <div class="qd-factor-menu-header">
+        <div class="qd-factor-menu-title" id="hg-picker-title"></div>
+        <button type="button" class="qd-factor-menu-close" id="hg-picker-close" aria-label="Close">✕</button>
+      </div>
+      <div class="qd-factor-menu-searchbar">
+        <input type="text" class="taxonomy-search qd-factor-menu-search" id="hg-picker-search" autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false" placeholder="🔍 Search heroes…" />
+      </div>
+      <div class="hg-picker-list" id="hg-picker-list"></div>
+      <button type="button" class="btn btn-gold hg-picker-done" id="hg-picker-done">DONE</button>
+    </div>`;
+  document.body.appendChild(el);
+  hgPickerEl = el;
+
+  const close = () => hgClosePicker();
+  el.querySelector("#hg-picker-close").addEventListener("click", close);
+  el.querySelector("#hg-picker-done").addEventListener("click", close);
+  el.addEventListener("click", e => { if (e.target === el) close(); });
+  el.addEventListener("keydown", e => { if (e.key === "Escape") close(); });
+  el.querySelector("#hg-picker-search").addEventListener("input", e => {
+    hgPickerCtx.search = e.target.value;
+    hgRenderPickerList();
+  });
+  el.querySelector("#hg-picker-list").addEventListener("click", e => {
+    const b = e.target.closest(".hg-pick-item");
+    if (!b || b.disabled || !hgPickerCtx) return;
+    const { cls, rowId } = hgPickerCtx;
+    const draft = hgPlannerDraft[cls];
+    const r = draft?.find(x => String(x.id) === String(rowId));
+    if (!r) return;
+    const heroId = b.dataset.hero;
+    const i = r.heroIds.findIndex(x => String(x) === heroId);
+    if (i >= 0) r.heroIds.splice(i, 1);
+    else if (!hgHeroRowElsewhere(draft, heroId, rowId)) r.heroIds.push(classHeroesId(cls, heroId));
+    hgRenderPickerList();
+  });
+  return el;
+}
+
+function hgRenderPickerList() {
+  const { cls, rowId, search } = hgPickerCtx;
+  const draft = hgPlannerDraft[cls] || [];
+  const r = draft.find(x => String(x.id) === String(rowId));
+  const q = (search || "").trim().toLowerCase();
+  const list = hgClassHeroes(cls).filter(h => !q || String(h.name).toLowerCase().includes(q));
+  const rowNo = draft.findIndex(x => String(x.id) === String(rowId)) + 1;
+
+  hgPickerEl.querySelector("#hg-picker-title").textContent =
+    `${cls} heroes — Row ${rowNo} (${r ? r.heroIds.length : 0} picked)`;
+
+  hgPickerEl.querySelector("#hg-picker-list").innerHTML = list.length
+    ? list.map(h => {
+        const on = !!r && r.heroIds.some(x => String(x) === String(h.id));
+        const other = on ? 0 : hgHeroRowElsewhere(draft, h.id, rowId);
+        return `<button type="button" class="hg-pick-item${on ? " on" : ""}${other ? " taken" : ""}" data-hero="${hgEsc(h.id)}"${other ? " disabled" : ""}>
+          <span class="hg-pick-check">${on ? "✓" : ""}</span>
+          <span class="hg-pick-name">${hgEsc(h.name)}</span>
+          ${other ? `<span class="hg-pick-note">in Row ${other}</span>` : ""}
+        </button>`;
+      }).join("")
+    : `<div class="hg-text hg-empty">${hgClassHeroes(cls).length ? "No heroes match that search." : `No ${hgEsc(cls)} heroes added yet.`}</div>`;
+}
+
+function hgOpenPicker(cls, rowId) {
+  hgPickerCtx = { cls, rowId, search: "" };
+  const el = hgEnsurePicker();
+  el.querySelector("#hg-picker-search").value = "";
+  hgRenderPickerList();
+  el.style.display = "flex";
+}
+
+function hgClosePicker() {
+  if (hgPickerEl) hgPickerEl.style.display = "none";
+  hgPickerCtx = null;
+  renderHeroGear(); // refresh the row's hero tags behind the popup
 }
 
 function renderHeroGear() {
