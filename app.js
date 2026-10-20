@@ -54,13 +54,22 @@ let hasUnsavedChanges = false;
 const GEAR_CLASSES = ["Warrior", "Knight", "Thief", "Ranger", "Mage", "Soul Weaver"];
 function emptyHeroGear() {
   const out = {};
-  GEAR_CLASSES.forEach(c => { out[c] = { equipment: { note: "", items: [] }, artifacts: { note: "", items: [] } }; });
+  GEAR_CLASSES.forEach(c => { out[c] = { equipment: { note: "", items: [] }, artifacts: { note: "", items: [] }, planner: [] }; });
   return out;
 }
 function normalizeHeroGear(raw) {
   const out = emptyHeroGear();
   if (!raw || typeof raw !== "object") return out;
   GEAR_CLASSES.forEach(c => {
+    // Equipment Planner rows: { id, gearSet, artifactType, heroIds[] }
+    out[c].planner = (Array.isArray(raw[c]?.planner) ? raw[c].planner : [])
+      .filter(r => r && typeof r === "object")
+      .map((r, i) => ({
+        id: r.id ?? (Date.now() + i),
+        gearSet: typeof r.gearSet === "string" ? r.gearSet : "",
+        artifactType: typeof r.artifactType === "string" ? r.artifactType : "",
+        heroIds: Array.isArray(r.heroIds) ? r.heroIds.filter(x => x != null) : [],
+      }));
     ["equipment", "artifacts"].forEach(kind => {
       const sec = raw[c] && raw[c][kind];
       if (!sec || typeof sec !== "object") return;
@@ -78,6 +87,14 @@ function mergeHeroGearAdditive(current, incoming) {
   const inc = normalizeHeroGear(incoming);
   let added = 0;
   GEAR_CLASSES.forEach(c => {
+    const haveRows = new Set(out[c].planner.map(r => `${r.gearSet.trim().toLowerCase()}|${r.artifactType.trim().toLowerCase()}`));
+    inc[c].planner.forEach(r => {
+      const key = `${r.gearSet.trim().toLowerCase()}|${r.artifactType.trim().toLowerCase()}`;
+      if (haveRows.has(key)) return;
+      haveRows.add(key);
+      out[c].planner.push({ ...r, id: Date.now() + Math.floor(Math.random() * 1e6) });
+      added++;
+    });
     ["equipment", "artifacts"].forEach(kind => {
       if (!out[c][kind].note && inc[c][kind].note) { out[c][kind].note = inc[c][kind].note; added++; }
       const have = new Set(out[c][kind].items.map(it => it.text.trim().toLowerCase()));

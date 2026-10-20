@@ -5241,3 +5241,16 @@ body.hide-labels .hero-dot-label {
 .hg-add { width: auto; padding: 0 8px; font-weight: 700; }
 body.qd-companion .hg-handle,
 body.qd-companion .hg-drawer { display: none !important; }
+
+/* Equipment Planner table */
+.hg-plan-row { display: grid; grid-template-columns: 1fr 1fr 1.6fr; gap: 6px; margin: 3px 0; align-items: start; }
+.hg-plan-cols { font-size: 11px; color: var(--text-dim); text-transform: uppercase; letter-spacing: .05em; margin-top: 2px; }
+.hg-plan-in { width: 100%; box-sizing: border-box; }
+.hg-plan-heroes { display: flex; flex-wrap: wrap; gap: 4px; align-items: center; }
+.hg-chip { font: inherit; font-size: 11px; padding: 3px 8px; border-radius: 999px; cursor: pointer; background: var(--bg3); color: var(--text); border: 1px solid var(--border); }
+.hg-chip.on { background: rgba(201,162,39,.25); border-color: var(--gold); color: var(--gold2); font-weight: 600; }
+.hg-save { border-color: var(--gold); color: var(--gold2); }
+@media (max-width: 600px) {
+  .hg-plan-cols { display: none; }
+  .hg-plan-row { grid-template-columns: 1fr; border: 1px solid var(--border); border-radius: 8px; padding: 6px; }
+}
