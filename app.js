@@ -1776,7 +1776,7 @@ function wireScrollTopBtn(scrollEl, btnId, threshold = 240) {
       const reader = new FileReader();
       reader.onload = () => {
         let parsed;
-        try { parsed = JSON.parse(reader.result); }
+        try { parsed = JSON.parse(String(reader.result).split("/e7-chart/main/assets/").join("/e7-chart/data/assets/")); } // old exports: images moved main -> data
         catch { setStatus("❌ That file isn't valid JSON"); return; }
         handleImportedFile(parsed);
       };
