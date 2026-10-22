@@ -55,7 +55,8 @@ export default async function handler(req, res) {
   }, null, 2);
 
   // Base64-encode the JSON content for the GitHub API
-  const encoded = Buffer.from(content, "utf8").toString("base64");
+  // Images now live on the data branch — never write the old main-branch links.
+  const encoded = Buffer.from(content.split("/e7-chart/main/assets/").join("/e7-chart/data/assets/"), "utf8").toString("base64");
 
   // Check if file already exists (need its SHA to update)
   let sha;

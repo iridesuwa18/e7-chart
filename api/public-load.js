@@ -26,7 +26,13 @@ export default async function handler(req, res) {
     const data = await apiRes.json();
     if (!apiRes.ok) return res.status(apiRes.status).json({ error: data.message || "GitHub API error" });
 
-    const parsed = JSON.parse(Buffer.from(data.content, "base64").toString("utf8"));
+    // Images moved from the main branch to the data branch. Saved links in
+    // the data file still say .../main/assets/..., so rewrite them to
+    // .../data/assets/... as they're read (the file itself is updated the
+    // next time it's saved).
+    const parsed = JSON.parse(
+      Buffer.from(data.content, "base64").toString("utf8").split("/e7-chart/main/assets/").join("/e7-chart/data/assets/")
+    );
     return res.status(200).json({
       heroes:    parsed.heroes    || [],
       draftData: parsed.draftData || null,

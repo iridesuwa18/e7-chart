@@ -5,7 +5,7 @@
 // Env vars required: GITHUB_TOKEN, ADMIN_PASSWORD
 
 const REPO   = "iridesuwa18/e7-chart";
-const BRANCH = "main";
+const BRANCH = "data"; // images now live on the data-only branch (Vercel deploys disabled for it) — was "main"
 
 export default async function handler(req, res) {
   res.setHeader("Access-Control-Allow-Origin", "https://iridesuwa18.github.io");
