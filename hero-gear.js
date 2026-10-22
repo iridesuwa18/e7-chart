@@ -116,7 +116,7 @@ function hgPlannerHTML(cls) {
           return `<div class="hg-plan-row">
             <div class="hg-text${r.gearSet ? "" : " hg-empty"}" data-label="Gear Set">${hgEsc(r.gearSet || "—")}</div>
             <div class="hg-text${r.artifactType ? "" : " hg-empty"}" data-label="Artifact Type">${hgEsc(r.artifactType || "—")}</div>
-            <div class="hg-text hg-heroes-view${picked_heroes.length ? "" : " hg-empty"}" data-label="Heroes">${picked_heroes.length ? picked_heroes.map(h => `<span class="hg-hero-chip">${hgAvatar(h)}${hgEsc(h.name || "Unnamed")}</span>`).join("") : "—"}</div>
+            <div class="hg-text hg-heroes-view${picked_heroes.length ? "" : " hg-empty"}" data-label="Heroes">${picked_heroes.length ? picked_heroes.map(h => `<span class="hg-hero-chip">${hgAvatar(h)}${hgEsc(h.name || "Unnamed")}</span>`).join("") : "—"}<button type="button" class="hg-pill hg-copy-btn" ${cAttr} data-act="plan-copy" data-row="${r.id}" title="Copy Gear Set + Artifact Type to another class">⧉ Copy to…</button></div>
           </div>`;
         }
         const picked = picked_heroes.map(h => { const id = h.id; return `<span class="hg-tag">${hgAvatar(h)}${hgEsc(h.name || "Unnamed")}<button type="button" class="hg-tag-x" ${cAttr} data-act="plan-unhero" data-row="${r.id}" data-hero="${hgEsc(id)}" title="Remove">✕</button></span>`; }).join("");
@@ -126,6 +126,7 @@ function hgPlannerHTML(cls) {
           <div class="hg-plan-heroes">
             ${picked}
             <button type="button" class="hg-pill" ${cAttr} data-act="plan-pick" data-row="${r.id}">＋ Heroes</button>
+            <button type="button" class="hg-pill" ${cAttr} data-act="plan-copy" data-row="${r.id}" title="Copy Gear Set + Artifact Type to another class">⧉ Copy to…</button>
             <button type="button" class="hg-icon-btn hg-del" ${cAttr} data-act="plan-del" data-row="${r.id}" title="Delete row #${idx + 1}">🗑</button>
           </div>
         </div>`;
@@ -138,6 +139,7 @@ function hgPlannerClick(btn) {
   const { cls, act, row, hero } = btn.dataset;
   if (!heroGear[cls]) return;
   const draft = hgPlannerDraft[cls];
+  if (act === "plan-copy") { hgOpenCopyMenu(cls, row); return; } // works in view or edit mode
   if (act === "plan-edit") {
     hgPlannerDraft[cls] = heroGear[cls].planner.map(r => ({ ...r, heroIds: [...r.heroIds] }));
   } else if (act === "plan-cancel") {
@@ -451,6 +453,106 @@ function hgClosePicker() {
   document.body.classList.remove("qd-factor-menu-open");
   hgPickerCtx = null;
   renderHeroGear(); // refresh the row's hero tags behind the popup
+}
+
+// ── Copy a planner row to other classes ───────────────────────────
+// Copies ONLY the Gear Set + Artifact Type; Assigned heroes is left empty
+// (the heroes belong to the source class). Tick any number of other
+// classes, then COPY — classes that already have the row can't be ticked.
+// If the target class is mid-edit the copy lands in its working copy
+// (still needs its 💾 Save); otherwise it's added and saved straight away.
+let hgCopyEl = null;
+
+function hgPlannerRowsFor(cls) {
+  return hgPlannerDraft[cls] || heroGear[cls].planner;
+}
+
+function hgRowKey(r) {
+  return `${r.gearSet.trim().toLowerCase()}|${r.artifactType.trim().toLowerCase()}`;
+}
+
+function hgCopyRowTo(srcCls, rowId, targetCls) {
+  const src = hgPlannerRowsFor(srcCls).find(r => String(r.id) === String(rowId));
+  if (!src) return "missing";
+  if (!src.gearSet.trim() && !src.artifactType.trim()) return "empty";
+  const targetRows = hgPlannerRowsFor(targetCls);
+  if (targetRows.some(r => hgRowKey(r) === hgRowKey(src))) return "dupe";
+  targetRows.push({
+    id: Date.now() + Math.floor(Math.random() * 1e6),
+    gearSet: src.gearSet.trim(),
+    artifactType: src.artifactType.trim(),
+    heroIds: [],
+  });
+  if (!hgPlannerDraft[targetCls]) hgMarkChanged();
+  return "ok";
+}
+
+function hgOpenCopyMenu(srcCls, rowId) {
+  const src = hgPlannerRowsFor(srcCls).find(r => String(r.id) === String(rowId));
+  if (!src) return;
+  if (!hgCopyEl) {
+    hgCopyEl = document.createElement("div");
+    hgCopyEl.className = "qd-factor-menu-overlay hg-picker";
+    hgCopyEl.style.display = "none";
+    document.body.appendChild(hgCopyEl);
+    hgCopyEl.addEventListener("click", e => { if (e.target === hgCopyEl) hgCloseCopyMenu(); });
+    hgCopyEl.addEventListener("keydown", e => { if (e.key === "Escape") hgCloseCopyMenu(); });
+  }
+  const targets = GEAR_CLASSES.filter(c => c !== srcCls);
+  const summary = [src.gearSet.trim(), src.artifactType.trim()].filter(Boolean).map(hgEsc).join(" · ");
+  // Classes that already have this exact Gear Set + Artifact Type can't be picked.
+  const has = c => hgPlannerRowsFor(c).some(r => hgRowKey(r) === hgRowKey(src));
+  const selected = new Set();
+
+  const paint = () => {
+    const pickable = targets.filter(c => !has(c));
+    hgCopyEl.innerHTML = `
+      <div class="qd-factor-menu-panel hg-copy-panel">
+        <div class="qd-factor-menu-header">
+          <div class="qd-factor-menu-title">⧉ Copy to classes</div>
+          <button type="button" class="qd-factor-menu-close" id="hg-copy-close" aria-label="Close">✕</button>
+        </div>
+        <div class="hg-text hg-copy-what">${summary || "(empty row)"}<br><span class="hg-pick-note">Heroes are not copied. Tick one or more classes.</span></div>
+        <div class="hg-picker-list">
+          ${targets.map(c => {
+            const on = selected.has(c), dupe = has(c);
+            return `<button type="button" class="hg-pick-item${on ? " on" : ""}${dupe ? " taken" : ""}" data-target="${hgEsc(c)}"${dupe ? " disabled" : ""}>
+              <span class="hg-pick-check">${on ? "✓" : ""}</span>
+              <span class="hg-pick-name">${hgEsc(c)}</span>
+              ${dupe ? `<span class="hg-pick-note">Already has it</span>` : ""}
+            </button>`;
+          }).join("")}
+        </div>
+        <div class="hg-copy-actions">
+          <button type="button" class="btn btn-ghost btn-xs" id="hg-copy-all"${pickable.length ? "" : " disabled"}>${selected.size === pickable.length && pickable.length ? "Select none" : "Select all"}</button>
+          <button type="button" class="btn btn-gold hg-copy-go" id="hg-copy-go"${selected.size ? "" : " disabled"}>COPY TO ${selected.size || ""} ${selected.size === 1 ? "CLASS" : "CLASSES"}</button>
+        </div>
+      </div>`;
+    hgCopyEl.querySelector("#hg-copy-close").addEventListener("click", hgCloseCopyMenu);
+    hgCopyEl.querySelectorAll(".hg-pick-item").forEach(b => b.addEventListener("click", () => {
+      const c = b.dataset.target;
+      if (selected.has(c)) selected.delete(c); else selected.add(c);
+      paint();
+    }));
+    hgCopyEl.querySelector("#hg-copy-all").addEventListener("click", () => {
+      if (selected.size === pickable.length) selected.clear(); else pickable.forEach(c => selected.add(c));
+      paint();
+    });
+    hgCopyEl.querySelector("#hg-copy-go").addEventListener("click", () => {
+      const done = [...selected].filter(c => hgCopyRowTo(srcCls, rowId, c) === "ok");
+      hgCloseCopyMenu();
+      if (done.length && typeof setStatus === "function") setStatus(`✅ Copied to ${done.join(", ")}`);
+    });
+  };
+  paint();
+  hgCopyEl.style.display = "flex";
+  document.body.classList.add("qd-factor-menu-open");
+}
+
+function hgCloseCopyMenu() {
+  if (hgCopyEl) hgCopyEl.style.display = "none";
+  document.body.classList.remove("qd-factor-menu-open");
+  renderHeroGear(); // show the new rows in their classes
 }
 
 function renderHeroGear() {

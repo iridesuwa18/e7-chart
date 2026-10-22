@@ -5281,3 +5281,12 @@ body.qd-companion .hg-drawer { display: none !important; }
 .hg-hero-chip { display: inline-flex; align-items: center; gap: 5px; margin: 0 8px 3px 0; }
 .hg-heroes-view { display: flex; flex-wrap: wrap; }
 .hg-tag { padding-left: 3px; }
+
+/* Copy-to-class menu + button */
+.hg-copy-panel { max-width: 420px; }
+.hg-copy-what { margin: 8px 0; }
+.hg-copy-btn { margin-left: auto; align-self: center; }
+.hg-pick-item:disabled { cursor: default; }
+.hg-copy-actions { display: flex; gap: 8px; align-items: center; justify-content: space-between; margin-top: 8px; }
+.hg-copy-go { flex: 1; padding: 12px; }
+.hg-copy-go:disabled { opacity: .45; cursor: not-allowed; }
