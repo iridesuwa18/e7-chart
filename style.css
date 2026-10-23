@@ -5296,3 +5296,12 @@ body.qd-companion .hg-drawer { display: none !important; }
 .hg-settype { display: flex; flex-wrap: wrap; align-items: center; gap: 4px; }
 .hg-pill.on { background: rgba(201,162,39,.25); border-color: var(--gold); color: var(--gold2); font-weight: 600; }
 .hg-set-badge { display: inline-block; font-family: 'Cinzel', serif; font-size: 10px; letter-spacing: .06em; padding: 1px 7px; border-radius: 999px; background: rgba(201,162,39,.18); border: 1px solid var(--gold-dim); color: var(--gold2); vertical-align: middle; white-space: nowrap; }
+
+/* per-row planner editing */
+.hg-row-btns { display: inline-flex; gap: 6px; margin-left: auto; align-self: center; }
+.hg-row-actions { grid-column: 1 / -1; display: flex; flex-wrap: wrap; gap: 6px; align-items: center; }
+.hg-row-actions .hg-copy-btn { margin-left: auto; }
+.hg-plan-editing { border: 1px solid var(--gold-dim); border-radius: 8px; padding: 8px; background: rgba(201,162,39,.05); }
+.hg-plan-editing .hg-add-row { grid-column: 1 / -1; }
+.hg-add-row { margin: 6px 0 2px; }
+.hg-pill:disabled { opacity: .4; cursor: not-allowed; }

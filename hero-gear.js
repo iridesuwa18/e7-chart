@@ -2,7 +2,8 @@
    HERO EQUIPMENT & ARTIFACTS
 
    (Each class also has an Equipment Planner table — Gear Set | Artifact
-   Type | Assigned heroes — edited per class with ✏️ then 💾 Save.)
+   Type | Assigned heroes. Each row has its own ✏️ Edit → 💾 Save; only
+   one row can be edited at a time, and ＋ Add row sits under it.)
 
    A drawer above Quick Draft with one block per class (Warrior, Knight,
    Thief, Ranger, Mage, Soul Weaver). Each class has two sections —
@@ -20,10 +21,12 @@
 let hgEditing = null;
 let hgOpen = false;
 
-// Equipment Planner: a class whose planner is in edit mode has a working
-// copy here (planner draft) — typing edits the copy, Save commits it to
-// heroGear, Cancel throws it away. { Knight: [{id,gearSet,artifactType,heroIds}] }
-const hgPlannerDraft = {};
+// Equipment Planner: ONE row at a time can be edited (across the whole
+// drawer). hgEdit holds that row's working copy — typing edits the copy,
+// 💾 Save commits it into heroGear, Cancel throws it away.
+//   { cls, row: {id,gearSet,artifactType,setType,setCount,heroIds},
+//     isNew, insertAt }   (insertAt = where a brand-new row will land)
+let hgEdit = null;
 
 function hgMarkChanged() {
   hasUnsavedChanges = true;
@@ -104,115 +107,166 @@ function hgHeroPiecesUsed(rows, heroId, exceptRowId) {
     .reduce((sum, r) => sum + hgRowPieces(r), 0);
 }
 
+// The class's rows as they currently look on screen: saved rows, with the
+// row being edited swapped for its working copy (or, for a new row, inserted
+// at its spot). Same object as hgEdit.row, so edits made through it stick.
+function hgEffectiveRows(cls) {
+  const saved = heroGear[cls].planner;
+  if (!hgEdit || hgEdit.cls !== cls) return saved;
+  if (hgEdit.isNew) {
+    const out = [...saved];
+    out.splice(Math.min(hgEdit.insertAt, out.length), 0, hgEdit.row);
+    return out;
+  }
+  return saved.map(r => String(r.id) === String(hgEdit.row.id) ? hgEdit.row : r);
+}
+
+function hgNewRow() {
+  return { id: Date.now() + Math.floor(Math.random() * 1000), gearSet: "", artifactType: "", setType: "4", setCount: 1, heroIds: [] };
+}
+
 function hgPlannerHTML(cls) {
-  const editing = !!hgPlannerDraft[cls];
-  const rows = editing ? hgPlannerDraft[cls] : heroGear[cls].planner;
+  const rows = hgEffectiveRows(cls);
   const classHeroes = hgClassHeroes(cls);
   const heroOf = id => classHeroes.find(h => String(h.id) === String(id));
   const cAttr = `data-cls="${hgEsc(cls)}"`;
+  const editingHere = !!hgEdit && hgEdit.cls === cls;
+  const editingElsewhere = !!hgEdit && !editingHere;
+  const addBtn = disabled => `<div class="hg-add-row"><button type="button" class="hg-pill" ${cAttr} data-act="plan-add"${disabled ? ' disabled title="Finish editing the other row first"' : ""}>＋ Add row</button></div>`;
 
-  const head = `<div class="hg-section-head">Equipment Planner
-    ${editing
-      ? `<button type="button" class="hg-pill" ${cAttr} data-act="plan-add">＋ Row</button>
-         <button type="button" class="hg-pill hg-save" ${cAttr} data-act="plan-save">💾 Save</button>
-         <button type="button" class="hg-pill" ${cAttr} data-act="plan-cancel">✕ Cancel</button>`
-      : `<button type="button" class="hg-pill" ${cAttr} data-act="plan-edit">✏️ Edit</button>`}
-  </div>`;
-
+  const head = `<div class="hg-section-head">Equipment Planner</div>`;
   const cols = `<div class="hg-plan-row hg-plan-cols"><div>Gear Set</div><div>Artifact Type</div><div>Assigned heroes</div></div>`;
 
-  const body = rows.length === 0
-    ? `<div class="hg-text hg-empty">${editing ? "No rows yet — press ＋ Row to add one." : "No planner rows yet — press ✏️ Edit to start."}</div>`
-    : rows.map((r, idx) => {
-        const picked_heroes = r.heroIds.map(heroOf).filter(Boolean);
-        if (!editing) {
-          return `<div class="hg-plan-row">
-            <div class="hg-text${r.gearSet ? "" : " hg-empty"}" data-label="Gear Set">${hgEsc(r.gearSet || "—")} <span class="hg-set-badge">${hgSetLabel(r)}</span></div>
-            <div class="hg-text${r.artifactType ? "" : " hg-empty"}" data-label="Artifact Type">${hgEsc(r.artifactType || "—")}</div>
-            <div class="hg-text hg-heroes-view${picked_heroes.length ? "" : " hg-empty"}" data-label="Heroes">${picked_heroes.length ? picked_heroes.map(h => `<span class="hg-hero-chip">${hgAvatar(h)}${hgEsc(h.name || "Unnamed")}</span>`).join("") : "—"}<button type="button" class="hg-pill hg-copy-btn" ${cAttr} data-act="plan-copy" data-row="${r.id}" title="Copy Gear Set + Artifact Type to another class">⧉ Copy to…</button></div>
-          </div>`;
-        }
-        const picked = picked_heroes.map(h => { const id = h.id; return `<span class="hg-tag">${hgAvatar(h)}${hgEsc(h.name || "Unnamed")}<button type="button" class="hg-tag-x" ${cAttr} data-act="plan-unhero" data-row="${r.id}" data-hero="${hgEsc(id)}" title="Remove">✕</button></span>`; }).join("");
-        return `<div class="hg-plan-row">
-          <div class="hg-gear-cell">
-            <input type="text" class="hg-input hg-plan-in" ${cAttr} data-row="${r.id}" data-f="gearSet" value="${hgEsc(r.gearSet)}" placeholder="Gear set" aria-label="Gear set">
-            <div class="hg-settype">
-              <button type="button" class="hg-pill${r.setType !== "2" ? " on" : ""}" ${cAttr} data-act="plan-settype" data-row="${r.id}" data-val="4">4 set</button>
-              <button type="button" class="hg-pill${r.setType === "2" ? " on" : ""}" ${cAttr} data-act="plan-settype" data-row="${r.id}" data-val="2">2 set</button>
-              ${r.setType === "2" ? [1, 2, 3].map(n => `<button type="button" class="hg-pill${(Number(r.setCount) || 1) === n ? " on" : ""}" ${cAttr} data-act="plan-setcount" data-row="${r.id}" data-val="${n}">×${n}</button>`).join("") : ""}
-              <span class="hg-pick-note">${hgRowPieces(r)}/${HG_PIECE_LIMIT} pcs</span>
-            </div>
-          </div>
-          <input type="text" class="hg-input hg-plan-in" ${cAttr} data-row="${r.id}" data-f="artifactType" value="${hgEsc(r.artifactType)}" placeholder="Artifact type" aria-label="Artifact type">
-          <div class="hg-plan-heroes">
-            ${picked}
-            <button type="button" class="hg-pill" ${cAttr} data-act="plan-pick" data-row="${r.id}">＋ Heroes</button>
+  const body = rows.map((r, idx) => {
+    const picked_heroes = r.heroIds.map(heroOf).filter(Boolean);
+    if (!(editingHere && r === hgEdit.row)) {
+      return `<div class="hg-plan-row">
+        <div class="hg-text${r.gearSet ? "" : " hg-empty"}" data-label="Gear Set">${hgEsc(r.gearSet || "—")} <span class="hg-set-badge">${hgSetLabel(r)}</span></div>
+        <div class="hg-text${r.artifactType ? "" : " hg-empty"}" data-label="Artifact Type">${hgEsc(r.artifactType || "—")}</div>
+        <div class="hg-text hg-heroes-view${picked_heroes.length ? "" : " hg-empty"}" data-label="Heroes">${picked_heroes.length ? picked_heroes.map(h => `<span class="hg-hero-chip">${hgAvatar(h)}${hgEsc(h.name || "Unnamed")}</span>`).join("") : "—"}
+          <span class="hg-row-btns">
+            <button type="button" class="hg-pill" ${cAttr} data-act="plan-edit" data-row="${r.id}"${hgEdit ? ' disabled title="Finish editing the other row first"' : ' title="Edit this row"'}>✏️ Edit</button>
             <button type="button" class="hg-pill" ${cAttr} data-act="plan-copy" data-row="${r.id}" title="Copy Gear Set + Artifact Type to another class">⧉ Copy to…</button>
-            <button type="button" class="hg-icon-btn hg-del" ${cAttr} data-act="plan-del" data-row="${r.id}" title="Delete row #${idx + 1}">🗑</button>
-          </div>
-        </div>`;
-      }).join("");
+          </span>
+        </div>
+      </div>`;
+    }
+    const picked = picked_heroes.map(h => `<span class="hg-tag">${hgAvatar(h)}${hgEsc(h.name || "Unnamed")}<button type="button" class="hg-tag-x" ${cAttr} data-act="plan-unhero" data-row="${r.id}" data-hero="${hgEsc(h.id)}" title="Remove">✕</button></span>`).join("");
+    return `<div class="hg-plan-row hg-plan-editing">
+      <div class="hg-gear-cell">
+        <input type="text" class="hg-input hg-plan-in" ${cAttr} data-row="${r.id}" data-f="gearSet" value="${hgEsc(r.gearSet)}" placeholder="Gear set" aria-label="Gear set">
+        <div class="hg-settype">
+          <button type="button" class="hg-pill${r.setType !== "2" ? " on" : ""}" ${cAttr} data-act="plan-settype" data-row="${r.id}" data-val="4">4 set</button>
+          <button type="button" class="hg-pill${r.setType === "2" ? " on" : ""}" ${cAttr} data-act="plan-settype" data-row="${r.id}" data-val="2">2 set</button>
+          ${r.setType === "2" ? [1, 2, 3].map(n => `<button type="button" class="hg-pill${(Number(r.setCount) || 1) === n ? " on" : ""}" ${cAttr} data-act="plan-setcount" data-row="${r.id}" data-val="${n}">×${n}</button>`).join("") : ""}
+          <span class="hg-pick-note">${hgRowPieces(r)}/${HG_PIECE_LIMIT} pcs</span>
+        </div>
+      </div>
+      <input type="text" class="hg-input hg-plan-in" ${cAttr} data-row="${r.id}" data-f="artifactType" value="${hgEsc(r.artifactType)}" placeholder="Artifact type" aria-label="Artifact type">
+      <div class="hg-plan-heroes">
+        ${picked}
+        <button type="button" class="hg-pill" ${cAttr} data-act="plan-pick" data-row="${r.id}">＋ Heroes</button>
+      </div>
+      <div class="hg-row-actions">
+        <button type="button" class="hg-pill hg-save" ${cAttr} data-act="plan-save" data-row="${r.id}">💾 Save</button>
+        <button type="button" class="hg-pill" ${cAttr} data-act="plan-cancel" data-row="${r.id}">✕ Cancel</button>
+        <button type="button" class="hg-pill hg-copy-btn" ${cAttr} data-act="plan-copy" data-row="${r.id}" title="Copy Gear Set + Artifact Type to another class">⧉ Copy to…</button>
+        <button type="button" class="hg-icon-btn hg-del" ${cAttr} data-act="plan-del" data-row="${r.id}" title="Delete this row">🗑</button>
+      </div>
+      ${addBtn(false)}
+    </div>`;
+  }).join("");
 
-  return `<div class="hg-section hg-planner">${head}${cols}${body}</div>`;
+  const empty = rows.length === 0 ? `<div class="hg-text hg-empty">No planner rows yet.</div>` : "";
+  // The Add button sits under the row being edited; otherwise at the bottom.
+  return `<div class="hg-section hg-planner">${head}${rows.length ? cols : ""}${body}${empty}${editingHere ? "" : addBtn(editingElsewhere)}</div>`;
+}
+
+// Write the row being edited into heroGear. Returns the index just after it
+// (where a follow-up new row should go), or -1 if nothing was edited.
+function hgCommitEdit() {
+  if (!hgEdit) return -1;
+  const { cls, isNew, insertAt } = hgEdit;
+  const saved = heroGear[cls].planner;
+  const row = hgEdit.row;
+  const need = hgRowPieces(row);
+  const inRow = new Set();
+  // A hero can't exceed 6 pieces across the class's other rows.
+  const clean = {
+    ...row,
+    gearSet: row.gearSet.trim(),
+    artifactType: row.artifactType.trim(),
+    heroIds: row.heroIds.filter(id => {
+      const k = String(id);
+      if (inRow.has(k) || hgHeroPiecesUsed(saved, id, row.id) + need > HG_PIECE_LIMIT) return false;
+      inRow.add(k);
+      return true;
+    }),
+  };
+  const blank = !clean.gearSet && !clean.artifactType && !clean.heroIds.length;
+  let pos;
+  if (isNew) {
+    pos = Math.min(insertAt, saved.length);
+    if (!blank) { saved.splice(pos, 0, clean); hgMarkChanged(); pos += 1; }
+  } else {
+    pos = saved.findIndex(r => String(r.id) === String(row.id));
+    if (pos >= 0) {
+      if (blank) saved.splice(pos, 1); else { saved[pos] = clean; pos += 1; }
+      hgMarkChanged();
+    }
+  }
+  hgEdit = null;
+  return pos;
 }
 
 function hgPlannerClick(btn) {
   const { cls, act, row, hero } = btn.dataset;
   if (!heroGear[cls]) return;
-  const draft = hgPlannerDraft[cls];
-  if (act === "plan-copy") { hgOpenCopyMenu(cls, row); return; } // works in view or edit mode
+  if (act === "plan-copy") { hgOpenCopyMenu(cls, row); return; } // works any time
+
   if (act === "plan-edit") {
-    hgPlannerDraft[cls] = heroGear[cls].planner.map(r => ({ ...r, heroIds: [...r.heroIds] }));
-  } else if (act === "plan-cancel") {
-    delete hgPlannerDraft[cls];
-  } else if (act === "plan-save") {
-    // Blank rows are dropped. Heroes are checked in row order against the
-    // 6-piece limit, so anything that would overflow (older data, or a
-    // hero in the same row twice) is dropped from the later row.
-    const used = new Map();
-    heroGear[cls].planner = draft
-      .map(r => {
-        const need = hgRowPieces(r);
-        const inRow = new Set();
-        return {
-          ...r,
-          gearSet: r.gearSet.trim(),
-          artifactType: r.artifactType.trim(),
-          heroIds: r.heroIds.filter(id => {
-            const k = String(id);
-            if (inRow.has(k) || (used.get(k) || 0) + need > HG_PIECE_LIMIT) return false;
-            inRow.add(k); used.set(k, (used.get(k) || 0) + need);
-            return true;
-          }),
-        };
-      })
-      .filter(r => r.gearSet || r.artifactType || r.heroIds.length);
-    delete hgPlannerDraft[cls];
-    hgMarkChanged();
-  } else if (!draft) {
-    return;
-  } else if (act === "plan-add") {
-    draft.push({ id: Date.now() + Math.floor(Math.random() * 1000), gearSet: "", artifactType: "", setType: "4", setCount: 1, heroIds: [] });
-  } else if (act === "plan-settype" || act === "plan-setcount") {
-    const r = draft.find(x => String(x.id) === row);
+    if (hgEdit) return; // only one row at a time
+    const r = heroGear[cls].planner.find(x => String(x.id) === row);
     if (!r) return;
+    hgEdit = { cls, row: { ...r, heroIds: [...r.heroIds] }, isNew: false, insertAt: 0 };
+  } else if (act === "plan-add") {
+    if (hgEdit && hgEdit.cls !== cls) return;
+    // Adding while a row is open saves that row first, then opens the new
+    // blank one directly below it.
+    const at = hgEdit ? hgCommitEdit() : heroGear[cls].planner.length;
+    hgEdit = { cls, row: hgNewRow(), isNew: true, insertAt: at < 0 ? heroGear[cls].planner.length : at };
+  } else if (!hgEdit || hgEdit.cls !== cls) {
+    return;
+  } else if (act === "plan-cancel") {
+    hgEdit = null;
+  } else if (act === "plan-save") {
+    hgCommitEdit();
+  } else if (act === "plan-del") {
+    const r = hgEdit.row;
+    const hasContent = r.gearSet.trim() || r.artifactType.trim() || r.heroIds.length;
+    if (!hgEdit.isNew) {
+      if (hasContent && !confirm("Delete this row?")) return;
+      heroGear[cls].planner = heroGear[cls].planner.filter(x => String(x.id) !== String(r.id));
+      hgMarkChanged();
+    }
+    hgEdit = null;
+  } else if (act === "plan-settype" || act === "plan-setcount") {
+    const r = hgEdit.row;
     const next = { ...r };
     if (act === "plan-settype") next.setType = btn.dataset.val === "2" ? "2" : "4";
     else next.setCount = Number(btn.dataset.val) || 1;
     // Don't let a change push an already-assigned hero past 6 pieces.
     const need = hgRowPieces(next);
-    const over = r.heroIds.filter(id => hgHeroPiecesUsed(draft, id, r.id) + need > HG_PIECE_LIMIT)
+    const rowsNow = hgEffectiveRows(cls);
+    const over = r.heroIds.filter(id => hgHeroPiecesUsed(rowsNow, id, r.id) + need > HG_PIECE_LIMIT)
       .map(id => hgHeroById(cls, id)?.name || "A hero");
     if (over.length) {
       alert(`Can't change to ${hgSetLabel(next)} (${need} pieces): ${over.join(", ")} would go over ${HG_PIECE_LIMIT}. Remove them from this row first.`);
       return;
     }
     r.setType = next.setType; r.setCount = next.setCount;
-  } else if (act === "plan-del") {
-    hgPlannerDraft[cls] = draft.filter(r => String(r.id) !== row);
   } else if (act === "plan-unhero") {
-    const r = draft.find(x => String(x.id) === row);
-    if (r) r.heroIds = r.heroIds.filter(x => String(x) !== hero);
+    hgEdit.row.heroIds = hgEdit.row.heroIds.filter(x => String(x) !== hero);
   } else if (act === "plan-pick") {
     hgOpenPicker(cls, row);
     return; // popup handles its own rendering
@@ -348,8 +402,8 @@ function hgBuildPickerPanel() {
     const b = e.target.closest(".hg-pick-item");
     if (!b || b.disabled || !hgPickerCtx) return;
     const { cls, rowId } = hgPickerCtx;
-    const draft = hgPlannerDraft[cls];
-    const r = draft?.find(x => String(x.id) === String(rowId));
+    const draft = hgEffectiveRows(cls);
+    const r = draft.find(x => String(x.id) === String(rowId));
     if (!r) return;
     const heroId = b.dataset.hero;
     const idx = r.heroIds.findIndex(x => String(x) === heroId);
@@ -460,7 +514,7 @@ function hgRenderFactorList() {
 function hgRenderPickerList() {
   if (!hgPickerCtx) return;
   const { cls, rowId } = hgPickerCtx;
-  const draft = hgPlannerDraft[cls] || [];
+  const draft = hgEffectiveRows(cls);
   const r = draft.find(x => String(x.id) === String(rowId));
   const list = hgPickerHeroes(cls);
   const all = hgClassHeroes(cls);
@@ -513,7 +567,7 @@ function hgClosePicker() {
 let hgCopyEl = null;
 
 function hgPlannerRowsFor(cls) {
-  return hgPlannerDraft[cls] || heroGear[cls].planner;
+  return hgEffectiveRows(cls);
 }
 
 function hgRowKey(r) {
@@ -526,7 +580,7 @@ function hgCopyRowTo(srcCls, rowId, targetCls) {
   if (!src.gearSet.trim() && !src.artifactType.trim()) return "empty";
   const targetRows = hgPlannerRowsFor(targetCls);
   if (targetRows.some(r => hgRowKey(r) === hgRowKey(src))) return "dupe";
-  targetRows.push({
+  heroGear[targetCls].planner.push({
     id: Date.now() + Math.floor(Math.random() * 1e6),
     gearSet: src.gearSet.trim(),
     artifactType: src.artifactType.trim(),
@@ -534,7 +588,7 @@ function hgCopyRowTo(srcCls, rowId, targetCls) {
     setCount: Number(src.setCount) || 1,
     heroIds: [],
   });
-  if (!hgPlannerDraft[targetCls]) hgMarkChanged();
+  hgMarkChanged();
   return "ok";
 }
 
@@ -609,6 +663,8 @@ function hgCloseCopyMenu() {
 function renderHeroGear() {
   const body = document.getElementById("hero-gear-body");
   if (!body) return; // page without the drawer (e.g. quickdraft.html)
+  // A reload/import can drop the row being edited — never edit a ghost.
+  if (hgEdit && !hgEdit.isNew && !heroGear[hgEdit.cls].planner.some(r => String(r.id) === String(hgEdit.row.id))) hgEdit = null;
 
   body.innerHTML = GEAR_CLASSES.map(cls => `
     <div class="hg-class">
@@ -704,8 +760,7 @@ function initHeroGear() {
   body.addEventListener("input", e => {
     const inp = e.target.closest?.(".hg-plan-in");
     if (!inp) return;
-    const r = hgPlannerDraft[inp.dataset.cls]?.find(x => String(x.id) === inp.dataset.row);
-    if (r) r[inp.dataset.f] = inp.value;
+    if (hgEdit && hgEdit.cls === inp.dataset.cls && String(hgEdit.row.id) === inp.dataset.row) hgEdit.row[inp.dataset.f] = inp.value;
   });
   // Ctrl/Cmd+Enter saves the field being edited; Escape cancels it.
   body.addEventListener("keydown", e => {
