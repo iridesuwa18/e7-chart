@@ -19,7 +19,7 @@
 // Which text field is currently being edited: "Knight|equipment|note" or
 // "Knight|equipment|item:<id>". Only one at a time keeps things simple.
 let hgEditing = null;
-let hgUnusedEditing = false; // the global "sets I won't use" note
+let hgUnusedEditing = null; // class whose copy of the shared "sets not in use" note is open for editing
 let hgOpen = false;
 
 // Equipment Planner: ONE row at a time can be edited (across the whole
@@ -135,7 +135,24 @@ function hgPlannerHTML(cls) {
   const editingElsewhere = !!hgEdit && !editingHere;
   const addBtn = disabled => `<div class="hg-add-row"><button type="button" class="hg-pill" ${cAttr} data-act="plan-add"${disabled ? ' disabled title="Finish editing the other row first"' : ""}>＋ Add row</button></div>`;
 
-  const head = `<div class="hg-section-head">Equipment Planner</div>`;
+  // One shared text for every class ("sets I won't use"), written right under
+  // the header; editing it from any class changes it everywhere.
+  const unusedText = heroGear.unusedSets || "";
+  const unusedEditingHere = hgUnusedEditing === cls;
+  const head = `<div class="hg-section-head">Equipment Planner</div>
+    <div class="hg-unused">
+      <div class="hg-unused-label">Sets not in use · shared by all classes</div>
+      ${unusedEditingHere
+        ? `<div class="hg-row">
+            <textarea class="hg-input" rows="3" placeholder="e.g. Counter, Torrent, Revenge…">${hgEsc(unusedText)}</textarea>
+            <button type="button" class="hg-icon-btn hg-ok" data-gact="unused-ok" title="Save">✓</button>
+            <button type="button" class="hg-icon-btn hg-cancel" data-gact="unused-cancel" title="Cancel">✕</button>
+          </div>`
+        : `<div class="hg-row">
+            <div class="hg-text hg-note${unusedText.trim() ? "" : " hg-empty"}">${unusedText.trim() ? hgEsc(unusedText) : "Nothing written yet."}</div>
+            <button type="button" class="hg-icon-btn" data-gact="unused-edit" data-ucls="${hgEsc(cls)}" title="Edit"${hgUnusedEditing ? " disabled" : ""}>✏️</button>
+          </div>`}
+    </div>`;
   const cols = `<div class="hg-plan-row hg-plan-cols"><div>Gear Set</div><div>Artifact Type</div><div>Assigned heroes</div></div>`;
 
   const body = rows.map((r, idx) => {
@@ -180,10 +197,7 @@ function hgPlannerHTML(cls) {
 
   const empty = rows.length === 0 ? `<div class="hg-text hg-empty">No planner rows yet.</div>` : "";
   // The Add button sits under the row being edited; otherwise at the bottom.
-  const unused = (heroGear.unusedSets || "").trim()
-    ? `<div class="hg-unused"><div class="hg-unused-label">Sets not in use</div><div class="hg-text hg-note">${hgEsc(heroGear.unusedSets)}</div></div>`
-    : "";
-  return `<div class="hg-section hg-planner">${head}${rows.length ? cols : ""}${body}${empty}${editingHere ? "" : addBtn(editingElsewhere)}${unused}</div>`;
+  return `<div class="hg-section hg-planner">${head}${rows.length ? cols : ""}${body}${empty}${editingHere ? "" : addBtn(editingElsewhere)}</div>`;
 }
 
 // Write the row being edited into heroGear. Returns the index just after it
@@ -670,22 +684,7 @@ function renderHeroGear() {
   // A reload/import can drop the row being edited — never edit a ghost.
   if (hgEdit && !hgEdit.isNew && !heroGear[hgEdit.cls].planner.some(r => String(r.id) === String(hgEdit.row.id))) hgEdit = null;
 
-  const unusedText = heroGear.unusedSets || "";
-  const unusedBlock = `<div class="hg-class hg-global">
-      <div class="hg-section-head">Equipment sets I won't use (all classes)</div>
-      ${hgUnusedEditing
-        ? `<div class="hg-row">
-            <textarea class="hg-input" rows="3" placeholder="e.g. Counter, Torrent, Revenge…">${hgEsc(unusedText)}</textarea>
-            <button type="button" class="hg-icon-btn hg-ok" data-gact="unused-ok" title="Save">✓</button>
-            <button type="button" class="hg-icon-btn hg-cancel" data-gact="unused-cancel" title="Cancel">✕</button>
-          </div>`
-        : `<div class="hg-row">
-            <div class="hg-text hg-note${unusedText.trim() ? "" : " hg-empty"}">${unusedText.trim() ? hgEsc(unusedText) : "Nothing written yet — shown under every class's Equipment Planner."}</div>
-            <button type="button" class="hg-icon-btn" data-gact="unused-edit" title="Edit">✏️</button>
-          </div>`}
-    </div>`;
-
-  body.innerHTML = unusedBlock + GEAR_CLASSES.map(cls => `
+  body.innerHTML = GEAR_CLASSES.map(cls => `
     <div class="hg-class">
       <div class="hg-class-title">${hgEsc(cls)}</div>
       ${hgSectionHTML(cls, "equipment", "Equipment")}
@@ -718,12 +717,12 @@ function hgCommit(cls, kind, field, value) {
 function hgOnClick(e) {
   const btn = e.target.closest("button");
   if (btn && btn.dataset.gact) {
-    if (btn.dataset.gact === "unused-edit") hgUnusedEditing = true;
+    if (btn.dataset.gact === "unused-edit") hgUnusedEditing = btn.dataset.ucls;
     else if (btn.dataset.gact === "unused-ok") {
       const v = btn.closest(".hg-row").querySelector(".hg-input").value;
       if (v !== (heroGear.unusedSets || "")) { heroGear.unusedSets = v; hgMarkChanged(); }
-      hgUnusedEditing = false;
-    } else hgUnusedEditing = false; // unused-cancel
+      hgUnusedEditing = null;
+    } else hgUnusedEditing = null; // unused-cancel
     renderHeroGear();
     return;
   }
