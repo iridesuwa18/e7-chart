@@ -27716,6 +27716,14 @@
           "setType": "4",
           "setCount": 1,
           "heroIds": []
+        },
+        {
+          "id": 1792751179695,
+          "gearSet": "Crit Dmg / Attack Set(Non-debuffers niche DPS) E.g. Kawerik or Frieren",
+          "artifactType": "High damage artifact",
+          "setType": "4",
+          "setCount": 1,
+          "heroIds": []
         }
       ]
     },
@@ -27974,5 +27982,5 @@
     }
   },
   "schemaVersion": 2,
-  "savedAt": "2026-10-23T10:24:34.860Z"
+  "savedAt": "2026-10-23T10:28:37.229Z"
 }
