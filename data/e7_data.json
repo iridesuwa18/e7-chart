@@ -27601,24 +27601,40 @@
           "id": 1792713748558,
           "gearSet": "Weakening Set (<100% debuff apply)",
           "artifactType": "Any non-debuff artifact",
+          "setType": "4",
+          "setCount": 1,
           "heroIds": []
         },
         {
           "id": 1792714063777,
           "gearSet": "Weakening Set (No debuffs)",
           "artifactType": "Debuff artifact",
+          "setType": "4",
+          "setCount": 1,
           "heroIds": []
         },
         {
           "id": 1792714579358,
           "gearSet": "Effect Resist Set (Passive + Not Debuffer)",
           "artifactType": "Any non-debuff artifact (No weakening)",
+          "setType": "2",
+          "setCount": 1,
           "heroIds": []
         },
         {
           "id": 1792714669478,
           "gearSet": "Effect Resist Set (Passive + Not Debuffer)",
           "artifactType": "Any debuff artifact (Weakening)",
+          "setType": "2",
+          "setCount": 1,
+          "heroIds": []
+        },
+        {
+          "id": 1792748493300,
+          "gearSet": "Protection Set (High HP, no barrier units)",
+          "artifactType": "No shield artifacts",
+          "setType": "4",
+          "setCount": 1,
           "heroIds": []
         }
       ]
@@ -27658,6 +27674,8 @@
           "id": 1792714054027,
           "gearSet": "Weakening Set (<100% debuff apply)",
           "artifactType": "Any non-debuff artifact",
+          "setType": "4",
+          "setCount": 1,
           "heroIds": []
         }
       ]
@@ -27698,12 +27716,16 @@
           "id": 1792714703161,
           "gearSet": "Weakening Set (<100% debuff apply)",
           "artifactType": "Any non-debuff artifact",
+          "setType": "4",
+          "setCount": 1,
           "heroIds": []
         },
         {
           "id": 1792715110845,
           "gearSet": "Weakening Set (No debuffs)",
           "artifactType": "Debuff artifact",
+          "setType": "4",
+          "setCount": 1,
           "heroIds": []
         }
       ]
@@ -27764,12 +27786,16 @@
           "id": 1792714463600,
           "gearSet": "Weakening Set (<100% debuff apply)",
           "artifactType": "Any non-debuff artifact",
+          "setType": "4",
+          "setCount": 1,
           "heroIds": []
         },
         {
           "id": 1792714315155,
           "gearSet": "Weakening Set (No debuffs)",
           "artifactType": "Debuff artifact",
+          "setType": "4",
+          "setCount": 1,
           "heroIds": []
         }
       ]
@@ -27814,12 +27840,16 @@
           "id": 1792714270388,
           "gearSet": "Weakening Set (<100% debuff apply)",
           "artifactType": "Any non-debuff artifact",
+          "setType": "4",
+          "setCount": 1,
           "heroIds": []
         },
         {
           "id": 1792715079485,
           "gearSet": "Weakening Set (No debuffs)",
           "artifactType": "Debuff artifact",
+          "setType": "4",
+          "setCount": 1,
           "heroIds": []
         }
       ]
@@ -27848,17 +27878,21 @@
           "id": 1792714120397,
           "gearSet": "Weakening Set (<100% debuff apply)",
           "artifactType": "Any non-debuff artifact",
+          "setType": "4",
+          "setCount": 1,
           "heroIds": []
         },
         {
           "id": 1792714172635,
           "gearSet": "Weakening Set (No debuffs)",
           "artifactType": "Debuff artifact",
+          "setType": "4",
+          "setCount": 1,
           "heroIds": []
         }
       ]
     }
   },
   "schemaVersion": 2,
-  "savedAt": "2026-10-23T00:25:08.532Z"
+  "savedAt": "2026-10-23T09:42:41.819Z"
 }
