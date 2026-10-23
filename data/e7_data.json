@@ -27692,6 +27692,22 @@
           "setType": "4",
           "setCount": 1,
           "heroIds": []
+        },
+        {
+          "id": 1792750534693,
+          "gearSet": "Effectiveness Set (Always 2 set, used for any unit w debuffs whether artif or not)",
+          "artifactType": "Any artifact",
+          "setType": "2",
+          "setCount": 1,
+          "heroIds": []
+        },
+        {
+          "id": 1792750649322,
+          "gearSet": "Riposte Set (No debuff units with evasion)",
+          "artifactType": "Evasion artifact",
+          "setType": "4",
+          "setCount": 1,
+          "heroIds": []
         }
       ]
     },
@@ -27950,5 +27966,5 @@
     }
   },
   "schemaVersion": 2,
-  "savedAt": "2026-10-23T10:14:18.896Z"
+  "savedAt": "2026-10-23T10:19:41.870Z"
 }
