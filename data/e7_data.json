@@ -27631,7 +27631,7 @@
         },
         {
           "id": 1792748493300,
-          "gearSet": "Protection Set (High HP, no barrier units)",
+          "gearSet": "Protection Set (Non-DPS, High HP, no barrier units)",
           "artifactType": "No shield artifacts",
           "setType": "4",
           "setCount": 1,
@@ -27894,5 +27894,5 @@
     }
   },
   "schemaVersion": 2,
-  "savedAt": "2026-10-23T09:42:41.819Z"
+  "savedAt": "2026-10-23T09:53:57.609Z"
 }
