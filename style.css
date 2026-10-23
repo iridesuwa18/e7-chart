@@ -5305,3 +5305,8 @@ body.qd-companion .hg-drawer { display: none !important; }
 .hg-plan-editing .hg-add-row { grid-column: 1 / -1; }
 .hg-add-row { margin: 6px 0 2px; }
 .hg-pill:disabled { opacity: .4; cursor: not-allowed; }
+
+/* global "sets not in use" note */
+.hg-global { background: rgba(255,255,255,.02); }
+.hg-unused { margin-top: 8px; padding-top: 6px; border-top: 1px dashed var(--border); }
+.hg-unused-label { font-family: 'Cinzel', serif; font-size: 10px; letter-spacing: .1em; text-transform: uppercase; color: var(--text-dim); margin-bottom: 3px; }

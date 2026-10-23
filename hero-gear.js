@@ -19,6 +19,7 @@
 // Which text field is currently being edited: "Knight|equipment|note" or
 // "Knight|equipment|item:<id>". Only one at a time keeps things simple.
 let hgEditing = null;
+let hgUnusedEditing = false; // the global "sets I won't use" note
 let hgOpen = false;
 
 // Equipment Planner: ONE row at a time can be edited (across the whole
@@ -179,7 +180,10 @@ function hgPlannerHTML(cls) {
 
   const empty = rows.length === 0 ? `<div class="hg-text hg-empty">No planner rows yet.</div>` : "";
   // The Add button sits under the row being edited; otherwise at the bottom.
-  return `<div class="hg-section hg-planner">${head}${rows.length ? cols : ""}${body}${empty}${editingHere ? "" : addBtn(editingElsewhere)}</div>`;
+  const unused = (heroGear.unusedSets || "").trim()
+    ? `<div class="hg-unused"><div class="hg-unused-label">Sets not in use</div><div class="hg-text hg-note">${hgEsc(heroGear.unusedSets)}</div></div>`
+    : "";
+  return `<div class="hg-section hg-planner">${head}${rows.length ? cols : ""}${body}${empty}${editingHere ? "" : addBtn(editingElsewhere)}${unused}</div>`;
 }
 
 // Write the row being edited into heroGear. Returns the index just after it
@@ -666,7 +670,22 @@ function renderHeroGear() {
   // A reload/import can drop the row being edited — never edit a ghost.
   if (hgEdit && !hgEdit.isNew && !heroGear[hgEdit.cls].planner.some(r => String(r.id) === String(hgEdit.row.id))) hgEdit = null;
 
-  body.innerHTML = GEAR_CLASSES.map(cls => `
+  const unusedText = heroGear.unusedSets || "";
+  const unusedBlock = `<div class="hg-class hg-global">
+      <div class="hg-section-head">Equipment sets I won't use (all classes)</div>
+      ${hgUnusedEditing
+        ? `<div class="hg-row">
+            <textarea class="hg-input" rows="3" placeholder="e.g. Counter, Torrent, Revenge…">${hgEsc(unusedText)}</textarea>
+            <button type="button" class="hg-icon-btn hg-ok" data-gact="unused-ok" title="Save">✓</button>
+            <button type="button" class="hg-icon-btn hg-cancel" data-gact="unused-cancel" title="Cancel">✕</button>
+          </div>`
+        : `<div class="hg-row">
+            <div class="hg-text hg-note${unusedText.trim() ? "" : " hg-empty"}">${unusedText.trim() ? hgEsc(unusedText) : "Nothing written yet — shown under every class's Equipment Planner."}</div>
+            <button type="button" class="hg-icon-btn" data-gact="unused-edit" title="Edit">✏️</button>
+          </div>`}
+    </div>`;
+
+  body.innerHTML = unusedBlock + GEAR_CLASSES.map(cls => `
     <div class="hg-class">
       <div class="hg-class-title">${hgEsc(cls)}</div>
       ${hgSectionHTML(cls, "equipment", "Equipment")}
@@ -698,6 +717,16 @@ function hgCommit(cls, kind, field, value) {
 
 function hgOnClick(e) {
   const btn = e.target.closest("button");
+  if (btn && btn.dataset.gact) {
+    if (btn.dataset.gact === "unused-edit") hgUnusedEditing = true;
+    else if (btn.dataset.gact === "unused-ok") {
+      const v = btn.closest(".hg-row").querySelector(".hg-input").value;
+      if (v !== (heroGear.unusedSets || "")) { heroGear.unusedSets = v; hgMarkChanged(); }
+      hgUnusedEditing = false;
+    } else hgUnusedEditing = false; // unused-cancel
+    renderHeroGear();
+    return;
+  }
   if (!btn || !btn.dataset.cls) return;
   if (btn.dataset.act) { hgPlannerClick(btn); return; }
   const { cls, kind, field } = btn.dataset;

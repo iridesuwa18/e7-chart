@@ -53,13 +53,14 @@ let hasUnsavedChanges = false;
 //               artifacts: { note: "", items: [{ id, text }] } }, ... }
 const GEAR_CLASSES = ["Warrior", "Knight", "Thief", "Ranger", "Mage", "Soul Weaver"];
 function emptyHeroGear() {
-  const out = {};
+  const out = { unusedSets: "" }; // unusedSets = one global note shown under every class's planner
   GEAR_CLASSES.forEach(c => { out[c] = { equipment: { note: "", items: [] }, artifacts: { note: "", items: [] }, planner: [] }; });
   return out;
 }
 function normalizeHeroGear(raw) {
   const out = emptyHeroGear();
   if (!raw || typeof raw !== "object") return out;
+  out.unusedSets = typeof raw.unusedSets === "string" ? raw.unusedSets : "";
   GEAR_CLASSES.forEach(c => {
     // Equipment Planner rows: { id, gearSet, artifactType, setType, setCount, heroIds[] }
     out[c].planner = (Array.isArray(raw[c]?.planner) ? raw[c].planner : [])
@@ -89,6 +90,7 @@ function mergeHeroGearAdditive(current, incoming) {
   const out = normalizeHeroGear(current);
   const inc = normalizeHeroGear(incoming);
   let added = 0;
+  if (!out.unusedSets && inc.unusedSets) { out.unusedSets = inc.unusedSets; added++; }
   GEAR_CLASSES.forEach(c => {
     const rowKey = r => `${r.gearSet.trim().toLowerCase()}|${r.artifactType.trim().toLowerCase()}|${r.setType}|${r.setType === "2" ? r.setCount : 0}`;
     const haveRows = new Set(out[c].planner.map(rowKey));
