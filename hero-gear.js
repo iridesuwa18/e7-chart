@@ -313,6 +313,7 @@ let hgPickerCtx = null; // { cls, rowId }
 const hgPickFilt = {
   search: "",
   categories: new Set(),
+  excludeCategories: new Set(), // reverse filter: hide heroes holding anything in these
   reactionIds: new Set(),
   engagementIds: new Set(),
   factorIds: new Set(),
@@ -322,7 +323,7 @@ const hgPickFilt = {
 };
 
 function hgPickFiltCount() {
-  return hgPickFilt.categories.size + hgPickFilt.reactionIds.size + hgPickFilt.engagementIds.size + hgPickFilt.factorIds.size;
+  return hgPickFilt.categories.size + hgPickFilt.excludeCategories.size + hgPickFilt.reactionIds.size + hgPickFilt.engagementIds.size + hgPickFilt.factorIds.size;
 }
 
 function hgHeroMatchesFactor(h, factorId) {
@@ -338,6 +339,8 @@ function hgPickerHeroes(cls) {
   if (f.reactionIds.size) list = list.filter(h => [...f.reactionIds].every(id => hfHeroHasTag(h, "reactions", id)));
   if (f.engagementIds.size) list = list.filter(h => [...f.engagementIds].every(id => hfHeroHasTag(h, "engagements", id)));
   if (f.categories.size) list = list.filter(h => [...f.categories].some(c => hfHeroMatchesCategory(h, c)));
+  // Reverse filter: drop any hero holding something in an excluded category.
+  if (f.excludeCategories.size) list = list.filter(h => ![...f.excludeCategories].some(c => hfHeroMatchesCategory(h, c)));
   if (f.factorIds.size) list = list.filter(h => [...f.factorIds].some(id => hgHeroMatchesFactor(h, id)));
   return list;
 }
@@ -374,7 +377,10 @@ function hgBuildPickerPanel() {
         <span class="hf-count" id="hg-pf-count"></span>
         <button type="button" class="btn btn-ghost btn-xs" id="hg-pf-clear">✕ Clear filters</button>
       </div>
+      <div class="hg-chip-label">Show heroes with</div>
       <div class="hf-category-chips" id="hg-pf-cats"></div>
+      <div class="hg-chip-label hg-chip-label-x">Hide heroes with</div>
+      <div class="hf-category-chips hg-exclude-chips" id="hg-pf-xcats"></div>
 
       <details class="hf-details" id="hg-pf-d-r"${f.reactionIds.size ? " open" : ""}>
         <summary id="hg-pf-sum-r"></summary>
@@ -412,7 +418,7 @@ function hgBuildPickerPanel() {
 
   document.getElementById("hg-pf-clear").addEventListener("click", () => {
     f.search = f.reactionSearch = f.engagementSearch = f.factorSearch = "";
-    f.categories.clear(); f.reactionIds.clear(); f.engagementIds.clear(); f.factorIds.clear();
+    f.categories.clear(); f.excludeCategories.clear(); f.reactionIds.clear(); f.engagementIds.clear(); f.factorIds.clear();
     hgBuildPickerPanel();
   });
 
@@ -439,15 +445,30 @@ function hgBuildPickerPanel() {
 }
 
 function hgRenderCategoryChips() {
-  const box = document.getElementById("hg-pf-cats");
-  if (!box) return;
+  const inc = document.getElementById("hg-pf-cats");
+  const exc = document.getElementById("hg-pf-xcats");
+  if (!inc || !exc) return;
   const cats = hfAllRankingCategories();
-  if (!cats.length) { box.innerHTML = ""; return; }
-  box.innerHTML = cats.map(c => `<button type="button" class="qd-factor-priority-chip${hgPickFilt.categories.has(c) ? " active" : ""}" data-cat="${escAttr(c)}">${hgEsc(c)}</button>`).join("");
-  box.querySelectorAll("button").forEach(btn => btn.addEventListener("click", () => {
+  const labelX = document.querySelector(".hg-chip-label-x");
+  const labelI = inc.previousElementSibling;
+  if (!cats.length) { inc.innerHTML = exc.innerHTML = ""; if (labelX) labelX.style.display = "none"; if (labelI) labelI.style.display = "none"; return; }
+
+  const f = hgPickFilt;
+  inc.innerHTML = cats.map(c => `<button type="button" class="qd-factor-priority-chip${f.categories.has(c) ? " active" : ""}" data-cat="${escAttr(c)}">${hgEsc(c)}</button>`).join("");
+  exc.innerHTML = cats.map(c => `<button type="button" class="qd-factor-priority-chip hg-chip-x${f.excludeCategories.has(c) ? " active" : ""}" data-cat="${escAttr(c)}">${hgEsc(c)}</button>`).join("");
+
+  // A category can't be both required and excluded — ticking one side
+  // clears the other so the two rows never contradict each other.
+  inc.querySelectorAll("button").forEach(btn => btn.addEventListener("click", () => {
     const c = btn.dataset.cat;
-    if (hgPickFilt.categories.has(c)) hgPickFilt.categories.delete(c); else hgPickFilt.categories.add(c);
-    btn.classList.toggle("active");
+    if (f.categories.has(c)) f.categories.delete(c); else { f.categories.add(c); f.excludeCategories.delete(c); }
+    hgRenderCategoryChips();
+    hgRenderPickerList();
+  }));
+  exc.querySelectorAll("button").forEach(btn => btn.addEventListener("click", () => {
+    const c = btn.dataset.cat;
+    if (f.excludeCategories.has(c)) f.excludeCategories.delete(c); else { f.excludeCategories.add(c); f.categories.delete(c); }
+    hgRenderCategoryChips();
     hgRenderPickerList();
   }));
 }

@@ -5309,3 +5309,8 @@ body.qd-companion .hg-drawer { display: none !important; }
 /* global "sets not in use" note */
 .hg-unused { margin: 2px 0 8px; padding-bottom: 8px; border-bottom: 1px dashed var(--border); }
 .hg-unused-label { font-family: 'Cinzel', serif; font-size: 10px; letter-spacing: .1em; text-transform: uppercase; color: var(--text-dim); margin-bottom: 3px; }
+
+/* reverse (hide) Category row in the hero picker */
+.hg-chip-label { font-family: 'Cinzel', serif; font-size: 9.5px; letter-spacing: .1em; text-transform: uppercase; color: var(--text-dim); margin: 6px 0 3px; }
+.hg-chip-label-x { color: #e08a80; }
+.hg-chip-x.active { background: rgba(192,57,43,.28); border-color: #c0392b; color: #ffb3a8; text-decoration: line-through; }
