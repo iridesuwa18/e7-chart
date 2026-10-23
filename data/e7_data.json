@@ -27608,6 +27608,18 @@
           "gearSet": "Weakening Set (No debuffs)",
           "artifactType": "Debuff artifact",
           "heroIds": []
+        },
+        {
+          "id": 1792714579358,
+          "gearSet": "Effect Resist Set (Passive + Not Debuffer)",
+          "artifactType": "Any non-debuff artifact (No weakening)",
+          "heroIds": []
+        },
+        {
+          "id": 1792714669478,
+          "gearSet": "Effect Resist Set (Passive + Not Debuffer)",
+          "artifactType": "Any debuff artifact (Weakening)",
+          "heroIds": []
         }
       ]
     },
@@ -27848,5 +27860,5 @@
     }
   },
   "schemaVersion": 2,
-  "savedAt": "2026-10-23T00:10:29.118Z"
+  "savedAt": "2026-10-23T00:25:08.532Z"
 }
