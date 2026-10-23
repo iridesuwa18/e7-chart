@@ -27557,7 +27557,7 @@
     ]
   },
   "heroGear": {
-    "unusedSets": "Critical, Fervor, Immunity, Torrent, Unity",
+    "unusedSets": "Critical, Fervor, Immunity, Torrent, Unity, Injury, Rage, Reversal",
     "Warrior": {
       "equipment": {
         "note": "",
@@ -28007,5 +28007,5 @@
     }
   },
   "schemaVersion": 2,
-  "savedAt": "2026-10-23T10:59:07.726Z"
+  "savedAt": "2026-10-23T11:02:31.209Z"
 }
