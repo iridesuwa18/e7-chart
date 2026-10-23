@@ -27636,6 +27636,22 @@
           "setType": "4",
           "setCount": 1,
           "heroIds": []
+        },
+        {
+          "id": 1792749294025,
+          "gearSet": "Health Set (Tanks, Barrier units, Damage sharers/Defenders)",
+          "artifactType": "Any barrier artifact is good",
+          "setType": "2",
+          "setCount": 3,
+          "heroIds": []
+        },
+        {
+          "id": 1792749385629,
+          "gearSet": "Health Set (HP scalers)",
+          "artifactType": "Any artifact (HP based artif is good)",
+          "setType": "2",
+          "setCount": 1,
+          "heroIds": []
         }
       ]
     },
@@ -27894,5 +27910,5 @@
     }
   },
   "schemaVersion": 2,
-  "savedAt": "2026-10-23T09:53:57.609Z"
+  "savedAt": "2026-10-23T09:57:51.404Z"
 }
