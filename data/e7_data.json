@@ -27557,6 +27557,7 @@
     ]
   },
   "heroGear": {
+    "unusedSets": "Critical, Fervor, Immunity, Torrent, Unity",
     "Warrior": {
       "equipment": {
         "note": "",
@@ -27737,6 +27738,14 @@
           "id": 1792751721858,
           "gearSet": "Pursuit Set (Unit using an additional dmg artif)",
           "artifactType": "Additional / fixed damage artifact",
+          "setType": "2",
+          "setCount": 1,
+          "heroIds": []
+        },
+        {
+          "id": 1792753066703,
+          "gearSet": "Penetration Set (Non debuff DPS units)",
+          "artifactType": "Any artifact",
           "setType": "2",
           "setCount": 1,
           "heroIds": []
@@ -27998,5 +28007,5 @@
     }
   },
   "schemaVersion": 2,
-  "savedAt": "2026-10-23T10:49:47.550Z"
+  "savedAt": "2026-10-23T10:59:07.726Z"
 }
