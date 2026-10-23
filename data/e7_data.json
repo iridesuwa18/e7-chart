@@ -27596,7 +27596,14 @@
           }
         ]
       },
-      "planner": []
+      "planner": [
+        {
+          "id": 1792713748558,
+          "gearSet": "Weakening Set (<100% debuff apply)",
+          "artifactType": "Any non-debuff artifact",
+          "heroIds": []
+        }
+      ]
     },
     "Knight": {
       "equipment": {
@@ -27776,5 +27783,5 @@
     }
   },
   "schemaVersion": 2,
-  "savedAt": "2026-10-23T00:01:37.079Z"
+  "savedAt": "2026-10-23T00:03:57.119Z"
 }
