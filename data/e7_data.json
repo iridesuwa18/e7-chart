@@ -27790,6 +27790,150 @@
           "setType": "4",
           "setCount": 1,
           "heroIds": []
+        },
+        {
+          "id": 1792761220495,
+          "gearSet": "Weakening Set (No debuffs)",
+          "artifactType": "Debuff artifact",
+          "setType": "4",
+          "setCount": 1,
+          "heroIds": []
+        },
+        {
+          "id": 1792761991609,
+          "gearSet": "Effect Resist Set (Passive + Not Debuffer)",
+          "artifactType": "Any non-debuff artifact (No weakening)",
+          "setType": "2",
+          "setCount": 1,
+          "heroIds": []
+        },
+        {
+          "id": 1792761761776,
+          "gearSet": "Effect Resist Set (Passive + Not Debuffer)",
+          "artifactType": "Any debuff artifact (Weakening)",
+          "setType": "2",
+          "setCount": 1,
+          "heroIds": []
+        },
+        {
+          "id": 1792761610965,
+          "gearSet": "Protection Set (Non-DPS, High HP, no barrier units)",
+          "artifactType": "No shield artifacts",
+          "setType": "4",
+          "setCount": 1,
+          "heroIds": []
+        },
+        {
+          "id": 1792761541301,
+          "gearSet": "Health Set (Tanks, Barrier units, Damage sharers/Defenders)",
+          "artifactType": "Any barrier artifact is good",
+          "setType": "2",
+          "setCount": 3,
+          "heroIds": []
+        },
+        {
+          "id": 1792761673259,
+          "gearSet": "Health Set (HP scalers)",
+          "artifactType": "Any artifact (HP based artif is good)",
+          "setType": "2",
+          "setCount": 1,
+          "heroIds": []
+        },
+        {
+          "id": 1792761811731,
+          "gearSet": "Defense Set (DEF scalers)",
+          "artifactType": "Any artifact (DEF based artif is good)",
+          "setType": "4",
+          "setCount": 1,
+          "heroIds": []
+        },
+        {
+          "id": 1792761705638,
+          "gearSet": "Revenge Set (Turn 2 Units w High Sustainability, 100% debuff units or No debuff units only)",
+          "artifactType": "Speed artifacts",
+          "setType": "4",
+          "setCount": 1,
+          "heroIds": []
+        },
+        {
+          "id": 1792761346705,
+          "gearSet": "Speed Set (All Soul Weavers / Buffers, No debuff units)",
+          "artifactType": "Any artifact",
+          "setType": "4",
+          "setCount": 1,
+          "heroIds": []
+        },
+        {
+          "id": 1792762080329,
+          "gearSet": "Counter Set (Units already w counter, Niche units)",
+          "artifactType": "Non-counter artifacts",
+          "setType": "4",
+          "setCount": 1,
+          "heroIds": []
+        },
+        {
+          "id": 1792761906678,
+          "gearSet": "Counter Set (Units with no counter but uses a counter arti)",
+          "artifactType": "Counter artifact",
+          "setType": "4",
+          "setCount": 1,
+          "heroIds": []
+        },
+        {
+          "id": 1792762016410,
+          "gearSet": "Effectiveness Set (Always 2 set, used for any unit w debuffs whether artif or not)",
+          "artifactType": "Any artifact",
+          "setType": "2",
+          "setCount": 1,
+          "heroIds": []
+        },
+        {
+          "id": 1792762125030,
+          "gearSet": "Riposte Set (No debuff units with evasion)",
+          "artifactType": "Evasion artifact",
+          "setType": "4",
+          "setCount": 1,
+          "heroIds": []
+        },
+        {
+          "id": 1792761774036,
+          "gearSet": "Warfare Set (Super niche, very specific units)",
+          "artifactType": "Any artifact",
+          "setType": "4",
+          "setCount": 1,
+          "heroIds": []
+        },
+        {
+          "id": 1792761610667,
+          "gearSet": "Crit Dmg / Attack Set(Non-debuffers niche DPS) E.g. Kawerik or Frieren",
+          "artifactType": "High damage artifact",
+          "setType": "4",
+          "setCount": 1,
+          "heroIds": []
+        },
+        {
+          "id": 1792761688616,
+          "gearSet": "Pursuit Set (Any unit with Additional Dmg in their kit)",
+          "artifactType": "Any artifact",
+          "setType": "2",
+          "setCount": 1,
+          "heroIds": []
+        },
+        {
+          "id": 1792761672421,
+          "gearSet": "Pursuit Set (Unit using an additional dmg artif)",
+          "artifactType": "Additional / fixed damage artifact",
+          "setType": "2",
+          "setCount": 1,
+          "heroIds": []
+        },
+        {
+          "id": 1792761952553,
+          "gearSet": "Penetration Set (Non debuff DPS units)",
+          "artifactType": "Any artifact",
+          "setType": "2",
+          "setCount": 1,
+          "heroIds": []
         }
       ]
     },
@@ -27838,6 +27982,142 @@
           "gearSet": "Weakening Set (No debuffs)",
           "artifactType": "Debuff artifact",
           "setType": "4",
+          "setCount": 1,
+          "heroIds": []
+        },
+        {
+          "id": 1792761850632,
+          "gearSet": "Effect Resist Set (Passive + Not Debuffer)",
+          "artifactType": "Any non-debuff artifact (No weakening)",
+          "setType": "2",
+          "setCount": 1,
+          "heroIds": []
+        },
+        {
+          "id": 1792761193633,
+          "gearSet": "Effect Resist Set (Passive + Not Debuffer)",
+          "artifactType": "Any debuff artifact (Weakening)",
+          "setType": "2",
+          "setCount": 1,
+          "heroIds": []
+        },
+        {
+          "id": 1792762151465,
+          "gearSet": "Protection Set (Non-DPS, High HP, no barrier units)",
+          "artifactType": "No shield artifacts",
+          "setType": "4",
+          "setCount": 1,
+          "heroIds": []
+        },
+        {
+          "id": 1792761603454,
+          "gearSet": "Health Set (Tanks, Barrier units, Damage sharers/Defenders)",
+          "artifactType": "Any barrier artifact is good",
+          "setType": "2",
+          "setCount": 3,
+          "heroIds": []
+        },
+        {
+          "id": 1792761614609,
+          "gearSet": "Health Set (HP scalers)",
+          "artifactType": "Any artifact (HP based artif is good)",
+          "setType": "2",
+          "setCount": 1,
+          "heroIds": []
+        },
+        {
+          "id": 1792761669882,
+          "gearSet": "Defense Set (DEF scalers)",
+          "artifactType": "Any artifact (DEF based artif is good)",
+          "setType": "4",
+          "setCount": 1,
+          "heroIds": []
+        },
+        {
+          "id": 1792761784033,
+          "gearSet": "Revenge Set (Turn 2 Units w High Sustainability, 100% debuff units or No debuff units only)",
+          "artifactType": "Speed artifacts",
+          "setType": "4",
+          "setCount": 1,
+          "heroIds": []
+        },
+        {
+          "id": 1792761279085,
+          "gearSet": "Speed Set (All Soul Weavers / Buffers, No debuff units)",
+          "artifactType": "Any artifact",
+          "setType": "4",
+          "setCount": 1,
+          "heroIds": []
+        },
+        {
+          "id": 1792762070281,
+          "gearSet": "Counter Set (Units already w counter, Niche units)",
+          "artifactType": "Non-counter artifacts",
+          "setType": "4",
+          "setCount": 1,
+          "heroIds": []
+        },
+        {
+          "id": 1792761882640,
+          "gearSet": "Counter Set (Units with no counter but uses a counter arti)",
+          "artifactType": "Counter artifact",
+          "setType": "4",
+          "setCount": 1,
+          "heroIds": []
+        },
+        {
+          "id": 1792761235275,
+          "gearSet": "Effectiveness Set (Always 2 set, used for any unit w debuffs whether artif or not)",
+          "artifactType": "Any artifact",
+          "setType": "2",
+          "setCount": 1,
+          "heroIds": []
+        },
+        {
+          "id": 1792761383008,
+          "gearSet": "Riposte Set (No debuff units with evasion)",
+          "artifactType": "Evasion artifact",
+          "setType": "4",
+          "setCount": 1,
+          "heroIds": []
+        },
+        {
+          "id": 1792761980415,
+          "gearSet": "Warfare Set (Super niche, very specific units)",
+          "artifactType": "Any artifact",
+          "setType": "4",
+          "setCount": 1,
+          "heroIds": []
+        },
+        {
+          "id": 1792761880457,
+          "gearSet": "Crit Dmg / Attack Set(Non-debuffers niche DPS) E.g. Kawerik or Frieren",
+          "artifactType": "High damage artifact",
+          "setType": "4",
+          "setCount": 1,
+          "heroIds": []
+        },
+        {
+          "id": 1792761904802,
+          "gearSet": "Pursuit Set (Any unit with Additional Dmg in their kit)",
+          "artifactType": "Any artifact",
+          "setType": "2",
+          "setCount": 1,
+          "heroIds": []
+        },
+        {
+          "id": 1792762131442,
+          "gearSet": "Pursuit Set (Unit using an additional dmg artif)",
+          "artifactType": "Additional / fixed damage artifact",
+          "setType": "2",
+          "setCount": 1,
+          "heroIds": []
+        },
+        {
+          "id": 1792761588541,
+          "gearSet": "Penetration Set (Non debuff DPS units)",
+          "artifactType": "Any artifact",
+          "setType": "2",
           "setCount": 1,
           "heroIds": []
         }
@@ -27910,6 +28190,142 @@
           "setType": "4",
           "setCount": 1,
           "heroIds": []
+        },
+        {
+          "id": 1792761751290,
+          "gearSet": "Effect Resist Set (Passive + Not Debuffer)",
+          "artifactType": "Any non-debuff artifact (No weakening)",
+          "setType": "2",
+          "setCount": 1,
+          "heroIds": []
+        },
+        {
+          "id": 1792761400151,
+          "gearSet": "Effect Resist Set (Passive + Not Debuffer)",
+          "artifactType": "Any debuff artifact (Weakening)",
+          "setType": "2",
+          "setCount": 1,
+          "heroIds": []
+        },
+        {
+          "id": 1792761731169,
+          "gearSet": "Protection Set (Non-DPS, High HP, no barrier units)",
+          "artifactType": "No shield artifacts",
+          "setType": "4",
+          "setCount": 1,
+          "heroIds": []
+        },
+        {
+          "id": 1792761546119,
+          "gearSet": "Health Set (Tanks, Barrier units, Damage sharers/Defenders)",
+          "artifactType": "Any barrier artifact is good",
+          "setType": "2",
+          "setCount": 3,
+          "heroIds": []
+        },
+        {
+          "id": 1792761239526,
+          "gearSet": "Health Set (HP scalers)",
+          "artifactType": "Any artifact (HP based artif is good)",
+          "setType": "2",
+          "setCount": 1,
+          "heroIds": []
+        },
+        {
+          "id": 1792761286494,
+          "gearSet": "Defense Set (DEF scalers)",
+          "artifactType": "Any artifact (DEF based artif is good)",
+          "setType": "4",
+          "setCount": 1,
+          "heroIds": []
+        },
+        {
+          "id": 1792762041994,
+          "gearSet": "Revenge Set (Turn 2 Units w High Sustainability, 100% debuff units or No debuff units only)",
+          "artifactType": "Speed artifacts",
+          "setType": "4",
+          "setCount": 1,
+          "heroIds": []
+        },
+        {
+          "id": 1792761704486,
+          "gearSet": "Speed Set (All Soul Weavers / Buffers, No debuff units)",
+          "artifactType": "Any artifact",
+          "setType": "4",
+          "setCount": 1,
+          "heroIds": []
+        },
+        {
+          "id": 1792761247231,
+          "gearSet": "Counter Set (Units already w counter, Niche units)",
+          "artifactType": "Non-counter artifacts",
+          "setType": "4",
+          "setCount": 1,
+          "heroIds": []
+        },
+        {
+          "id": 1792762202824,
+          "gearSet": "Counter Set (Units with no counter but uses a counter arti)",
+          "artifactType": "Counter artifact",
+          "setType": "4",
+          "setCount": 1,
+          "heroIds": []
+        },
+        {
+          "id": 1792761776265,
+          "gearSet": "Effectiveness Set (Always 2 set, used for any unit w debuffs whether artif or not)",
+          "artifactType": "Any artifact",
+          "setType": "2",
+          "setCount": 1,
+          "heroIds": []
+        },
+        {
+          "id": 1792761243505,
+          "gearSet": "Riposte Set (No debuff units with evasion)",
+          "artifactType": "Evasion artifact",
+          "setType": "4",
+          "setCount": 1,
+          "heroIds": []
+        },
+        {
+          "id": 1792761459894,
+          "gearSet": "Warfare Set (Super niche, very specific units)",
+          "artifactType": "Any artifact",
+          "setType": "4",
+          "setCount": 1,
+          "heroIds": []
+        },
+        {
+          "id": 1792761959900,
+          "gearSet": "Crit Dmg / Attack Set(Non-debuffers niche DPS) E.g. Kawerik or Frieren",
+          "artifactType": "High damage artifact",
+          "setType": "4",
+          "setCount": 1,
+          "heroIds": []
+        },
+        {
+          "id": 1792761263176,
+          "gearSet": "Pursuit Set (Any unit with Additional Dmg in their kit)",
+          "artifactType": "Any artifact",
+          "setType": "2",
+          "setCount": 1,
+          "heroIds": []
+        },
+        {
+          "id": 1792761439623,
+          "gearSet": "Pursuit Set (Unit using an additional dmg artif)",
+          "artifactType": "Additional / fixed damage artifact",
+          "setType": "2",
+          "setCount": 1,
+          "heroIds": []
+        },
+        {
+          "id": 1792761876873,
+          "gearSet": "Penetration Set (Non debuff DPS units)",
+          "artifactType": "Any artifact",
+          "setType": "2",
+          "setCount": 1,
+          "heroIds": []
         }
       ]
     },
@@ -27964,6 +28380,142 @@
           "setType": "4",
           "setCount": 1,
           "heroIds": []
+        },
+        {
+          "id": 1792762034949,
+          "gearSet": "Effect Resist Set (Passive + Not Debuffer)",
+          "artifactType": "Any non-debuff artifact (No weakening)",
+          "setType": "2",
+          "setCount": 1,
+          "heroIds": []
+        },
+        {
+          "id": 1792761238426,
+          "gearSet": "Effect Resist Set (Passive + Not Debuffer)",
+          "artifactType": "Any debuff artifact (Weakening)",
+          "setType": "2",
+          "setCount": 1,
+          "heroIds": []
+        },
+        {
+          "id": 1792762047255,
+          "gearSet": "Protection Set (Non-DPS, High HP, no barrier units)",
+          "artifactType": "No shield artifacts",
+          "setType": "4",
+          "setCount": 1,
+          "heroIds": []
+        },
+        {
+          "id": 1792761454963,
+          "gearSet": "Health Set (Tanks, Barrier units, Damage sharers/Defenders)",
+          "artifactType": "Any barrier artifact is good",
+          "setType": "2",
+          "setCount": 3,
+          "heroIds": []
+        },
+        {
+          "id": 1792762170689,
+          "gearSet": "Health Set (HP scalers)",
+          "artifactType": "Any artifact (HP based artif is good)",
+          "setType": "2",
+          "setCount": 1,
+          "heroIds": []
+        },
+        {
+          "id": 1792761443057,
+          "gearSet": "Defense Set (DEF scalers)",
+          "artifactType": "Any artifact (DEF based artif is good)",
+          "setType": "4",
+          "setCount": 1,
+          "heroIds": []
+        },
+        {
+          "id": 1792762188481,
+          "gearSet": "Revenge Set (Turn 2 Units w High Sustainability, 100% debuff units or No debuff units only)",
+          "artifactType": "Speed artifacts",
+          "setType": "4",
+          "setCount": 1,
+          "heroIds": []
+        },
+        {
+          "id": 1792761709350,
+          "gearSet": "Speed Set (All Soul Weavers / Buffers, No debuff units)",
+          "artifactType": "Any artifact",
+          "setType": "4",
+          "setCount": 1,
+          "heroIds": []
+        },
+        {
+          "id": 1792762153535,
+          "gearSet": "Counter Set (Units already w counter, Niche units)",
+          "artifactType": "Non-counter artifacts",
+          "setType": "4",
+          "setCount": 1,
+          "heroIds": []
+        },
+        {
+          "id": 1792761873743,
+          "gearSet": "Counter Set (Units with no counter but uses a counter arti)",
+          "artifactType": "Counter artifact",
+          "setType": "4",
+          "setCount": 1,
+          "heroIds": []
+        },
+        {
+          "id": 1792761237085,
+          "gearSet": "Effectiveness Set (Always 2 set, used for any unit w debuffs whether artif or not)",
+          "artifactType": "Any artifact",
+          "setType": "2",
+          "setCount": 1,
+          "heroIds": []
+        },
+        {
+          "id": 1792761563523,
+          "gearSet": "Riposte Set (No debuff units with evasion)",
+          "artifactType": "Evasion artifact",
+          "setType": "4",
+          "setCount": 1,
+          "heroIds": []
+        },
+        {
+          "id": 1792761938726,
+          "gearSet": "Warfare Set (Super niche, very specific units)",
+          "artifactType": "Any artifact",
+          "setType": "4",
+          "setCount": 1,
+          "heroIds": []
+        },
+        {
+          "id": 1792761742692,
+          "gearSet": "Crit Dmg / Attack Set(Non-debuffers niche DPS) E.g. Kawerik or Frieren",
+          "artifactType": "High damage artifact",
+          "setType": "4",
+          "setCount": 1,
+          "heroIds": []
+        },
+        {
+          "id": 1792762012022,
+          "gearSet": "Pursuit Set (Any unit with Additional Dmg in their kit)",
+          "artifactType": "Any artifact",
+          "setType": "2",
+          "setCount": 1,
+          "heroIds": []
+        },
+        {
+          "id": 1792762124348,
+          "gearSet": "Pursuit Set (Unit using an additional dmg artif)",
+          "artifactType": "Additional / fixed damage artifact",
+          "setType": "2",
+          "setCount": 1,
+          "heroIds": []
+        },
+        {
+          "id": 1792761839320,
+          "gearSet": "Penetration Set (Non debuff DPS units)",
+          "artifactType": "Any artifact",
+          "setType": "2",
+          "setCount": 1,
+          "heroIds": []
         }
       ]
     },
@@ -28002,10 +28554,146 @@
           "setType": "4",
           "setCount": 1,
           "heroIds": []
+        },
+        {
+          "id": 1792761617176,
+          "gearSet": "Effect Resist Set (Passive + Not Debuffer)",
+          "artifactType": "Any non-debuff artifact (No weakening)",
+          "setType": "2",
+          "setCount": 1,
+          "heroIds": []
+        },
+        {
+          "id": 1792762147040,
+          "gearSet": "Effect Resist Set (Passive + Not Debuffer)",
+          "artifactType": "Any debuff artifact (Weakening)",
+          "setType": "2",
+          "setCount": 1,
+          "heroIds": []
+        },
+        {
+          "id": 1792761766162,
+          "gearSet": "Protection Set (Non-DPS, High HP, no barrier units)",
+          "artifactType": "No shield artifacts",
+          "setType": "4",
+          "setCount": 1,
+          "heroIds": []
+        },
+        {
+          "id": 1792761931678,
+          "gearSet": "Health Set (Tanks, Barrier units, Damage sharers/Defenders)",
+          "artifactType": "Any barrier artifact is good",
+          "setType": "2",
+          "setCount": 3,
+          "heroIds": []
+        },
+        {
+          "id": 1792761975691,
+          "gearSet": "Health Set (HP scalers)",
+          "artifactType": "Any artifact (HP based artif is good)",
+          "setType": "2",
+          "setCount": 1,
+          "heroIds": []
+        },
+        {
+          "id": 1792762172481,
+          "gearSet": "Defense Set (DEF scalers)",
+          "artifactType": "Any artifact (DEF based artif is good)",
+          "setType": "4",
+          "setCount": 1,
+          "heroIds": []
+        },
+        {
+          "id": 1792761609157,
+          "gearSet": "Revenge Set (Turn 2 Units w High Sustainability, 100% debuff units or No debuff units only)",
+          "artifactType": "Speed artifacts",
+          "setType": "4",
+          "setCount": 1,
+          "heroIds": []
+        },
+        {
+          "id": 1792762194217,
+          "gearSet": "Speed Set (All Soul Weavers / Buffers, No debuff units)",
+          "artifactType": "Any artifact",
+          "setType": "4",
+          "setCount": 1,
+          "heroIds": []
+        },
+        {
+          "id": 1792761569549,
+          "gearSet": "Counter Set (Units already w counter, Niche units)",
+          "artifactType": "Non-counter artifacts",
+          "setType": "4",
+          "setCount": 1,
+          "heroIds": []
+        },
+        {
+          "id": 1792761524898,
+          "gearSet": "Counter Set (Units with no counter but uses a counter arti)",
+          "artifactType": "Counter artifact",
+          "setType": "4",
+          "setCount": 1,
+          "heroIds": []
+        },
+        {
+          "id": 1792761908683,
+          "gearSet": "Effectiveness Set (Always 2 set, used for any unit w debuffs whether artif or not)",
+          "artifactType": "Any artifact",
+          "setType": "2",
+          "setCount": 1,
+          "heroIds": []
+        },
+        {
+          "id": 1792761955593,
+          "gearSet": "Riposte Set (No debuff units with evasion)",
+          "artifactType": "Evasion artifact",
+          "setType": "4",
+          "setCount": 1,
+          "heroIds": []
+        },
+        {
+          "id": 1792761430575,
+          "gearSet": "Warfare Set (Super niche, very specific units)",
+          "artifactType": "Any artifact",
+          "setType": "4",
+          "setCount": 1,
+          "heroIds": []
+        },
+        {
+          "id": 1792761473066,
+          "gearSet": "Crit Dmg / Attack Set(Non-debuffers niche DPS) E.g. Kawerik or Frieren",
+          "artifactType": "High damage artifact",
+          "setType": "4",
+          "setCount": 1,
+          "heroIds": []
+        },
+        {
+          "id": 1792762102531,
+          "gearSet": "Pursuit Set (Any unit with Additional Dmg in their kit)",
+          "artifactType": "Any artifact",
+          "setType": "2",
+          "setCount": 1,
+          "heroIds": []
+        },
+        {
+          "id": 1792761687937,
+          "gearSet": "Pursuit Set (Unit using an additional dmg artif)",
+          "artifactType": "Additional / fixed damage artifact",
+          "setType": "2",
+          "setCount": 1,
+          "heroIds": []
+        },
+        {
+          "id": 1792761522238,
+          "gearSet": "Penetration Set (Non debuff DPS units)",
+          "artifactType": "Any artifact",
+          "setType": "2",
+          "setCount": 1,
+          "heroIds": []
         }
       ]
     }
   },
   "schemaVersion": 2,
-  "savedAt": "2026-10-23T11:02:31.209Z"
+  "savedAt": "2026-10-23T13:14:20.674Z"
 }
