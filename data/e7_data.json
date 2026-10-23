@@ -27652,6 +27652,14 @@
           "setType": "2",
           "setCount": 1,
           "heroIds": []
+        },
+        {
+          "id": 1792749480605,
+          "gearSet": "Defense Set (DEF scalers)",
+          "artifactType": "Any artifact (DEF based artif is good)",
+          "setType": "4",
+          "setCount": 1,
+          "heroIds": []
         }
       ]
     },
@@ -27910,5 +27918,5 @@
     }
   },
   "schemaVersion": 2,
-  "savedAt": "2026-10-23T09:57:51.404Z"
+  "savedAt": "2026-10-23T09:59:16.471Z"
 }
