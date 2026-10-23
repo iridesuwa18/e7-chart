@@ -17398,7 +17398,7 @@
       "id": 1787966765429,
       "name": "Ragnvald",
       "rarity": "3",
-      "role": "Warrior",
+      "role": "Thief",
       "element": "Ice",
       "notes": "",
       "iconData": "https://raw.githubusercontent.com/iridesuwa18/e7-chart/data/assets/heroes/ragnvald.webp",
@@ -28695,5 +28695,5 @@
     }
   },
   "schemaVersion": 2,
-  "savedAt": "2026-10-23T13:23:36.461Z"
+  "savedAt": "2026-10-23T13:33:58.915Z"
 }
