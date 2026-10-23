@@ -7320,7 +7320,7 @@
       "id": 1787486160524,
       "name": "Aube",
       "rarity": "5ml",
-      "role": "Soul Weaver",
+      "role": "Ranger",
       "element": "Ice",
       "notes": "",
       "iconData": "https://raw.githubusercontent.com/iridesuwa18/e7-chart/data/assets/heroes/aube.webp",
@@ -28860,5 +28860,5 @@
     }
   },
   "schemaVersion": 2,
-  "savedAt": "2026-10-23T14:30:09.444Z"
+  "savedAt": "2026-10-23T14:32:35.658Z"
 }
