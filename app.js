@@ -61,13 +61,16 @@ function normalizeHeroGear(raw) {
   const out = emptyHeroGear();
   if (!raw || typeof raw !== "object") return out;
   GEAR_CLASSES.forEach(c => {
-    // Equipment Planner rows: { id, gearSet, artifactType, heroIds[] }
+    // Equipment Planner rows: { id, gearSet, artifactType, setType, setCount, heroIds[] }
     out[c].planner = (Array.isArray(raw[c]?.planner) ? raw[c].planner : [])
       .filter(r => r && typeof r === "object")
       .map((r, i) => ({
         id: r.id ?? (Date.now() + i),
         gearSet: typeof r.gearSet === "string" ? r.gearSet : "",
         artifactType: typeof r.artifactType === "string" ? r.artifactType : "",
+        // "4" = a 4-piece set; "2" = a 2-piece set used setCount (1-3) times.
+        setType: r.setType === "2" ? "2" : "4",
+        setCount: [1, 2, 3].includes(Number(r.setCount)) ? Number(r.setCount) : 1,
         heroIds: Array.isArray(r.heroIds) ? r.heroIds.filter(x => x != null) : [],
       }));
     ["equipment", "artifacts"].forEach(kind => {
@@ -87,9 +90,10 @@ function mergeHeroGearAdditive(current, incoming) {
   const inc = normalizeHeroGear(incoming);
   let added = 0;
   GEAR_CLASSES.forEach(c => {
-    const haveRows = new Set(out[c].planner.map(r => `${r.gearSet.trim().toLowerCase()}|${r.artifactType.trim().toLowerCase()}`));
+    const rowKey = r => `${r.gearSet.trim().toLowerCase()}|${r.artifactType.trim().toLowerCase()}|${r.setType}|${r.setType === "2" ? r.setCount : 0}`;
+    const haveRows = new Set(out[c].planner.map(rowKey));
     inc[c].planner.forEach(r => {
-      const key = `${r.gearSet.trim().toLowerCase()}|${r.artifactType.trim().toLowerCase()}`;
+      const key = rowKey(r);
       if (haveRows.has(key)) return;
       haveRows.add(key);
       out[c].planner.push({ ...r, id: Date.now() + Math.floor(Math.random() * 1e6) });

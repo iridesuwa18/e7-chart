@@ -5290,3 +5290,9 @@ body.qd-companion .hg-drawer { display: none !important; }
 .hg-copy-actions { display: flex; gap: 8px; align-items: center; justify-content: space-between; margin-top: 8px; }
 .hg-copy-go { flex: 1; padding: 12px; }
 .hg-copy-go:disabled { opacity: .45; cursor: not-allowed; }
+
+/* 4 set / 2 set ×N */
+.hg-gear-cell { display: flex; flex-direction: column; gap: 5px; min-width: 0; }
+.hg-settype { display: flex; flex-wrap: wrap; align-items: center; gap: 4px; }
+.hg-pill.on { background: rgba(201,162,39,.25); border-color: var(--gold); color: var(--gold2); font-weight: 600; }
+.hg-set-badge { display: inline-block; font-family: 'Cinzel', serif; font-size: 10px; letter-spacing: .06em; padding: 1px 7px; border-radius: 999px; background: rgba(201,162,39,.18); border: 1px solid var(--gold-dim); color: var(--gold2); vertical-align: middle; white-space: nowrap; }

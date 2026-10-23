@@ -84,11 +84,24 @@ function hgAvatar(h, cls = "hg-avatar") {
 }
 const hgHeroById = (cls, id) => hgClassHeroes(cls).find(h => String(h.id) === String(id));
 
-// A hero can sit in only ONE planner row per class. Returns the (1-based)
-// number of the first row OTHER than `exceptRowId` that already has them, or 0.
-function hgHeroRowElsewhere(rows, heroId, exceptRowId) {
-  const i = rows.findIndex(r => String(r.id) !== String(exceptRowId) && r.heroIds.some(x => String(x) === String(heroId)));
-  return i + 1;
+// ── Set pieces ─────────────────────────────────────────────────────
+// Every hero wears 6 pieces. A "4 set" row uses 4 of them; a "2 set ×N"
+// row uses 2N (×1 = 2, ×2 = 4, ×3 = 6). A hero can be assigned to several
+// rows of a class as long as the pieces across those rows total ≤ 6, e.g.
+// 4 set + 2 set ×1, or 2 set ×1 + 2 set ×2. A 2 set ×3 fills all six.
+const HG_PIECE_LIMIT = 6;
+
+function hgRowPieces(r) {
+  return r && r.setType === "2" ? 2 * (Number(r.setCount) || 1) : 4;
+}
+function hgSetLabel(r) {
+  return r && r.setType === "2" ? `2 set ×${Number(r.setCount) || 1}` : "4 set";
+}
+// Pieces the hero already uses in every row other than `exceptRowId`.
+function hgHeroPiecesUsed(rows, heroId, exceptRowId) {
+  return rows
+    .filter(r => String(r.id) !== String(exceptRowId) && r.heroIds.some(x => String(x) === String(heroId)))
+    .reduce((sum, r) => sum + hgRowPieces(r), 0);
 }
 
 function hgPlannerHTML(cls) {
@@ -114,14 +127,22 @@ function hgPlannerHTML(cls) {
         const picked_heroes = r.heroIds.map(heroOf).filter(Boolean);
         if (!editing) {
           return `<div class="hg-plan-row">
-            <div class="hg-text${r.gearSet ? "" : " hg-empty"}" data-label="Gear Set">${hgEsc(r.gearSet || "—")}</div>
+            <div class="hg-text${r.gearSet ? "" : " hg-empty"}" data-label="Gear Set">${hgEsc(r.gearSet || "—")} <span class="hg-set-badge">${hgSetLabel(r)}</span></div>
             <div class="hg-text${r.artifactType ? "" : " hg-empty"}" data-label="Artifact Type">${hgEsc(r.artifactType || "—")}</div>
             <div class="hg-text hg-heroes-view${picked_heroes.length ? "" : " hg-empty"}" data-label="Heroes">${picked_heroes.length ? picked_heroes.map(h => `<span class="hg-hero-chip">${hgAvatar(h)}${hgEsc(h.name || "Unnamed")}</span>`).join("") : "—"}<button type="button" class="hg-pill hg-copy-btn" ${cAttr} data-act="plan-copy" data-row="${r.id}" title="Copy Gear Set + Artifact Type to another class">⧉ Copy to…</button></div>
           </div>`;
         }
         const picked = picked_heroes.map(h => { const id = h.id; return `<span class="hg-tag">${hgAvatar(h)}${hgEsc(h.name || "Unnamed")}<button type="button" class="hg-tag-x" ${cAttr} data-act="plan-unhero" data-row="${r.id}" data-hero="${hgEsc(id)}" title="Remove">✕</button></span>`; }).join("");
         return `<div class="hg-plan-row">
-          <input type="text" class="hg-input hg-plan-in" ${cAttr} data-row="${r.id}" data-f="gearSet" value="${hgEsc(r.gearSet)}" placeholder="Gear set" aria-label="Gear set">
+          <div class="hg-gear-cell">
+            <input type="text" class="hg-input hg-plan-in" ${cAttr} data-row="${r.id}" data-f="gearSet" value="${hgEsc(r.gearSet)}" placeholder="Gear set" aria-label="Gear set">
+            <div class="hg-settype">
+              <button type="button" class="hg-pill${r.setType !== "2" ? " on" : ""}" ${cAttr} data-act="plan-settype" data-row="${r.id}" data-val="4">4 set</button>
+              <button type="button" class="hg-pill${r.setType === "2" ? " on" : ""}" ${cAttr} data-act="plan-settype" data-row="${r.id}" data-val="2">2 set</button>
+              ${r.setType === "2" ? [1, 2, 3].map(n => `<button type="button" class="hg-pill${(Number(r.setCount) || 1) === n ? " on" : ""}" ${cAttr} data-act="plan-setcount" data-row="${r.id}" data-val="${n}">×${n}</button>`).join("") : ""}
+              <span class="hg-pick-note">${hgRowPieces(r)}/${HG_PIECE_LIMIT} pcs</span>
+            </div>
+          </div>
           <input type="text" class="hg-input hg-plan-in" ${cAttr} data-row="${r.id}" data-f="artifactType" value="${hgEsc(r.artifactType)}" placeholder="Artifact type" aria-label="Artifact type">
           <div class="hg-plan-heroes">
             ${picked}
@@ -145,23 +166,48 @@ function hgPlannerClick(btn) {
   } else if (act === "plan-cancel") {
     delete hgPlannerDraft[cls];
   } else if (act === "plan-save") {
-    // Blank rows are dropped; a hero can only live in one row, so any
-    // duplicate from older data is kept in its first row only.
-    const seen = new Set();
+    // Blank rows are dropped. Heroes are checked in row order against the
+    // 6-piece limit, so anything that would overflow (older data, or a
+    // hero in the same row twice) is dropped from the later row.
+    const used = new Map();
     heroGear[cls].planner = draft
-      .map(r => ({
-        ...r,
-        gearSet: r.gearSet.trim(),
-        artifactType: r.artifactType.trim(),
-        heroIds: r.heroIds.filter(id => !seen.has(String(id)) && seen.add(String(id))),
-      }))
+      .map(r => {
+        const need = hgRowPieces(r);
+        const inRow = new Set();
+        return {
+          ...r,
+          gearSet: r.gearSet.trim(),
+          artifactType: r.artifactType.trim(),
+          heroIds: r.heroIds.filter(id => {
+            const k = String(id);
+            if (inRow.has(k) || (used.get(k) || 0) + need > HG_PIECE_LIMIT) return false;
+            inRow.add(k); used.set(k, (used.get(k) || 0) + need);
+            return true;
+          }),
+        };
+      })
       .filter(r => r.gearSet || r.artifactType || r.heroIds.length);
     delete hgPlannerDraft[cls];
     hgMarkChanged();
   } else if (!draft) {
     return;
   } else if (act === "plan-add") {
-    draft.push({ id: Date.now() + Math.floor(Math.random() * 1000), gearSet: "", artifactType: "", heroIds: [] });
+    draft.push({ id: Date.now() + Math.floor(Math.random() * 1000), gearSet: "", artifactType: "", setType: "4", setCount: 1, heroIds: [] });
+  } else if (act === "plan-settype" || act === "plan-setcount") {
+    const r = draft.find(x => String(x.id) === row);
+    if (!r) return;
+    const next = { ...r };
+    if (act === "plan-settype") next.setType = btn.dataset.val === "2" ? "2" : "4";
+    else next.setCount = Number(btn.dataset.val) || 1;
+    // Don't let a change push an already-assigned hero past 6 pieces.
+    const need = hgRowPieces(next);
+    const over = r.heroIds.filter(id => hgHeroPiecesUsed(draft, id, r.id) + need > HG_PIECE_LIMIT)
+      .map(id => hgHeroById(cls, id)?.name || "A hero");
+    if (over.length) {
+      alert(`Can't change to ${hgSetLabel(next)} (${need} pieces): ${over.join(", ")} would go over ${HG_PIECE_LIMIT}. Remove them from this row first.`);
+      return;
+    }
+    r.setType = next.setType; r.setCount = next.setCount;
   } else if (act === "plan-del") {
     hgPlannerDraft[cls] = draft.filter(r => String(r.id) !== row);
   } else if (act === "plan-unhero") {
@@ -308,7 +354,7 @@ function hgBuildPickerPanel() {
     const heroId = b.dataset.hero;
     const idx = r.heroIds.findIndex(x => String(x) === heroId);
     if (idx >= 0) r.heroIds.splice(idx, 1);
-    else if (!hgHeroRowElsewhere(draft, heroId, rowId)) r.heroIds.push(classHeroesId(cls, heroId));
+    else if (hgHeroPiecesUsed(draft, heroId, rowId) + hgRowPieces(r) <= HG_PIECE_LIMIT) r.heroIds.push(classHeroesId(cls, heroId));
     hgRenderPickerList();
   });
 
@@ -421,20 +467,23 @@ function hgRenderPickerList() {
   const rowNo = draft.findIndex(x => String(x.id) === String(rowId)) + 1;
 
   document.getElementById("hg-picker-title").textContent =
-    `${cls} heroes — Row ${rowNo} (${r ? r.heroIds.length : 0} picked)`;
+    `${cls} heroes — Row ${rowNo} · ${hgSetLabel(r)} (${r ? r.heroIds.length : 0} picked)`;
   const countEl = document.getElementById("hg-pf-count");
   if (countEl) countEl.textContent = `${list.length} of ${all.length} ${cls} hero${all.length === 1 ? "" : "es"}${hgPickFiltCount() ? ` · ${hgPickFiltCount()} filter${hgPickFiltCount() === 1 ? "" : "s"}` : ""}`;
 
   document.getElementById("hg-picker-list").innerHTML = list.length
     ? list.map(h => {
         const on = !!r && r.heroIds.some(x => String(x) === String(h.id));
-        const other = on ? 0 : hgHeroRowElsewhere(draft, h.id, rowId);
+        const used = hgHeroPiecesUsed(draft, h.id, rowId);
+        const need = hgRowPieces(r);
+        const blocked = !on && used + need > HG_PIECE_LIMIT;
+        const note = on ? `${used + need}/${HG_PIECE_LIMIT} pcs` : blocked ? `no room · ${used}/${HG_PIECE_LIMIT} used` : used ? `${used}/${HG_PIECE_LIMIT} used` : "";
         const icon = hgAvatar(h, "hg-pick-icon");
-        return `<button type="button" class="hg-pick-item${on ? " on" : ""}${other ? " taken" : ""}" data-hero="${hgEsc(h.id)}"${other ? " disabled" : ""}>
+        return `<button type="button" class="hg-pick-item${on ? " on" : ""}${blocked ? " taken" : ""}" data-hero="${hgEsc(h.id)}"${blocked ? " disabled" : ""}>
           <span class="hg-pick-check">${on ? "✓" : ""}</span>
           ${icon}
           <span class="hg-pick-name">${hgEsc(h.name || "Unnamed")}</span>
-          ${other ? `<span class="hg-pick-note">in Row ${other}</span>` : ""}
+          ${note ? `<span class="hg-pick-note">${note}</span>` : ""}
         </button>`;
       }).join("")
     : `<div class="hg-text hg-empty">${all.length ? "No heroes match these filters." : `No ${hgEsc(cls)} heroes added yet.`}</div>`;
@@ -456,7 +505,7 @@ function hgClosePicker() {
 }
 
 // ── Copy a planner row to other classes ───────────────────────────
-// Copies ONLY the Gear Set + Artifact Type; Assigned heroes is left empty
+// Copies the Gear Set, Artifact Type and set option (4 set / 2 set ×N); Assigned heroes is left empty
 // (the heroes belong to the source class). Tick any number of other
 // classes, then COPY — classes that already have the row can't be ticked.
 // If the target class is mid-edit the copy lands in its working copy
@@ -468,7 +517,7 @@ function hgPlannerRowsFor(cls) {
 }
 
 function hgRowKey(r) {
-  return `${r.gearSet.trim().toLowerCase()}|${r.artifactType.trim().toLowerCase()}`;
+  return `${r.gearSet.trim().toLowerCase()}|${r.artifactType.trim().toLowerCase()}|${r.setType === "2" ? "2x" + (Number(r.setCount) || 1) : "4"}`;
 }
 
 function hgCopyRowTo(srcCls, rowId, targetCls) {
@@ -481,6 +530,8 @@ function hgCopyRowTo(srcCls, rowId, targetCls) {
     id: Date.now() + Math.floor(Math.random() * 1e6),
     gearSet: src.gearSet.trim(),
     artifactType: src.artifactType.trim(),
+    setType: src.setType === "2" ? "2" : "4",
+    setCount: Number(src.setCount) || 1,
     heroIds: [],
   });
   if (!hgPlannerDraft[targetCls]) hgMarkChanged();
