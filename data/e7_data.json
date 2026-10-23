@@ -1914,7 +1914,7 @@
       "id": 1787447565605,
       "name": "Solitaria of the Snow",
       "rarity": "5ml",
-      "role": "Soul Weaver",
+      "role": "Mage",
       "element": "Light",
       "notes": "",
       "iconData": "https://raw.githubusercontent.com/iridesuwa18/e7-chart/data/assets/heroes/solitaria-of-the-snow.webp",
@@ -28863,5 +28863,5 @@
     }
   },
   "schemaVersion": 2,
-  "savedAt": "2026-10-23T14:37:19.653Z"
+  "savedAt": "2026-10-23T14:38:04.732Z"
 }
