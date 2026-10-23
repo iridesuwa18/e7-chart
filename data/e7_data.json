@@ -27724,6 +27724,22 @@
           "setType": "4",
           "setCount": 1,
           "heroIds": []
+        },
+        {
+          "id": 1792751675509,
+          "gearSet": "Pursuit Set (Any unit with Additional Dmg in their kit)",
+          "artifactType": "Any artifact",
+          "setType": "2",
+          "setCount": 1,
+          "heroIds": []
+        },
+        {
+          "id": 1792751721858,
+          "gearSet": "Pursuit Set (Unit using an additional dmg artif)",
+          "artifactType": "Additional / fixed damage artifact",
+          "setType": "2",
+          "setCount": 1,
+          "heroIds": []
         }
       ]
     },
@@ -27982,5 +27998,5 @@
     }
   },
   "schemaVersion": 2,
-  "savedAt": "2026-10-23T10:28:37.229Z"
+  "savedAt": "2026-10-23T10:36:04.013Z"
 }
