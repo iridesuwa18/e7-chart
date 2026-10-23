@@ -27676,6 +27676,14 @@
           "setType": "4",
           "setCount": 1,
           "heroIds": []
+        },
+        {
+          "id": 1792749928648,
+          "gearSet": "Counter Set (Units already w counter, Niche units)",
+          "artifactType": "Non-counter artifacts",
+          "setType": "4",
+          "setCount": 1,
+          "heroIds": []
         }
       ]
     },
@@ -27934,5 +27942,5 @@
     }
   },
   "schemaVersion": 2,
-  "savedAt": "2026-10-23T10:04:44.288Z"
+  "savedAt": "2026-10-23T10:09:36.738Z"
 }
