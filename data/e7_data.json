@@ -27660,6 +27660,22 @@
           "setType": "4",
           "setCount": 1,
           "heroIds": []
+        },
+        {
+          "id": 1792749636649,
+          "gearSet": "Revenge Set (Turn 2 Units w High Sustainability, 100% debuff units or No debuff units only)",
+          "artifactType": "Speed artifacts",
+          "setType": "4",
+          "setCount": 1,
+          "heroIds": []
+        },
+        {
+          "id": 1792749793126,
+          "gearSet": "Speed Set (All Soul Weavers / Buffers, No debuff units)",
+          "artifactType": "Any artifact",
+          "setType": "4",
+          "setCount": 1,
+          "heroIds": []
         }
       ]
     },
@@ -27918,5 +27934,5 @@
     }
   },
   "schemaVersion": 2,
-  "savedAt": "2026-10-23T09:59:16.471Z"
+  "savedAt": "2026-10-23T10:04:44.288Z"
 }
