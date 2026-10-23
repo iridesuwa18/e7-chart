@@ -27635,7 +27635,20 @@
         "note": "Damage protection, shields, HP/DEF, buffs",
         "items": []
       },
-      "planner": []
+      "planner": [
+        {
+          "id": 1792714054027,
+          "gearSet": "Weakening Set (<100% debuff apply)",
+          "artifactType": "Any non-debuff artifact",
+          "heroIds": []
+        },
+        {
+          "id": 1792714672356,
+          "gearSet": "Weakening Set (No debuffs)",
+          "artifactType": "Debuff artifact",
+          "heroIds": []
+        }
+      ]
     },
     "Thief": {
       "equipment": {
@@ -27668,7 +27681,20 @@
           }
         ]
       },
-      "planner": []
+      "planner": [
+        {
+          "id": 1792714703161,
+          "gearSet": "Weakening Set (<100% debuff apply)",
+          "artifactType": "Any non-debuff artifact",
+          "heroIds": []
+        },
+        {
+          "id": 1792715110845,
+          "gearSet": "Weakening Set (No debuffs)",
+          "artifactType": "Debuff artifact",
+          "heroIds": []
+        }
+      ]
     },
     "Ranger": {
       "equipment": {
@@ -27721,7 +27747,20 @@
           }
         ]
       },
-      "planner": []
+      "planner": [
+        {
+          "id": 1792714463600,
+          "gearSet": "Weakening Set (<100% debuff apply)",
+          "artifactType": "Any non-debuff artifact",
+          "heroIds": []
+        },
+        {
+          "id": 1792714315155,
+          "gearSet": "Weakening Set (No debuffs)",
+          "artifactType": "Debuff artifact",
+          "heroIds": []
+        }
+      ]
     },
     "Mage": {
       "equipment": {
@@ -27758,7 +27797,20 @@
           }
         ]
       },
-      "planner": []
+      "planner": [
+        {
+          "id": 1792714270388,
+          "gearSet": "Weakening Set (<100% debuff apply)",
+          "artifactType": "Any non-debuff artifact",
+          "heroIds": []
+        },
+        {
+          "id": 1792715079485,
+          "gearSet": "Weakening Set (No debuffs)",
+          "artifactType": "Debuff artifact",
+          "heroIds": []
+        }
+      ]
     },
     "Soul Weaver": {
       "equipment": {
@@ -27779,9 +27831,22 @@
           }
         ]
       },
-      "planner": []
+      "planner": [
+        {
+          "id": 1792714120397,
+          "gearSet": "Weakening Set (<100% debuff apply)",
+          "artifactType": "Any non-debuff artifact",
+          "heroIds": []
+        },
+        {
+          "id": 1792714172635,
+          "gearSet": "Weakening Set (No debuffs)",
+          "artifactType": "Debuff artifact",
+          "heroIds": []
+        }
+      ]
     }
   },
   "schemaVersion": 2,
-  "savedAt": "2026-10-23T00:03:57.119Z"
+  "savedAt": "2026-10-23T00:09:46.726Z"
 }
