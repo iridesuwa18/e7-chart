@@ -27657,15 +27657,22 @@
           "artifactType": "Any non-debuff artifact (No weakening)",
           "setType": "2",
           "setCount": 1,
-          "heroIds": []
-        },
-        {
-          "id": 1792714669478,
-          "gearSet": "Effect Resist Set (Passive + Not Debuffer)",
-          "artifactType": "Any debuff artifact (Weakening)",
-          "setType": "2",
-          "setCount": 1,
-          "heroIds": []
+          "heroIds": [
+            1787449475162,
+            1787971060955,
+            1787970912141,
+            1789810080226,
+            1787450410417,
+            1787483937003,
+            1787752519542,
+            1787966171066,
+            1786457519319,
+            1786457677406,
+            1787450689561,
+            1786457038338,
+            1787753087846,
+            1787781638331
+          ]
         },
         {
           "id": 1792748493300,
@@ -27874,14 +27881,6 @@
           "heroIds": []
         },
         {
-          "id": 1792761761776,
-          "gearSet": "Effect Resist Set (Passive + Not Debuffer)",
-          "artifactType": "Any debuff artifact (Weakening)",
-          "setType": "2",
-          "setCount": 1,
-          "heroIds": []
-        },
-        {
           "id": 1792761610965,
           "gearSet": "Protection Set (Non-DPS, High HP, no barrier units)",
           "artifactType": "No shield artifacts",
@@ -28085,14 +28084,6 @@
           "id": 1792761850632,
           "gearSet": "Effect Resist Set (Passive + Not Debuffer)",
           "artifactType": "Any non-debuff artifact (No weakening)",
-          "setType": "2",
-          "setCount": 1,
-          "heroIds": []
-        },
-        {
-          "id": 1792761193633,
-          "gearSet": "Effect Resist Set (Passive + Not Debuffer)",
-          "artifactType": "Any debuff artifact (Weakening)",
           "setType": "2",
           "setCount": 1,
           "heroIds": []
@@ -28326,14 +28317,6 @@
           "heroIds": []
         },
         {
-          "id": 1792761400151,
-          "gearSet": "Effect Resist Set (Passive + Not Debuffer)",
-          "artifactType": "Any debuff artifact (Weakening)",
-          "setType": "2",
-          "setCount": 1,
-          "heroIds": []
-        },
-        {
           "id": 1792761731169,
           "gearSet": "Protection Set (Non-DPS, High HP, no barrier units)",
           "artifactType": "No shield artifacts",
@@ -28559,14 +28542,6 @@
           "heroIds": []
         },
         {
-          "id": 1792761238426,
-          "gearSet": "Effect Resist Set (Passive + Not Debuffer)",
-          "artifactType": "Any debuff artifact (Weakening)",
-          "setType": "2",
-          "setCount": 1,
-          "heroIds": []
-        },
-        {
           "id": 1792762047255,
           "gearSet": "Protection Set (Non-DPS, High HP, no barrier units)",
           "artifactType": "No shield artifacts",
@@ -28762,14 +28737,6 @@
           "heroIds": []
         },
         {
-          "id": 1792762147040,
-          "gearSet": "Effect Resist Set (Passive + Not Debuffer)",
-          "artifactType": "Any debuff artifact (Weakening)",
-          "setType": "2",
-          "setCount": 1,
-          "heroIds": []
-        },
-        {
           "id": 1792761766162,
           "gearSet": "Protection Set (Non-DPS, High HP, no barrier units)",
           "artifactType": "No shield artifacts",
@@ -28893,5 +28860,5 @@
     }
   },
   "schemaVersion": 2,
-  "savedAt": "2026-10-23T23:54:31.110Z"
+  "savedAt": "2026-10-23T23:58:47.313Z"
 }
