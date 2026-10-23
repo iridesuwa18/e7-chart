@@ -27708,6 +27708,14 @@
           "setType": "4",
           "setCount": 1,
           "heroIds": []
+        },
+        {
+          "id": 1792750992416,
+          "gearSet": "Warfare Set (Super niche, very specific units)",
+          "artifactType": "Any artifact",
+          "setType": "4",
+          "setCount": 1,
+          "heroIds": []
         }
       ]
     },
@@ -27966,5 +27974,5 @@
     }
   },
   "schemaVersion": 2,
-  "savedAt": "2026-10-23T10:22:48.052Z"
+  "savedAt": "2026-10-23T10:24:34.860Z"
 }
