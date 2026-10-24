@@ -27973,7 +27973,10 @@
           "artifactType": "High damage artifact",
           "setType": "4",
           "setCount": 1,
-          "heroIds": []
+          "heroIds": [
+            1779353267841,
+            1787870072197
+          ]
         },
         {
           "id": 1792761811731,
@@ -29420,5 +29423,5 @@
     }
   },
   "schemaVersion": 2,
-  "savedAt": "2026-10-24T15:05:20.613Z"
+  "savedAt": "2026-10-24T15:05:44.379Z"
 }
