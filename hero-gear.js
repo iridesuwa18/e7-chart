@@ -228,7 +228,7 @@ function hgPlannerHTML(cls) {
     const picked = picked_heroes.map(h => `<span class="hg-tag">${hgAvatar(h)}${hgEsc(h.name || "Unnamed")}<button type="button" class="hg-tag-x" ${cAttr} data-act="plan-unhero" data-row="${r.id}" data-hero="${hgEsc(h.id)}" title="Remove">✕</button></span>`).join("");
     return `<div class="hg-plan-row hg-plan-editing">
       <div class="hg-gear-cell">
-        <input type="text" class="hg-input hg-plan-in" ${cAttr} data-row="${r.id}" data-f="gearSet" value="${hgEsc(r.gearSet)}" placeholder="Gear set (pick or type)" aria-label="Gear set" list="hg-set-names" autocomplete="off">
+        <input type="text" class="hg-input hg-plan-in" ${cAttr} data-row="${r.id}" data-f="gearSet" value="${hgEsc(r.gearSet)}" placeholder="Gear set" aria-label="Gear set" list="hg-set-names" autocomplete="off">
         <div class="hg-settype">
           <button type="button" class="hg-pill${r.setType !== "2" ? " on" : ""}" ${cAttr} data-act="plan-settype" data-row="${r.id}" data-val="4">4 set</button>
           <button type="button" class="hg-pill${r.setType === "2" ? " on" : ""}" ${cAttr} data-act="plan-settype" data-row="${r.id}" data-val="2">2 set</button>
@@ -919,6 +919,7 @@ function openHeroEquipment(h) {
 }
 
 function renderHeroGear() {
+  hgRefreshEquipFilter(); // roster chips + autocomplete follow the planners (also on pages with no drawer)
   const body = document.getElementById("hero-gear-body");
   if (!body) return; // page without the drawer (e.g. quickdraft.html)
   // A reload/import can drop the row being edited — never edit a ghost.
@@ -1012,58 +1013,57 @@ function hgOnClick(e) {
   }
 }
 
-// ── Common equipment set types ─────────────────────────────────────
-// Offered as suggestions when typing a Gear Set (autocomplete) and as
-// filter chips in the roster's ⚙ Filter panel. A Gear Set counts as a type
-// when its text contains the type's name or one of its short forms as a
-// whole word (so "Crit", "Critical" and "Speed/Crit" all work). To add or
-// rename a type, edit this list.
-const HG_EQUIP_TYPES = [
-  { name: "Attack",      alias: ["atk"] },
-  { name: "Health",      alias: ["hp"] },
-  { name: "Defense",     alias: ["def", "defence"] },
-  { name: "Speed",       alias: ["spd"] },
-  { name: "Critical",    alias: ["crit"] },
-  { name: "Hit",         alias: ["effectiveness", "eff"] },
-  { name: "Destruction", alias: ["destro"] },
-  { name: "Lifesteal",   alias: ["life steal", "ls"] },
-  { name: "Counter",     alias: ["counterattack"] },
-  { name: "Resist",      alias: ["resistance", "res"] },
-  { name: "Rage",        alias: [] },
-  { name: "Immunity",    alias: ["imm"] },
-  { name: "Unity",       alias: [] },
-  { name: "Revenge",     alias: [] },
-  { name: "Injury",      alias: [] },
-  { name: "Penetration", alias: ["pen"] },
-  { name: "Torrent",     alias: [] },
-  { name: "Protection",  alias: [] },
-].map(t => ({
-  ...t,
-  // names/short forms are plain letters + spaces, so no regex escaping needed
-  re: new RegExp("(^|[^a-z])(" + [t.name, ...t.alias].map(w => w.toLowerCase()).join("|") + ")([^a-z]|$)", "i"),
-}));
+// ── Roster equipment filter, built from YOUR gear sets ─────────────
+// The roster's ⚙ Filter → EQUIPMENT chips (and the Gear Set autocomplete) are
+// the Gear Set names actually used in the Equipment Planners, across all
+// classes — no presets. Same name in different classes (any capitalisation)
+// is one chip. A hero matches a chip when one of the planner rows they're
+// assigned to has that Gear Set name.
+const hgSetKey = s => String(s || "").trim().toLowerCase().replace(/\s+/g, " ");
 
-// Which common types a Gear Set text matches.
-function hgTypesOfGearSet(text) {
-  return HG_EQUIP_TYPES.filter(t => t.re.test(text || "")).map(t => t.name);
+// Map of key -> display name (first spelling found), A–Z by name.
+function hgUsedSetNames() {
+  const m = new Map();
+  GEAR_CLASSES.forEach(c => (heroGear[c]?.planner || []).forEach(r => {
+    const k = hgSetKey(r.gearSet);
+    if (k && !m.has(k)) m.set(k, r.gearSet.trim());
+  }));
+  return new Map([...m.entries()].sort((a, b) => gearCmp(a[1], b[1])));
 }
 
-// Every type of equipment a hero has, from the planner rows (of their class)
-// that list them. Returns a Set of type names.
+// The gear-set keys a hero has equipped (used by the roster filter).
 function heroEquipTypes(h) {
   const out = new Set();
   if (!GEAR_CLASSES.includes(h.role)) return out;
   heroGear[h.role].planner.forEach(r => {
-    if (r.heroIds.some(x => String(x) === String(h.id))) hgTypesOfGearSet(r.gearSet).forEach(n => out.add(n));
+    if (r.heroIds.some(x => String(x) === String(h.id)) && hgSetKey(r.gearSet)) out.add(hgSetKey(r.gearSet));
   });
   return out;
 }
 
-// Roster ⚙ Filter → EQUIPMENT chips (+ Has all / Has any).
+// Rebuild the roster chips + the Gear Set autocomplete from the current
+// planners. Called whenever the planners render/change/load.
+function hgRefreshEquipFilter() {
+  const names = hgUsedSetNames();
+
+  const dl = document.getElementById("hg-set-names") || Object.assign(document.createElement("datalist"), { id: "hg-set-names" });
+  if (!dl.parentNode) document.body.appendChild(dl);
+  dl.innerHTML = [...names.values()].map(n => `<option value="${hgEsc(n)}"></option>`).join("");
+
+  const box = document.getElementById("filter-equip");
+  if (!box || typeof filterEquip === "undefined") return;
+  // Drop ticks for gear sets that no longer exist.
+  let pruned = false;
+  [...filterEquip].forEach(k => { if (!names.has(k)) { filterEquip.delete(k); pruned = true; } });
+  box.innerHTML = names.size
+    ? [...names.entries()].map(([k, n]) => `<button type="button" class="chip${filterEquip.has(k) ? " active" : ""}" data-val="${hgEsc(k)}">${hgEsc(n)}</button>`).join("")
+    : `<div class="hg-pick-note">No gear sets yet — add some under 🛡 Hero Equipment and Artifacts.</div>`;
+  if (pruned) renderRoster();
+}
+
 function initHeroGearRosterFilter() {
   const box = document.getElementById("filter-equip");
   if (!box) return;
-  box.innerHTML = HG_EQUIP_TYPES.map(t => `<button type="button" class="chip" data-val="${t.name}">${t.name}</button>`).join("");
   box.addEventListener("click", e => {
     const btn = e.target.closest(".chip");
     if (!btn) return;
@@ -1077,19 +1077,10 @@ function initHeroGearRosterFilter() {
     document.querySelectorAll("#filter-equip-mode button").forEach(b => b.classList.toggle("on", b === btn));
     if (filterEquip.size) renderRoster();
   }));
-}
-
-// Autocomplete list for the Gear Set text boxes (free text still allowed).
-function hgEnsureSetDatalist() {
-  if (document.getElementById("hg-set-names")) return;
-  const dl = document.createElement("datalist");
-  dl.id = "hg-set-names";
-  dl.innerHTML = HG_EQUIP_TYPES.map(t => `<option value="${t.name}"></option>`).join("");
-  document.body.appendChild(dl);
+  hgRefreshEquipFilter();
 }
 
 function initHeroGear() {
-  hgEnsureSetDatalist();
   initHeroGearRosterFilter();
   const handle = document.getElementById("hero-gear-handle");
   const drawer = document.getElementById("hero-gear-drawer");
