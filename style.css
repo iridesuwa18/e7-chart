@@ -5314,3 +5314,7 @@ body.qd-companion .hg-drawer { display: none !important; }
 .hg-chip-label { font-family: 'Cinzel', serif; font-size: 9.5px; letter-spacing: .1em; text-transform: uppercase; color: var(--text-dim); margin: 6px 0 3px; }
 .hg-chip-label-x { color: #e08a80; }
 .hg-chip-x.active { background: rgba(192,57,43,.28); border-color: #c0392b; color: #ffb3a8; text-decoration: line-through; }
+
+/* Not fully equipped heroes */
+.hg-nf-list { display: flex; flex-wrap: wrap; gap: 4px 10px; }
+.hg-nf-chip { margin: 0; font-family: 'Crimson Pro', serif; font-size: 15px; background: var(--bg3); border: 1px solid var(--border); border-radius: 999px; padding: 2px 10px 2px 4px; }

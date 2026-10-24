@@ -126,6 +126,34 @@ function hgNewRow() {
   return { id: Date.now() + Math.floor(Math.random() * 1000), gearSet: "", artifactType: "", setType: "4", setCount: 1, heroIds: [] };
 }
 
+// ── Not fully equipped heroes (per class) ──────────────────────────
+// Every hero of the class whose assigned planner rows add up to fewer than
+// 6 pieces (heroes in no row at all count as 0/6). Live: it reflects the row
+// currently being edited too. Heroes at 6/6 are left out.
+function hgNotFullHTML(cls) {
+  const all = hgClassHeroes(cls);
+  const rows = hgEffectiveRows(cls);
+  const used = h => rows
+    .filter(r => r.heroIds.some(x => String(x) === String(h.id)))
+    .reduce((sum, r) => sum + hgRowPieces(r), 0);
+  const list = all
+    .map(h => ({ h, n: used(h) }))
+    .filter(x => x.n < HG_PIECE_LIMIT)
+    .sort((a, b) => gearCmp(a.h.name, b.h.name));
+
+  const body = !all.length
+    ? `<div class="hg-text hg-empty">No ${hgEsc(cls)} heroes added yet.</div>`
+    : !list.length
+      ? `<div class="hg-text hg-empty">All ${hgEsc(cls)} heroes are fully equipped (6/6) ✓</div>`
+      : `<div class="hg-nf-list">${list.map(({ h, n }) =>
+          `<span class="hg-hero-chip hg-nf-chip">${hgAvatar(h)}${hgEsc(h.name || "Unnamed")} <span class="hg-pick-note">${n}/${HG_PIECE_LIMIT}</span></span>`).join("")}</div>`;
+
+  return `<div class="hg-section hg-notfull">
+    <div class="hg-section-head">Not Fully Equipped Heroes${all.length ? ` (${list.length})` : ""}</div>
+    ${body}
+  </div>`;
+}
+
 function hgPlannerHTML(cls) {
   const rows = hgEffectiveRows(cls);
   const classHeroes = hgClassHeroes(cls);
@@ -758,6 +786,7 @@ function renderHeroGear() {
       ${hgSectionHTML(cls, "equipment", "Equipment")}
       ${hgSectionHTML(cls, "artifacts", "Artifacts")}
       ${hgPlannerHTML(cls)}
+      ${hgNotFullHTML(cls)}
     </div>`).join("");
 
   body.querySelector("textarea.hg-input")?.focus();
