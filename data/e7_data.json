@@ -430,7 +430,7 @@
       "id": 1786457038338,
       "name": "Monarch of the Sword Iseria",
       "rarity": "5ml",
-      "role": "Warrior",
+      "role": "Knight",
       "element": "Light",
       "notes": "",
       "iconData": "https://raw.githubusercontent.com/iridesuwa18/e7-chart/data/assets/heroes/monarch-of-the-sword-iseria.webp",
@@ -27948,8 +27948,8 @@
           "setType": "4",
           "setCount": 1,
           "heroIds": [
-            1787869970026,
-            1779353620344
+            1779353620344,
+            1786457038338
           ]
         },
         {
@@ -28026,7 +28026,8 @@
             1787965200695,
             1786494564456,
             1779353620344,
-            1787971429383
+            1787971429383,
+            1786457038338
           ]
         },
         {
@@ -29413,5 +29414,5 @@
     }
   },
   "schemaVersion": 2,
-  "savedAt": "2026-10-24T13:08:27.080Z"
+  "savedAt": "2026-10-24T13:21:37.717Z"
 }
