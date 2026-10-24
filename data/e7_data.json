@@ -27579,6 +27579,10 @@
         "note": "Burns, Bleeds, stuns etc ",
         "items": [
           {
+            "id": 1792803737436,
+            "text": "Additional dmg artifacts (Uberius Tooth, etc)"
+          },
+          {
             "id": 1792399973515,
             "text": "Champion's Trophy"
           },
@@ -28971,5 +28975,5 @@
     }
   },
   "schemaVersion": 2,
-  "savedAt": "2026-10-24T01:01:29.563Z"
+  "savedAt": "2026-10-24T01:02:38.121Z"
 }
