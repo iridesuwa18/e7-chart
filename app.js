@@ -4859,9 +4859,11 @@ function renderMagnifierList(filtered) {
   });
 }
 
-function renderRoster() {
-  document.querySelectorAll(".hero-card").forEach(el => el.remove());
-
+// The roster's current list: sorted and filtered by the sidebar's Sort,
+// Rarity/Role/Element/Equipment filters and search. Shared by the sidebar
+// roster and the full-page Hero Grid popup (hero-grid.js), so both always
+// agree.
+function rosterVisibleHeroes() {
   // Sort
   let list = [...heroes];
   if (rosterSort === "az")        list.sort((a,b) => (a.name||"").localeCompare(b.name||""));
@@ -4891,6 +4893,14 @@ function renderRoster() {
     const q = rosterSearchQuery.toLowerCase();
     list = list.filter(h => (h.name || "").toLowerCase().includes(q));
   }
+
+  return list;
+}
+
+function renderRoster() {
+  document.querySelectorAll(".hero-card").forEach(el => el.remove());
+
+  const list = rosterVisibleHeroes();
 
   emptyMsg.style.display = list.length === 0 ? "block" : "none";
   if (list.length === 0) {
@@ -4973,6 +4983,8 @@ function renderRoster() {
 
     rosterList.appendChild(card);
   });
+
+  if (typeof hgrRefreshIfOpen === "function") hgrRefreshIfOpen(); // full-page Hero Grid (hero-grid.js)
 }
 
 /* ═══════════════════════════════════════

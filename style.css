@@ -5352,3 +5352,18 @@ body.qd-companion .hg-drawer { display: none !important; }
 .hg-equip-name { margin-right: 6px; }
 .hg-equip-avatar { width: 26px; height: 26px; vertical-align: middle; margin-right: 4px; }
 .hg-equip-total { margin-top: 6px; }
+
+/* ── Hero Grid: full-page popup ── */
+.hgr-overlay { padding: 0; }
+.hgr-panel { width: 100vw; max-width: none; height: 100vh; max-height: none; border-radius: 0; }
+.hgr-top { display: flex; gap: 8px; align-items: center; margin-bottom: 8px; }
+.hgr-top .hgr-search { flex: 1; min-width: 0; margin: 0; }
+.hgr-filters { display: block; margin: 0 0 8px; }
+.hgr-count { margin: 4px 0 8px; }
+.hgr-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(92px, 1fr)); gap: 10px; align-content: start; padding-bottom: 12px; }
+.hgr-tile { display: flex; flex-direction: column; align-items: center; gap: 4px; padding: 8px 4px 7px; border-radius: 10px; border: 1.5px solid var(--border); background: rgba(255,255,255,.02); color: var(--text); cursor: pointer; font: inherit; transition: background .15s, border-color .15s; }
+.hgr-tile:hover { border-color: var(--gold); background: rgba(201,162,39,.08); }
+.hgr-tile img, .hgr-fallback { width: 56px; height: 56px; border-radius: 50%; object-fit: cover; }
+.hgr-fallback { font-size: 24px; }
+.hgr-tile-name { font-family: 'Crimson Pro', serif; font-size: 14px; line-height: 1.15; text-align: center; max-width: 86px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.hgr-tile-sub { font-family: 'Cinzel', serif; font-size: 8.5px; letter-spacing: .05em; color: var(--text-dim); text-align: center; }
