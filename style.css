@@ -5342,3 +5342,4 @@ body.qd-companion .hg-drawer { display: none !important; }
 .hg-heroes-view .hg-row-btns { margin-top: 3px; }
 .hg-plan-row { gap: 4px; margin: 3px 0; }
 @media (max-width: 600px) { .hg-plan-row { padding: 6px; } }
+.hg-mode-row { margin: 4px 0 2px; }

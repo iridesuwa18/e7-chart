@@ -362,7 +362,7 @@ function hgPlannerClick(btn) {
 // and work like the Hero Factors panel's, but live entirely in hgPickFilt
 // below. They never touch Quick Draft's ticked Enemy Factors or the Hero
 // Factors panel's filters. Matching rules mirror Hero Factors (except Categories, which here need ALL ticked): ticked
-// Reactions / Engagements must ALL be held, a Category matches if the hero
+// Reactions / Engagements default to ALL held (each has a Has all / Has any toggle), a Category matches if the hero
 // holds any item in it, and an Enemy Factor matches
 // if the hero holds any Reaction/Engagement tagged to it (any ticked factor).
 let hgPickerEl = null;
@@ -372,6 +372,8 @@ const hgPickFilt = {
   search: "",
   categories: new Set(),
   excludeCategories: new Set(), // reverse filter: hide heroes holding anything in these
+  reactionMode: "all",          // Reactions ticked: "all" = hero needs every one, "any" = at least one
+  engagementMode: "all",        // same for Engagements
   excludeMode: "all",           // "all" = hide only heroes with EVERY hidden category; "any" = hide heroes with ANY of them
   hideRowIds: new Set(),        // hide heroes already assigned to these planner rows
   hideSetTypes: new Set(),      // hide heroes already in ANY row of these set types ("4" / "2")
@@ -397,8 +399,8 @@ function hgPickerHeroes(cls) {
   const f = hgPickFilt;
   const q = f.search.trim().toLowerCase();
   if (q) list = list.filter(h => String(h.name || "").toLowerCase().includes(q));
-  if (f.reactionIds.size) list = list.filter(h => [...f.reactionIds].every(id => hfHeroHasTag(h, "reactions", id)));
-  if (f.engagementIds.size) list = list.filter(h => [...f.engagementIds].every(id => hfHeroHasTag(h, "engagements", id)));
+  if (f.reactionIds.size) list = list.filter(h => [...f.reactionIds][f.reactionMode === "any" ? "some" : "every"](id => hfHeroHasTag(h, "reactions", id)));
+  if (f.engagementIds.size) list = list.filter(h => [...f.engagementIds][f.engagementMode === "any" ? "some" : "every"](id => hfHeroHasTag(h, "engagements", id)));
   // Multiple "Show" categories = the hero must have ALL of them.
   if (f.categories.size) list = list.filter(h => [...f.categories].every(c => hfHeroMatchesCategory(h, c)));
   // Hide heroes already assigned to a chosen row, or to any row of a chosen
@@ -470,11 +472,23 @@ function hgBuildPickerPanel() {
 
       <details class="hf-details" id="hg-pf-d-r"${f.reactionIds.size ? " open" : ""}>
         <summary id="hg-pf-sum-r"></summary>
+        <div class="hg-chip-label hg-mode-row">Hero must have
+          <span class="hg-mode" id="hg-pf-rmode">
+            <button type="button" class="hg-pill${f.reactionMode !== "any" ? " on" : ""}" data-mode="all" title="Hero needs every ticked item">Has all</button>
+            <button type="button" class="hg-pill${f.reactionMode === "any" ? " on" : ""}" data-mode="any" title="Hero needs at least one ticked item">Has any</button>
+          </span>
+        </div>
         ${sbox("hg-pf-rsearch", "🔍 Search Reactions…")}
         <div class="qd-factor-menu-list" id="hg-pf-rlist"></div>
       </details>
       <details class="hf-details" id="hg-pf-d-e"${f.engagementIds.size ? " open" : ""}>
         <summary id="hg-pf-sum-e"></summary>
+        <div class="hg-chip-label hg-mode-row">Hero must have
+          <span class="hg-mode" id="hg-pf-emode">
+            <button type="button" class="hg-pill${f.engagementMode !== "any" ? " on" : ""}" data-mode="all" title="Hero needs every ticked item">Has all</button>
+            <button type="button" class="hg-pill${f.engagementMode === "any" ? " on" : ""}" data-mode="any" title="Hero needs at least one ticked item">Has any</button>
+          </span>
+        </div>
         ${sbox("hg-pf-esearch", "🔍 Search Engagements…")}
         <div class="qd-factor-menu-list" id="hg-pf-elist"></div>
       </details>
@@ -506,6 +520,13 @@ function hgBuildPickerPanel() {
   bind("hg-pf-esearch", "engagementSearch", () => hgRenderTagList("engagements"));
   bind("hg-pf-fsearch", "factorSearch", () => { hgRenderQuickWords(); hgRenderFactorList(); });
 
+  [["#hg-pf-rmode", "reactionMode"], ["#hg-pf-emode", "engagementMode"]].forEach(([sel, key]) => {
+    document.querySelectorAll(sel + " button").forEach(btn => btn.addEventListener("click", () => {
+      f[key] = btn.dataset.mode === "any" ? "any" : "all";
+      document.querySelectorAll(sel + " button").forEach(b => b.classList.toggle("on", b === btn));
+      hgRenderPickerList();
+    }));
+  });
   document.querySelectorAll("#hg-pf-xmode button").forEach(btn => btn.addEventListener("click", () => {
     f.excludeMode = btn.dataset.mode === "any" ? "any" : "all";
     document.querySelectorAll("#hg-pf-xmode button").forEach(b => b.classList.toggle("on", b === btn));
