@@ -5318,3 +5318,7 @@ body.qd-companion .hg-drawer { display: none !important; }
 /* Not fully equipped heroes */
 .hg-nf-list { display: flex; flex-wrap: wrap; gap: 4px 10px; }
 .hg-nf-chip { margin: 0; font-family: 'Crimson Pro', serif; font-size: 15px; background: var(--bg3); border: 1px solid var(--border); border-radius: 999px; padding: 2px 10px 2px 4px; }
+
+.hg-pick-bulk { display: flex; gap: 8px; margin: 8px 0 2px; }
+.hg-mode { display: inline-flex; gap: 4px; margin-left: 8px; vertical-align: middle; }
+.hg-mode .hg-pill { padding: 2px 8px; font-size: 9.5px; text-transform: none; letter-spacing: .04em; }

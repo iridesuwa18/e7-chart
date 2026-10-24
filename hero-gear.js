@@ -334,9 +334,9 @@ function hgPlannerClick(btn) {
 // and Enemy Factors (with the High/Low/Evasion… quick words) — that look
 // and work like the Hero Factors panel's, but live entirely in hgPickFilt
 // below. They never touch Quick Draft's ticked Enemy Factors or the Hero
-// Factors panel's filters. Matching rules mirror Hero Factors: ticked
+// Factors panel's filters. Matching rules mirror Hero Factors (except Categories, which here need ALL ticked): ticked
 // Reactions / Engagements must ALL be held, a Category matches if the hero
-// holds any item in it (any ticked category), and an Enemy Factor matches
+// holds any item in it, and an Enemy Factor matches
 // if the hero holds any Reaction/Engagement tagged to it (any ticked factor).
 let hgPickerEl = null;
 let hgPickerCtx = null; // { cls, rowId }
@@ -345,6 +345,7 @@ const hgPickFilt = {
   search: "",
   categories: new Set(),
   excludeCategories: new Set(), // reverse filter: hide heroes holding anything in these
+  excludeMode: "all",           // "all" = hide only heroes with EVERY hidden category; "any" = hide heroes with ANY of them
   hideRowIds: new Set(),        // hide heroes already assigned to these planner rows
   hideSetTypes: new Set(),      // hide heroes already in ANY row of these set types ("4" / "2")
   reactionIds: new Set(),
@@ -371,7 +372,8 @@ function hgPickerHeroes(cls) {
   if (q) list = list.filter(h => String(h.name || "").toLowerCase().includes(q));
   if (f.reactionIds.size) list = list.filter(h => [...f.reactionIds].every(id => hfHeroHasTag(h, "reactions", id)));
   if (f.engagementIds.size) list = list.filter(h => [...f.engagementIds].every(id => hfHeroHasTag(h, "engagements", id)));
-  if (f.categories.size) list = list.filter(h => [...f.categories].some(c => hfHeroMatchesCategory(h, c)));
+  // Multiple "Show" categories = the hero must have ALL of them.
+  if (f.categories.size) list = list.filter(h => [...f.categories].every(c => hfHeroMatchesCategory(h, c)));
   // Hide heroes already assigned to a chosen row, or to any row of a chosen
   // set type (the row being edited never counts — it's the one being filled).
   if (f.hideRowIds.size || f.hideSetTypes.size) {
@@ -383,7 +385,14 @@ function hgPickerHeroes(cls) {
     list = list.filter(h => !hidden.has(String(h.id)));
   }
   // Reverse filter: drop any hero holding something in an excluded category.
-  if (f.excludeCategories.size) list = list.filter(h => ![...f.excludeCategories].some(c => hfHeroMatchesCategory(h, c)));
+  // Multiple "Hide" categories: per the toggle, hide heroes that have ALL of
+  // them (default) or ANY of them.
+  if (f.excludeCategories.size) {
+    const test = h => f.excludeMode === "any"
+      ? [...f.excludeCategories].some(c => hfHeroMatchesCategory(h, c))
+      : [...f.excludeCategories].every(c => hfHeroMatchesCategory(h, c));
+    list = list.filter(h => !test(h));
+  }
   if (f.factorIds.size) list = list.filter(h => [...f.factorIds].some(id => hgHeroMatchesFactor(h, id)));
   return list;
 }
@@ -422,7 +431,12 @@ function hgBuildPickerPanel() {
       </div>
       <div class="hg-chip-label">Show heroes with</div>
       <div class="hf-category-chips" id="hg-pf-cats"></div>
-      <div class="hg-chip-label hg-chip-label-x">Hide heroes with</div>
+      <div class="hg-chip-label hg-chip-label-x">Hide heroes with
+        <span class="hg-mode" id="hg-pf-xmode">
+          <button type="button" class="hg-pill${f.excludeMode !== "any" ? " on" : ""}" data-mode="all" title="Hide only heroes that have every selected category">Has all</button>
+          <button type="button" class="hg-pill${f.excludeMode === "any" ? " on" : ""}" data-mode="any" title="Hide heroes that have any selected category">Has any</button>
+        </span>
+      </div>
       <div class="hf-category-chips hg-exclude-chips" id="hg-pf-xcats"></div>
       <div class="hg-chip-label hg-chip-label-x" id="hg-pf-rows-label">Hide heroes already in</div>
       <div class="hf-category-chips hg-exclude-chips" id="hg-pf-rowchips"></div>
@@ -444,6 +458,10 @@ function hgBuildPickerPanel() {
         <div class="qd-factor-menu-list" id="hg-pf-flist"></div>
       </details>
 
+      <div class="hg-pick-bulk">
+        <button type="button" class="hg-pill" id="hg-pick-all" title="Add every hero currently shown (that still has room for this set)">✓ Select all</button>
+        <button type="button" class="hg-pill" id="hg-pick-none" title="Remove every hero from this row">✕ Clear all</button>
+      </div>
       <div class="hg-picker-list" id="hg-picker-list"></div>
     </div>
     <button type="button" class="btn btn-gold hg-picker-done" id="hg-picker-done">DONE</button>`;
@@ -461,10 +479,38 @@ function hgBuildPickerPanel() {
   bind("hg-pf-esearch", "engagementSearch", () => hgRenderTagList("engagements"));
   bind("hg-pf-fsearch", "factorSearch", () => { hgRenderQuickWords(); hgRenderFactorList(); });
 
+  document.querySelectorAll("#hg-pf-xmode button").forEach(btn => btn.addEventListener("click", () => {
+    f.excludeMode = btn.dataset.mode === "any" ? "any" : "all";
+    document.querySelectorAll("#hg-pf-xmode button").forEach(b => b.classList.toggle("on", b === btn));
+    hgRenderPickerList();
+  }));
+
   document.getElementById("hg-pf-clear").addEventListener("click", () => {
     f.search = f.reactionSearch = f.engagementSearch = f.factorSearch = "";
     f.categories.clear(); f.excludeCategories.clear(); f.hideRowIds.clear(); f.hideSetTypes.clear(); f.reactionIds.clear(); f.engagementIds.clear(); f.factorIds.clear();
     hgBuildPickerPanel();
+  });
+
+  // Select all adds every hero currently SHOWN (so filters narrow it) that
+  // still has room for this row's set; Clear all empties the whole row.
+  document.getElementById("hg-pick-all").addEventListener("click", () => {
+    if (!hgPickerCtx) return;
+    const { cls, rowId } = hgPickerCtx;
+    const rows = hgEffectiveRows(cls);
+    const r = rows.find(x => String(x.id) === String(rowId));
+    if (!r) return;
+    const need = hgRowPieces(r);
+    hgPickerHeroes(cls).forEach(h => {
+      if (r.heroIds.some(x => String(x) === String(h.id))) return;
+      if (hgHeroPiecesUsed(rows, h.id, rowId) + need <= HG_PIECE_LIMIT) r.heroIds.push(h.id);
+    });
+    hgRenderPickerList();
+  });
+  document.getElementById("hg-pick-none").addEventListener("click", () => {
+    if (!hgPickerCtx) return;
+    const r = hgEffectiveRows(hgPickerCtx.cls).find(x => String(x.id) === String(hgPickerCtx.rowId));
+    if (r) r.heroIds = [];
+    hgRenderPickerList();
   });
 
   document.getElementById("hg-picker-list").addEventListener("click", e => {
