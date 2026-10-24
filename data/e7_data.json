@@ -27653,7 +27653,7 @@
         },
         {
           "id": 1792714579358,
-          "gearSet": "Effect Resist Set (Passive + Not Debuffer)",
+          "gearSet": "Effect Resist Set (Passive + Not Debuffer) + Effect Resist Ring",
           "artifactType": "Any non-debuff artifact (No weakening)",
           "setType": "2",
           "setCount": 1,
@@ -27999,6 +27999,14 @@
           "setType": "2",
           "setCount": 1,
           "heroIds": []
+        },
+        {
+          "id": 1792800268924,
+          "gearSet": "Effect Resist Set (Passive + Not Debuffer) + Effect Resist Ring",
+          "artifactType": "Any non-debuff artifact (No weakening)",
+          "setType": "2",
+          "setCount": 1,
+          "heroIds": []
         }
       ]
     },
@@ -28204,6 +28212,14 @@
           "id": 1792761588541,
           "gearSet": "Penetration Set (Non debuff DPS units)",
           "artifactType": "Any artifact",
+          "setType": "2",
+          "setCount": 1,
+          "heroIds": []
+        },
+        {
+          "id": 1792800126992,
+          "gearSet": "Effect Resist Set (Passive + Not Debuffer) + Effect Resist Ring",
+          "artifactType": "Any non-debuff artifact (No weakening)",
           "setType": "2",
           "setCount": 1,
           "heroIds": []
@@ -28435,6 +28451,14 @@
           "setType": "2",
           "setCount": 1,
           "heroIds": []
+        },
+        {
+          "id": 1792800570095,
+          "gearSet": "Effect Resist Set (Passive + Not Debuffer) + Effect Resist Ring",
+          "artifactType": "Any non-debuff artifact (No weakening)",
+          "setType": "2",
+          "setCount": 1,
+          "heroIds": []
         }
       ]
     },
@@ -28660,6 +28684,14 @@
           "setType": "2",
           "setCount": 1,
           "heroIds": []
+        },
+        {
+          "id": 1792800068282,
+          "gearSet": "Effect Resist Set (Passive + Not Debuffer) + Effect Resist Ring",
+          "artifactType": "Any non-debuff artifact (No weakening)",
+          "setType": "2",
+          "setCount": 1,
+          "heroIds": []
         }
       ]
     },
@@ -28855,10 +28887,18 @@
           "setType": "2",
           "setCount": 1,
           "heroIds": []
+        },
+        {
+          "id": 1792800083779,
+          "gearSet": "Effect Resist Set (Passive + Not Debuffer) + Effect Resist Ring",
+          "artifactType": "Any non-debuff artifact (No weakening)",
+          "setType": "2",
+          "setCount": 1,
+          "heroIds": []
         }
       ]
     }
   },
   "schemaVersion": 2,
-  "savedAt": "2026-10-23T23:58:47.313Z"
+  "savedAt": "2026-10-24T00:01:03.917Z"
 }
