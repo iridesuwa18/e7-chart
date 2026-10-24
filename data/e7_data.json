@@ -28957,7 +28957,6 @@
             1787900402616,
             1787755372046,
             1787967092257,
-            1787443483547,
             1787972554796,
             1787962659353,
             1787447162534,
@@ -28984,6 +28983,16 @@
           "heroIds": []
         },
         {
+          "id": 1792821956075,
+          "gearSet": "Immunity Set",
+          "artifactType": "Non immunity artifact",
+          "setType": "2",
+          "setCount": 1,
+          "heroIds": [
+            1787443483547
+          ]
+        },
+        {
           "id": 1792761839320,
           "gearSet": "Penetration Set (Non debuff DPS units)",
           "artifactType": "Any artifact",
@@ -28997,7 +29006,10 @@
           "artifactType": "No shield artifacts",
           "setType": "4",
           "setCount": 1,
-          "heroIds": []
+          "heroIds": [
+            1787463182981,
+            1787443483547
+          ]
         },
         {
           "id": 1792762012022,
@@ -29313,5 +29325,5 @@
     }
   },
   "schemaVersion": 2,
-  "savedAt": "2026-10-24T06:04:44.775Z"
+  "savedAt": "2026-10-24T06:08:16.019Z"
 }
