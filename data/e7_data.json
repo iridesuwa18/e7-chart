@@ -28243,9 +28243,7 @@
           "artifactType": "Non-counter artifacts",
           "setType": "4",
           "setCount": 1,
-          "heroIds": [
-            1786456875931
-          ]
+          "heroIds": []
         },
         {
           "id": 1792761882640,
@@ -28353,6 +28351,16 @@
           "setCount": 1,
           "heroIds": [
             1787908993300
+          ]
+        },
+        {
+          "id": 1792806462849,
+          "gearSet": "Lifesteal Set (Counter)",
+          "artifactType": "Any evasive artifact",
+          "setType": "4",
+          "setCount": 1,
+          "heroIds": [
+            1786456875931
           ]
         },
         {
@@ -29144,5 +29152,5 @@
     }
   },
   "schemaVersion": 2,
-  "savedAt": "2026-10-24T01:46:31.268Z"
+  "savedAt": "2026-10-24T01:48:40.811Z"
 }
