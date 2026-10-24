@@ -27836,7 +27836,9 @@
           "artifactType": "Evasion artifact",
           "setType": "4",
           "setCount": 1,
-          "heroIds": []
+          "heroIds": [
+            1787450689561
+          ]
         },
         {
           "id": 1792749793126,
@@ -29413,5 +29415,5 @@
     }
   },
   "schemaVersion": 2,
-  "savedAt": "2026-10-24T13:48:59.333Z"
+  "savedAt": "2026-10-24T14:34:24.801Z"
 }
