@@ -57,6 +57,32 @@ function emptyHeroGear() {
   GEAR_CLASSES.forEach(c => { out[c] = { equipment: { note: "", items: [] }, artifacts: { note: "", items: [] }, planner: [] }; });
   return out;
 }
+// A–Z ordering for the Equipment/Artifact entry lists and Equipment Planner
+// rows (blank text sorts last). Used on load/import here and after every
+// edit in hero-gear.js.
+function gearCmp(a, b) {
+  a = (a || "").trim(); b = (b || "").trim();
+  if (!a && !b) return 0;
+  if (!a) return 1;
+  if (!b) return -1;
+  return a.localeCompare(b, undefined, { sensitivity: "base", numeric: true });
+}
+function sortPlannerRows(rows) {
+  return rows.sort((x, y) =>
+    gearCmp(x.gearSet, y.gearSet) || gearCmp(x.artifactType, y.artifactType) ||
+    (x.setType === y.setType ? (x.setCount || 1) - (y.setCount || 1) : (x.setType === "4" ? -1 : 1)));
+}
+function sortGearEntries(items) { return items.sort((x, y) => gearCmp(x.text, y.text)); }
+function sortHeroGearAZ(gear) {
+  GEAR_CLASSES.forEach(c => {
+    if (!gear[c]) return;
+    sortPlannerRows(gear[c].planner);
+    sortGearEntries(gear[c].equipment.items);
+    sortGearEntries(gear[c].artifacts.items);
+  });
+  return gear;
+}
+
 function normalizeHeroGear(raw) {
   const out = emptyHeroGear();
   if (!raw || typeof raw !== "object") return out;
@@ -83,7 +109,7 @@ function normalizeHeroGear(raw) {
         .map((it, i) => ({ id: it.id ?? (Date.now() + i), text: it.text }));
     });
   });
-  return out;
+  return sortHeroGearAZ(out);
 }
 // Additive merge for file Import — never overwrites what's already there.
 function mergeHeroGearAdditive(current, incoming) {
@@ -113,7 +139,7 @@ function mergeHeroGearAdditive(current, incoming) {
       });
     });
   });
-  return { merged: out, added };
+  return { merged: sortHeroGearAZ(out), added };
 }
 let heroGear = emptyHeroGear();
 

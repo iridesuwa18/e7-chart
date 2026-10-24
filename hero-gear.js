@@ -156,7 +156,7 @@ function hgPlannerHTML(cls) {
   const cols = `<div class="hg-plan-row hg-plan-cols"><div>Gear Set</div><div>Artifact Type</div><div>Assigned heroes</div></div>`;
 
   const body = rows.map((r, idx) => {
-    const picked_heroes = r.heroIds.map(heroOf).filter(Boolean);
+    const picked_heroes = r.heroIds.map(heroOf).filter(Boolean).sort((a, b) => gearCmp(a.name, b.name));
     if (!(editingHere && r === hgEdit.row)) {
       return `<div class="hg-plan-row">
         <div class="hg-text${r.gearSet ? "" : " hg-empty"}" data-label="Gear Set">${hgEsc(r.gearSet || "—")} <span class="hg-set-badge">${hgSetLabel(r)}</span></div>
@@ -234,6 +234,9 @@ function hgCommitEdit() {
     }
   }
   hgEdit = null;
+  // Keep the class's rows A–Z by Gear Set; "below this row" follows the row.
+  sortPlannerRows(saved);
+  if (!blank) { const at = saved.findIndex(r => r.id === clean.id); if (at >= 0) pos = at + 1; }
   return pos;
 }
 
@@ -627,6 +630,7 @@ function hgCopyRowTo(srcCls, rowId, targetCls) {
     setCount: Number(src.setCount) || 1,
     heroIds: [],
   });
+  sortPlannerRows(heroGear[targetCls].planner);
   hgMarkChanged();
   return "ok";
 }
@@ -732,6 +736,7 @@ function hgCommit(cls, kind, field, value) {
       heroGear[cls][kind].items = heroGear[cls][kind].items.filter(x => x !== it);
       hgMarkChanged();
     } else if (it.text !== value) { it.text = value; hgMarkChanged(); }
+    sortGearEntries(heroGear[cls][kind].items);
   }
 }
 
