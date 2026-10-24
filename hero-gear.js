@@ -317,6 +317,8 @@ const hgPickFilt = {
   search: "",
   categories: new Set(),
   excludeCategories: new Set(), // reverse filter: hide heroes holding anything in these
+  hideRowIds: new Set(),        // hide heroes already assigned to these planner rows
+  hideSetTypes: new Set(),      // hide heroes already in ANY row of these set types ("4" / "2")
   reactionIds: new Set(),
   engagementIds: new Set(),
   factorIds: new Set(),
@@ -326,7 +328,7 @@ const hgPickFilt = {
 };
 
 function hgPickFiltCount() {
-  return hgPickFilt.categories.size + hgPickFilt.excludeCategories.size + hgPickFilt.reactionIds.size + hgPickFilt.engagementIds.size + hgPickFilt.factorIds.size;
+  return hgPickFilt.categories.size + hgPickFilt.excludeCategories.size + hgPickFilt.hideRowIds.size + hgPickFilt.hideSetTypes.size + hgPickFilt.reactionIds.size + hgPickFilt.engagementIds.size + hgPickFilt.factorIds.size;
 }
 
 function hgHeroMatchesFactor(h, factorId) {
@@ -342,6 +344,16 @@ function hgPickerHeroes(cls) {
   if (f.reactionIds.size) list = list.filter(h => [...f.reactionIds].every(id => hfHeroHasTag(h, "reactions", id)));
   if (f.engagementIds.size) list = list.filter(h => [...f.engagementIds].every(id => hfHeroHasTag(h, "engagements", id)));
   if (f.categories.size) list = list.filter(h => [...f.categories].some(c => hfHeroMatchesCategory(h, c)));
+  // Hide heroes already assigned to a chosen row, or to any row of a chosen
+  // set type (the row being edited never counts — it's the one being filled).
+  if (f.hideRowIds.size || f.hideSetTypes.size) {
+    const rows = hgPickerCtx ? hgEffectiveRows(cls).filter(r => String(r.id) !== String(hgPickerCtx.rowId)) : [];
+    const hidden = new Set();
+    rows.forEach(r => {
+      if (f.hideRowIds.has(String(r.id)) || f.hideSetTypes.has(r.setType === "2" ? "2" : "4")) r.heroIds.forEach(id => hidden.add(String(id)));
+    });
+    list = list.filter(h => !hidden.has(String(h.id)));
+  }
   // Reverse filter: drop any hero holding something in an excluded category.
   if (f.excludeCategories.size) list = list.filter(h => ![...f.excludeCategories].some(c => hfHeroMatchesCategory(h, c)));
   if (f.factorIds.size) list = list.filter(h => [...f.factorIds].some(id => hgHeroMatchesFactor(h, id)));
@@ -384,6 +396,8 @@ function hgBuildPickerPanel() {
       <div class="hf-category-chips" id="hg-pf-cats"></div>
       <div class="hg-chip-label hg-chip-label-x">Hide heroes with</div>
       <div class="hf-category-chips hg-exclude-chips" id="hg-pf-xcats"></div>
+      <div class="hg-chip-label hg-chip-label-x" id="hg-pf-rows-label">Hide heroes already in</div>
+      <div class="hf-category-chips hg-exclude-chips" id="hg-pf-rowchips"></div>
 
       <details class="hf-details" id="hg-pf-d-r"${f.reactionIds.size ? " open" : ""}>
         <summary id="hg-pf-sum-r"></summary>
@@ -421,7 +435,7 @@ function hgBuildPickerPanel() {
 
   document.getElementById("hg-pf-clear").addEventListener("click", () => {
     f.search = f.reactionSearch = f.engagementSearch = f.factorSearch = "";
-    f.categories.clear(); f.excludeCategories.clear(); f.reactionIds.clear(); f.engagementIds.clear(); f.factorIds.clear();
+    f.categories.clear(); f.excludeCategories.clear(); f.hideRowIds.clear(); f.hideSetTypes.clear(); f.reactionIds.clear(); f.engagementIds.clear(); f.factorIds.clear();
     hgBuildPickerPanel();
   });
 
@@ -440,6 +454,7 @@ function hgBuildPickerPanel() {
   });
 
   hgRenderCategoryChips();
+  hgRenderRowChips();
   hgRenderTagList("reactions");
   hgRenderTagList("engagements");
   hgRenderQuickWords();
@@ -472,6 +487,34 @@ function hgRenderCategoryChips() {
     const c = btn.dataset.cat;
     if (f.excludeCategories.has(c)) f.excludeCategories.delete(c); else { f.excludeCategories.add(c); f.categories.delete(c); }
     hgRenderCategoryChips();
+    hgRenderPickerList();
+  }));
+}
+
+// "Hide heroes already in …": one chip per other planner row that has heroes
+// in it, plus All 4 set / All 2 set. Pressing a chip hides every hero assigned
+// to that row (or to any row of that set type) from the list.
+function hgRenderRowChips() {
+  const box = document.getElementById("hg-pf-rowchips");
+  const label = document.getElementById("hg-pf-rows-label");
+  if (!box || !hgPickerCtx) return;
+  const { cls, rowId } = hgPickerCtx;
+  const f = hgPickFilt;
+  const rows = hgEffectiveRows(cls).filter(r => String(r.id) !== String(rowId) && r.heroIds.length);
+  // Forget picks for rows that no longer exist / are empty.
+  [...f.hideRowIds].forEach(id => { if (!rows.some(r => String(r.id) === id)) f.hideRowIds.delete(id); });
+  if (!rows.length) { box.innerHTML = ""; if (label) label.style.display = "none"; return; }
+  if (label) label.style.display = "";
+
+  const groups = ["4", "2"].filter(t => rows.some(r => (r.setType === "2" ? "2" : "4") === t));
+  box.innerHTML =
+    groups.map(t => `<button type="button" class="qd-factor-priority-chip hg-chip-x${f.hideSetTypes.has(t) ? " active" : ""}" data-set="${t}">All ${t} set</button>`).join("") +
+    rows.map(r => `<button type="button" class="qd-factor-priority-chip hg-chip-x${f.hideRowIds.has(String(r.id)) ? " active" : ""}" data-rid="${hgEsc(r.id)}">${hgEsc(r.gearSet.trim() || "(no name)")} · ${hgSetLabel(r)}</button>`).join("");
+  box.querySelectorAll("button").forEach(btn => btn.addEventListener("click", () => {
+    const set = btn.dataset.set ? f.hideSetTypes : f.hideRowIds;
+    const key = btn.dataset.set || btn.dataset.rid;
+    if (set.has(key)) set.delete(key); else set.add(key);
+    hgRenderRowChips();
     hgRenderPickerList();
   }));
 }
