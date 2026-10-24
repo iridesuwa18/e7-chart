@@ -27817,7 +27817,9 @@
           "artifactType": "Any artifact",
           "setType": "4",
           "setCount": 1,
-          "heroIds": []
+          "heroIds": [
+            1787449914285
+          ]
         },
         {
           "id": 1792713748558,
@@ -28975,5 +28977,5 @@
     }
   },
   "schemaVersion": 2,
-  "savedAt": "2026-10-24T01:02:38.121Z"
+  "savedAt": "2026-10-24T01:03:21.649Z"
 }
