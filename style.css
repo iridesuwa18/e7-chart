@@ -5330,3 +5330,15 @@ body.qd-companion .hg-drawer { display: none !important; }
 .hg-group-un .hg-group-title { color: var(--text-dim); }
 .hg-group-heroes { display: flex; flex-wrap: wrap; }
 .hg-heroes-view .hg-row-btns { flex: 1 1 100%; justify-content: flex-end; margin-left: 0; }
+
+/* Tighten the heroes cell. The big gaps came from the cell inheriting
+   `white-space: pre-wrap` from .hg-text, so the line breaks/indentation in
+   the grouped markup were being drawn as blank lines. */
+.hg-heroes-view { white-space: normal; padding: 4px 8px; line-height: 1.2; }
+.hg-group { margin-bottom: 3px; }
+.hg-group:last-of-type { margin-bottom: 0; }
+.hg-group-title { line-height: 1.15; margin-bottom: 1px; }
+.hg-hero-chip { margin: 0 6px 2px 0; line-height: 1.2; }
+.hg-heroes-view .hg-row-btns { margin-top: 3px; }
+.hg-plan-row { gap: 4px; margin: 3px 0; }
+@media (max-width: 600px) { .hg-plan-row { padding: 6px; } }
