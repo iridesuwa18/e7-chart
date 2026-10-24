@@ -1166,6 +1166,10 @@ let rosterSearchQuery = "";
 let qdHeroSearchQuery = "";
 let filterRarity  = new Set(["5ml","5r","4","3"]);
 let filterRole    = new Set(["Warrior","Knight","Thief","Ranger","Mage","Soul Weaver",""]);
+// Equipment-type roster filter (chips are built by hero-gear.js). Empty set =
+// no filtering; otherwise heroes must have ALL (or ANY) of the ticked types.
+let filterEquip = new Set();
+let filterEquipMode = "all";
 let filterElement = new Set(["Fire","Ice","Earth","Light","Dark",""]);
 
 /* ── Quick Draft state ──
@@ -4873,6 +4877,14 @@ function renderRoster() {
     filterRole.has(h.role ?? "") &&
     filterElement.has(h.element ?? "")
   );
+
+  // Equipment types (from the Equipment Planner) — see hero-gear.js
+  if (filterEquip.size && typeof heroEquipTypes === "function") {
+    list = list.filter(h => {
+      const have = heroEquipTypes(h);
+      return [...filterEquip][filterEquipMode === "any" ? "some" : "every"](t => have.has(t));
+    });
+  }
 
   // Search — case-insensitive substring match on hero name
   if (rosterSearchQuery) {
