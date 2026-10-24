@@ -868,6 +868,55 @@ function hgCloseCopyMenu() {
   renderHeroGear(); // show the new rows in their classes
 }
 
+// ── Hero equipment popup (the "E" button on each roster card) ──────
+// Shows which 4 set and 2 set(s) a hero is equipped with, read from the
+// Equipment Planner rows of the hero's class that list them.
+let hgEquipEl = null;
+
+function openHeroEquipment(h) {
+  if (!hgEquipEl) {
+    hgEquipEl = document.createElement("div");
+    hgEquipEl.className = "qd-factor-menu-overlay hg-picker";
+    hgEquipEl.style.display = "none";
+    document.body.appendChild(hgEquipEl);
+    const close = () => { hgEquipEl.style.display = "none"; document.body.classList.remove("qd-factor-menu-open"); };
+    hgEquipEl.addEventListener("click", e => { if (e.target === hgEquipEl || e.target.closest("[data-equip-close]")) close(); });
+    hgEquipEl.addEventListener("keydown", e => { if (e.key === "Escape") close(); });
+  }
+  const cls = h.role;
+  const known = GEAR_CLASSES.includes(cls);
+  const rows = known ? heroGear[cls].planner.filter(r => r.heroIds.some(x => String(x) === String(h.id))) : [];
+  const four = rows.filter(r => r.setType !== "2").sort((a, b) => gearCmp(a.gearSet, b.gearSet));
+  const twos = rows.filter(r => r.setType === "2").sort((a, b) => gearCmp(a.gearSet, b.gearSet));
+  const used = rows.reduce((sum, r) => sum + hgRowPieces(r), 0);
+
+  const line = r => `<div class="hg-equip-line">
+      <span class="hg-equip-name">${hgEsc(r.gearSet.trim() || "(no name)")}</span>
+      <span class="hg-set-badge">${hgSetLabel(r)}</span>
+      ${r.artifactType.trim() ? `<div class="hg-pick-note">Artifact: ${hgEsc(r.artifactType.trim())}</div>` : ""}
+    </div>`;
+  const block = (title, list) => `<div class="hg-equip-block">
+      <div class="hg-group-title">${title}</div>
+      ${list.length ? list.map(line).join("") : `<div class="hg-text hg-empty">— none yet —</div>`}
+    </div>`;
+
+  const icon = hgAvatar(h, "hg-avatar hg-equip-avatar");
+  hgEquipEl.innerHTML = `
+    <div class="qd-factor-menu-panel hg-copy-panel">
+      <div class="qd-factor-menu-header">
+        <div class="qd-factor-menu-title">${icon} ${hgEsc(h.name || "Unnamed Hero")} — Equipment</div>
+        <button type="button" class="qd-factor-menu-close" data-equip-close aria-label="Close">✕</button>
+      </div>
+      ${!known
+        ? `<div class="hg-text hg-empty">This hero has no class set, so there's no equipment planner for them.</div>`
+        : `${block("4 set", four)}${block("2 set" + (twos.length > 1 ? "s" : ""), twos)}
+           <div class="hg-pick-note hg-equip-total">${used}/${HG_PIECE_LIMIT} pieces${used < HG_PIECE_LIMIT ? ` — ${HG_PIECE_LIMIT - used} open` : " — fully equipped"}</div>`}
+      <button type="button" class="btn btn-gold hg-picker-done" data-equip-close>DONE</button>
+    </div>`;
+  hgEquipEl.style.display = "flex";
+  document.body.classList.add("qd-factor-menu-open");
+}
+
 function renderHeroGear() {
   const body = document.getElementById("hero-gear-body");
   if (!body) return; // page without the drawer (e.g. quickdraft.html)

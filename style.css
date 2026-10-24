@@ -5343,3 +5343,12 @@ body.qd-companion .hg-drawer { display: none !important; }
 .hg-plan-row { gap: 4px; margin: 3px 0; }
 @media (max-width: 600px) { .hg-plan-row { padding: 6px; } }
 .hg-mode-row { margin: 4px 0 2px; }
+
+/* roster "E" button + hero equipment popup */
+.btn-equip { font-family: 'Cinzel', serif; font-weight: 700; font-size: 12px; color: var(--teal2); }
+.hg-equip-block { margin: 8px 0; }
+.hg-equip-line { padding: 5px 0; border-bottom: 1px dashed var(--border); font-family: 'Crimson Pro', serif; font-size: 16px; }
+.hg-equip-line:last-child { border-bottom: 0; }
+.hg-equip-name { margin-right: 6px; }
+.hg-equip-avatar { width: 26px; height: 26px; vertical-align: middle; margin-right: 4px; }
+.hg-equip-total { margin-top: 6px; }
