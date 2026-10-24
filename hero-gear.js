@@ -154,6 +154,29 @@ function hgNotFullHTML(cls) {
   </div>`;
 }
 
+// Splits a row's heroes by their "partner" set: for a 4 set row, by the
+// 2 set they also wear; for a 2 set row, by the 4 set they also wear. Heroes
+// with no such partner row go in "Unassigned" (always last). Groups are A–Z
+// by Gear Set name and heroes A–Z inside each.
+function hgGroupRowHeroes(cls, rows, r) {
+  const want = r.setType === "2" ? "4" : "2";
+  const partners = rows.filter(p => String(p.id) !== String(r.id) && (p.setType === "2" ? "2" : "4") === want);
+  const groups = new Map(); // key -> { title, label, heroes[] }
+  const unassigned = [];
+  r.heroIds.map(id => hgHeroById(cls, id)).filter(Boolean).forEach(h => {
+    const p = partners.find(x => x.heroIds.some(i => String(i) === String(h.id)));
+    if (!p) { unassigned.push(h); return; }
+    const title = p.gearSet.trim() || "(no name)";
+    const key = `${title.toLowerCase()}|${hgSetLabel(p)}`;
+    if (!groups.has(key)) groups.set(key, { title, label: hgSetLabel(p), heroes: [] });
+    groups.get(key).heroes.push(h);
+  });
+  const out = [...groups.values()].sort((a, b) => gearCmp(a.title, b.title));
+  out.forEach(gr => gr.heroes.sort((a, b) => gearCmp(a.name, b.name)));
+  if (unassigned.length) out.push({ title: "Unassigned", label: "", heroes: unassigned.sort((a, b) => gearCmp(a.name, b.name)), unassigned: true });
+  return out;
+}
+
 function hgPlannerHTML(cls) {
   const rows = hgEffectiveRows(cls);
   const classHeroes = hgClassHeroes(cls);
@@ -189,7 +212,11 @@ function hgPlannerHTML(cls) {
       return `<div class="hg-plan-row">
         <div class="hg-text${r.gearSet ? "" : " hg-empty"}" data-label="Gear Set">${hgEsc(r.gearSet || "—")} <span class="hg-set-badge">${hgSetLabel(r)}</span></div>
         <div class="hg-text${r.artifactType ? "" : " hg-empty"}" data-label="Artifact Type">${hgEsc(r.artifactType || "—")}</div>
-        <div class="hg-text hg-heroes-view${picked_heroes.length ? "" : " hg-empty"}" data-label="Heroes">${picked_heroes.length ? picked_heroes.map(h => `<span class="hg-hero-chip">${hgAvatar(h)}${hgEsc(h.name || "Unnamed")}</span>`).join("") : "—"}
+        <div class="hg-text hg-heroes-view${picked_heroes.length ? "" : " hg-empty"}" data-label="Heroes">
+          ${picked_heroes.length ? hgGroupRowHeroes(cls, rows, r).map(gr => `<div class="hg-group${gr.unassigned ? " hg-group-un" : ""}">
+            <div class="hg-group-title">${hgEsc(gr.title)}${gr.label ? ` <span class="hg-set-badge">${gr.label}</span>` : ""}</div>
+            <div class="hg-group-heroes">${gr.heroes.map(h => `<span class="hg-hero-chip">${hgAvatar(h)}${hgEsc(h.name || "Unnamed")}</span>`).join("")}</div>
+          </div>`).join("") : "—"}
           <span class="hg-row-btns">
             <button type="button" class="hg-pill" ${cAttr} data-act="plan-edit" data-row="${r.id}"${hgEdit ? ' disabled title="Finish editing the other row first"' : ' title="Edit this row"'}>✏️ Edit</button>
             <button type="button" class="hg-pill" ${cAttr} data-act="plan-copy" data-row="${r.id}" title="Copy Gear Set + Artifact Type to another class">⧉ Copy to…</button>

@@ -5322,3 +5322,11 @@ body.qd-companion .hg-drawer { display: none !important; }
 .hg-pick-bulk { display: flex; gap: 8px; margin: 8px 0 2px; }
 .hg-mode { display: inline-flex; gap: 4px; margin-left: 8px; vertical-align: middle; }
 .hg-mode .hg-pill { padding: 2px 8px; font-size: 9.5px; text-transform: none; letter-spacing: .04em; }
+
+/* heroes grouped by partner set inside a planner row */
+.hg-heroes-view { display: flex; flex-wrap: wrap; align-items: flex-start; }
+.hg-group { flex: 1 1 100%; margin-bottom: 6px; }
+.hg-group-title { font-family: 'Cinzel', serif; font-size: 10.5px; letter-spacing: .06em; color: var(--gold2); margin-bottom: 2px; }
+.hg-group-un .hg-group-title { color: var(--text-dim); }
+.hg-group-heroes { display: flex; flex-wrap: wrap; }
+.hg-heroes-view .hg-row-btns { flex: 1 1 100%; justify-content: flex-end; margin-left: 0; }
