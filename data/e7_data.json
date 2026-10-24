@@ -27958,7 +27958,13 @@
           "artifactType": "Counter artifact",
           "setType": "4",
           "setCount": 1,
-          "heroIds": []
+          "heroIds": [
+            1787781759357,
+            1787870072197,
+            1787753484471,
+            1787453649890,
+            1787318177165
+          ]
         },
         {
           "id": 1792761610667,
@@ -28045,7 +28051,9 @@
           "artifactType": "Any barrier artifact is good",
           "setType": "2",
           "setCount": 3,
-          "heroIds": []
+          "heroIds": [
+            1786494420941
+          ]
         },
         {
           "id": 1792761952553,
@@ -28061,7 +28069,15 @@
           "artifactType": "No shield artifacts",
           "setType": "4",
           "setCount": 1,
-          "heroIds": []
+          "heroIds": [
+            1787907862013,
+            1786494323094,
+            1787965200695,
+            1786494564456,
+            1787971429383,
+            1787753662988,
+            1787753804085
+          ]
         },
         {
           "id": 1792761688616,
@@ -28085,7 +28101,11 @@
           "artifactType": "Speed artifacts",
           "setType": "4",
           "setCount": 1,
-          "heroIds": []
+          "heroIds": [
+            1787262710589,
+            1787497684937,
+            1787484762650
+          ]
         },
         {
           "id": 1792762125030,
@@ -29048,5 +29068,5 @@
     }
   },
   "schemaVersion": 2,
-  "savedAt": "2026-10-24T01:29:21.652Z"
+  "savedAt": "2026-10-24T01:34:58.968Z"
 }
