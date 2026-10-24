@@ -28060,7 +28060,13 @@
           "artifactType": "Any artifact (HP based artif is good)",
           "setType": "2",
           "setCount": 1,
-          "heroIds": []
+          "heroIds": [
+            1787963725615,
+            1787967696574,
+            1779353267841,
+            1787966505497,
+            1787262710589
+          ]
         },
         {
           "id": 1792761541301,
@@ -28078,7 +28084,11 @@
           "artifactType": "Any artifact",
           "setType": "2",
           "setCount": 1,
-          "heroIds": []
+          "heroIds": [
+            1787870072197,
+            1779353267841,
+            1787753662988
+          ]
         },
         {
           "id": 1792761610965,
@@ -29085,5 +29095,5 @@
     }
   },
   "schemaVersion": 2,
-  "savedAt": "2026-10-24T01:36:46.096Z"
+  "savedAt": "2026-10-24T01:37:57.077Z"
 }
