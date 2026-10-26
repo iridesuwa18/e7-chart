@@ -1142,6 +1142,14 @@ function initHeroGear() {
     else if (e.key === "Escape") { e.preventDefault(); ta.closest(".hg-row").querySelector(".hg-cancel")?.click(); }
   });
   renderHeroGear();
+
+  // Heroes added / renamed / re-classed / deleted / loaded → refresh the drawer
+  // so hero chips and "Not Fully Equipped" never go stale. Skipped while a
+  // field is mid-edit (a re-render would steal focus / drop typing).
+  window.addEventListener("chartHeroesUpdated", () => {
+    if (hgEdit || hgEditing || hgUnusedEditing || (typeof hgPickerCtx !== "undefined" && hgPickerCtx)) return;
+    renderHeroGear();
+  });
 }
 
 initHeroGear();

@@ -7980,7 +7980,6 @@ async function autoLoadFromServer() {
     // cleanup has the real library to check against.
     taxonomy = normalizeTaxonomy(data.taxonomy);
     heroGear = normalizeHeroGear(data.heroGear);
-    if (typeof renderHeroGear === "function") renderHeroGear();
 
     if (Array.isArray(data.heroes)) {
       const migrated = migrateHeroTypes(data.heroes);
@@ -7992,6 +7991,7 @@ async function autoLoadFromServer() {
       updateTaxonomySaveReminder();
       renderAll();
     }
+    try { if (typeof renderHeroGear === "function") renderHeroGear(); } catch (e) { console.error("Hero gear render failed:", e); } // after heroes are in place, so the gear drawer can find them
 
     // Draft-only data (buffs/debuffs/roles/etc) also comes from GitHub now,
     // instead of localStorage — see window.chartDraftData above.
@@ -8212,7 +8212,7 @@ function handleImportedFile(parsed) {
     const { merged, added } = mergeHeroGearAdditive(heroGear, importedGear);
     heroGear = merged;
     if (added > 0) saveLocal();
-    if (typeof renderHeroGear === "function") renderHeroGear();
+    try { if (typeof renderHeroGear === "function") renderHeroGear(); } catch (e) { console.error("Hero gear render failed:", e); }
     if (!importedHeroes && !importedTaxonomy) {
       setStatus(added > 0 ? `✅ Imported ${added} equipment/artifact note${added === 1 ? "" : "s"}` : "⚠️ Nothing new — those equipment/artifact notes are already here");
       return;
@@ -8456,7 +8456,6 @@ async function loadFromServer(password) {
       // cleanup below has the real library to check heroes against.
       taxonomy = normalizeTaxonomy(data.taxonomy);
       heroGear = normalizeHeroGear(data.heroGear);
-      if (typeof renderHeroGear === "function") renderHeroGear();
       const migrated = migrateHeroTypes(data.heroes);
       heroes = cleanDanglingTaxonomyRefs(migrated, taxonomy);
       saveLocal();
@@ -8465,6 +8464,7 @@ async function loadFromServer(password) {
       hasUnsavedChanges = false;
       updateTaxonomySaveReminder();
       renderAll();
+      try { if (typeof renderHeroGear === "function") renderHeroGear(); } catch (e) { console.error("Hero gear render failed:", e); } // after heroes are in place, so the gear drawer can find them
       if (data.draftData) window.chartDraftData = data.draftData;
       applyLoadedSavedAt(data); // the actual last-saved time, not "not saved this session"
       setStatus(isLegacySchema(data) ? "✅ Loaded from GitHub (legacy format — migrated)" : "✅ Loaded from GitHub");
