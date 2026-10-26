@@ -39,6 +39,30 @@ function hgEsc(str) {
   return String(str ?? "").replace(/[&<>"']/g, ch => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[ch]));
 }
 
+// ── Drawers (collapsible sections) ─────────────────────────────────
+// The drawer is a tree of <details>: A. CLASS → 1. EQUIPMENT / 2. ARTIFACTS /
+// 3. EQUIPMENT PLANNER / 4. NOT FULLY EQUIPPED → (planner) A. GEAR SET →
+// 1. ARTIFACT TYPE / 2. HEROES. Letters and numbers alternate level by level
+// so you always know where you are. Which drawers are open is remembered in
+// hgOpenKeys (by key), so re-rendering after an edit never snaps them shut.
+const hgOpenKeys = new Set();
+const hgLetter = i => (i < 26 ? String.fromCharCode(65 + i) : String(i + 1));
+
+function hgDrawer(key, { idx, title, meta = "", badge = "", level, body }) {
+  return `<details class="hg-d hg-d-${level}" data-key="${hgEsc(key)}"${hgOpenKeys.has(key) ? " open" : ""}>
+    <summary><span class="hg-idx">${idx}</span><span class="hg-d-title">${title}</span>${badge}${meta ? `<span class="hg-d-meta">${meta}</span>` : ""}</summary>
+    <div class="hg-d-body">${body}</div>
+  </details>`;
+}
+// Make sure a planner row (and the drawers above it) are open — used when
+// you start editing / adding so the form is never hidden inside a closed drawer.
+function hgOpenPath(cls, rowId) {
+  hgOpenKeys.add(`c:${cls}`);
+  hgOpenKeys.add(`s:${cls}:planner`);
+  if (rowId != null) hgOpenKeys.add(`r:${cls}:${rowId}`);
+}
+const hgPlural = (n, one, many) => `${n} ${n === 1 ? one : many}`;
+
 function hgRowHTML(cls, kind, field, text, { isNote = false, deletable = false, placeholder = "" } = {}) {
   const key = `${cls}|${kind}|${field}`;
   const attrs = `data-cls="${hgEsc(cls)}" data-kind="${kind}" data-field="${hgEsc(field)}"`;
@@ -57,17 +81,13 @@ function hgRowHTML(cls, kind, field, text, { isNote = false, deletable = false, 
   </div>`;
 }
 
-function hgSectionHTML(cls, kind, label) {
+// Body of the EQUIPMENT / ARTIFACTS drawers: a notes line, then the entries.
+function hgSectionBodyHTML(cls, kind, label) {
   const sec = heroGear[cls][kind];
-  return `<div class="hg-section">
-    <div class="hg-section-head">${label}
-      <button type="button" class="hg-icon-btn hg-add" data-cls="${hgEsc(cls)}" data-kind="${kind}" title="Add ${label}">＋</button>
-    </div>
+  return `<div class="hg-add-row"><button type="button" class="hg-pill hg-add" data-cls="${hgEsc(cls)}" data-kind="${kind}" title="Add ${label}">＋ Add entry</button></div>
     ${hgRowHTML(cls, kind, "note", sec.note, { isNote: true, placeholder: "Notes…" })}
-    ${sec.items.map(it => hgRowHTML(cls, kind, `item:${it.id}`, it.text, { deletable: true, placeholder: "(empty)" })).join("")}
-  </div>`;
+    ${sec.items.map(it => hgRowHTML(cls, kind, `item:${it.id}`, it.text, { deletable: true, placeholder: "(empty)" })).join("")}`;
 }
-
 
 // ── Equipment Planner (per class) ──────────────────────────────────
 function hgClassHeroes(cls) {
@@ -131,7 +151,7 @@ function hgNewRow() {
 // Every hero of the class whose assigned planner rows add up to fewer than
 // 6 pieces (heroes in no row at all count as 0/6). Live: it reflects the row
 // currently being edited too. Heroes at 6/6 are left out.
-function hgNotFullHTML(cls) {
+function hgNotFullInfo(cls) {
   const all = hgClassHeroes(cls);
   const rows = hgEffectiveRows(cls);
   const used = h => rows
@@ -142,17 +162,13 @@ function hgNotFullHTML(cls) {
     .filter(x => x.n < HG_PIECE_LIMIT)
     .sort((a, b) => gearCmp(a.h.name, b.h.name));
 
-  const body = !all.length
+  const html = !all.length
     ? `<div class="hg-text hg-empty">No ${hgEsc(cls)} heroes added yet.</div>`
     : !list.length
       ? `<div class="hg-text hg-empty">All ${hgEsc(cls)} heroes are fully equipped (6/6) ✓</div>`
       : `<div class="hg-nf-list">${list.map(({ h, n }) =>
           `<span class="hg-hero-chip hg-nf-chip">${hgAvatar(h)}${hgEsc(h.name || "Unnamed")} <span class="hg-pick-note">${n}/${HG_PIECE_LIMIT}</span></span>`).join("")}</div>`;
-
-  return `<div class="hg-section hg-notfull">
-    <div class="hg-section-head">Not Fully Equipped Heroes${all.length ? ` (${list.length})` : ""}</div>
-    ${body}
-  </div>`;
+  return { html, count: all.length ? list.length : 0 };
 }
 
 // Splits a row's heroes by their "partner" set: for a 4 set row, by the
@@ -178,21 +194,22 @@ function hgGroupRowHeroes(cls, rows, r) {
   return out;
 }
 
-function hgPlannerHTML(cls) {
+// Body of the EQUIPMENT PLANNER drawer: the shared "not in use" note, then one
+// drawer per Gear Set (A, B, C… in A–Z order), then ＋ Add row.
+function hgPlannerBodyHTML(cls) {
   const rows = hgEffectiveRows(cls);
   const classHeroes = hgClassHeroes(cls);
   const heroOf = id => classHeroes.find(h => String(h.id) === String(id));
   const cAttr = `data-cls="${hgEsc(cls)}"`;
   const editingHere = !!hgEdit && hgEdit.cls === cls;
   const editingElsewhere = !!hgEdit && !editingHere;
-  const addBtn = disabled => `<div class="hg-add-row"><button type="button" class="hg-pill" ${cAttr} data-act="plan-add"${disabled ? ' disabled title="Finish editing the other row first"' : ""}>＋ Add row</button></div>`;
+  const addBtn = disabled => `<div class="hg-add-row"><button type="button" class="hg-pill" ${cAttr} data-act="plan-add"${disabled ? ' disabled title="Finish editing the other row first"' : ""}>＋ Add gear set</button></div>`;
 
-  // One shared text for every class ("sets I won't use"), written right under
-  // the header; editing it from any class changes it everywhere.
+  // One shared text for every class ("sets I won't use"); editing it from any
+  // class changes it everywhere.
   const unusedText = heroGear.unusedSets || "";
   const unusedEditingHere = hgUnusedEditing === cls;
-  const head = `<div class="hg-section-head">Equipment Planner</div>
-    <div class="hg-unused">
+  const unused = `<div class="hg-unused">
       <div class="hg-unused-label">Sets not in use · shared by all classes</div>
       ${unusedEditingHere
         ? `<div class="hg-row">
@@ -205,55 +222,57 @@ function hgPlannerHTML(cls) {
             <button type="button" class="hg-icon-btn" data-gact="unused-edit" data-ucls="${hgEsc(cls)}" title="Edit"${hgUnusedEditing ? " disabled" : ""}>✏️</button>
           </div>`}
     </div>`;
-  const cols = `<div class="hg-plan-row hg-plan-cols"><div>Gear Set</div><div>Artifact Type</div><div>Assigned heroes</div></div>`;
 
-  const body = rows.map((r, idx) => {
+  const rowDrawers = rows.map((r, idx) => {
     const picked_heroes = r.heroIds.map(heroOf).filter(Boolean).sort((a, b) => gearCmp(a.name, b.name));
-    if (!(editingHere && r === hgEdit.row)) {
-      return `<div class="hg-plan-row">
-        <div class="hg-text${r.gearSet ? "" : " hg-empty"}" data-label="Gear Set">${hgEsc(r.gearSet || "—")} <span class="hg-set-badge">${hgSetLabel(r)}</span></div>
-        <div class="hg-text${r.artifactType ? "" : " hg-empty"}" data-label="Artifact Type">${hgEsc(r.artifactType || "—")}</div>
-        <div class="hg-text hg-heroes-view${picked_heroes.length ? "" : " hg-empty"}" data-label="Heroes">
-          ${picked_heroes.length ? hgGroupRowHeroes(cls, rows, r).map(gr => `<div class="hg-group${gr.unassigned ? " hg-group-un" : ""}">
+    const editingThis = editingHere && r === hgEdit.row;
+    const meta = hgPlural(picked_heroes.length, "hero", "heroes");
+    const badge = `<span class="hg-set-badge">${hgSetLabel(r)}</span>`;
+    const title = hgEsc(r.gearSet.trim() || (editingThis ? "New gear set" : "(no name)"));
+    const kv = (n, label, val) => `<div class="hg-kv"><div class="hg-kv-label"><span class="hg-idx">${n}.</span> ${label}</div><div class="hg-kv-val">${val}</div></div>`;
+
+    let inner;
+    if (!editingThis) {
+      const groups = picked_heroes.length
+        ? hgGroupRowHeroes(cls, rows, r).map(gr => `<div class="hg-group${gr.unassigned ? " hg-group-un" : ""}">
             <div class="hg-group-title">${hgEsc(gr.title)}${gr.label ? ` <span class="hg-set-badge">${gr.label}</span>` : ""}</div>
             <div class="hg-group-heroes">${gr.heroes.map(h => `<span class="hg-hero-chip">${hgAvatar(h)}${hgEsc(h.name || "Unnamed")}</span>`).join("")}</div>
-          </div>`).join("") : "—"}
-          <span class="hg-row-btns">
-            <button type="button" class="hg-pill" ${cAttr} data-act="plan-edit" data-row="${r.id}"${hgEdit ? ' disabled title="Finish editing the other row first"' : ' title="Edit this row"'}>✏️ Edit</button>
-            <button type="button" class="hg-pill" ${cAttr} data-act="plan-copy" data-row="${r.id}" title="Copy Gear Set + Artifact Type to another class">⧉ Copy to…</button>
-          </span>
+          </div>`).join("")
+        : `<span class="hg-empty">—</span>`;
+      inner = `${kv(1, "ARTIFACT TYPE", r.artifactType.trim() ? hgEsc(r.artifactType) : `<span class="hg-empty">—</span>`)}
+        ${kv(2, "HEROES", groups)}
+        <div class="hg-row-btns">
+          <button type="button" class="hg-pill" ${cAttr} data-act="plan-edit" data-row="${r.id}"${hgEdit ? ' disabled title="Finish editing the other row first"' : ' title="Edit this gear set"'}>✏️ Edit</button>
+          <button type="button" class="hg-pill" ${cAttr} data-act="plan-copy" data-row="${r.id}" title="Copy Gear Set + Artifact Type to another class">⧉ Copy to…</button>
+        </div>`;
+    } else {
+      const picked = picked_heroes.map(h => `<span class="hg-tag">${hgAvatar(h)}${hgEsc(h.name || "Unnamed")}<button type="button" class="hg-tag-x" ${cAttr} data-act="plan-unhero" data-row="${r.id}" data-hero="${hgEsc(h.id)}" title="Remove">✕</button></span>`).join("");
+      inner = `<div class="hg-kv"><div class="hg-kv-label">GEAR SET</div>
+          <div class="hg-kv-val">
+            <input type="text" class="hg-input hg-plan-in" ${cAttr} data-row="${r.id}" data-f="gearSet" value="${hgEsc(r.gearSet)}" placeholder="Gear set" aria-label="Gear set" list="hg-set-names" autocomplete="off">
+            <div class="hg-settype">
+              <button type="button" class="hg-pill${r.setType !== "2" ? " on" : ""}" ${cAttr} data-act="plan-settype" data-row="${r.id}" data-val="4">4 set</button>
+              <button type="button" class="hg-pill${r.setType === "2" ? " on" : ""}" ${cAttr} data-act="plan-settype" data-row="${r.id}" data-val="2">2 set</button>
+              ${r.setType === "2" ? [1, 2, 3].map(n => `<button type="button" class="hg-pill${(Number(r.setCount) || 1) === n ? " on" : ""}" ${cAttr} data-act="plan-setcount" data-row="${r.id}" data-val="${n}">×${n}</button>`).join("") : ""}
+              <span class="hg-pick-note">${hgRowPieces(r)}/${HG_PIECE_LIMIT} pcs</span>
+            </div>
+          </div></div>
+        ${kv(1, "ARTIFACT TYPE", `<input type="text" class="hg-input hg-plan-in" ${cAttr} data-row="${r.id}" data-f="artifactType" value="${hgEsc(r.artifactType)}" placeholder="Artifact type" aria-label="Artifact type">`)}
+        ${kv(2, "HEROES", `<div class="hg-plan-heroes">${picked}<button type="button" class="hg-pill" ${cAttr} data-act="plan-pick" data-row="${r.id}">＋ Heroes</button></div>`)}
+        <div class="hg-row-actions">
+          <button type="button" class="hg-pill hg-save" ${cAttr} data-act="plan-save" data-row="${r.id}">💾 Save</button>
+          <button type="button" class="hg-pill" ${cAttr} data-act="plan-cancel" data-row="${r.id}">✕ Cancel</button>
+          <button type="button" class="hg-pill hg-copy-btn" ${cAttr} data-act="plan-copy" data-row="${r.id}" title="Copy Gear Set + Artifact Type to another class">⧉ Copy to…</button>
+          <button type="button" class="hg-icon-btn hg-del" ${cAttr} data-act="plan-del" data-row="${r.id}" title="Delete this gear set">🗑</button>
         </div>
-      </div>`;
+        ${addBtn(false)}`;
     }
-    const picked = picked_heroes.map(h => `<span class="hg-tag">${hgAvatar(h)}${hgEsc(h.name || "Unnamed")}<button type="button" class="hg-tag-x" ${cAttr} data-act="plan-unhero" data-row="${r.id}" data-hero="${hgEsc(h.id)}" title="Remove">✕</button></span>`).join("");
-    return `<div class="hg-plan-row hg-plan-editing">
-      <div class="hg-gear-cell">
-        <input type="text" class="hg-input hg-plan-in" ${cAttr} data-row="${r.id}" data-f="gearSet" value="${hgEsc(r.gearSet)}" placeholder="Gear set" aria-label="Gear set" list="hg-set-names" autocomplete="off">
-        <div class="hg-settype">
-          <button type="button" class="hg-pill${r.setType !== "2" ? " on" : ""}" ${cAttr} data-act="plan-settype" data-row="${r.id}" data-val="4">4 set</button>
-          <button type="button" class="hg-pill${r.setType === "2" ? " on" : ""}" ${cAttr} data-act="plan-settype" data-row="${r.id}" data-val="2">2 set</button>
-          ${r.setType === "2" ? [1, 2, 3].map(n => `<button type="button" class="hg-pill${(Number(r.setCount) || 1) === n ? " on" : ""}" ${cAttr} data-act="plan-setcount" data-row="${r.id}" data-val="${n}">×${n}</button>`).join("") : ""}
-          <span class="hg-pick-note">${hgRowPieces(r)}/${HG_PIECE_LIMIT} pcs</span>
-        </div>
-      </div>
-      <input type="text" class="hg-input hg-plan-in" ${cAttr} data-row="${r.id}" data-f="artifactType" value="${hgEsc(r.artifactType)}" placeholder="Artifact type" aria-label="Artifact type">
-      <div class="hg-plan-heroes">
-        ${picked}
-        <button type="button" class="hg-pill" ${cAttr} data-act="plan-pick" data-row="${r.id}">＋ Heroes</button>
-      </div>
-      <div class="hg-row-actions">
-        <button type="button" class="hg-pill hg-save" ${cAttr} data-act="plan-save" data-row="${r.id}">💾 Save</button>
-        <button type="button" class="hg-pill" ${cAttr} data-act="plan-cancel" data-row="${r.id}">✕ Cancel</button>
-        <button type="button" class="hg-pill hg-copy-btn" ${cAttr} data-act="plan-copy" data-row="${r.id}" title="Copy Gear Set + Artifact Type to another class">⧉ Copy to…</button>
-        <button type="button" class="hg-icon-btn hg-del" ${cAttr} data-act="plan-del" data-row="${r.id}" title="Delete this row">🗑</button>
-      </div>
-      ${addBtn(false)}
-    </div>`;
+    return hgDrawer(`r:${cls}:${r.id}`, { idx: hgLetter(idx) + ".", title, badge, meta, level: "row", body: inner });
   }).join("");
 
-  const empty = rows.length === 0 ? `<div class="hg-text hg-empty">No planner rows yet.</div>` : "";
+  const empty = rows.length === 0 ? `<div class="hg-text hg-empty">No gear sets yet.</div>` : "";
   // The Add button sits under the row being edited; otherwise at the bottom.
-  return `<div class="hg-section hg-planner">${head}${rows.length ? cols : ""}${body}${empty}${editingHere ? "" : addBtn(editingElsewhere)}</div>`;
+  return `${unused}${rowDrawers}${empty}${editingHere ? "" : addBtn(editingElsewhere)}`;
 }
 
 // Write the row being edited into heroGear. Returns the index just after it
@@ -306,12 +325,14 @@ function hgPlannerClick(btn) {
     const r = heroGear[cls].planner.find(x => String(x.id) === row);
     if (!r) return;
     hgEdit = { cls, row: { ...r, heroIds: [...r.heroIds] }, isNew: false, insertAt: 0 };
+    hgOpenPath(cls, r.id);
   } else if (act === "plan-add") {
     if (hgEdit && hgEdit.cls !== cls) return;
     // Adding while a row is open saves that row first, then opens the new
     // blank one directly below it.
     const at = hgEdit ? hgCommitEdit() : heroGear[cls].planner.length;
     hgEdit = { cls, row: hgNewRow(), isNew: true, insertAt: at < 0 ? heroGear[cls].planner.length : at };
+    hgOpenPath(cls, hgEdit.row.id);
   } else if (!hgEdit || hgEdit.cls !== cls) {
     return;
   } else if (act === "plan-cancel") {
@@ -925,14 +946,20 @@ function renderHeroGear() {
   // A reload/import can drop the row being edited — never edit a ghost.
   if (hgEdit && !hgEdit.isNew && !heroGear[hgEdit.cls].planner.some(r => String(r.id) === String(hgEdit.row.id))) hgEdit = null;
 
-  body.innerHTML = GEAR_CLASSES.map(cls => `
-    <div class="hg-class">
-      <div class="hg-class-title">${hgEsc(cls)}</div>
-      ${hgSectionHTML(cls, "equipment", "Equipment")}
-      ${hgSectionHTML(cls, "artifacts", "Artifacts")}
-      ${hgPlannerHTML(cls)}
-      ${hgNotFullHTML(cls)}
-    </div>`).join("");
+  const scroll = body.scrollTop;
+  body.innerHTML = GEAR_CLASSES.map((cls, ci) => {
+    const nf = hgNotFullInfo(cls);
+    const sec = (n, name, key, meta, html) => hgDrawer(`s:${cls}:${key}`, { idx: n + ".", title: name, meta, level: "sec", body: html });
+    const eqN = heroGear[cls].equipment.items.length, arN = heroGear[cls].artifacts.items.length;
+    const rows = hgEffectiveRows(cls);
+    const inner =
+      sec(1, "Equipment", "equipment", hgPlural(eqN, "entry", "entries"), hgSectionBodyHTML(cls, "equipment", "Equipment")) +
+      sec(2, "Artifacts", "artifacts", hgPlural(arN, "entry", "entries"), hgSectionBodyHTML(cls, "artifacts", "Artifacts")) +
+      sec(3, "Equipment Planner", "planner", hgPlural(rows.length, "gear set", "gear sets"), hgPlannerBodyHTML(cls)) +
+      sec(4, "Not Fully Equipped Heroes", "notfull", `${nf.count}`, nf.html);
+    return hgDrawer(`c:${cls}`, { idx: hgLetter(ci) + ".", title: hgEsc(cls), meta: hgPlural(rows.length, "gear set", "gear sets"), level: "class", body: inner });
+  }).join("");
+  body.scrollTop = scroll;
 
   body.querySelector("textarea.hg-input")?.focus();
 }
@@ -1093,6 +1120,12 @@ function initHeroGear() {
     handle.classList.toggle("open", hgOpen);
     if (hgOpen) renderHeroGear(); // pick up heroes added since last render
   });
+  // Remember which drawers are open (toggle doesn't bubble, so listen in capture).
+  body.addEventListener("toggle", e => {
+    const key = e.target?.dataset?.key;
+    if (!key) return;
+    if (e.target.open) hgOpenKeys.add(key); else hgOpenKeys.delete(key);
+  }, true);
   body.addEventListener("click", hgOnClick);
   // Planner text fields write straight into the working copy (no re-render,
   // so typing never loses focus). Nothing is saved until 💾 Save.

@@ -5367,3 +5367,75 @@ body.qd-companion .hg-drawer { display: none !important; }
 .hgr-fallback { font-size: 24px; }
 .hgr-tile-name { font-family: 'Crimson Pro', serif; font-size: 14px; line-height: 1.15; text-align: center; max-width: 86px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .hgr-tile-sub { font-family: 'Cinzel', serif; font-size: 8.5px; letter-spacing: .05em; color: var(--text-dim); text-align: center; }
+
+/* ═══════════════════════════════════════════════════════════════
+   Hero Equipment & Artifacts — nested drawers (A. CLASS → 1. SECTION →
+   A. GEAR SET → 1. FIELD). Smaller, calmer type than before.
+═══════════════════════════════════════════════════════════════ */
+.hg-inner { padding: 8px 10px 10px; }
+
+.hg-d { border-radius: 10px; }
+.hg-d > summary {
+  display: flex; align-items: center; gap: 8px;
+  list-style: none; cursor: pointer; user-select: none;
+  -webkit-tap-highlight-color: transparent;
+}
+.hg-d > summary::-webkit-details-marker { display: none; }
+.hg-d > summary::after {            /* chevron on the right */
+  content: "▸"; padding-left: 2px;
+  color: var(--text-dim); font-size: 11px; transition: transform .18s ease;
+}
+.hg-d[open] > summary::after { transform: rotate(90deg); color: var(--gold2); }
+
+.hg-idx { font-family: 'Cinzel', serif; color: var(--gold2); font-weight: 700; flex: none; min-width: 1.35em; }
+.hg-d-title { font-family: 'Cinzel', serif; letter-spacing: .08em; min-width: 0; overflow-wrap: anywhere; }
+.hg-d-meta { font-family: 'Crimson Pro', serif; font-size: 11.5px; color: var(--text-dim); white-space: nowrap; margin-left: auto; }
+.hg-d > summary .hg-d-title ~ .hg-set-badge { flex: none; }
+
+/* Level 1 — class (A. WARRIOR) */
+.hg-d-class { margin: 8px 0; border: 1px solid rgba(201,162,39,.28); background: linear-gradient(180deg, rgba(201,162,39,.07), rgba(255,255,255,.015)); }
+.hg-d-class[open] { border-color: rgba(201,162,39,.5); }
+.hg-d-class > summary { padding: 11px 13px; }
+.hg-d-class > summary .hg-d-title { font-size: 13px; text-transform: uppercase; color: var(--text); }
+.hg-d-class > summary .hg-idx { font-size: 13px; }
+.hg-d-class > .hg-d-body { padding: 2px 10px 10px; }
+
+/* Level 2 — sections (1. EQUIPMENT …) */
+.hg-d-sec { margin: 6px 0; border: 1px solid var(--border); background: rgba(6,16,30,.55); }
+.hg-d-sec > summary { padding: 8px 11px; }
+.hg-d-sec > summary .hg-d-title { font-size: 11px; text-transform: uppercase; color: var(--teal2); }
+.hg-d-sec > summary .hg-idx { font-size: 11px; }
+.hg-d-sec > .hg-d-body { padding: 4px 10px 10px; }
+
+/* Level 3 — gear sets (A. SPEED) */
+.hg-d-row { margin: 6px 0; border: 1px solid rgba(255,255,255,.07); background: rgba(255,255,255,.025); }
+.hg-d-row[open] { border-color: rgba(201,162,39,.3); }
+.hg-d-row > summary { padding: 7px 10px; }
+.hg-d-row > summary .hg-d-title { font-family: 'Crimson Pro', serif; letter-spacing: .01em; font-size: 14.5px; font-weight: 600; color: var(--text); }
+.hg-d-row > summary .hg-idx { font-size: 11px; }
+.hg-d-row > .hg-d-body { padding: 2px 10px 10px; }
+
+/* labelled fields inside a gear set (1. ARTIFACT TYPE / 2. HEROES) */
+.hg-kv { margin: 7px 0; }
+.hg-kv-label { font-family: 'Cinzel', serif; font-size: 9.5px; letter-spacing: .1em; color: var(--text-dim); margin-bottom: 3px; }
+.hg-kv-label .hg-idx { font-size: 9.5px; }
+.hg-kv-val { font-family: 'Crimson Pro', serif; font-size: 14px; line-height: 1.3; overflow-wrap: anywhere; }
+.hg-kv-val .hg-input { width: 100%; box-sizing: border-box; }
+.hg-d-row .hg-row-btns { display: flex; gap: 6px; margin: 8px 0 0; justify-content: flex-end; }
+.hg-d-row .hg-row-actions { margin-top: 8px; }
+
+/* quieter type everywhere inside the drawer */
+.hg-inner .hg-text { font-size: 13px; line-height: 1.35; padding: 4px 8px; }
+.hg-inner .hg-input { font-size: 13px; padding: 4px 8px; }
+.hg-inner .hg-hero-chip { font-size: 13px; margin: 0 6px 3px 0; }
+.hg-inner .hg-avatar { width: 20px; height: 20px; }
+.hg-inner .hg-tag { font-size: 12.5px; }
+.hg-inner .hg-nf-chip { font-size: 13px; }
+.hg-inner .hg-pill { font-size: 9.5px; padding: 4px 9px; }
+.hg-inner .hg-pick-note { font-size: 10px; }
+.hg-inner .hg-group-title { font-size: 9.5px; }
+.hg-inner .hg-set-badge { font-size: 9px; padding: 0 6px; }
+.hg-inner .hg-add-row { margin: 4px 0 6px; }
+.hg-inner .hg-unused { margin: 2px 0 8px; padding-bottom: 6px; }
+.hg-inner .hg-unused-label { font-size: 9px; }
+.hg-inner .hg-icon-btn { width: 26px; height: 26px; font-size: 11px; }
