@@ -1478,6 +1478,29 @@ body.qd-companion .sidebar,
 body.qd-companion .quickdraft-handle {
   display: none !important;
 }
+/* Switch link between full site and Quick Draft — stays visible in companion mode */
+/* View-mode pill toggle (Full site <-> Quick Draft) */
+.mode-toggle {
+  display: inline-flex; align-items: center; gap: 2px; padding: 3px;
+  background: var(--bg2); border: 1px solid var(--border); border-radius: 999px;
+  flex-shrink: 0;
+}
+.mode-seg {
+  display: inline-flex; align-items: center; gap: 5px;
+  padding: 5px 11px; border-radius: 999px;
+  font-size: 10px; font-weight: 600; letter-spacing: .08em; text-transform: uppercase;
+  color: var(--text-dim); text-decoration: none; white-space: nowrap;
+  transition: color .15s, background .15s;
+}
+a.mode-seg:hover { color: var(--gold2); background: rgba(201,162,39,.1); }
+.mode-seg.active {
+  color: var(--bg); background: linear-gradient(135deg, var(--gold2), var(--gold));
+  cursor: default;
+}
+@media (max-width: 480px) {
+  .mode-seg { padding: 5px 9px; }
+}
+body.qd-companion header .header-top { align-items: center; }
 body.qd-companion header { padding: 10px 14px; }
 body.qd-companion main { display: block; padding: 10px; }
 body.qd-companion .chart-column { width: 100%; }
