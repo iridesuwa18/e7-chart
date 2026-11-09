@@ -28591,9 +28591,7 @@
           "artifactType": "Counter artifact",
           "setType": "4",
           "setCount": 1,
-          "heroIds": [
-            1787899571123
-          ]
+          "heroIds": []
         },
         {
           "id": 1792761959900,
@@ -29451,5 +29449,5 @@
     }
   },
   "schemaVersion": 2,
-  "savedAt": "2026-11-09T11:29:20.370Z"
+  "savedAt": "2026-11-09T11:34:32.392Z"
 }
