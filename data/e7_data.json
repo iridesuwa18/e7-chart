@@ -29020,6 +29020,16 @@
           ]
         },
         {
+          "id": 1794223733519,
+          "gearSet": "Lifesteal Set (Mage Healer)",
+          "artifactType": "",
+          "setType": "4",
+          "setCount": 1,
+          "heroIds": [
+            1787967092257
+          ]
+        },
+        {
           "id": 1792761839320,
           "gearSet": "Penetration Set (Non debuff DPS units)",
           "artifactType": "Any artifact",
@@ -29441,5 +29451,5 @@
     }
   },
   "schemaVersion": 2,
-  "savedAt": "2026-11-09T11:23:33.905Z"
+  "savedAt": "2026-11-09T11:29:20.370Z"
 }
