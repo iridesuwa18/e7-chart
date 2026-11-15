@@ -28521,9 +28521,7 @@
           "artifactType": "Debuff artifact",
           "setType": "4",
           "setCount": 1,
-          "heroIds": [
-            1787317989913
-          ]
+          "heroIds": []
         }
       ]
     },
@@ -29458,5 +29456,5 @@
     }
   },
   "schemaVersion": 2,
-  "savedAt": "2026-11-15T08:28:28.399Z"
+  "savedAt": "2026-11-15T08:31:35.326Z"
 }
