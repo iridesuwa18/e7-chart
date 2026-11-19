@@ -173,11 +173,23 @@ function hgrBuildPanel() {
   }));
 
   // Tapping a tile opens that hero's equipment popup.
-  document.getElementById("hgr-grid").addEventListener("click", e => {
+  // 👁 opens Hero Details, E jumps to the hero's gear sets in the Equipment
+  // Planner (same as the roster cards); tapping the tile itself opens the quick
+  // equipment popup.
+  const gridEl = document.getElementById("hgr-grid");
+  const tileAction = e => {
     const tile = e.target.closest(".hgr-tile");
     if (!tile) return;
     const h = heroes.find(x => String(x.id) === tile.dataset.heroId);
-    if (h && typeof openHeroEquipment === "function") openHeroEquipment(h);
+    if (!h) return;
+    const act = e.target.closest("[data-act]")?.dataset.act;
+    if (act === "view") { if (typeof openHeroDetails === "function") openHeroDetails(h); }
+    else if (act === "equip") { if (typeof hgEquipAction === "function") hgEquipAction(h); }
+    else if (typeof openHeroEquipment === "function") openHeroEquipment(h);
+  };
+  gridEl.addEventListener("click", tileAction);
+  gridEl.addEventListener("keydown", e => {
+    if ((e.key === "Enter" || e.key === " ") && e.target.classList.contains("hgr-tile")) { e.preventDefault(); tileAction(e); }
   });
 
   hgrRenderGrid();
@@ -196,11 +208,17 @@ function hgrRenderGrid() {
   grid.innerHTML = list.map(h => {
     const icon = h.iconData ? `<img src="${h.iconData}" alt="">` : `<div class="hf-tile-fallback hgr-fallback">⚔️</div>`;
     const sub = [h.role, h.element].filter(Boolean).join(" · ");
-    return `<button type="button" class="hgr-tile" data-hero-id="${hgrEsc(h.id)}" title="${hgrEsc((h.name || "Unnamed Hero") + " — tap for equipment")}">
+    return `<div class="hgr-tile" role="button" tabindex="0" data-hero-id="${hgrEsc(h.id)}" title="${hgrEsc((h.name || "Unnamed Hero") + " — tap for equipment")}">
+      <span class="hgr-tile-btns">
+        <button type="button" class="icon-btn hgr-btn" data-act="view" title="Hero Details" aria-label="Hero Details">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+        </button>
+        <button type="button" class="icon-btn hgr-btn" data-act="equip" title="Equipment planner" aria-label="Equipment planner">E</button>
+      </span>
       ${icon}
       <span class="hgr-tile-name">${hgrEsc(h.name || "Unnamed")}</span>
       ${sub ? `<span class="hgr-tile-sub">${hgrEsc(sub)}</span>` : ""}
-    </button>`;
+    </div>`;
   }).join("");
 }
 

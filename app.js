@@ -4961,7 +4961,7 @@ function renderRoster() {
         <button class="icon-btn btn-view" title="Hero Details">
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
         </button>
-        <button class="icon-btn btn-equip" title="Equipment (4 set / 2 sets)">E</button>
+        <button class="icon-btn btn-equip" title="Equipment planner — jump to this hero's gear sets">E</button>
         <button class="icon-btn btn-quickdraft-add${qdHeroInDraft(h.id) ? " active" : ""}" title="${qdHeroInDraft(h.id) ? "Remove from Quick Draft" : "Add to Quick Draft"}">
           ${qdHeroInDraft(h.id)
             ? `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>`
@@ -4972,7 +4972,8 @@ function renderRoster() {
     card.querySelector(".btn-view").addEventListener("click", e => { e.stopPropagation(); openHeroDetails(h); });
     card.querySelector(".btn-equip").addEventListener("click", e => {
       e.stopPropagation();
-      if (typeof openHeroEquipment === "function") openHeroEquipment(h); // hero-gear.js
+      if (typeof hgEquipAction === "function") hgEquipAction(h);          // hero-gear.js: jump to the planner
+      else if (typeof openHeroEquipment === "function") openHeroEquipment(h);
     });
     card.querySelector(".btn-quickdraft-add").addEventListener("click", e => {
       e.stopPropagation();

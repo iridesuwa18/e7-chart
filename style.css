@@ -24,7 +24,7 @@
 
 /* ── Reset ── */
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-html { height: 100%; }
+html { height: 100%; -webkit-text-size-adjust: 100%; text-size-adjust: 100%; }
 
 body {
   background: var(--bg);
@@ -5246,8 +5246,8 @@ body.hide-labels .hero-dot-label {
    taller scrolling body and the per-class sections.
 ══════════════════════════════════════ */
 .hg-handle { margin-bottom: 8px; }
-.hg-drawer.open { max-height: 75vh; }
-.hg-inner { max-height: 75vh; overflow-y: auto; -webkit-overflow-scrolling: touch; }
+.hg-drawer.open { max-height: 85vh; }
+.hg-inner { max-height: calc(85vh - 64px); overflow-y: auto; -webkit-overflow-scrolling: touch; }
 .hg-class { border-bottom: 1px solid var(--border); padding: 8px 0 10px; }
 .hg-class:last-child { border-bottom: 0; }
 .hg-class-title { font-family: 'Cinzel', serif; color: var(--gold2); font-size: 14px; letter-spacing: .1em; text-transform: uppercase; margin-bottom: 6px; }
@@ -5462,3 +5462,98 @@ body.qd-companion .hg-drawer { display: none !important; }
 .hg-inner .hg-unused { margin: 2px 0 8px; padding-bottom: 6px; }
 .hg-inner .hg-unused-label { font-size: 9px; }
 .hg-inner .hg-icon-btn { width: 26px; height: 26px; font-size: 11px; }
+
+
+/* ══════════════════════════════════════
+   HERO GRID TILES — 👁 / E buttons
+══════════════════════════════════════ */
+.hgr-tile { position: relative; }
+.hgr-tile:focus-visible { outline: 2px solid var(--gold); outline-offset: 2px; }
+.hgr-tile-btns { position: absolute; top: 3px; right: 3px; display: flex; gap: 2px; z-index: 1; }
+.hgr-btn {
+  width: 26px; height: 26px; padding: 0; display: inline-flex; align-items: center; justify-content: center;
+  border-radius: 7px; border: 1px solid var(--border); background: rgba(4,9,15,.78);
+  color: var(--gold2); font-family: 'Cinzel', serif; font-size: 11px; font-weight: 700; opacity: .9;
+}
+.hgr-btn:hover, .hgr-btn:active { opacity: 1; border-color: var(--gold); background: rgba(201,162,39,.18); }
+
+/* ══════════════════════════════════════
+   HERO SEARCH inside 🛡 Hero Equipment and Artifacts
+══════════════════════════════════════ */
+.hg-search { position: relative; padding: 8px 10px 4px; }
+.hg-search .taxonomy-search { width: 100%; }
+.hg-search-results {
+  margin-top: 6px; max-height: 40vh; overflow-y: auto; -webkit-overflow-scrolling: touch;
+  border: 1px solid var(--border); border-radius: 8px; background: var(--bg2);
+}
+.hg-search-item {
+  display: flex; align-items: center; gap: 8px; width: 100%; padding: 8px 10px; text-align: left;
+  background: none; border: 0; border-bottom: 1px solid var(--border); color: var(--text); font: inherit; cursor: pointer;
+}
+.hg-search-item:last-child { border-bottom: 0; }
+.hg-search-item:hover, .hg-search-item:active { background: rgba(201,162,39,.1); }
+.hg-search-main { display: flex; flex-direction: column; min-width: 0; line-height: 1.25; }
+.hg-search-name { font-size: 15px; }
+.hg-search-sets { white-space: normal; }
+.hg-search-none { padding: 10px; }
+
+/* ══════════════════════════════════════
+   Move-hero button + jump highlight
+══════════════════════════════════════ */
+.hg-chip-move {
+  margin-left: 2px; padding: 0 5px; min-width: 22px; height: 22px; line-height: 1;
+  border-radius: 6px; border: 1px solid var(--border); background: rgba(255,255,255,.03);
+  color: var(--text-dim); font-size: 13px; cursor: pointer;
+}
+.hg-chip-move:hover, .hg-chip-move:active { color: var(--gold2); border-color: var(--gold); }
+.hg-equip-link { display: block; text-align: center; text-decoration: none; }
+@keyframes hg-flash-kf { 0%,100% { box-shadow: 0 0 0 0 rgba(232,200,74,0); } 25%,70% { box-shadow: 0 0 0 3px rgba(232,200,74,.75); } }
+.hg-flash { animation: hg-flash-kf 1.6s ease-out 1; border-radius: 8px; }
+@keyframes hg-chip-kf { 0%,100% { background: transparent; } 25%,70% { background: rgba(232,200,74,.35); } }
+.hg-chip-flash { animation: hg-chip-kf 2.4s ease-out 1; border-radius: 999px; }
+
+/* Hero Details (and its sub-dialogs) must sit above the full-page Hero Grid. */
+body.qd-factor-menu-open .overlay { z-index: 600; }
+
+/* ══════════════════════════════════════
+   LANDSCAPE PHONES
+   Short-and-wide screens: keep the sidebar beside the chart (even under 700px
+   wide), shrink the header and make the chart as tall as the screen so it
+   fits without scrolling. Respects the notch via safe-area insets.
+══════════════════════════════════════ */
+@media (orientation: landscape) {
+  body {
+    padding-left: env(safe-area-inset-left, 0px);
+    padding-right: env(safe-area-inset-right, 0px);
+  }
+}
+@media (orientation: landscape) and (max-height: 520px) {
+  header { padding: 5px 12px; }
+  .brand-emblem { width: 26px; height: 26px; font-size: 12px; }
+  .brand-text p { display: none; }
+  .brand-text h1 { font-size: 14px; }
+  .header-actions { gap: 5px; }
+  .mode-seg { padding: 3px 9px; }
+
+  main { grid-template-columns: minmax(0, 1fr) 210px; padding: 8px; gap: 10px; }
+  .sidebar { top: 8px; max-height: calc(100vh - 60px); max-height: calc(100dvh - 60px); }
+
+  /* Square chart sized to the screen height (chart-outer = chart + its axis padding). */
+  .chart-outer {
+    padding: 22px 40px;
+    max-width: calc(100vh - 24px);
+    max-width: calc(100dvh - 24px);
+    margin-inline: auto;
+  }
+  .axis-label { font-size: 7px; }
+
+  /* Popups: use the width, not the height. */
+  .qd-factor-menu-overlay { padding: 2vh 2vw; }
+  .qd-factor-menu-panel { max-height: 96vh; max-height: 96dvh; }
+  .hgr-panel { height: 100vh; height: 100dvh; }
+  .hgr-grid { grid-template-columns: repeat(auto-fill, minmax(84px, 1fr)); gap: 8px; }
+  .hg-drawer.open { max-height: 80vh; }
+  .hg-inner { max-height: calc(80vh - 56px); }
+
+  body.qd-companion .quickdraft-inner { min-height: calc(100vh - 50px); min-height: calc(100dvh - 50px); }
+}

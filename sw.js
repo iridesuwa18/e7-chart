@@ -2,7 +2,7 @@
    Bump CACHE_NAME any time you change index.html / app.js / style.css,
    otherwise Android may keep serving the old cached versions even after
    you push new files to GitHub. */
-const CACHE_NAME = "e7-draft-v8";
+const CACHE_NAME = "e7-draft-v9";
 
 const SHELL_FILES = [
   "./index.html",

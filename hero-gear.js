@@ -167,7 +167,7 @@ function hgNotFullInfo(cls) {
     : !list.length
       ? `<div class="hg-text hg-empty">All ${hgEsc(cls)} heroes are fully equipped (6/6) ✓</div>`
       : `<div class="hg-nf-list">${list.map(({ h, n }) =>
-          `<span class="hg-hero-chip hg-nf-chip">${hgAvatar(h)}${hgEsc(h.name || "Unnamed")} <span class="hg-pick-note">${n}/${HG_PIECE_LIMIT}</span></span>`).join("")}</div>`;
+          `<span class="hg-hero-chip hg-nf-chip" data-hero="${hgEsc(h.id)}">${hgAvatar(h)}${hgEsc(h.name || "Unnamed")} <span class="hg-pick-note">${n}/${HG_PIECE_LIMIT}</span></span>`).join("")}</div>`;
   return { html, count: all.length ? list.length : 0 };
 }
 
@@ -202,7 +202,6 @@ function hgPlannerBodyHTML(cls) {
   const heroOf = id => classHeroes.find(h => String(h.id) === String(id));
   const cAttr = `data-cls="${hgEsc(cls)}"`;
   const editingHere = !!hgEdit && hgEdit.cls === cls;
-  const editingElsewhere = !!hgEdit && !editingHere;
   const addBtn = disabled => `<div class="hg-add-row"><button type="button" class="hg-pill" ${cAttr} data-act="plan-add"${disabled ? ' disabled title="Finish editing the other row first"' : ""}>＋ Add gear set</button></div>`;
 
   // One shared text for every class ("sets I won't use"); editing it from any
@@ -236,13 +235,13 @@ function hgPlannerBodyHTML(cls) {
       const groups = picked_heroes.length
         ? hgGroupRowHeroes(cls, rows, r).map(gr => `<div class="hg-group${gr.unassigned ? " hg-group-un" : ""}">
             <div class="hg-group-title">${hgEsc(gr.title)}${gr.label ? ` <span class="hg-set-badge">${gr.label}</span>` : ""}</div>
-            <div class="hg-group-heroes">${gr.heroes.map(h => `<span class="hg-hero-chip">${hgAvatar(h)}${hgEsc(h.name || "Unnamed")}</span>`).join("")}</div>
+            <div class="hg-group-heroes">${gr.heroes.map(h => `<span class="hg-hero-chip" data-hero="${hgEsc(h.id)}">${hgAvatar(h)}${hgEsc(h.name || "Unnamed")}<button type="button" class="hg-chip-move" ${cAttr} data-act="plan-move" data-row="${r.id}" data-hero="${hgEsc(h.id)}" title="Move ${hgEsc(h.name || "hero")} to another gear set" aria-label="Move to another gear set">⇄</button></span>`).join("")}</div>
           </div>`).join("")
         : `<span class="hg-empty">—</span>`;
       inner = `${kv(1, "ARTIFACT TYPE", r.artifactType.trim() ? hgEsc(r.artifactType) : `<span class="hg-empty">—</span>`)}
         ${kv(2, "HEROES", groups)}
         <div class="hg-row-btns">
-          <button type="button" class="hg-pill" ${cAttr} data-act="plan-edit" data-row="${r.id}"${hgEdit ? ' disabled title="Finish editing the other row first"' : ' title="Edit this gear set"'}>✏️ Edit</button>
+          <button type="button" class="hg-pill" ${cAttr} data-act="plan-edit" data-row="${r.id}" title="Edit this gear set">✏️ Edit</button>
           <button type="button" class="hg-pill" ${cAttr} data-act="plan-copy" data-row="${r.id}" title="Copy Gear Set + Artifact Type to another class">⧉ Copy to…</button>
         </div>`;
     } else {
@@ -272,7 +271,7 @@ function hgPlannerBodyHTML(cls) {
 
   const empty = rows.length === 0 ? `<div class="hg-text hg-empty">No gear sets yet.</div>` : "";
   // The Add button sits under the row being edited; otherwise at the bottom.
-  return `${unused}${rowDrawers}${empty}${editingHere ? "" : addBtn(editingElsewhere)}`;
+  return `${unused}${rowDrawers}${empty}${editingHere ? "" : addBtn(false)}`;
 }
 
 // Write the row being edited into heroGear. Returns the index just after it
@@ -319,19 +318,20 @@ function hgPlannerClick(btn) {
   const { cls, act, row, hero } = btn.dataset;
   if (!heroGear[cls]) return;
   if (act === "plan-copy") { hgOpenCopyMenu(cls, row); return; } // works any time
+  if (act === "plan-move") { hgOpenMoveMenu(cls, row, hero); return; } // works any time
 
   if (act === "plan-edit") {
-    if (hgEdit) return; // only one row at a time
+    if (hgEdit) hgCommitEdit(); // starting another edit saves the open row first (no manual 💾 needed)
     const r = heroGear[cls].planner.find(x => String(x.id) === row);
     if (!r) return;
     hgEdit = { cls, row: { ...r, heroIds: [...r.heroIds] }, isNew: false, insertAt: 0 };
     hgOpenPath(cls, r.id);
   } else if (act === "plan-add") {
-    if (hgEdit && hgEdit.cls !== cls) return;
-    // Adding while a row is open saves that row first, then opens the new
-    // blank one directly below it.
+    // Adding while a row is open saves that row first (in any class); if it was
+    // in this class the new blank row opens directly below it.
+    const sameCls = !!hgEdit && hgEdit.cls === cls;
     const at = hgEdit ? hgCommitEdit() : heroGear[cls].planner.length;
-    hgEdit = { cls, row: hgNewRow(), isNew: true, insertAt: at < 0 ? heroGear[cls].planner.length : at };
+    hgEdit = { cls, row: hgNewRow(), isNew: true, insertAt: (!sameCls || at < 0) ? heroGear[cls].planner.length : at };
     hgOpenPath(cls, hgEdit.row.id);
   } else if (!hgEdit || hgEdit.cls !== cls) {
     return;
@@ -890,6 +890,198 @@ function hgCloseCopyMenu() {
   renderHeroGear(); // show the new rows in their classes
 }
 
+// ── Move a hero to a different gear set ───────────────────────────
+// The ⇄ on a hero chip lists the class's other gear sets; picking one takes
+// the hero out of the current row and puts them in the chosen one. Works
+// without entering Edit mode. A set is greyed out if the hero is already in it
+// or the move would push them past 6 pieces.
+let hgMoveEl = null;
+
+function hgMoveHero(cls, fromId, toId, heroId) {
+  const rows = heroGear[cls].planner;
+  const from = rows.find(r => String(r.id) === String(fromId));
+  const to = rows.find(r => String(r.id) === String(toId));
+  if (!from || !to) return false;
+  from.heroIds = from.heroIds.filter(x => String(x) !== String(heroId));
+  if (!to.heroIds.some(x => String(x) === String(heroId))) to.heroIds.push(heroId);
+  hgOpenPath(cls, to.id);
+  hgMarkChanged();
+  return true;
+}
+
+function hgOpenMoveMenu(cls, fromId, heroId) {
+  if (hgEdit) hgCommitEdit(); // never let a stale working copy overwrite the move
+  const rows = heroGear[cls]?.planner || [];
+  const from = rows.find(r => String(r.id) === String(fromId));
+  const hero = hgHeroById(cls, heroId);
+  if (!from || !hero) { renderHeroGear(); return; }
+  if (!hgMoveEl) {
+    hgMoveEl = document.createElement("div");
+    hgMoveEl.className = "qd-factor-menu-overlay hg-picker";
+    hgMoveEl.style.display = "none";
+    document.body.appendChild(hgMoveEl);
+    hgMoveEl.addEventListener("click", e => { if (e.target === hgMoveEl) hgCloseMoveMenu(); });
+    hgMoveEl.addEventListener("keydown", e => { if (e.key === "Escape") hgCloseMoveMenu(); });
+  }
+  const others = rows.filter(r => String(r.id) !== String(fromId))
+    .sort((a, b) => gearCmp(a.gearSet, b.gearSet));
+  // Pieces the hero wears in every row except the one they leave and the one they join.
+  const piecesAfter = tgt => rows
+    .filter(r => String(r.id) !== String(fromId) && String(r.id) !== String(tgt.id) && r.heroIds.some(x => String(x) === String(heroId)))
+    .reduce((n, r) => n + hgRowPieces(r), 0) + hgRowPieces(tgt);
+  const reason = t => t.heroIds.some(x => String(x) === String(heroId)) ? "Already in it"
+    : piecesAfter(t) > HG_PIECE_LIMIT ? `Over ${HG_PIECE_LIMIT} pieces` : "";
+
+  hgMoveEl.innerHTML = `
+    <div class="qd-factor-menu-panel hg-copy-panel">
+      <div class="qd-factor-menu-header">
+        <div class="qd-factor-menu-title">⇄ Move ${hgEsc(hero.name || "hero")}</div>
+        <button type="button" class="qd-factor-menu-close" data-move-close aria-label="Close">✕</button>
+      </div>
+      <div class="hg-text hg-copy-what">From <b>${hgEsc(from.gearSet.trim() || "(no name)")}</b> <span class="hg-set-badge">${hgSetLabel(from)}</span><br><span class="hg-pick-note">Pick the gear set to move them to.</span></div>
+      <div class="hg-picker-list">
+        ${others.length ? others.map(t => {
+          const why = reason(t);
+          return `<button type="button" class="hg-pick-item${why ? " taken" : ""}" data-to="${hgEsc(t.id)}"${why ? " disabled" : ""}>
+            <span class="hg-pick-name">${hgEsc(t.gearSet.trim() || "(no name)")} <span class="hg-set-badge">${hgSetLabel(t)}</span>${t.artifactType.trim() ? `<span class="hg-pick-note"> · ${hgEsc(t.artifactType.trim())}</span>` : ""}</span>
+            ${why ? `<span class="hg-pick-note">${why}</span>` : ""}
+          </button>`;
+        }).join("") : `<div class="hg-text hg-empty">No other gear sets in ${hgEsc(cls)} yet — add one first.</div>`}
+      </div>
+      <button type="button" class="btn btn-gold hg-picker-done" data-move-close>CANCEL</button>
+    </div>`;
+  hgMoveEl.querySelectorAll("[data-move-close]").forEach(b => b.addEventListener("click", hgCloseMoveMenu));
+  hgMoveEl.querySelectorAll("[data-to]").forEach(b => b.addEventListener("click", () => {
+    if (hgMoveHero(cls, fromId, b.dataset.to, hero.id)) {
+      const to = rows.find(r => String(r.id) === b.dataset.to);
+      hgCloseMoveMenu();
+      if (typeof setStatus === "function") setStatus(`✅ Moved ${hero.name || "hero"} to ${to?.gearSet.trim() || "gear set"}`);
+    }
+  }));
+  hgMoveEl.style.display = "flex";
+  document.body.classList.add("qd-factor-menu-open");
+}
+
+function hgCloseMoveMenu() {
+  if (hgMoveEl) hgMoveEl.style.display = "none";
+  document.body.classList.remove("qd-factor-menu-open");
+  renderHeroGear();
+}
+
+// ── Jump to a hero's gear in the Equipment Planner ─────────────────
+// Opens 🛡 Hero Equipment and Artifacts → the hero's class → Equipment
+// Planner, opens EVERY gear set the hero is in, and scrolls to the 4 set
+// (or, if they have no 4 set, their first 2 set). A hero in no gear set lands
+// on the class's "Not Fully Equipped Heroes" list, with their name flashed.
+// Returns false when this page has no drawer (Quick Draft page / companion
+// mode) so callers can fall back to the little popup.
+function hgJumpToHero(h) {
+  const handle = document.getElementById("hero-gear-handle");
+  const cls = h && h.role;
+  if (!handle || handle.offsetParent === null || !GEAR_CLASSES.includes(cls)) return false;
+
+  // Get the grid / popups out of the way.
+  if (typeof hgrClose === "function") hgrClose();
+  if (hgEquipEl) hgEquipEl.style.display = "none";
+  document.body.classList.remove("qd-factor-menu-open");
+
+  const wasOpen = hgOpen;
+  if (!hgOpen) handle.click(); // opens + renders the drawer
+  const rows = hgEffectiveRows(cls).filter(r => r.heroIds.some(x => String(x) === String(h.id)));
+  const four = rows.filter(r => r.setType !== "2").sort((a, b) => gearCmp(a.gearSet, b.gearSet));
+  const twos = rows.filter(r => r.setType === "2").sort((a, b) => gearCmp(a.gearSet, b.gearSet));
+  const first = four[0] || twos[0] || null;
+
+  hgOpenKeys.add(`c:${cls}`);
+  let targetKey;
+  if (first) {
+    hgOpenKeys.add(`s:${cls}:planner`);
+    [...four, ...twos].forEach(r => hgOpenKeys.add(`r:${cls}:${r.id}`));
+    targetKey = `r:${cls}:${first.id}`;
+  } else {
+    hgOpenKeys.add(`s:${cls}:notfull`);
+    targetKey = `s:${cls}:notfull`;
+  }
+  renderHeroGear();
+
+  // A drawer that was just opened is still sliding down, so wait for it before scrolling.
+  setTimeout(() => {
+    const find = key => [...document.querySelectorAll("#hero-gear-body details[data-key]")].find(d => d.dataset.key === key);
+    const target = find(targetKey);
+    if (!target) return;
+    target.scrollIntoView({ behavior: "smooth", block: "start" });
+    target.classList.remove("hg-flash"); void target.offsetWidth; target.classList.add("hg-flash");
+    const scope = first ? [...four, ...twos].map(r => find(`r:${cls}:${r.id}`)).filter(Boolean) : [target];
+    scope.forEach(d => d.querySelectorAll(".hg-hero-chip").forEach(c => {
+      if (c.dataset.hero === String(h.id)) { c.classList.remove("hg-chip-flash"); void c.offsetWidth; c.classList.add("hg-chip-flash"); }
+    }));
+  }, wasOpen ? 30 : 450);
+  return true;
+}
+
+// What the "E" buttons call: jump to the planner when this page has one,
+// otherwise show the quick popup.
+function hgEquipAction(h) {
+  if (!hgJumpToHero(h)) openHeroEquipment(h);
+}
+
+// "Find a hero" box under 🛡 Hero Equipment and Artifacts.
+function initHeroGearSearch() {
+  const input = document.getElementById("hg-hero-search");
+  const box = document.getElementById("hg-hero-results");
+  if (!input || !box) return;
+  const summary = h => {
+    if (!GEAR_CLASSES.includes(h.role)) return "No class set";
+    const rows = heroGear[h.role].planner.filter(r => r.heroIds.some(x => String(x) === String(h.id)));
+    if (!rows.length) return "No gear sets yet";
+    const f = rows.filter(r => r.setType !== "2").map(r => r.gearSet.trim() || "(no name)");
+    const t = rows.filter(r => r.setType === "2").map(r => r.gearSet.trim() || "(no name)");
+    return [f.length ? `4: ${f.join(", ")}` : "", t.length ? `2: ${t.join(", ")}` : ""].filter(Boolean).join(" · ");
+  };
+  const paint = () => {
+    const q = input.value.trim().toLowerCase();
+    if (!q) { box.innerHTML = ""; box.style.display = "none"; return; }
+    const list = heroes.filter(h => (h.name || "").toLowerCase().includes(q))
+      .sort((a, b) => gearCmp(a.name, b.name)).slice(0, 12);
+    box.style.display = "block";
+    box.innerHTML = list.length
+      ? list.map(h => `<button type="button" class="hg-search-item" data-id="${hgEsc(h.id)}">
+          ${hgAvatar(h)}
+          <span class="hg-search-main"><span class="hg-search-name">${hgEsc(h.name || "Unnamed")}</span>${h.role ? ` <span class="hg-pick-note">${hgEsc(h.role)}</span>` : ""}
+          <span class="hg-pick-note hg-search-sets">${hgEsc(summary(h))}</span></span>
+        </button>`).join("")
+      : `<div class="hg-text hg-empty hg-search-none">No heroes match “${hgEsc(input.value.trim())}”.</div>`;
+  };
+  input.addEventListener("input", paint);
+  input.addEventListener("keydown", e => {
+    if (e.key === "Escape") { input.value = ""; paint(); }
+    else if (e.key === "Enter") { box.querySelector(".hg-search-item")?.click(); }
+  });
+  box.addEventListener("click", e => {
+    const b = e.target.closest(".hg-search-item");
+    if (!b) return;
+    const h = heroes.find(x => String(x.id) === b.dataset.id);
+    if (!h) return;
+    input.value = ""; paint();
+    if (!hgJumpToHero(h)) openHeroEquipment(h);
+  });
+}
+
+// index.html?equip=<heroId> (from the Quick Draft page's popup) jumps straight
+// to that hero once the roster has loaded.
+(function () {
+  let id;
+  try { id = new URLSearchParams(location.search).get("equip"); } catch (e) { return; }
+  if (!id) return;
+  let tries = 0;
+  const attempt = () => {
+    const h = (typeof heroes !== "undefined" ? heroes : []).find(x => String(x.id) === id);
+    if (h && hgJumpToHero(h)) { try { history.replaceState(null, "", location.pathname); } catch (e) {} return; }
+    if (++tries < 40) setTimeout(attempt, 300);
+  };
+  setTimeout(attempt, 600);
+})();
+
 // ── Hero equipment popup (the "E" button on each roster card) ──────
 // Shows which 4 set and 2 set(s) a hero is equipped with, read from the
 // Equipment Planner rows of the hero's class that list them.
@@ -933,8 +1125,12 @@ function openHeroEquipment(h) {
         ? `<div class="hg-text hg-empty">This hero has no class set, so there's no equipment planner for them.</div>`
         : `${block("4 set", four)}${block("2 set" + (twos.length > 1 ? "s" : ""), twos)}
            <div class="hg-pick-note hg-equip-total">${used}/${HG_PIECE_LIMIT} pieces${used < HG_PIECE_LIMIT ? ` — ${HG_PIECE_LIMIT - used} open` : " — fully equipped"}</div>`}
+      ${known ? (document.getElementById("hero-gear-drawer")
+        ? `<button type="button" class="btn btn-ghost hg-picker-done" data-equip-jump>🛡 Open in Equipment Planner</button>`
+        : `<a class="btn btn-ghost hg-picker-done hg-equip-link" href="index.html?equip=${encodeURIComponent(h.id)}">🖥 Open in Equipment Planner (full site)</a>`) : ""}
       <button type="button" class="btn btn-gold hg-picker-done" data-equip-close>DONE</button>
     </div>`;
+  hgEquipEl.querySelector("[data-equip-jump]")?.addEventListener("click", () => hgJumpToHero(h));
   hgEquipEl.style.display = "flex";
   document.body.classList.add("qd-factor-menu-open");
 }
@@ -1109,6 +1305,7 @@ function initHeroGearRosterFilter() {
 
 function initHeroGear() {
   initHeroGearRosterFilter();
+  initHeroGearSearch();
   const handle = document.getElementById("hero-gear-handle");
   const drawer = document.getElementById("hero-gear-drawer");
   const body = document.getElementById("hero-gear-body");
