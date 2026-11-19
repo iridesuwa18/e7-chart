@@ -896,6 +896,8 @@ function hgCloseCopyMenu() {
 // without entering Edit mode. A set is greyed out if the hero is already in it
 // or the move would push them past 6 pieces.
 let hgMoveEl = null;
+let hgMoveCtx = null;      // { cls, fromId, heroId } while the move menu is open (restored after a rotate/reload)
+let hgEquipHeroId = null;  // hero shown in the equipment popup
 
 function hgMoveHero(cls, fromId, toId, heroId) {
   const rows = heroGear[cls].planner;
@@ -958,11 +960,13 @@ function hgOpenMoveMenu(cls, fromId, heroId) {
       if (typeof setStatus === "function") setStatus(`✅ Moved ${hero.name || "hero"} to ${to?.gearSet.trim() || "gear set"}`);
     }
   }));
+  hgMoveCtx = { cls, fromId, heroId: hero.id };
   hgMoveEl.style.display = "flex";
   document.body.classList.add("qd-factor-menu-open");
 }
 
 function hgCloseMoveMenu() {
+  hgMoveCtx = null;
   if (hgMoveEl) hgMoveEl.style.display = "none";
   document.body.classList.remove("qd-factor-menu-open");
   renderHeroGear();
@@ -1097,6 +1101,7 @@ function openHeroEquipment(h) {
     hgEquipEl.addEventListener("click", e => { if (e.target === hgEquipEl || e.target.closest("[data-equip-close]")) close(); });
     hgEquipEl.addEventListener("keydown", e => { if (e.key === "Escape") close(); });
   }
+  hgEquipHeroId = h.id;
   const cls = h.role;
   const known = GEAR_CLASSES.includes(cls);
   const rows = known ? heroGear[cls].planner.filter(r => r.heroIds.some(x => String(x) === String(h.id))) : [];

@@ -5557,3 +5557,21 @@ body.qd-factor-menu-open .overlay { z-index: 600; }
 
   body.qd-companion .quickdraft-inner { min-height: calc(100vh - 50px); min-height: calc(100dvh - 50px); }
 }
+
+
+/* Small popups (Move / Copy / Equipment): size to content, and let the list
+   scroll inside the panel — a fixed-height flex panel with a non-scrolling
+   list is what made long gear-set lists unreachable. */
+.qd-factor-menu-panel.hg-copy-panel {
+  height: auto;
+  max-height: 92vh; max-height: 92dvh;
+  overflow: hidden;
+}
+.hg-copy-panel .hg-picker-list {
+  flex: 1 1 auto; min-height: 0;
+  overflow-y: auto; -webkit-overflow-scrolling: touch;
+  overscroll-behavior: contain; touch-action: pan-y;
+}
+.hg-copy-panel .hg-copy-what, .hg-copy-panel .qd-factor-menu-header,
+.hg-copy-panel .hg-picker-done, .hg-copy-panel .hg-copy-actions { flex: 0 0 auto; }
+.hg-copy-panel .hg-equip-block { flex: 0 0 auto; }

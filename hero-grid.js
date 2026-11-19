@@ -227,3 +227,98 @@ function hgrRenderGrid() {
   const btn = document.getElementById("btn-roster-grid");
   if (btn) btn.addEventListener("click", hgrOpen);
 })();
+
+
+/* ═══════════════════════════════════════════════════════════════════
+   KEEP OPEN MENUS ACROSS ROTATION / RELOAD
+   Rotating a phone (or the app updating) can reload the page, which used
+   to drop whatever popup was open. The open menus — Hero Grid (with its
+   filters + scroll), Hero Details, the equipment popup, the move menu and
+   the Hero Equipment drawer (with its opened sections) — are remembered in
+   sessionStorage and put back once the roster has loaded. Per tab/app
+   session only, and forgotten after 15 minutes.
+═══════════════════════════════════════════════════════════════════ */
+(function () {
+  const KEY = "e7-ui-state-v1";
+  const MAX_AGE = 15 * 60 * 1000;
+  const vis = el => !!el && el.style.display !== "none" && el.style.display !== "";
+  let restoring = true;   // don't overwrite the saved state until we've tried restoring it
+  let last = "";
+
+  function snapshot() {
+    const s = {};
+    if (hgrIsOpen()) {
+      s.grid = {
+        scroll: document.querySelector("#hero-grid-panel .hf-scroll-body")?.scrollTop || 0,
+        rarity: [...filterRarity], role: [...filterRole], element: [...filterElement],
+        equip: [...filterEquip], equipMode: filterEquipMode, sort: rosterSort, search: rosterSearchQuery || "",
+      };
+    }
+    const det = document.getElementById("details-overlay");
+    if (det && det.classList.contains("open") && detailsHeroId != null) s.details = detailsHeroId;
+    if (vis(typeof hgEquipEl !== "undefined" ? hgEquipEl : null) && hgEquipHeroId != null) s.equip = hgEquipHeroId;
+    if (vis(typeof hgMoveEl !== "undefined" ? hgMoveEl : null) && hgMoveCtx) s.move = hgMoveCtx;
+    if (typeof hgOpen !== "undefined" && hgOpen) { s.drawer = true; s.keys = [...hgOpenKeys]; }
+    return s;
+  }
+
+  function save() {
+    if (restoring) return;
+    try {
+      const snap = snapshot();
+      const str = JSON.stringify(snap);
+      if (str === last) return;
+      last = str;
+      if (Object.keys(snap).length) sessionStorage.setItem(KEY, JSON.stringify({ t: Date.now(), s: snap }));
+      else sessionStorage.removeItem(KEY);
+    } catch (e) { /* storage unavailable — nothing to do */ }
+  }
+
+  function restore() {
+    let saved = null;
+    try { saved = JSON.parse(sessionStorage.getItem(KEY) || "null"); } catch (e) {}
+    if (!saved || !saved.s || Date.now() - saved.t > MAX_AGE) { restoring = false; return; }
+    const s = saved.s;
+    const heroById = id => heroes.find(h => String(h.id) === String(id));
+    try {
+      if (s.drawer && document.getElementById("hero-gear-handle")) {
+        (s.keys || []).forEach(k => hgOpenKeys.add(k));
+        if (!hgOpen) document.getElementById("hero-gear-handle").click();
+        else renderHeroGear();
+      }
+      if (s.grid) {
+        const g = s.grid;
+        const fill = (set, arr) => { set.clear(); (arr || []).forEach(v => set.add(v)); };
+        fill(filterRarity, g.rarity); fill(filterRole, g.role); fill(filterElement, g.element); fill(filterEquip, g.equip);
+        filterEquipMode = g.equipMode === "any" ? "any" : "all";
+        if (g.sort) rosterSort = g.sort;
+        rosterSearchQuery = g.search || "";
+        const si = document.getElementById("roster-search"); if (si) si.value = rosterSearchQuery;
+        const ss = document.getElementById("roster-sort"); if (ss && g.sort) ss.value = g.sort;
+        hgrSyncSidebar();
+        renderRoster();
+        hgrOpen();
+        const body = document.querySelector("#hero-grid-panel .hf-scroll-body");
+        if (body) body.scrollTop = g.scroll || 0;
+      }
+      if (s.details != null && heroById(s.details)) openHeroDetails(heroById(s.details));
+      if (s.equip != null && heroById(s.equip)) openHeroEquipment(heroById(s.equip));
+      if (s.move && s.move.cls) hgOpenMoveMenu(s.move.cls, s.move.fromId, String(s.move.heroId));
+    } catch (e) { console.warn("UI state restore failed", e); }
+    restoring = false;
+    save();
+  }
+
+  // Wait for the roster, then restore (give up after ~12s so saving can resume).
+  let tries = 0;
+  const attempt = () => {
+    if (typeof heroes !== "undefined" && heroes.length) { restore(); return; }
+    if (++tries < 40) setTimeout(attempt, 300);
+    else { restoring = false; }
+  };
+  setTimeout(attempt, 300);
+
+  setInterval(save, 800);
+  ["resize", "orientationchange", "pagehide"].forEach(ev => window.addEventListener(ev, save));
+  document.addEventListener("visibilitychange", () => { if (document.hidden) save(); });
+})();
