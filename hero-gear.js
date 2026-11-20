@@ -901,10 +901,10 @@ let hgEquipHeroId = null;  // hero shown in the equipment popup
 
 function hgMoveHero(cls, fromId, toId, heroId) {
   const rows = heroGear[cls].planner;
-  const from = rows.find(r => String(r.id) === String(fromId));
+  const from = fromId == null ? null : rows.find(r => String(r.id) === String(fromId));
   const to = rows.find(r => String(r.id) === String(toId));
-  if (!from || !to) return false;
-  from.heroIds = from.heroIds.filter(x => String(x) !== String(heroId));
+  if (!to || (fromId != null && !from)) return false;
+  if (from) from.heroIds = from.heroIds.filter(x => String(x) !== String(heroId));
   if (!to.heroIds.some(x => String(x) === String(heroId))) to.heroIds.push(heroId);
   hgOpenPath(cls, to.id);
   hgMarkChanged();
@@ -925,41 +925,72 @@ function hgOpenMoveMenu(cls, fromId, heroId) {
     hgMoveEl.addEventListener("click", e => { if (e.target === hgMoveEl) hgCloseMoveMenu(); });
     hgMoveEl.addEventListener("keydown", e => { if (e.key === "Escape") hgCloseMoveMenu(); });
   }
-  const others = rows.filter(r => String(r.id) !== String(fromId))
-    .sort((a, b) => gearCmp(a.gearSet, b.gearSet));
-  // Pieces the hero wears in every row except the one they leave and the one they join.
-  const piecesAfter = tgt => rows
-    .filter(r => String(r.id) !== String(fromId) && String(r.id) !== String(tgt.id) && r.heroIds.some(x => String(x) === String(heroId)))
+  const isTwo = r => r.setType === "2";
+  const has = r => r.heroIds.some(x => String(x) === String(heroId));
+  const byType = t => rows.filter(r => (t === "2") === isTwo(r)).sort((a, b) => gearCmp(a.gearSet, b.gearSet));
+  const TYPES = [{ t: "4", name: "4 set" }, { t: "2", name: "2 set" }];
+  // Which of the hero's current sets of each type a pick will replace
+  // (defaults to the row the ⇄ was opened from, for its own type).
+  const sel = {};
+  TYPES.forEach(({ t }) => {
+    const cur = byType(t).filter(has);
+    sel[t] = (String(from.setType === "2" ? "2" : "4") === t && cur.some(r => String(r.id) === String(fromId)))
+      ? fromId : (cur[0] ? cur[0].id : null);
+  });
+  // Pieces the hero would wear after swapping `leaveId` (may be null) for `tgt`.
+  const piecesAfter = (tgt, leaveId) => rows
+    .filter(r => has(r) && String(r.id) !== String(tgt.id) && String(r.id) !== String(leaveId))
     .reduce((n, r) => n + hgRowPieces(r), 0) + hgRowPieces(tgt);
-  const reason = t => t.heroIds.some(x => String(x) === String(heroId)) ? "Already in it"
-    : piecesAfter(t) > HG_PIECE_LIMIT ? `Over ${HG_PIECE_LIMIT} pieces` : "";
+  const nm = r => hgEsc(r.gearSet.trim() || "(no name)");
 
-  hgMoveEl.innerHTML = `
+  const section = ({ t, name }) => {
+    const all = byType(t);
+    const cur = all.filter(has);
+    const curHtml = !cur.length
+      ? `<span class="hg-pick-note">None assigned — picking one adds it</span>`
+      : cur.length === 1
+        ? `<b>${nm(cur[0])}</b>`
+        : cur.map(r => `<button type="button" class="hg-move-cur${String(r.id) === String(sel[t]) ? " on" : ""}" data-sel="${t}:${hgEsc(r.id)}">${nm(r)}</button>`).join("");
+    return `<div class="hg-move-sec">
+      <div class="hg-move-head"><span class="hg-set-badge">${name}</span> <span class="hg-move-current">Using: ${curHtml}</span></div>
+      ${cur.length > 1 ? `<div class="hg-pick-note">Tap the one you want to replace, then pick below.</div>` : ""}
+      ${all.length ? all.map(r => {
+        const mine = has(r);
+        const over = !mine && piecesAfter(r, sel[t]) > HG_PIECE_LIMIT;
+        const why = mine ? "Current" : over ? `Over ${HG_PIECE_LIMIT} pieces` : "";
+        return `<button type="button" class="hg-pick-item${why ? " taken" : ""}${mine ? " on" : ""}" data-to="${hgEsc(r.id)}" data-type="${t}"${why ? " disabled" : ""}>
+          <span class="hg-pick-name">${nm(r)}${r.artifactType.trim() ? `<span class="hg-pick-note"> · ${hgEsc(r.artifactType.trim())}</span>` : ""}${t === "2" ? ` <span class="hg-pick-note">×${Number(r.setCount) || 1}</span>` : ""}</span>
+          ${why ? `<span class="hg-pick-note">${why}</span>` : ""}
+        </button>`;
+      }).join("") : `<div class="hg-text hg-empty">No ${name}s in ${hgEsc(cls)} yet — add one first.</div>`}
+    </div>`;
+  };
+
+  const paint = () => {
+    hgMoveEl.innerHTML = `
     <div class="qd-factor-menu-panel hg-copy-panel">
       <div class="qd-factor-menu-header">
-        <div class="qd-factor-menu-title">⇄ Move ${hgEsc(hero.name || "hero")}</div>
+        <div class="qd-factor-menu-title">⇄ ${hgEsc(hero.name || "Hero")}'s gear sets</div>
         <button type="button" class="qd-factor-menu-close" data-move-close aria-label="Close">✕</button>
       </div>
-      <div class="hg-text hg-copy-what">From <b>${hgEsc(from.gearSet.trim() || "(no name)")}</b> <span class="hg-set-badge">${hgSetLabel(from)}</span><br><span class="hg-pick-note">Pick the gear set to move them to.</span></div>
-      <div class="hg-picker-list">
-        ${others.length ? others.map(t => {
-          const why = reason(t);
-          return `<button type="button" class="hg-pick-item${why ? " taken" : ""}" data-to="${hgEsc(t.id)}"${why ? " disabled" : ""}>
-            <span class="hg-pick-name">${hgEsc(t.gearSet.trim() || "(no name)")} <span class="hg-set-badge">${hgSetLabel(t)}</span>${t.artifactType.trim() ? `<span class="hg-pick-note"> · ${hgEsc(t.artifactType.trim())}</span>` : ""}</span>
-            ${why ? `<span class="hg-pick-note">${why}</span>` : ""}
-          </button>`;
-        }).join("") : `<div class="hg-text hg-empty">No other gear sets in ${hgEsc(cls)} yet — add one first.</div>`}
-      </div>
-      <button type="button" class="btn btn-gold hg-picker-done" data-move-close>CANCEL</button>
+      <div class="hg-picker-list">${TYPES.map(section).join("")}</div>
+      <button type="button" class="btn btn-gold hg-picker-done" data-move-close>DONE</button>
     </div>`;
-  hgMoveEl.querySelectorAll("[data-move-close]").forEach(b => b.addEventListener("click", hgCloseMoveMenu));
-  hgMoveEl.querySelectorAll("[data-to]").forEach(b => b.addEventListener("click", () => {
-    if (hgMoveHero(cls, fromId, b.dataset.to, hero.id)) {
-      const to = rows.find(r => String(r.id) === b.dataset.to);
-      hgCloseMoveMenu();
-      if (typeof setStatus === "function") setStatus(`✅ Moved ${hero.name || "hero"} to ${to?.gearSet.trim() || "gear set"}`);
-    }
-  }));
+    hgMoveEl.querySelectorAll("[data-move-close]").forEach(b => b.addEventListener("click", hgCloseMoveMenu));
+    hgMoveEl.querySelectorAll("[data-sel]").forEach(b => b.addEventListener("click", () => {
+      const [t, id] = b.dataset.sel.split(":"); sel[t] = rows.find(r => String(r.id) === id)?.id ?? sel[t];
+      const sc = hgMoveEl.querySelector(".hg-picker-list")?.scrollTop || 0; paint();
+      const l = hgMoveEl.querySelector(".hg-picker-list"); if (l) l.scrollTop = sc;
+    }));
+    hgMoveEl.querySelectorAll("[data-to]").forEach(b => b.addEventListener("click", () => {
+      const t = b.dataset.type, to = rows.find(r => String(r.id) === b.dataset.to);
+      if (to && hgMoveHero(cls, sel[t], to.id, hero.id)) {
+        hgCloseMoveMenu();
+        if (typeof setStatus === "function") setStatus(`✅ ${hero.name || "Hero"}: ${t} set → ${to.gearSet.trim() || "gear set"}`);
+      }
+    }));
+  };
+  paint();
   hgMoveCtx = { cls, fromId, heroId: hero.id };
   hgMoveEl.style.display = "flex";
   document.body.classList.add("qd-factor-menu-open");
