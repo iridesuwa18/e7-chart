@@ -23538,8 +23538,53 @@
           "refId": 1788783486720
         }
       ],
-      "_x": 50,
+      "_x": 5.5,
       "_y": 52.9
+    },
+    {
+      "id": 1795222642178,
+      "name": "Bunny Girl Maid Cecilia",
+      "rarity": "5r",
+      "role": "Soul Weaver",
+      "element": "Earth",
+      "notes": "",
+      "iconData": "https://raw.githubusercontent.com/iridesuwa18/e7-chart/data/assets/heroes/bunny-girl-maid-cecilia.webp",
+      "locked": true,
+      "pvpTag": false,
+      "altStats": null,
+      "selfishScore": 3,
+      "selflessScore": 0,
+      "selfSkillIds": [
+        "decCr",
+        "spdCr",
+        "lifesteal"
+      ],
+      "allySupport": [],
+      "reactions": [
+        {
+          "refId": 1788780122184
+        }
+      ],
+      "engagements": [
+        {
+          "refId": 1788780430787
+        },
+        {
+          "refId": 1788772163166
+        },
+        {
+          "refId": 1788786336798
+        },
+        {
+          "refId": 1788785021751
+        },
+        {
+          "refId": 1788772268160
+        }
+      ],
+      "_x": 50,
+      "_y": 35,
+      "needsRerating": false
     }
   ],
   "draftData": {
@@ -29643,5 +29688,5 @@
     }
   },
   "schemaVersion": 2,
-  "savedAt": "2026-11-21T00:55:36.775Z"
+  "savedAt": "2026-11-21T01:01:03.465Z"
 }
